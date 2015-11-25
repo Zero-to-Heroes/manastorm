@@ -1,0 +1,53 @@
+React = require 'react'
+
+class Timeline extends React.Component
+	componentDidMount: ->
+		@int = setInterval((=> @forceUpdate()), 500)
+
+	componentWillUnmount: ->
+		clearInterval(@int)
+
+	render: ->
+		replay = @props.replay
+
+		length = replay.getTotalLength()
+		totalSeconds = "" + Math.floor(length % 60)
+		if totalSeconds.length < 2
+			totalSeconds = "0" + totalSeconds
+		totalMinutes = Math.floor(length / 60)
+		if totalMinutes.length < 2
+			totalMinutes = "0" + totalMinutes
+
+		position = replay.getElapsed()
+		elapsedSeconds = "" + Math.floor(position % 60)
+		if elapsedSeconds.length < 2
+			elapsedSeconds = "0" + elapsedSeconds
+		elapsedMinutes = Math.floor(position / 60)
+		if elapsedMinutes.length < 2
+			elapsedMinutes = "0" + elapsedMinutes
+
+		handleStyle =
+			width: ((position / length) * 100) + '%'
+
+		remaining = Math.floor(length - position)
+		remainingSeconds = ""+(remaining % 60)
+		if remainingSeconds.length < 2
+			remainingSeconds = "0" + remainingSeconds
+		remainingMinutes = Math.floor(remaining / 60)
+
+		<div className="timeline">
+			<div className="timeline-container">
+				<div className="time-display">{elapsedMinutes}:{elapsedSeconds}</div>
+				<div className="scrub-bar" onClick={this.handleClick}>
+					<div className="slider">
+						<div className="current-time" style={handleStyle}></div>
+					</div>
+				</div>
+				<div className="time-display">{totalMinutes}:{totalSeconds}</div>
+			</div>
+		</div>
+
+	handleClick: (e) ->
+		console.log 'clicked on timeline', e
+
+module.exports = Timeline
