@@ -24,6 +24,7 @@ class ReplayPlayer extends EventEmitter
 		@currentReplayTime = 0
 
 		@started = false
+		@speed = 1
 		window.replay = this
 		console.log 'player constructed'
 
@@ -34,18 +35,26 @@ class ReplayPlayer extends EventEmitter
 		console.log 'running player'
 		# @parser.parse(this)
 		console.log 'parsed game'
-		@frequency = @initialFrequency || 200
+		@frequency = 200
+		@speed = @initialSpeed || 1
 		setInterval((=> @update()), @frequency)
 
 	start: (timestamp) ->
-		console.log 'starting game'
+		console.log 'starting game at timestamp', timestamp
 		@startTimestamp = timestamp
 		@started = true
 
 	pause: ->
 		console.log 'pausing in replay-plyaer'
-		@initialFrequency = @frequency
-		@frequency = 0
+		@initialSpeed = @speed
+		@speed = 0
+
+	changeSpeed: (speed) ->
+		console.log 'changing speed in replay', speed
+		@speed = speed
+
+	getSpeed: ->
+		@speed
 
 	getTotalLength: ->
 		return @history[@history.length - 1].timestamp - @startTimestamp
@@ -60,9 +69,14 @@ class ReplayPlayer extends EventEmitter
 	getTimestamps: ->
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
+	moveTime: (progression) ->
+		target = @getTotalLength() * progression
+		console.log 'moving to', target
+		@currentReplayTime = target * 1000
+
 	update: ->
 		# console.log 'on update', this
-		@currentReplayTime += @frequency
+		@currentReplayTime += @frequency * @speed
 		elapsed = @getElapsed()
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp

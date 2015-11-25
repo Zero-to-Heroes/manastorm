@@ -1787,6 +1787,7 @@
   display: table-cell;
   color: #2E2E2E;
   width: 50px;
+  padding-top: 10px;
 }
 .hearthstone #externalPlayer .timeline .scrub-bar {
   cursor: pointer;
@@ -1799,7 +1800,7 @@
 .hearthstone #externalPlayer .scrub-bar .slider {
   vertical-align: middle;
   margin-top: 24px;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
   height: 2px;
   cursor: pointer;
   background-color: #000;
@@ -1807,6 +1808,11 @@
 .hearthstone #externalPlayer .scrub-bar .current-time {
   background-color: #fff;
   height: 2px;
+}
+.hearthstone #externalPlayer .replay__controls .playback-speed {
+  display: table-cell;
+  width: 70px;
+  vertical-align: middle;
 }
 .hearthstone #externalPlayer .title-bar {
   display: none;

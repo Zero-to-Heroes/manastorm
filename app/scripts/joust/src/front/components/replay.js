@@ -120,24 +120,52 @@
         "onClick": this.onClickFastForward
       })), React.createElement(Timeline, {
         "replay": replay
-      })), React.createElement("div", {
+      }), React.createElement("div", {
+        "className": "playback-speed"
+      }, React.createElement("div", {
+        "className": "dropup"
+      }, React.createElement("button", {
+        "className": "btn btn-default dropdown-toggle ng-binding",
+        "type": "button",
+        "id": "dropdownMenu1",
+        "data-toggle": "dropdown",
+        "aria-haspopup": "true",
+        "aria-expanded": "true"
+      }, " ", this.state.replay.getSpeed(), " ", React.createElement("span", {
+        "className": "caret"
+      }), " "), React.createElement("ul", {
+        "className": "dropdown-menu",
+        "aria-labelledby": "dropdownMenu1"
+      }, React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 1)
+      }, "\"1x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 2)
+      }, "\"2x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 4)
+      }, "\"4x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 8)
+      }, "\"8x\"")))))), React.createElement("div", {
         "className": "replay__game"
       }, top, bottom));
     };
 
     Replay.prototype.onClickPause = function(e) {
-      console.log('pausing', this.state);
       e.preventDefault();
       return this.state.replay.pause();
     };
 
     Replay.prototype.onClickPlay = function(e) {
-      console.log('clicked on play, running', this.state);
       e.preventDefault();
       return this.state.replay.run();
     };
 
     Replay.prototype.onClickFastForward = function() {};
+
+    Replay.prototype.onClickChangeSpeed = function(speed) {
+      console.log('changing speed', speed);
+      this.state.replay.changeSpeed(speed);
+      return this.forceUpdate();
+    };
 
     return Replay;
 

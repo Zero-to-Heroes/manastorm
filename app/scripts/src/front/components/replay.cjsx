@@ -73,6 +73,18 @@ class Replay extends React.Component
 				</ButtonGroup>
 
 				<Timeline replay={replay} />
+
+				<div className="playback-speed">
+					<div className="dropup"> 
+						<button className="btn btn-default dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.getSpeed()}x <span className="caret"></span> </button> 
+						<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
+							<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
+							<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
+							<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
+							<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
+						</ul> 
+					</div>
+				</div>
 			</form>
 			<div className="replay__game">
 				{top}
@@ -81,15 +93,19 @@ class Replay extends React.Component
 		</div>
 
 	onClickPause: (e) =>
-		console.log 'pausing', @state
 		e.preventDefault()
 		@state.replay.pause()
 
 	onClickPlay: (e) =>
-		console.log 'clicked on play, running', @state
 		e.preventDefault()
 		@state.replay.run()
 
 	onClickFastForward: ->
+
+	onClickChangeSpeed: (speed) ->
+		console.log 'changing speed', speed
+		@state.replay.changeSpeed speed
+		@forceUpdate()
+
 
 module.exports = Replay

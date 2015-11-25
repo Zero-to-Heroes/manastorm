@@ -27,6 +27,7 @@
     Timeline.prototype.render = function() {
       var elapsedMinutes, elapsedSeconds, handleStyle, length, position, remaining, remainingMinutes, remainingSeconds, replay, totalMinutes, totalSeconds;
       replay = this.props.replay;
+      this.replay = replay;
       length = replay.getTotalLength();
       totalSeconds = "" + Math.floor(length % 60);
       if (totalSeconds.length < 2) {
@@ -74,7 +75,15 @@
     };
 
     Timeline.prototype.handleClick = function(e) {
-      return console.log('clicked on timeline', e);
+      var element, left, progression;
+      left = 0;
+      element = e.target;
+      while (element !== null) {
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+      }
+      progression = (e.clientX - left) / e.target.offsetWidth;
+      return this.replay.moveTime(progression);
     };
 
     return Timeline;

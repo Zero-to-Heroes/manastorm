@@ -164,24 +164,52 @@
         "onClick": this.onClickFastForward
       })), React.createElement(Timeline, {
         "replay": replay
-      })), React.createElement("div", {
+      }), React.createElement("div", {
+        "className": "playback-speed"
+      }, React.createElement("div", {
+        "className": "dropup"
+      }, React.createElement("button", {
+        "className": "btn btn-default dropdown-toggle ng-binding",
+        "type": "button",
+        "id": "dropdownMenu1",
+        "data-toggle": "dropdown",
+        "aria-haspopup": "true",
+        "aria-expanded": "true"
+      }, " ", this.state.replay.getSpeed(), " ", React.createElement("span", {
+        "className": "caret"
+      }), " "), React.createElement("ul", {
+        "className": "dropdown-menu",
+        "aria-labelledby": "dropdownMenu1"
+      }, React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 1)
+      }, "\"1x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 2)
+      }, "\"2x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 4)
+      }, "\"4x\"")), React.createElement("li", null, React.createElement("a", {
+        "onClick": this.onClickChangeSpeed.bind(this, 8)
+      }, "\"8x\"")))))), React.createElement("div", {
         "className": "replay__game"
       }, top, bottom));
     };
 
     Replay.prototype.onClickPause = function(e) {
-      console.log('pausing', this.state);
       e.preventDefault();
       return this.state.replay.pause();
     };
 
     Replay.prototype.onClickPlay = function(e) {
-      console.log('clicked on play, running', this.state);
       e.preventDefault();
       return this.state.replay.run();
     };
 
     Replay.prototype.onClickFastForward = function() {};
+
+    Replay.prototype.onClickChangeSpeed = function(speed) {
+      console.log('changing speed', speed);
+      this.state.replay.changeSpeed(speed);
+      return this.forceUpdate();
+    };
 
     return Replay;
 
@@ -807,6 +835,7 @@
     Timeline.prototype.render = function() {
       var elapsedMinutes, elapsedSeconds, handleStyle, length, position, remaining, remainingMinutes, remainingSeconds, replay, totalMinutes, totalSeconds;
       replay = this.props.replay;
+      this.replay = replay;
       length = replay.getTotalLength();
       totalSeconds = "" + Math.floor(length % 60);
       if (totalSeconds.length < 2) {
@@ -854,7 +883,15 @@
     };
 
     Timeline.prototype.handleClick = function(e) {
-      return console.log('clicked on timeline', e);
+      var element, left, progression;
+      left = 0;
+      element = e.target;
+      while (element !== null) {
+        left += element.offsetLeft || 0;
+        element = element.offsetParent;
+      }
+      progression = (e.clientX - left) / e.target.offsetWidth;
+      return this.replay.moveTime(progression);
     };
 
     return Timeline;
@@ -1760,6 +1797,7 @@
       this.startTime = (new Date).getTime();
       this.currentReplayTime = 0;
       this.started = false;
+      this.speed = 1;
       window.replay = this;
       console.log('player constructed');
     }
@@ -1771,7 +1809,8 @@
     ReplayPlayer.prototype.run = function() {
       console.log('running player');
       console.log('parsed game');
-      this.frequency = this.initialFrequency || 200;
+      this.frequency = 200;
+      this.speed = this.initialSpeed || 1;
       return setInterval(((function(_this) {
         return function() {
           return _this.update();
@@ -1780,15 +1819,24 @@
     };
 
     ReplayPlayer.prototype.start = function(timestamp) {
-      console.log('starting game');
+      console.log('starting game at timestamp', timestamp);
       this.startTimestamp = timestamp;
       return this.started = true;
     };
 
     ReplayPlayer.prototype.pause = function() {
       console.log('pausing in replay-plyaer');
-      this.initialFrequency = this.frequency;
-      return this.frequency = 0;
+      this.initialSpeed = this.speed;
+      return this.speed = 0;
+    };
+
+    ReplayPlayer.prototype.changeSpeed = function(speed) {
+      console.log('changing speed in replay', speed);
+      return this.speed = speed;
+    };
+
+    ReplayPlayer.prototype.getSpeed = function() {
+      return this.speed;
     };
 
     ReplayPlayer.prototype.getTotalLength = function() {
@@ -1807,9 +1855,16 @@
       })(this));
     };
 
+    ReplayPlayer.prototype.moveTime = function(progression) {
+      var target;
+      target = this.getTotalLength() * progression;
+      console.log('moving to', target);
+      return this.currentReplayTime = target * 1000;
+    };
+
     ReplayPlayer.prototype.update = function() {
       var elapsed, results;
-      this.currentReplayTime += this.frequency;
+      this.currentReplayTime += this.frequency * this.speed;
       elapsed = this.getElapsed();
       results = [];
       while (this.historyPosition < this.history.length) {

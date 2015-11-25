@@ -9,6 +9,7 @@ class Timeline extends React.Component
 
 	render: ->
 		replay = @props.replay
+		@replay = replay
 
 		length = replay.getTotalLength()
 		totalSeconds = "" + Math.floor(length % 60)
@@ -48,6 +49,13 @@ class Timeline extends React.Component
 		</div>
 
 	handleClick: (e) ->
-		console.log 'clicked on timeline', e
+		left = 0
+		element = e.target
+		while (element != null) 
+			left += (element.offsetLeft || 0)
+			element = element.offsetParent
+
+		progression = (e.clientX - left) / e.target.offsetWidth
+		@replay.moveTime(progression)
 
 module.exports = Timeline
