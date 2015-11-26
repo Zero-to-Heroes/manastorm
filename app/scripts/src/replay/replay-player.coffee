@@ -8,6 +8,10 @@ class ReplayPlayer extends EventEmitter
 	constructor: (@parser) ->
 		EventEmitter.call(this)
 
+		window.replay = this
+		console.log 'player constructed'
+
+	init: ->
 		@entities = {}
 		@players = []
 
@@ -25,10 +29,7 @@ class ReplayPlayer extends EventEmitter
 
 		@started = false
 		@speed = 1
-		window.replay = this
-		console.log 'player constructed'
 
-	init: ->
 		@parser.parse(this)
 
 	run: ->
@@ -37,10 +38,11 @@ class ReplayPlayer extends EventEmitter
 		console.log 'parsed game'
 		@frequency = 200
 		@speed = @initialSpeed || 1
-		setInterval((=> @update()), @frequency)
+		@interval = setInterval((=> @update()), @frequency)
 
 	start: (timestamp) ->
 		console.log 'starting game at timestamp', timestamp
+		# The timestamp recorded by the game for the beginning, don't tpich this
 		@startTimestamp = timestamp
 		@started = true
 
@@ -70,29 +72,53 @@ class ReplayPlayer extends EventEmitter
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
 	moveTime: (progression) ->
-		target = @getTotalLength() * progression
+		target = @getTotalLength() * progression * 1000
 		console.log 'moving to', target
-		@currentReplayTime = target * 1000
+		@goToTimestamp target
+
+	goToTimestamp: (timestamp) ->
+		initialSpeed = @speed
+
+		if (timestamp < @currentReplayTime)
+			console.log 'resetting'
+			@init()
+			@historyPosition = 0
+
+		@start(@startTimestamp)
+
+		if (!@interval)
+			console.log 'running the game'
+			@run()
+			@changeSpeed(initialSpeed)
+
+		console.log 'going to timestamp in replay', timestamp
+		@currentReplayTime = timestamp
+
+		@emit 'moved-timestamp'
 
 	update: ->
 		# console.log 'on update', this
 		@currentReplayTime += @frequency * @speed
+		if (@currentReplayTime >= @getTotalLength() * 1000)
+			@currentReplayTime = @getTotalLength() * 1000
+
 		elapsed = @getElapsed()
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
+				#console.log 'processing ', @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else
 				break
 
 	receiveGameEntity: (definition) ->
-		console.log 'receiving game entity', definition
+		#console.log 'receiving game entity', definition
 		entity = new Entity(this)
 		@game = @entities[definition.id] = entity
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		console.log 'receiving player', definition
+		#console.log 'receiving player', definition
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
@@ -103,7 +129,7 @@ class ReplayPlayer extends EventEmitter
 			@opponent = entity
 
 	receiveEntity: (definition) ->
-		# console.log 'receiving entity', definition
+		#console.log 'receiving entity', definition
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else
@@ -119,6 +145,7 @@ class ReplayPlayer extends EventEmitter
 				@opponent = entity.getController()
 				@player = @opponent.getOpponent()
 
+			console.log 'emitting player-ready event'
 			@emit 'players-ready'
 
 	receiveTagChange: (change) ->
@@ -129,7 +156,6 @@ class ReplayPlayer extends EventEmitter
 			entity = @entities[change.entity]
 			entity.update tags: tags
 		else
-
 			entity = @entities[change.entity] = new Entity {
 				id: change.entity
 				tags: tags

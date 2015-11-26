@@ -20,6 +20,11 @@
     function ReplayPlayer(parser) {
       this.parser = parser;
       EventEmitter.call(this);
+      window.replay = this;
+      console.log('player constructed');
+    }
+
+    ReplayPlayer.prototype.init = function() {
       this.entities = {};
       this.players = [];
       this.game = null;
@@ -33,11 +38,6 @@
       this.currentReplayTime = 0;
       this.started = false;
       this.speed = 1;
-      window.replay = this;
-      console.log('player constructed');
-    }
-
-    ReplayPlayer.prototype.init = function() {
       return this.parser.parse(this);
     };
 
@@ -46,7 +46,7 @@
       console.log('parsed game');
       this.frequency = 200;
       this.speed = this.initialSpeed || 1;
-      return setInterval(((function(_this) {
+      return this.interval = setInterval(((function(_this) {
         return function() {
           return _this.update();
         };
@@ -92,14 +92,36 @@
 
     ReplayPlayer.prototype.moveTime = function(progression) {
       var target;
-      target = this.getTotalLength() * progression;
+      target = this.getTotalLength() * progression * 1000;
       console.log('moving to', target);
-      return this.currentReplayTime = target * 1000;
+      return this.goToTimestamp(target);
+    };
+
+    ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
+      var initialSpeed;
+      initialSpeed = this.speed;
+      if (timestamp < this.currentReplayTime) {
+        console.log('resetting');
+        this.init();
+        this.historyPosition = 0;
+      }
+      this.start(this.startTimestamp);
+      if (!this.interval) {
+        console.log('running the game');
+        this.run();
+        this.changeSpeed(initialSpeed);
+      }
+      console.log('going to timestamp in replay', timestamp);
+      this.currentReplayTime = timestamp;
+      return this.emit('moved-timestamp');
     };
 
     ReplayPlayer.prototype.update = function() {
       var elapsed, results;
       this.currentReplayTime += this.frequency * this.speed;
+      if (this.currentReplayTime >= this.getTotalLength() * 1000) {
+        this.currentReplayTime = this.getTotalLength() * 1000;
+      }
       elapsed = this.getElapsed();
       results = [];
       while (this.historyPosition < this.history.length) {
@@ -115,7 +137,6 @@
 
     ReplayPlayer.prototype.receiveGameEntity = function(definition) {
       var entity;
-      console.log('receiving game entity', definition);
       entity = new Entity(this);
       this.game = this.entities[definition.id] = entity;
       return entity.update(definition);
@@ -123,7 +144,6 @@
 
     ReplayPlayer.prototype.receivePlayer = function(definition) {
       var entity;
-      console.log('receiving player', definition);
       entity = new Player(this);
       this.entities[definition.id] = entity;
       this.players.push(entity);
@@ -152,6 +172,7 @@
           this.opponent = entity.getController();
           this.player = this.opponent.getOpponent();
         }
+        console.log('emitting player-ready event');
         return this.emit('players-ready');
       }
     };

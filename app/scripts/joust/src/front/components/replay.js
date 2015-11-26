@@ -40,6 +40,7 @@
     function Replay(props) {
       this.onClickPlay = __bind(this.onClickPlay, this);
       this.onClickPause = __bind(this.onClickPause, this);
+      this.callback = __bind(this.callback, this);
       Replay.__super__.constructor.call(this, props);
       console.log('initializing replay');
       this.state = {
@@ -48,7 +49,13 @@
       console.log('state', this.state);
       this.sub = subscribe(this.state.replay, 'players-ready', (function(_this) {
         return function() {
-          return _this.forceUpdate();
+          return _this.callback;
+        };
+      })(this));
+      this.sub = subscribe(this.state.replay, 'moved-timestamp', (function(_this) {
+        return function() {
+          console.log('receiving moved-timestamp');
+          return setTimeout(_this.callback, 1000);
         };
       })(this));
       console.log('sub', this.sub);
@@ -56,7 +63,13 @@
     }
 
     Replay.prototype.componentWillUnmount = function() {
+      console.log('Replay will unmount');
       return this.sub.off();
+    };
+
+    Replay.prototype.callback = function() {
+      console.log('forcing update');
+      return this.forceUpdate();
     };
 
     Replay.prototype.render = function() {
@@ -64,7 +77,7 @@
       replay = this.state.replay;
       console.log('rendering in replay', replay);
       if (replay.players.length === 2) {
-        console.log('All players are here');
+        console.log('All players are here', replay.opponent, replay.player);
         top = React.createElement("div", {
           "className": "top"
         }, React.createElement(PlayerName, {
@@ -106,7 +119,8 @@
       }
       console.log('top and bottom are', top, bottom);
       return React.createElement("div", {
-        "className": "replay"
+        "className": "replay",
+        "key": replay.resetCounter
       }, React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
@@ -115,9 +129,6 @@
       }), React.createElement(Button, {
         "glyph": "play",
         "onClick": this.onClickPlay
-      }), React.createElement(Button, {
-        "glyph": "fast-forward",
-        "onClick": this.onClickFastForward
       })), React.createElement(Timeline, {
         "replay": replay
       }), React.createElement("div", {
@@ -131,20 +142,20 @@
         "data-toggle": "dropdown",
         "aria-haspopup": "true",
         "aria-expanded": "true"
-      }, " ", this.state.replay.getSpeed(), " ", React.createElement("span", {
+      }, " ", this.state.replay.getSpeed(), "x ", React.createElement("span", {
         "className": "caret"
       }), " "), React.createElement("ul", {
         "className": "dropdown-menu",
         "aria-labelledby": "dropdownMenu1"
       }, React.createElement("li", null, React.createElement("a", {
         "onClick": this.onClickChangeSpeed.bind(this, 1)
-      }, "\"1x\"")), React.createElement("li", null, React.createElement("a", {
+      }, "1x")), React.createElement("li", null, React.createElement("a", {
         "onClick": this.onClickChangeSpeed.bind(this, 2)
-      }, "\"2x\"")), React.createElement("li", null, React.createElement("a", {
+      }, "2x")), React.createElement("li", null, React.createElement("a", {
         "onClick": this.onClickChangeSpeed.bind(this, 4)
-      }, "\"4x\"")), React.createElement("li", null, React.createElement("a", {
+      }, "4x")), React.createElement("li", null, React.createElement("a", {
         "onClick": this.onClickChangeSpeed.bind(this, 8)
-      }, "\"8x\"")))))), React.createElement("div", {
+      }, "8x")))))), React.createElement("div", {
         "className": "replay__game"
       }, top, bottom));
     };
@@ -158,8 +169,6 @@
       e.preventDefault();
       return this.state.replay.run();
     };
-
-    Replay.prototype.onClickFastForward = function() {};
 
     Replay.prototype.onClickChangeSpeed = function(speed) {
       console.log('changing speed', speed);
