@@ -31,7 +31,7 @@ class HSReplayParser
 		console.log 'replay parsed', @replay
 
 	rootState: (node) ->
-		# console.log '\tparsing node', node.name, node
+		#console.log '\tparsing node', node.name, node
 		switch node.name
 			when 'Game'
 				@replay.start(tsToSeconds(node.attributes.ts))

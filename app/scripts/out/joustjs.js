@@ -1488,6 +1488,7 @@
     };
 
     HSReplayParser.prototype.rootState = function(node) {
+      console.log('\tparsing node', node.name, node);
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
@@ -2115,9 +2116,9 @@
 var joustjs = {
 
 	init: function(config, review) {
-		$.get('/replay.xml', function(replayXml) {
-			joustjs.loadReplay(replayXml);
-		});
+		console.log('init joustjs', review.replayXml, review);
+		var replayXml = review.replayXml;
+		joustjs.loadReplay(replayXml);
 	},
 
 	loadReplay: function(replayXml) {

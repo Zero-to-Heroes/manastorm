@@ -47,6 +47,7 @@
     };
 
     HSReplayParser.prototype.rootState = function(node) {
+      console.log('\tparsing node', node.name, node);
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
