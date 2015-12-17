@@ -47,7 +47,6 @@
     };
 
     HSReplayParser.prototype.rootState = function(node) {
-      console.log('\tparsing node', node.name, node);
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
@@ -159,6 +158,7 @@
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
+            this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
           }
           if (node.attributes.name) {
             return this.entityDefinition.name = node.attributes.name;

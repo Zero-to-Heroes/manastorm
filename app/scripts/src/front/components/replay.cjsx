@@ -20,33 +20,27 @@ class Replay extends React.Component
 	constructor: (props) ->
 		super(props)
 
-		console.log 'initializing replay'
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
-		console.log('state', @state)
 
 		@sub = subscribe @state.replay, 'players-ready', => @callback
 
 		@sub = subscribe @state.replay, 'moved-timestamp', =>
-			console.log 'receiving moved-timestamp'
 			setTimeout @callback, 1000
 
 		console.log('sub', @sub)
 		@state.replay.init()
 
 	componentWillUnmount: ->
-		console.log 'Replay will unmount'
 		@sub.off()
 
 	callback: =>
-		console.log 'forcing update'
 		@forceUpdate()
 
 	render: ->
 		replay = @state.replay
-		console.log('rendering in replay', replay)
 
 		if replay.players.length == 2
-			console.log 'All players are here', replay.opponent, replay.player
+			replay.decidePlayerOpponent()
 
 			top = <div className="top">
 				<PlayerName entity={replay.opponent} />
@@ -70,12 +64,16 @@ class Replay extends React.Component
 				<Hand entity={replay.player} />
 			</div>
 
-		console.log 'top and bottom are', top, bottom
+		playButton = <Button glyph="play" onClick={@onClickPlay} />
+
+		console.log 'speed', @state.replay.getSpeed()
+		if (@state.replay.interval > 0 && @state.replay.getSpeed() > 0)
+			playButton = <Button glyph="pause" onClick={@onClickPause}/>
+
 		return <div className="replay" key={replay.resetCounter}>
 					<form className="replay__controls padded">
 						<ButtonGroup>
-							<Button glyph="pause" onClick={@onClickPause}/>
-							<Button glyph="play" onClick={@onClickPlay} />
+							{playButton}
 						</ButtonGroup>
 
 						<Timeline replay={replay} />
@@ -101,10 +99,12 @@ class Replay extends React.Component
 	onClickPause: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
+		@forceUpdate()
 
 	onClickPlay: (e) =>
 		e.preventDefault()
-		@state.replay.run()
+		@state.replay.play()
+		@forceUpdate()
 
 	onClickChangeSpeed: (speed) ->
 		console.log 'changing speed', speed

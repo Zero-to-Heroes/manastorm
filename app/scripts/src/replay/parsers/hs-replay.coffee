@@ -119,6 +119,7 @@ class HSReplayParser
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
+					@replay.mainPlayer @stack[@stack.length - 2].attributes.entity
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
@@ -164,6 +165,8 @@ class HSReplayParser
 
 	onOpenTag: (node) ->
 		@stack.push(node)
+		#method = "#{@state[@state.length-1]}State"
+		#console.log 'considering node and treatment', node, method, node.attributes.ts
 		@["#{@state[@state.length-1]}State"]?(node)
 
 	onCloseTag: () ->

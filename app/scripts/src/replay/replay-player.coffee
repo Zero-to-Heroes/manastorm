@@ -34,8 +34,6 @@ class ReplayPlayer extends EventEmitter
 
 	run: ->
 		console.log 'running player'
-		# @parser.parse(this)
-		console.log 'parsed game'
 		@frequency = 200
 		@speed = @initialSpeed || 1
 		@interval = setInterval((=> @update()), @frequency)
@@ -45,6 +43,10 @@ class ReplayPlayer extends EventEmitter
 		# The timestamp recorded by the game for the beginning, don't tpich this
 		@startTimestamp = timestamp
 		@started = true
+
+	play: ->
+		@speed = @initialSpeed || 1
+		@goToTimestamp @currentReplayTime
 
 	pause: ->
 		console.log 'pausing in replay-plyaer'
@@ -118,18 +120,31 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		#console.log 'receiving player', definition
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
+
 		if entity.tags.CURRENT_PLAYER
 			@player = entity
 		else
 			@opponent = entity
 
+	mainPlayer: (entityId) ->
+		if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
+			console.log 'updating @mainPlayerId', entityId
+			@mainPlayerId = entityId
+
+	decidePlayerOpponent: ->
+		# We got it wrong the first time
+		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
+			tempOpponent = @player
+			@player = @opponent
+			@opponent = tempOpponent
+
+
 	receiveEntity: (definition) ->
-		#console.log 'receiving entity', definition
+		# console.log 'receiving entity', definition
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else
@@ -145,7 +160,6 @@ class ReplayPlayer extends EventEmitter
 				@opponent = entity.getController()
 				@player = @opponent.getOpponent()
 
-			console.log 'emitting player-ready event'
 			@emit 'players-ready'
 
 	receiveTagChange: (change) ->
@@ -182,5 +196,6 @@ class ReplayPlayer extends EventEmitter
 		else
 			@lastBatch = new HistoryBatch(timestamp, [command, args])
 			@history.push(@lastBatch)
+		return @lastBatch
 
 module.exports = ReplayPlayer

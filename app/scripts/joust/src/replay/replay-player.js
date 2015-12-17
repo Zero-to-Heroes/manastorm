@@ -43,7 +43,6 @@
 
     ReplayPlayer.prototype.run = function() {
       console.log('running player');
-      console.log('parsed game');
       this.frequency = 200;
       this.speed = this.initialSpeed || 1;
       return this.interval = setInterval(((function(_this) {
@@ -57,6 +56,11 @@
       console.log('starting game at timestamp', timestamp);
       this.startTimestamp = timestamp;
       return this.started = true;
+    };
+
+    ReplayPlayer.prototype.play = function() {
+      this.speed = this.initialSpeed || 1;
+      return this.goToTimestamp(this.currentReplayTime);
     };
 
     ReplayPlayer.prototype.pause = function() {
@@ -155,6 +159,22 @@
       }
     };
 
+    ReplayPlayer.prototype.mainPlayer = function(entityId) {
+      if (!this.mainPlayerId && (parseInt(entityId) === 2 || parseInt(entityId) === 3)) {
+        console.log('updating @mainPlayerId', entityId);
+        return this.mainPlayerId = entityId;
+      }
+    };
+
+    ReplayPlayer.prototype.decidePlayerOpponent = function() {
+      var tempOpponent;
+      if (parseInt(this.opponent.id) === parseInt(this.mainPlayerId)) {
+        tempOpponent = this.player;
+        this.player = this.opponent;
+        return this.opponent = tempOpponent;
+      }
+    };
+
     ReplayPlayer.prototype.receiveEntity = function(definition) {
       var entity;
       if (this.entities[definition.id]) {
@@ -172,7 +192,6 @@
           this.opponent = entity.getController();
           this.player = this.opponent.getOpponent();
         }
-        console.log('emitting player-ready event');
         return this.emit('players-ready');
       }
     };
@@ -214,11 +233,12 @@
       var args, command, timestamp;
       timestamp = arguments[0], command = arguments[1], args = 3 <= arguments.length ? slice.call(arguments, 2) : [];
       if (!timestamp && this.lastBatch) {
-        return this.lastBatch.addCommand([command, args]);
+        this.lastBatch.addCommand([command, args]);
       } else {
         this.lastBatch = new HistoryBatch(timestamp, [command, args]);
-        return this.history.push(this.lastBatch);
+        this.history.push(this.lastBatch);
       }
+      return this.lastBatch;
     };
 
     return ReplayPlayer;

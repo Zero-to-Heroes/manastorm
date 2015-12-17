@@ -42,11 +42,9 @@
       this.onClickPause = __bind(this.onClickPause, this);
       this.callback = __bind(this.callback, this);
       Replay.__super__.constructor.call(this, props);
-      console.log('initializing replay');
       this.state = {
         replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
       };
-      console.log('state', this.state);
       this.sub = subscribe(this.state.replay, 'players-ready', (function(_this) {
         return function() {
           return _this.callback;
@@ -54,7 +52,6 @@
       })(this));
       this.sub = subscribe(this.state.replay, 'moved-timestamp', (function(_this) {
         return function() {
-          console.log('receiving moved-timestamp');
           return setTimeout(_this.callback, 1000);
         };
       })(this));
@@ -63,21 +60,18 @@
     }
 
     Replay.prototype.componentWillUnmount = function() {
-      console.log('Replay will unmount');
       return this.sub.off();
     };
 
     Replay.prototype.callback = function() {
-      console.log('forcing update');
       return this.forceUpdate();
     };
 
     Replay.prototype.render = function() {
-      var bottom, replay, top;
+      var bottom, playButton, replay, top;
       replay = this.state.replay;
-      console.log('rendering in replay', replay);
       if (replay.players.length === 2) {
-        console.log('All players are here', replay.opponent, replay.player);
+        replay.decidePlayerOpponent();
         top = React.createElement("div", {
           "className": "top"
         }, React.createElement(PlayerName, {
@@ -117,19 +111,23 @@
           "entity": replay.player
         }));
       }
-      console.log('top and bottom are', top, bottom);
+      playButton = React.createElement(Button, {
+        "glyph": "play",
+        "onClick": this.onClickPlay
+      });
+      console.log('speed', this.state.replay.getSpeed());
+      if (this.state.replay.interval > 0 && this.state.replay.getSpeed() > 0) {
+        playButton = React.createElement(Button, {
+          "glyph": "pause",
+          "onClick": this.onClickPause
+        });
+      }
       return React.createElement("div", {
         "className": "replay",
         "key": replay.resetCounter
       }, React.createElement("form", {
         "className": "replay__controls padded"
-      }, React.createElement(ButtonGroup, null, React.createElement(Button, {
-        "glyph": "pause",
-        "onClick": this.onClickPause
-      }), React.createElement(Button, {
-        "glyph": "play",
-        "onClick": this.onClickPlay
-      })), React.createElement(Timeline, {
+      }, React.createElement(ButtonGroup, null, playButton), React.createElement(Timeline, {
         "replay": replay
       }), React.createElement("div", {
         "className": "playback-speed"
@@ -162,12 +160,14 @@
 
     Replay.prototype.onClickPause = function(e) {
       e.preventDefault();
-      return this.state.replay.pause();
+      this.state.replay.pause();
+      return this.forceUpdate();
     };
 
     Replay.prototype.onClickPlay = function(e) {
       e.preventDefault();
-      return this.state.replay.run();
+      this.state.replay.play();
+      return this.forceUpdate();
     };
 
     Replay.prototype.onClickChangeSpeed = function(speed) {
