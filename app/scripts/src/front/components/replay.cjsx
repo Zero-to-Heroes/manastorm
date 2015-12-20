@@ -12,6 +12,7 @@ Mana = require './ui/replay/mana'
 Health = require './ui/replay/health'
 #Scrubber = require './ui/replay/scrubber'
 Timeline = require './ui/replay/timeline'
+GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
 
 {subscribe} = require '../../subscription'
@@ -22,93 +23,102 @@ class Replay extends React.Component
 
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
 
-		@sub = subscribe @state.replay, 'players-ready', => @callback
+		subscribe @state.replay, 'players-ready', =>
+			#console.log 'in players-ready' 
+			@callback
 
-		@sub = subscribe @state.replay, 'moved-timestamp', =>
-			setTimeout @callback, 1000
+		subscribe @state.replay, 'moved-timestamp', =>
+			#console.log 'in moved-timestamp'
+			setTimeout @callback, 500
 
-		console.log('sub', @sub)
+		#console.log('sub', @sub)
 		@state.replay.init()
 
 	componentWillUnmount: ->
-		@sub.off()
+		#@sub.off()
 
 	callback: =>
+		#console.log 'in callback'
 		@forceUpdate()
 
 	render: ->
 		replay = @state.replay
 
 		if replay.players.length == 2
-			replay.decidePlayerOpponent()
+			#console.log 'All players are here'
 
 			top = <div className="top">
 				<PlayerName entity={replay.opponent} />
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} />
-				<Mulligan entity={replay.opponent} />
+				<Mulligan entity={replay.opponent} isHidden={true} />
 				<Mana entity={replay.opponent} />
 				<Health entity={replay.opponent} />
 				<Play entity={replay.opponent} />
-				<Hand entity={replay.opponent} />
+				<Hand entity={replay.opponent} isHidden={true} />
 			</div>
 
 			bottom = <div className="bottom">
 				<PlayerName entity={replay.player} />
 				<Deck entity={replay.player} />
 				<Board entity={replay.player} />
-				<Mulligan entity={replay.player} />
+				<Mulligan entity={replay.player} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Health entity={replay.player} />
 				<Play entity={replay.player} />
-				<Hand entity={replay.player} />
+				<Hand entity={replay.player} isHidden={false} />
 			</div>
+		else 
+			console.warn 'Missing players', replay.players
 
-		playButton = <Button glyph="play" onClick={@onClickPlay} />
+		#playButton = <Button glyph="play" onClick={@onClickPlay} />
 
-		console.log 'speed', @state.replay.getSpeed()
-		if (@state.replay.interval > 0 && @state.replay.getSpeed() > 0)
-			playButton = <Button glyph="pause" onClick={@onClickPause}/>
+		#if (@state.replay.frequency > 0 && @state.replay.getSpeed() > 0)
+		#	playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
-		return <div className="replay" key={replay.resetCounter}>
+		# {playButton}
+		return <div className="replay">
 					<form className="replay__controls padded">
 						<ButtonGroup>
-							{playButton}
+							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
+							<Button glyph="to-start" onClick={@goPreviousAction}/>
+							<Button glyph="to-end" onClick={@goNextAction}/>
+							<Button glyph="fast-forward" onClick={@goNextTurn}/>
 						</ButtonGroup>
 
 						<Timeline replay={replay} />
-
-						<div className="playback-speed">
-							<div className="dropup"> 
-								<button className="btn btn-default dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.getSpeed()}x <span className="caret"></span> </button> 
-								<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-									<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
-								</ul> 
-							</div>
-						</div>
 					</form>
 					<div className="replay__game">
 						{top}
 						{bottom}
 					</div>
+					
+					<GameLog replay={replay} />
 				</div>
 
-	onClickPause: (e) =>
+	goNextAction: (e) =>
 		e.preventDefault()
-		@state.replay.pause()
+		@state.replay.goNextAction()
+		@forceUpdate()
+
+	goPreviousAction: (e) =>
+		e.preventDefault()
+		@state.replay.goPreviousAction()
+		@forceUpdate()
+
+	goNextTurn: (e) =>
+		e.preventDefault()
+		@state.replay.goNextTurn()
+		@forceUpdate()
+
+	goPreviousTurn: (e) =>
+		e.preventDefault()
+		@state.replay.goPreviousTurn()
 		@forceUpdate()
 
 	onClickPlay: (e) =>
 		e.preventDefault()
 		@state.replay.play()
-		@forceUpdate()
-
-	onClickChangeSpeed: (speed) ->
-		console.log 'changing speed', speed
-		@state.replay.changeSpeed speed
 		@forceUpdate()
 
 

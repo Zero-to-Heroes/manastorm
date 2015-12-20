@@ -20,7 +20,7 @@ Play = React.createClass
 		playing: null
 
 	componentWillUnmount: ->
-		@subs.off()
+		#@subs.off()
 
 	render: ->
 		if @state.playing

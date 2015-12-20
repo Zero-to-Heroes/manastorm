@@ -21,7 +21,11 @@
       this.parser = parser;
       EventEmitter.call(this);
       window.replay = this;
-      console.log('player constructed');
+      this.turns = {
+        length: 0
+      };
+      this.currentTurn = 0;
+      this.currentActionInTurn = 0;
     }
 
     ReplayPlayer.prototype.init = function() {
@@ -34,48 +38,99 @@
       this.historyPosition = 0;
       this.lastBatch = null;
       this.startTimestamp = null;
-      this.startTime = (new Date).getTime();
-      this.currentReplayTime = 0;
+      this.currentReplayTime = 200;
       this.started = false;
-      this.speed = 1;
-      return this.parser.parse(this);
-    };
-
-    ReplayPlayer.prototype.run = function() {
-      console.log('running player');
-      this.frequency = 200;
-      this.speed = this.initialSpeed || 1;
-      return this.interval = setInterval(((function(_this) {
-        return function() {
-          return _this.update();
-        };
-      })(this)), this.frequency);
+      this.turnLog = '';
+      this.cardUtils = window['parseCardsText'];
+      console.log('cardUtils', this.cardUtils);
+      this.parser.parse(this);
+      return this.finalizeInit();
     };
 
     ReplayPlayer.prototype.start = function(timestamp) {
-      console.log('starting game at timestamp', timestamp);
       this.startTimestamp = timestamp;
       return this.started = true;
     };
 
     ReplayPlayer.prototype.play = function() {
-      this.speed = this.initialSpeed || 1;
       return this.goToTimestamp(this.currentReplayTime);
     };
 
-    ReplayPlayer.prototype.pause = function() {
-      console.log('pausing in replay-plyaer');
-      this.initialSpeed = this.speed;
-      return this.speed = 0;
+    ReplayPlayer.prototype.goNextAction = function() {
+      this.turnLog = '';
+      this.currentActionInTurn++;
+      if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
+        console.log('going to next action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
+        return this.goToAction();
+      } else {
+        console.log('going directly to next turn');
+        return this.goNextTurn();
+      }
     };
 
-    ReplayPlayer.prototype.changeSpeed = function(speed) {
-      console.log('changing speed in replay', speed);
-      return this.speed = speed;
+    ReplayPlayer.prototype.goPreviousAction = function() {
+      this.turnLog = '';
+      this.currentActionInTurn--;
+      console.log('going to previous action', this.currentActionInTurn);
+      if (this.currentActionInTurn === 1) {
+        console.log('going directly to beginning of turn');
+        this.goPreviousTurn();
+        return this.goNextTurn();
+      } else if (this.currentActionInTurn <= 0) {
+        console.log('going directly to end of previous turn');
+        this.goPreviousTurn();
+        this.currentActionInTurn = this.turns[this.currentTurn].actions.length - 1;
+        return this.goToAction;
+      } else if (this.turns[this.currentTurn]) {
+        return this.goToAction();
+      }
     };
 
-    ReplayPlayer.prototype.getSpeed = function() {
-      return this.speed;
+    ReplayPlayer.prototype.goToAction = function() {
+      var action, card, targetTimestamp;
+      action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
+      console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
+      targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
+      console.log('executing action', action, action.data);
+      card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+      this.turnLog = action.owner.name + action.type + this.cardUtils.localizeName(this.cardUtils.getCard(card));
+      if (action.target) {
+        this.turnLog += ' -> ' + this.cardUtils.localizeName(this.cardUtils.getCard(action.target.cardID));
+      }
+      console.log(this.turnLog);
+      this.goToTimestamp(targetTimestamp);
+      return this.update();
+    };
+
+    ReplayPlayer.prototype.goNextTurn = function() {
+      var targetTimestamp;
+      this.currentActionInTurn = 0;
+      this.currentTurn++;
+      this.turnLog = 't' + this.currentTurn + ': ' + this.turns[this.currentTurn].activePlayer.name;
+      targetTimestamp = this.getTotalLength() * 1000;
+      if (this.currentTurn <= this.turns.length) {
+        targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
+      }
+      this.goToTimestamp(targetTimestamp);
+      return this.update();
+    };
+
+    ReplayPlayer.prototype.goPreviousTurn = function() {
+      var targetTimestamp;
+      this.currentActionInTurn = 0;
+      this.currentTurn--;
+      this.turnLog = 't' + this.currentTurn + ': ' + this.turns[this.currentTurn].activePlayer.name;
+      console.log('going to previous turn', this.currentTurn, this.currentActionInTurn);
+      targetTimestamp = this.getTotalLength() * 1000;
+      if (this.currentTurn <= 0) {
+        targetTimestamp = 0;
+        this.currentTurn = 0;
+      } else if (this.currentTurn <= this.turns.length) {
+        targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
+      }
+      this.goToTimestamp(targetTimestamp);
+      this.update();
+      return console.log('at previous turn', this.currentTurn, this.currentActionInTurn);
     };
 
     ReplayPlayer.prototype.getTotalLength = function() {
@@ -97,50 +152,42 @@
     ReplayPlayer.prototype.moveTime = function(progression) {
       var target;
       target = this.getTotalLength() * progression * 1000;
-      console.log('moving to', target);
       return this.goToTimestamp(target);
     };
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
-      var initialSpeed;
-      initialSpeed = this.speed;
+      console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
-        console.log('resetting');
-        this.init();
+        this.currentReplayTime = timestamp;
         this.historyPosition = 0;
+        this.init();
       }
       this.start(this.startTimestamp);
-      if (!this.interval) {
-        console.log('running the game');
-        this.run();
-        this.changeSpeed(initialSpeed);
-      }
-      console.log('going to timestamp in replay', timestamp);
       this.currentReplayTime = timestamp;
+      this.update();
       return this.emit('moved-timestamp');
     };
 
     ReplayPlayer.prototype.update = function() {
-      var elapsed, results;
-      this.currentReplayTime += this.frequency * this.speed;
+      var elapsed;
       if (this.currentReplayTime >= this.getTotalLength() * 1000) {
         this.currentReplayTime = this.getTotalLength() * 1000;
       }
       elapsed = this.getElapsed();
-      results = [];
       while (this.historyPosition < this.history.length) {
         if (elapsed > this.history[this.historyPosition].timestamp - this.startTimestamp) {
           this.history[this.historyPosition].execute(this);
-          results.push(this.historyPosition++);
+          this.historyPosition++;
         } else {
           break;
         }
       }
-      return results;
+      return console.log('stopped at history', this.history[this.historyPosition].timestamp, elapsed);
     };
 
     ReplayPlayer.prototype.receiveGameEntity = function(definition) {
       var entity;
+      console.log('receiving game entity', definition);
       entity = new Entity(this);
       this.game = this.entities[definition.id] = entity;
       return entity.update(definition);
@@ -148,6 +195,7 @@
 
     ReplayPlayer.prototype.receivePlayer = function(definition) {
       var entity;
+      console.log('receiving player', definition);
       entity = new Player(this);
       this.entities[definition.id] = entity;
       this.players.push(entity);
@@ -161,18 +209,140 @@
 
     ReplayPlayer.prototype.mainPlayer = function(entityId) {
       if (!this.mainPlayerId && (parseInt(entityId) === 2 || parseInt(entityId) === 3)) {
-        console.log('updating @mainPlayerId', entityId);
         return this.mainPlayerId = entityId;
       }
     };
 
-    ReplayPlayer.prototype.decidePlayerOpponent = function() {
-      var tempOpponent;
+    ReplayPlayer.prototype.finalizeInit = function() {
+      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, entityTag, i, j, k, l, len, len1, len2, len3, m, n, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, tag, tagValue, tempOpponent, turnNumber;
+      this.goToTimestamp(this.currentReplayTime);
+      this.update();
+      players = [this.player, this.opponent];
+      playerIndex = 0;
+      if (this.turns.length === 0) {
+        turnNumber = 1;
+        actionIndex = 0;
+        currentPlayer = players[playerIndex];
+        ref = this.history;
+        for (i = k = 0, len = ref.length; k < len; i = ++k) {
+          batch = ref[i];
+          ref1 = batch.commands;
+          for (j = l = 0, len1 = ref1.length; l < len1; j = ++l) {
+            command = ref1[j];
+            if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].entity === 2 && command[1][0].tag === 'MULLIGAN_STATE' && command[1][0].value === 1) {
+              this.turns[turnNumber] = {
+                historyPosition: i,
+                turn: 'mulligan',
+                timestamp: batch.timestamp || 0,
+                actions: [],
+                activePlayer: currentPlayer
+              };
+              this.turns.length++;
+              turnNumber++;
+              actionIndex = 0;
+              currentPlayer = players[++playerIndex % 2];
+            }
+            if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].entity === 3 && command[1][0].tag === 'MULLIGAN_STATE' && command[1][0].value === 1) {
+              currentPlayer = players[++playerIndex % 2];
+            }
+            if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].entity === 1 && command[1][0].tag === 'STEP' && command[1][0].value === 6) {
+              this.turns[turnNumber] = {
+                historyPosition: i,
+                turn: turnNumber,
+                timestamp: batch.timestamp,
+                actions: [],
+                activePlayer: currentPlayer
+              };
+              this.turns.length++;
+              turnNumber++;
+              actionIndex = 0;
+              currentPlayer = players[++playerIndex % 2];
+            }
+            if (command[0] === 'receiveAction') {
+              currentTurnNumber = turnNumber - 1;
+              if (this.turns[currentTurnNumber]) {
+                if (command[1].length > 0 && command[1][0].tags) {
+                  playedCard = -1;
+                  ref2 = command[1][0].tags;
+                  for (m = 0, len2 = ref2.length; m < len2; m++) {
+                    tag = ref2[m];
+                    if (tag.tag === 'ZONE' && tag.value === 1) {
+                      playedCard = tag.entity;
+                    }
+                  }
+                  if (playedCard > -1) {
+                    action = {
+                      turn: currentTurnNumber,
+                      index: actionIndex++,
+                      timestamp: batch.timestamp,
+                      type: ': ',
+                      data: this.entities[playedCard],
+                      owner: this.turns[currentTurnNumber].activePlayer
+                    };
+                    this.turns[currentTurnNumber].actions[actionIndex] = action;
+                  }
+                }
+                if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0) {
+                  action = {
+                    turn: currentTurnNumber,
+                    index: actionIndex++,
+                    timestamp: batch.timestamp,
+                    type: ': ',
+                    data: this.entities[command[1][0].attributes.entity],
+                    owner: this.turns[currentTurnNumber].activePlayer,
+                    target: this.entities[command[1][0].attributes.target]
+                  };
+                  this.turns[currentTurnNumber].actions[actionIndex] = action;
+                }
+                if (command[1].length > 0 && command[1][0].showEntity) {
+                  playedCard = -1;
+                  ref3 = command[1][0].showEntity.tags;
+                  for (entityTag in ref3) {
+                    tagValue = ref3[entityTag];
+                    if (entityTag === 'ZONE' && tagValue === 1) {
+                      playedCard = command[1][0].showEntity.id;
+                    }
+                  }
+                  ref4 = command[1][0].tags;
+                  for (n = 0, len3 = ref4.length; n < len3; n++) {
+                    tag = ref4[n];
+                    if (tag.tag === 'ZONE' && tag.value === 1) {
+                      playedCard = tag.entity;
+                    }
+                  }
+                  if (playedCard > -1) {
+                    action = {
+                      turn: currentTurnNumber,
+                      index: actionIndex++,
+                      timestamp: batch.timestamp,
+                      type: ': ',
+                      data: this.entities[command[1][0].showEntity.id] ? this.entities[command[1][0].showEntity.id] : command[1][0].showEntity,
+                      owner: this.turns[currentTurnNumber].activePlayer,
+                      debug: command[1][0].showEntity
+                    };
+                    if (action.data) {
+                      this.turns[currentTurnNumber].actions[actionIndex] = action;
+                    }
+                  }
+                }
+              }
+            }
+            if (command[0] === 'receiveShowEntity') {
+              if (command[1].length > 0 && command[1][0].id && this.entities[command[1][0].id]) {
+                this.entities[command[1][0].id].cardID = command[1][0].cardID;
+              }
+            }
+          }
+        }
+        console.log(this.turns.length, 'game turns at position', this.turns);
+      }
+      console.log('finalizing init, player are', this.player, this.opponent, this.players);
       if (parseInt(this.opponent.id) === parseInt(this.mainPlayerId)) {
         tempOpponent = this.player;
         this.player = this.opponent;
-        return this.opponent = tempOpponent;
+        this.opponent = tempOpponent;
       }
+      return this.emit('players-ready');
     };
 
     ReplayPlayer.prototype.receiveEntity = function(definition) {
@@ -183,17 +353,7 @@
         entity = new Entity(this);
       }
       this.entities[definition.id] = entity;
-      entity.update(definition);
-      if (definition.id === 68) {
-        if (definition.cardID === 'GAME_005') {
-          this.player = entity.getController();
-          this.opponent = this.player.getOpponent();
-        } else {
-          this.opponent = entity.getController();
-          this.player = this.opponent.getOpponent();
-        }
-        return this.emit('players-ready');
-      }
+      return entity.update(definition);
     };
 
     ReplayPlayer.prototype.receiveTagChange = function(change) {

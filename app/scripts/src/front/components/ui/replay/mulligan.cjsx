@@ -9,13 +9,14 @@ class Mulligan extends React.Component
 			@forceUpdate()
 
 	componentWillUnmount: ->
-		@sub.off()
+		#@sub.off()
 
 	render: ->
 		return null unless @props.entity.tags.MULLIGAN_STATE < 4
 
+		hidden = @props.isHidden
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
-			<Card entity={entity} key={entity.id} />
+			<Card entity={entity} key={entity.id} isHidden={hidden} />
 
 		return <div className="mulligan">
 			{cards}

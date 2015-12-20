@@ -28,20 +28,20 @@
       })(this));
     };
 
-    Mulligan.prototype.componentWillUnmount = function() {
-      return this.sub.off();
-    };
+    Mulligan.prototype.componentWillUnmount = function() {};
 
     Mulligan.prototype.render = function() {
-      var cards;
+      var cards, hidden;
       if (!(this.props.entity.tags.MULLIGAN_STATE < 4)) {
         return null;
       }
+      hidden = this.props.isHidden;
       cards = this.props.entity.getHand().slice(0, 4).map((function(_this) {
         return function(entity) {
           return React.createElement(Card, {
             "entity": entity,
-            "key": entity.id
+            "key": entity.id,
+            "isHidden": hidden
           });
         };
       })(this));

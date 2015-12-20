@@ -5,7 +5,7 @@ class Timeline extends React.Component
 		@int = setInterval((=> @forceUpdate()), 500)
 
 	componentWillUnmount: ->
-		clearInterval(@int)
+		#clearInterval(@int)
 
 	render: ->
 		replay = @props.replay

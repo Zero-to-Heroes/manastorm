@@ -24,14 +24,12 @@
       })(this));
     };
 
-    Card.prototype.componentWillUnmount = function() {
-      return this.sub.off();
-    };
+    Card.prototype.componentWillUnmount = function() {};
 
     Card.prototype.render = function() {
       var art, cls, stats, style;
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/" + this.props.entity.cardID + ".png";
-      if (this.props.entity.cardID) {
+      if (this.props.entity.cardID && !this.props.isHidden) {
         style = {
           background: "url(" + art + ") top left no-repeat",
           backgroundSize: '100% auto'
