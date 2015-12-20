@@ -34,9 +34,7 @@
       })(this));
     };
 
-    Health.prototype.componentWillUnmount = function() {
-      return this.subs.off();
-    };
+    Health.prototype.componentWillUnmount = function() {};
 
     Health.prototype.render = function() {
       var hero;

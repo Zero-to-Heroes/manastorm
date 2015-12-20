@@ -47,24 +47,34 @@
     };
 
     HSReplayParser.prototype.rootState = function(node) {
+      var tag;
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
         case 'Action':
-          this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction');
+          this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
           return this.state.push('action');
         case 'TagChange':
-          return this.replay.enqueue(null, 'receiveTagChange', {
+          tag = {
             entity: parseInt(node.attributes.entity),
             tag: tagNames[node.attributes.tag],
-            value: parseInt(node.attributes.value)
-          });
+            value: parseInt(node.attributes.value),
+            parent: this.stack[this.stack.length - 2]
+          };
+          if (!tag.parent.tags) {
+            tag.parent.tags = [];
+          }
+          tag.parent.tags.push(tag);
+          return this.replay.enqueue(null, 'receiveTagChange', tag);
         case 'GameEntity':
         case 'Player':
         case 'FullEntity':
         case 'ShowEntity':
           this.state.push('entity');
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          if (node.name === 'ShowEntity') {
+            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+          }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
           }
@@ -151,28 +161,41 @@
     };
 
     HSReplayParser.prototype.actionState = function(node) {
+      var tag;
       switch (node.name) {
         case 'ShowEntity':
         case 'FullEntity':
           this.state.push('entity');
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          if (node.name === 'ShowEntity') {
+            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+          }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
             this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
           }
           if (node.attributes.name) {
-            return this.entityDefinition.name = node.attributes.name;
+            this.entityDefinition.name = node.attributes.name;
+          }
+          if (this.entityDefinition.id === 12) {
+            return console.log('parsing entity 12', node, this.entityDefinition, this.stack[this.stack.length - 1], this.stack[this.stack.length - 2]);
           }
           break;
         case 'TagChange':
-          return this.replay.enqueue(null, 'receiveTagChange', {
+          tag = {
             entity: parseInt(node.attributes.entity),
             tag: tagNames[node.attributes.tag],
-            value: parseInt(node.attributes.value)
-          });
+            value: parseInt(node.attributes.value),
+            parent: this.stack[this.stack.length - 2]
+          };
+          if (!tag.parent.tags) {
+            tag.parent.tags = [];
+          }
+          tag.parent.tags.push(tag);
+          return this.replay.enqueue(null, 'receiveTagChange', tag);
         case 'Action':
           this.state.push('action');
-          return this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction');
+          return this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
         case 'Choices':
           this.choices = {
             entity: parseInt(node.attributes.entity),
@@ -211,7 +234,7 @@
       }
       switch (node.name) {
         case 'Action':
-          return this.state.pop();
+          return node = this.state.pop();
       }
     };
 

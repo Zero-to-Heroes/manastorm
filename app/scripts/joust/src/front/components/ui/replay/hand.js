@@ -49,21 +49,21 @@
         };
       })(this));
     },
-    componentWillUnmount: function() {
-      return this.subs.off();
-    },
+    componentWillUnmount: function() {},
     render: function() {
-      var active, cards;
+      var active, cards, hidden;
       if (this.props.entity.tags.MULLIGAN_STATE !== 4) {
         return null;
       }
       active = _.filter(this.props.entity.getHand(), function(entity) {
         return entity.tags.ZONE_POSITION > 0;
       });
+      hidden = this.props.isHidden;
       cards = active.map(function(entity) {
         return React.createElement(Card, {
           "entity": entity,
-          "key": entity.id
+          "key": entity.id,
+          "isHidden": hidden
         });
       });
       return React.createElement(ReactCSSTransitionGroup, {

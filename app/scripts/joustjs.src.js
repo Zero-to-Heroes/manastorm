@@ -14,6 +14,9 @@ var joustjs = {
 		//require('coffee-react/register');
 		var bundle = require('./joust/src/front/bundle.js');
 		bundle.init(strReplayXml);
+
+		window.replay.cardUtils = window['parseCardsText']
+		console.log('cardUtils', window.replay.cardUtils)
 	},
 
 	goToTimestamp: function(timestamp) {

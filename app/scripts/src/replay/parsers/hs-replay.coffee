@@ -37,21 +37,32 @@ class HSReplayParser
 				@replay.start(tsToSeconds(node.attributes.ts))
 
 			when 'Action'
-				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction'
+				#console.log 'enqueue action from rootState', node
+				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 				@state.push('action')
 
 			when 'TagChange'
-				@replay.enqueue null, 'receiveTagChange',
+				tag = {
 					entity: parseInt(node.attributes.entity)
 					tag: tagNames[node.attributes.tag]
 					value: parseInt(node.attributes.value)
+					parent: @stack[@stack.length - 2]
+				}
+				if (!tag.parent.tags)
+					tag.parent.tags = []
+				tag.parent.tags.push(tag)
+
+				@replay.enqueue null, 'receiveTagChange', tag
 
 			when 'GameEntity', 'Player', 'FullEntity', 'ShowEntity'
 				# console.log '\tpushing game entity to state', node
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
+				if node.name == 'ShowEntity'
+					@stack[@stack.length - 2].showEntity = @entityDefinition
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
+					#console.log 'giving name to card', node.attributes.cardID, @entityDefinition.id, @entityDefinition
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
@@ -117,20 +128,39 @@ class HSReplayParser
 			when 'ShowEntity', 'FullEntity'
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
+				if node.name == 'ShowEntity'
+					@stack[@stack.length - 2].showEntity = @entityDefinition
+
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
 					@replay.mainPlayer @stack[@stack.length - 2].attributes.entity
+					#console.log 'giving name to card', node.attributes.cardID, @entityDefinition.id, @entityDefinition
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
+				if @entityDefinition.id == 12
+					console.log 'parsing entity 12', node, @entityDefinition, @stack[@stack.length - 1], @stack[@stack.length - 2]
+
 			when 'TagChange'
-				@replay.enqueue null, 'receiveTagChange',
+				tag = {
 					entity: parseInt(node.attributes.entity)
 					tag: tagNames[node.attributes.tag]
 					value: parseInt(node.attributes.value)
+					parent: @stack[@stack.length - 2]
+				}
+				if (!tag.parent.tags)
+					tag.parent.tags = []
+				tag.parent.tags.push(tag)
+
+				@replay.enqueue null, 'receiveTagChange', tag
+
 			when 'Action'
+				#console.log 'enqueue action from actionState', node, @stack[@stack.length - 1], @stack[@stack.length - 2]
+				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
+				#node.parent = @stack[@stack.length - 2]
+				#console.log '\tupdated', @stack[@stack.length - 1]
 				@state.push('action')
-				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction'
+				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 
 			when 'Choices'
 				@choices =
@@ -161,16 +191,21 @@ class HSReplayParser
 			ts = null
 		switch node.name
 			when 'Action'
-				@state.pop()
+				node = @state.pop()
 
 	onOpenTag: (node) ->
+		#console.log 'opening tag', node
 		@stack.push(node)
+		#if @stack.length > 1
+		#	node.parent = @stack[@stack.length - 2]
+		#	node.parent.child = node
 		#method = "#{@state[@state.length-1]}State"
 		#console.log 'considering node and treatment', node, method, node.attributes.ts
 		@["#{@state[@state.length-1]}State"]?(node)
 
 	onCloseTag: () ->
 		node = @stack.pop()
+		#console.log 'closing action tag', node
 		@["#{@state[@state.length-1]}StateClose"]?(node)
 
 

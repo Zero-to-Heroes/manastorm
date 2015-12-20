@@ -14,7 +14,7 @@ class Health extends React.Component
 			@forceUpdate()
 
 	componentWillUnmount: ->
-		@subs.off()
+		#@subs.off()
 
 	render: ->
 		hero = @props.entity.getHero()

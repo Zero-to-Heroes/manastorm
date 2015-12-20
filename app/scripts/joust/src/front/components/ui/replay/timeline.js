@@ -20,9 +20,7 @@
       })(this)), 500);
     };
 
-    Timeline.prototype.componentWillUnmount = function() {
-      return clearInterval(this.int);
-    };
+    Timeline.prototype.componentWillUnmount = function() {};
 
     Timeline.prototype.render = function() {
       var elapsedMinutes, elapsedSeconds, handleStyle, length, position, remaining, remainingMinutes, remainingSeconds, replay, totalMinutes, totalSeconds;

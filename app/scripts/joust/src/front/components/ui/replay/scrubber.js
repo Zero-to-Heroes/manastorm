@@ -20,9 +20,7 @@
       })(this)), 500);
     };
 
-    Scrubber.prototype.componentWillUnmount = function() {
-      return clearInterval(this.int);
-    };
+    Scrubber.prototype.componentWillUnmount = function() {};
 
     Scrubber.prototype.render = function() {
       var handleStyle, i, length, point, pointStyle, points, position, remaining, remainingMinutes, remainingSeconds, replay, _i, _len, _ref;

@@ -8,12 +8,12 @@ class Card extends React.Component
 			@forceUpdate()
 
 	componentWillUnmount: ->
-		@sub.off()
+		#@sub.off()
 
 	render: ->
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
 
-		if @props.entity.cardID
+		if @props.entity.cardID && !@props.isHidden
 			style =
 				background: "url(#{art}) top left no-repeat"
 				backgroundSize: '100% auto'

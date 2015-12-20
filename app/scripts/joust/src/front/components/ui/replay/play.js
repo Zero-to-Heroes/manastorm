@@ -40,9 +40,7 @@
         playing: null
       };
     },
-    componentWillUnmount: function() {
-      return this.subs.off();
-    },
+    componentWillUnmount: function() {},
     render: function() {
       var card;
       if (this.state.playing) {
