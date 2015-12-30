@@ -14,8 +14,10 @@ Health = require './ui/replay/health'
 Timeline = require './ui/replay/timeline'
 GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
+Target = require './ui/replay/target'
 
 {subscribe} = require '../../subscription'
+_ = require 'lodash'
 
 class Replay extends React.Component
 	constructor: (props) ->
@@ -43,6 +45,7 @@ class Replay extends React.Component
 
 	render: ->
 		replay = @state.replay
+		console.log 'rerendering replay'
 
 		if replay.players.length == 2
 			#console.log 'All players are here'
@@ -50,7 +53,7 @@ class Replay extends React.Component
 			top = <div className="top">
 				<PlayerName entity={replay.opponent} />
 				<Deck entity={replay.opponent} />
-				<Board entity={replay.opponent} />
+				<Board entity={replay.opponent} ref="topBoard"/>
 				<Mulligan entity={replay.opponent} isHidden={true} />
 				<Mana entity={replay.opponent} />
 				<Health entity={replay.opponent} />
@@ -61,20 +64,23 @@ class Replay extends React.Component
 			bottom = <div className="bottom">
 				<PlayerName entity={replay.player} />
 				<Deck entity={replay.player} />
-				<Board entity={replay.player} />
+				<Board entity={replay.player} ref="bottomBoard"/>
 				<Mulligan entity={replay.player} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Health entity={replay.player} />
 				<Play entity={replay.player} />
 				<Hand entity={replay.player} isHidden={false} />
 			</div>
+
 		else 
 			console.warn 'Missing players', replay.players
 
-		#playButton = <Button glyph="play" onClick={@onClickPlay} />
+		#console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
+		if this.refs['topBoard'] && this.refs['bottomBoard'] 
+			#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
+			source = @findCard this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetSource
+			target = @findCard this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetDestination
 
-		#if (@state.replay.frequency > 0 && @state.replay.getSpeed() > 0)
-		#	playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
 		# {playButton}
 		return <div className="replay">
@@ -91,6 +97,7 @@ class Replay extends React.Component
 					<div className="replay__game">
 						{top}
 						{bottom}
+						<Target source={source} target={target} />
 					</div>
 					
 					<GameLog replay={replay} />
@@ -121,5 +128,16 @@ class Replay extends React.Component
 		@state.replay.play()
 		@forceUpdate()
 
+	findCard: (topBoardCards, bottomBoardCards, cardID) ->
+		#console.log 'finding card', topBoardCards, bottomBoardCards, cardID
+		if !topBoardCards || !bottomBoardCards || !cardID
+			return undefined
+
+		#console.log 'topBoard cardsMap', topBoardCards, cardID
+		card = topBoardCards[cardID]
+		if !card
+			card = bottomBoardCards[cardID]
+		#console.log '\tFound card', card
+		return card
 
 module.exports = Replay

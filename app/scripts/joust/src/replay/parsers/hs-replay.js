@@ -41,17 +41,19 @@
           return _this.onCloseTag();
         };
       })(this));
-      console.log('preparing to parse replay');
       this.stream = new Stream(this.xmlReplay).pipe(this.sax);
       return console.log('replay parsed', this.replay);
     };
 
     HSReplayParser.prototype.rootState = function(node) {
-      var tag;
+      var ref, tag;
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
         case 'Action':
+          if ((node != null ? (ref = node.attributes) != null ? ref.entity : void 0 : void 0) === '70') {
+            console.log('\tDebug', node);
+          }
           this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
           return this.state.push('action');
         case 'TagChange':
@@ -161,7 +163,7 @@
     };
 
     HSReplayParser.prototype.actionState = function(node) {
-      var tag;
+      var ref, tag;
       switch (node.name) {
         case 'ShowEntity':
         case 'FullEntity':
@@ -175,10 +177,7 @@
             this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
           }
           if (node.attributes.name) {
-            this.entityDefinition.name = node.attributes.name;
-          }
-          if (this.entityDefinition.id === 12) {
-            return console.log('parsing entity 12', node, this.entityDefinition, this.stack[this.stack.length - 1], this.stack[this.stack.length - 2]);
+            return this.entityDefinition.name = node.attributes.name;
           }
           break;
         case 'TagChange':
@@ -194,6 +193,9 @@
           tag.parent.tags.push(tag);
           return this.replay.enqueue(null, 'receiveTagChange', tag);
         case 'Action':
+          if ((node != null ? (ref = node.attributes) != null ? ref.entity : void 0 : void 0) === '70') {
+            console.log('\tDebug', node);
+          }
           this.state.push('action');
           return this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
         case 'Choices':

@@ -1,9 +1,11 @@
 (function() {
-  var Card, React, subscribe,
+  var Card, React, ReactDOM, subscribe,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   React = require('react');
+
+  ReactDOM = require('react-dom');
 
   subscribe = require('../../../../subscription').subscribe;
 
@@ -23,8 +25,6 @@
         };
       })(this));
     };
-
-    Card.prototype.componentWillUnmount = function() {};
 
     Card.prototype.render = function() {
       var art, cls, stats, style;
@@ -55,6 +55,21 @@
         "className": cls,
         "style": style
       }, stats);
+    };
+
+    Card.prototype.componentDidUpdate = function() {
+      var dimensions, domNode;
+      domNode = ReactDOM.findDOMNode(this);
+      dimensions = domNode.getBoundingClientRect();
+      this.centerX = dimensions.left + dimensions.width / 2;
+      return this.centerY = dimensions.top + dimensions.height / 2;
+    };
+
+    Card.prototype.getDimensions = function() {
+      return {
+        centerX: this.centerX,
+        centerY: this.centerY
+      };
     };
 
     return Card;

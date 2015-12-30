@@ -1,13 +1,11 @@
 var joustjs = {
 
 	init: function(config, review) {
-		console.log('init joustjs', review.replayXml, review);
 		var replayXml = review.replayXml;
 		joustjs.loadReplay(replayXml);
 	},
 
 	loadReplay: function(replayXml) {
-		console.log('loading replay', replayXml);
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
 		// console.log('string xml', strReplayXml);
 
@@ -16,7 +14,6 @@ var joustjs = {
 		bundle.init(strReplayXml);
 
 		window.replay.cardUtils = window['parseCardsText']
-		console.log('cardUtils', window.replay.cardUtils)
 	},
 
 	goToTimestamp: function(timestamp) {

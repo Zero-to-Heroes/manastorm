@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Timeline, subscribe, _ref,
+  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -34,7 +34,11 @@
 
   Play = require('./ui/replay/play');
 
+  Target = require('./ui/replay/target');
+
   subscribe = require('../../subscription').subscribe;
+
+  _ = require('lodash');
 
   Replay = (function(_super) {
     __extends(Replay, _super);
@@ -70,8 +74,9 @@
     };
 
     Replay.prototype.render = function() {
-      var bottom, replay, top;
+      var bottom, replay, source, target, top;
       replay = this.state.replay;
+      console.log('rerendering replay');
       if (replay.players.length === 2) {
         top = React.createElement("div", {
           "className": "top"
@@ -80,7 +85,8 @@
         }), React.createElement(Deck, {
           "entity": replay.opponent
         }), React.createElement(Board, {
-          "entity": replay.opponent
+          "entity": replay.opponent,
+          "ref": "topBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.opponent,
           "isHidden": true
@@ -101,7 +107,8 @@
         }), React.createElement(Deck, {
           "entity": replay.player
         }), React.createElement(Board, {
-          "entity": replay.player
+          "entity": replay.player,
+          "ref": "bottomBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.player,
           "isHidden": false
@@ -117,6 +124,10 @@
         }));
       } else {
         console.warn('Missing players', replay.players);
+      }
+      if (this.refs['topBoard'] && this.refs['bottomBoard']) {
+        source = this.findCard(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetSource);
+        target = this.findCard(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetDestination);
       }
       return React.createElement("div", {
         "className": "replay"
@@ -138,7 +149,10 @@
         "replay": replay
       })), React.createElement("div", {
         "className": "replay__game"
-      }, top, bottom), React.createElement(GameLog, {
+      }, top, bottom, React.createElement(Target, {
+        "source": source,
+        "target": target
+      })), React.createElement(GameLog, {
         "replay": replay
       }));
     };
@@ -171,6 +185,18 @@
       e.preventDefault();
       this.state.replay.play();
       return this.forceUpdate();
+    };
+
+    Replay.prototype.findCard = function(topBoardCards, bottomBoardCards, cardID) {
+      var card;
+      if (!topBoardCards || !bottomBoardCards || !cardID) {
+        return void 0;
+      }
+      card = topBoardCards[cardID];
+      if (!card) {
+        card = bottomBoardCards[cardID];
+      }
+      return card;
     };
 
     return Replay;

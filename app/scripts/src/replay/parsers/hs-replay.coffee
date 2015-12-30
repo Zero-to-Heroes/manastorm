@@ -26,7 +26,7 @@ class HSReplayParser
 		@sax.on 'closetag', => @onCloseTag()
 
 		#@stream = fs.createReadStream(@path).pipe(@sax)
-		console.log 'preparing to parse replay'
+		#console.log 'preparing to parse replay'
 		@stream = new Stream(@xmlReplay).pipe(@sax)
 		console.log 'replay parsed', @replay
 
@@ -38,6 +38,8 @@ class HSReplayParser
 
 			when 'Action'
 				#console.log 'enqueue action from rootState', node
+				if (node?.attributes?.entity == '70')
+					console.log '\tDebug', node
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 				@state.push('action')
 
@@ -138,9 +140,6 @@ class HSReplayParser
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
-				if @entityDefinition.id == 12
-					console.log 'parsing entity 12', node, @entityDefinition, @stack[@stack.length - 1], @stack[@stack.length - 2]
-
 			when 'TagChange'
 				tag = {
 					entity: parseInt(node.attributes.entity)
@@ -159,6 +158,8 @@ class HSReplayParser
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
+				if (node?.attributes?.entity == '70')
+					console.log '\tDebug', node
 				@state.push('action')
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 

@@ -34,17 +34,33 @@
     };
 
     Board.prototype.render = function() {
-      var cards;
+      var cards, cardsMap;
+      cardsMap = [];
       cards = this.props.entity.getBoard().map(function(entity) {
-        return React.createElement(Card, {
+        var cardDiv;
+        cardDiv = React.createElement(Card, {
           "entity": entity,
           "key": entity.id,
-          "stats": true
+          "stats": true,
+          "ref": entity.id
         });
+        cardsMap.push(entity.id);
+        return cardDiv;
       });
+      this.cardsMap = cardsMap;
       return React.createElement("div", {
         "className": "board"
       }, cards);
+    };
+
+    Board.prototype.getCardsMap = function() {
+      var refs, result;
+      result = {};
+      refs = this.refs;
+      this.cardsMap.forEach(function(key) {
+        return result[key] = refs[key];
+      });
+      return result;
     };
 
     return Board;

@@ -11,14 +11,31 @@ class Board extends React.Component
 			entitySub = @subs.add entity, 'left-play', =>
 				entitySub.off()
 				@forceUpdate()
-
 			@forceUpdate()
 
 	render: ->
+		cardsMap = []
 		cards = @props.entity.getBoard().map (entity) ->
-			(<Card entity={entity} key={entity.id} stats={true} />)
+			cardDiv = <Card entity={entity} key={entity.id} stats={true} ref={entity.id} />
+			#console.log 'cardsMap before adding entity', cardsMap, entity, cardDiv
+			cardsMap.push entity.id
+			(cardDiv)
+		#console.log 'cardsMap', cardsMap
+		@cardsMap = cardsMap
 		return <div className="board">
 			{cards}
 		</div>
+
+	getCardsMap: ->
+		result = {}
+
+		#console.log 'building cards map', this.refs
+		refs = this.refs
+		@cardsMap.forEach (key) ->
+			result[key] = refs[key]
+
+		#console.log '\tbuilt cards map', result
+
+		return result
 
 module.exports = Board

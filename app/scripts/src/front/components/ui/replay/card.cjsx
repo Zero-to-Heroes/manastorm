@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 {subscribe} = require '../../../../subscription'
 
 class Card extends React.Component
@@ -6,9 +7,6 @@ class Card extends React.Component
 		tagEvents = 'tag-changed:ATK tag-changed:HEALTH tag-changed:DAMAGE'
 		@sub = subscribe @props.entity, tagEvents, =>
 			@forceUpdate()
-
-	componentWillUnmount: ->
-		#@sub.off()
 
 	render: ->
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
@@ -34,5 +32,17 @@ class Card extends React.Component
 		return <div className={cls} style={style}>
 			{stats}
 		</div>
+
+	componentDidUpdate: ->
+		#console.log 'updating card dimensions'
+		domNode = ReactDOM.findDOMNode(this)
+		dimensions = domNode.getBoundingClientRect()
+		@centerX = dimensions.left + dimensions.width / 2
+		@centerY = dimensions.top + dimensions.height / 2
+		#console.log @centerX, @centerY, dimensions, domNode
+
+	getDimensions: ->
+		#console.log 'getting dimensions for card', @centerX, @centerY
+		return {@centerX, @centerY}
 
 module.exports = Card
