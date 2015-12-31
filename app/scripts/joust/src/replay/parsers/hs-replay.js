@@ -179,7 +179,10 @@
             this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
           }
           if (node.attributes.name) {
-            return this.entityDefinition.name = node.attributes.name;
+            this.entityDefinition.name = node.attributes.name;
+          }
+          if (this.entityDefinition.id === 77) {
+            return console.log('parsing Squire token', this.entityDefinition, node);
           }
           break;
         case 'TagChange':

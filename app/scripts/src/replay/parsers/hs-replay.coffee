@@ -142,6 +142,9 @@ class HSReplayParser
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
+				if @entityDefinition.id is 77
+					console.log 'parsing Squire token', @entityDefinition, node
+
 			when 'TagChange'
 				tag = {
 					entity: parseInt(node.attributes.entity)

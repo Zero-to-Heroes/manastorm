@@ -100,12 +100,22 @@ class ReplayPlayer extends EventEmitter
 		targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
 		console.log 'executing action', action, action.data
 		card = if action?.data then action.data['cardID'] else ''
-		@turnLog = action.owner.name + action.type + @cardUtils.localizeName(@cardUtils.getCard(card))
+
+		owner = action.owner.name 
+		if !owner
+			ownerCard = @entities[action.owner]
+			console.log 'ownerCard', ownerCard, action.owner
+			console.log '\tcardID', ownerCard.cardID
+			console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
+			owner = @cardUtils.localizeName(@cardUtils.getCard(ownerCard.cardID))
+			console.log '\tlocalized name', owner
+		@turnLog = owner + action.type + @cardUtils.localizeName(@cardUtils.getCard(card))
 
 		if action.target
+			target = @entities[action.target]
 			@targetSource = action?.data.id
-			@targetDestination = action.target.id
-			@turnLog += ' -> ' + @cardUtils.localizeName(@cardUtils.getCard(action.target.cardID))
+			@targetDestination = target.id
+			@turnLog += ' -> ' + @cardUtils.localizeName(@cardUtils.getCard(target.cardID))
 
 		console.log @turnLog
 
@@ -342,6 +352,22 @@ class ReplayPlayer extends EventEmitter
 									@turns[currentTurnNumber].actions[actionIndex] = action
 									#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
+							# Deaths. Not really an action, but useful to see clearly what happens
+							if command[1].length > 0 and command[1][0].tags and command[1][0].attributes.type == '6' 
+
+								for tag in command[1][0].tags
+									# Graveyard
+									if (tag.tag == 'ZONE' && tag.value == 4)
+										action = {
+											turn: currentTurnNumber - 1
+											index: actionIndex++
+											timestamp: batch.timestamp
+											type: ' died '
+											owner: tag.entity
+											initialCommand: command[1][0]
+										}
+										@turns[currentTurnNumber].actions[actionIndex] = action
+
 							# Attacked something
 							if command[1].length > 0 and parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
 								#console.log 'considering attack', command[1][0]
@@ -352,7 +378,7 @@ class ReplayPlayer extends EventEmitter
 									type: ': '
 									data: @entities[command[1][0].attributes.entity]
 									owner: @turns[currentTurnNumber].activePlayer
-									target: @entities[command[1][0].attributes.target]
+									target: command[1][0].attributes.target
 									initialCommand: command[1][0]
 								}
 								@turns[currentTurnNumber].actions[actionIndex] = action
@@ -363,12 +389,12 @@ class ReplayPlayer extends EventEmitter
 							# if it results from a spell being played
 							if (command[1].length > 0 && command[1][0].attributes.type == '3')
 
-								console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
+								#console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
 								# If parent action has a target, do nothing
 								if parseInt(command[1][0].parent?.attributes?.target) <= 0
 
-									console.log '\tadding', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
+									#console.log '\tadding', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
 									# Does it do damage?
 									if command[1][0].tags
@@ -388,7 +414,11 @@ class ReplayPlayer extends EventEmitter
 												type: ': '
 												data: @entities[command[1][0].attributes.entity]
 												owner: @turns[currentTurnNumber].activePlayer
-												target: @entities[target]
+												# Don't store the full entity, because it's possible the target 
+												# doesn't exist yet when parsing the replay
+												# (it's the case for created tokens)
+												#@entities[target]
+												target: target
 												initialCommand: command[1][0]
 											}
 											@turns[currentTurnNumber].actions[actionIndex] = action
@@ -462,7 +492,8 @@ class ReplayPlayer extends EventEmitter
 
 		@entities[definition.id] = entity
 		entity.update(definition)
-		#if definition.id is 68
+		if definition.id is 77
+			console.log 'receving Squire token', definition, entity
 			#if definition.cardID is 'GAME_005'
 			#	@player = entity.getController()
 			#	@opponent = @player.getOpponent()
