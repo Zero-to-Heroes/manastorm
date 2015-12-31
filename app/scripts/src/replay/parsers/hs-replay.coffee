@@ -62,6 +62,7 @@ class HSReplayParser
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 				if node.name == 'ShowEntity'
 					@stack[@stack.length - 2].showEntity = @entityDefinition
+					node.parent = @stack[@stack.length - 2]
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
 					#console.log 'giving name to card', node.attributes.cardID, @entityDefinition.id, @entityDefinition
@@ -132,6 +133,7 @@ class HSReplayParser
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 				if node.name == 'ShowEntity'
 					@stack[@stack.length - 2].showEntity = @entityDefinition
+					@entityDefinition.parent = @stack[@stack.length - 2]
 
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
@@ -158,8 +160,7 @@ class HSReplayParser
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
-				if (node?.attributes?.entity == '70')
-					console.log '\tDebug', node
+				node.parent = @stack[@stack.length - 2]
 				@state.push('action')
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 

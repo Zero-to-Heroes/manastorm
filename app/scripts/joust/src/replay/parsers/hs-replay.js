@@ -76,6 +76,7 @@
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            node.parent = this.stack[this.stack.length - 2];
           }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
@@ -163,7 +164,7 @@
     };
 
     HSReplayParser.prototype.actionState = function(node) {
-      var ref, tag;
+      var tag;
       switch (node.name) {
         case 'ShowEntity':
         case 'FullEntity':
@@ -171,6 +172,7 @@
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            this.entityDefinition.parent = this.stack[this.stack.length - 2];
           }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
@@ -193,9 +195,7 @@
           tag.parent.tags.push(tag);
           return this.replay.enqueue(null, 'receiveTagChange', tag);
         case 'Action':
-          if ((node != null ? (ref = node.attributes) != null ? ref.entity : void 0 : void 0) === '70') {
-            console.log('\tDebug', node);
-          }
+          node.parent = this.stack[this.stack.length - 2];
           this.state.push('action');
           return this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
         case 'Choices':

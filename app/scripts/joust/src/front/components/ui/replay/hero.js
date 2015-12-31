@@ -14,7 +14,6 @@
       }
       this.hero = this.props.entity.getHero();
       this.heroPower = this.props.entity.getHeroPower();
-      console.log('setting entity', this.hero, this.heroPower);
       hidden = false;
       return React.createElement("div", {
         "className": "hero"
@@ -38,10 +37,8 @@
       if (!this.hero || !this.heroPower) {
         return result;
       }
-      console.log('building cards map in hero', this.refs);
       result[this.hero.id] = this.refs[this.hero.id];
       result[this.heroPower.id] = this.refs[this.heroPower.id];
-      console.log('\tbuilt cards map', result);
       return result;
     }
   });

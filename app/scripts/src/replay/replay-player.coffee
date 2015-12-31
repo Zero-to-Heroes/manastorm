@@ -177,7 +177,7 @@ class ReplayPlayer extends EventEmitter
 		@goToTimestamp target
 
 	goToTimestamp: (timestamp) ->
-		console.log 'going to timestamp', timestamp
+		#console.log 'going to timestamp', timestamp
 		#initialSpeed = @speed
 
 		if (timestamp < @currentReplayTime)
@@ -305,7 +305,8 @@ class ReplayPlayer extends EventEmitter
 								timestamp: batch.timestamp
 								type: ' draw: '
 								data: @entities[playedCard]
-								owner: @turns[currentTurnNumber].activePlayer
+								owner: @entities[command[1][0].entity]
+								initialCommand: command[1][0]
 							}
 							@turns[currentTurnNumber].actions[actionIndex] = action
 
@@ -330,63 +331,74 @@ class ReplayPlayer extends EventEmitter
 									#console.log '\tcommand', j, command
 									#console.log '\t\tadding action to turn', currentTurnNumber, command[1][0].tags, command
 									action = {
-										turn: currentTurnNumber
+										turn: currentTurnNumber - 1
 										index: actionIndex++
 										timestamp: batch.timestamp
 										type: ': '
 										data: @entities[playedCard]
 										owner: @turns[currentTurnNumber].activePlayer
+										initialCommand: command[1][0]
 									}
 									@turns[currentTurnNumber].actions[actionIndex] = action
 									#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 							# Attacked something
-							if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0) 
+							if command[1].length > 0 and parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
 								#console.log 'considering attack', command[1][0]
 								action = {
-									turn: currentTurnNumber
+									turn: currentTurnNumber - 1
 									index: actionIndex++
 									timestamp: batch.timestamp
 									type: ': '
 									data: @entities[command[1][0].attributes.entity]
 									owner: @turns[currentTurnNumber].activePlayer
 									target: @entities[command[1][0].attributes.target]
+									initialCommand: command[1][0]
 								}
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding attack to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 							# Card powers. Maybe something more than just battlecries?
-							if (command[1].length > 0 && command[1][0].attributes.type == '3') 
+							# This also includes all effects from spells, which is too verbose. Don't add the action
+							# if it results from a spell being played
+							if (command[1].length > 0 && command[1][0].attributes.type == '3')
 
-								# Does it do damage?
-								if command[1][0].tags
-									dmg = 0
-									target = undefined
-									for tag in command[1][0].tags
-										if (tag.tag == 'DAMAGE' && tag.value > 0)
-											dmg = tag.value
-											target = tag.entity
+								console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
-									if dmg > 0
-										action = {
-											turn: currentTurnNumber
-											index: actionIndex++
-											timestamp: batch.timestamp
-											prefix: '\t'
-											type: ': '
-											data: @entities[command[1][0].attributes.entity]
-											owner: @turns[currentTurnNumber].activePlayer
-											target: @entities[target]
-										}
-										@turns[currentTurnNumber].actions[actionIndex] = action
+								# If parent action has a target, do nothing
+								if parseInt(command[1][0].parent?.attributes?.target) <= 0
+
+									console.log '\tadding', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
+
+									# Does it do damage?
+									if command[1][0].tags
+										dmg = 0
+										target = undefined
+										for tag in command[1][0].tags
+											if (tag.tag == 'DAMAGE' && tag.value > 0)
+												dmg = tag.value
+												target = tag.entity
+
+										if dmg > 0
+											action = {
+												turn: currentTurnNumber - 1
+												index: actionIndex++
+												timestamp: batch.timestamp
+												prefix: '\t'
+												type: ': '
+												data: @entities[command[1][0].attributes.entity]
+												owner: @turns[currentTurnNumber].activePlayer
+												target: @entities[target]
+												initialCommand: command[1][0]
+											}
+											@turns[currentTurnNumber].actions[actionIndex] = action
 
 
 							# Card revealed
-							# TODO: Hero Power is considered the same as any card
-							if (command[1].length > 0 && command[1][0].showEntity) 
+							# TODO: Don't add this when a spell is played, since another action already handles this
+							if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
 
 								#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
-
 								playedCard = -1
 
 								# Revealed entities can start in the PLAY zone
@@ -404,13 +416,15 @@ class ReplayPlayer extends EventEmitter
 								if (playedCard > -1)
 									#console.log '\tconsidering further'
 									action = {
-											turn: currentTurnNumber
+											turn: currentTurnNumber - 1
 											index: actionIndex++
 											timestamp: batch.timestamp
 											type: ': '
 											data: if @entities[command[1][0].showEntity.id] then @entities[command[1][0].showEntity.id] else command[1][0].showEntity
 											owner: @turns[currentTurnNumber].activePlayer
+											debugType: 'showEntity'
 											debug: command[1][0].showEntity
+											initialCommand: command[1][0]
 									}
 									if (action.data)
 										#console.log 'batch', i, batch

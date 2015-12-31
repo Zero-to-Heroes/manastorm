@@ -81,7 +81,6 @@
     Replay.prototype.render = function() {
       var allCards, bottom, replay, source, target, top;
       replay = this.state.replay;
-      console.log('rerendering replay');
       if (replay.players.length === 2) {
         top = React.createElement("div", {
           "className": "top"
@@ -138,7 +137,6 @@
       }
       if (this.refs['topBoard'] && this.refs['bottomBoard'] && this.refs['topHero'] && this.refs['bottomHero']) {
         allCards = this.merge(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap());
-        console.log('merged cards', allCards);
         source = this.findCard(allCards, replay.targetSource);
         target = this.findCard(allCards, replay.targetDestination);
       }

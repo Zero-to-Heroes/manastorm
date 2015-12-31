@@ -9,7 +9,7 @@ Hero = React.createClass
 
 		@hero = @props.entity.getHero()
 		@heroPower = @props.entity.getHeroPower()
-		console.log 'setting entity', @hero, @heroPower
+		#console.log 'setting entity', @hero, @heroPower
 		hidden = false
 			
 		return 	<div className="hero">
@@ -23,12 +23,12 @@ Hero = React.createClass
 		if !@hero || !@heroPower
 			return result
 
-		console.log 'building cards map in hero', this.refs
+		#console.log 'building cards map in hero', this.refs
 
 		result[@hero.id] = this.refs[@hero.id]
 		result[@heroPower.id] = this.refs[@heroPower.id]
 
-		console.log '\tbuilt cards map', result
+		#console.log '\tbuilt cards map', result
 
 		return result
 

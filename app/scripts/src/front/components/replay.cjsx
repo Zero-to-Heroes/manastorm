@@ -46,7 +46,7 @@ class Replay extends React.Component
 
 	render: ->
 		replay = @state.replay
-		console.log 'rerendering replay'
+		#console.log 'rerendering replay'
 
 		if replay.players.length == 2
 			#console.log 'All players are here'
@@ -82,7 +82,7 @@ class Replay extends React.Component
 		if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] 
 			#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
 			allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap()
-			console.log 'merged cards', allCards
+			#console.log 'merged cards', allCards
 			source = @findCard allCards, replay.targetSource
 			target = @findCard allCards, replay.targetDestination
 

@@ -184,7 +184,6 @@
     };
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
-      console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
         this.currentReplayTime = timestamp;
         this.historyPosition = 0;
@@ -242,7 +241,7 @@
     };
 
     ReplayPlayer.prototype.finalizeInit = function() {
-      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, i, j, k, l, len, len1, len2, len3, len4, m, n, o, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, ref5, tag, tagValue, target, tempOpponent, turnNumber;
+      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, i, j, k, l, len, len1, len2, len3, len4, m, n, o, playedCard, playerIndex, players, ref, ref1, ref10, ref11, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, tag, tagValue, target, tempOpponent, turnNumber;
       this.goToTimestamp(this.currentReplayTime);
       this.update();
       players = [this.player, this.opponent];
@@ -294,7 +293,8 @@
                   timestamp: batch.timestamp,
                   type: ' draw: ',
                   data: this.entities[playedCard],
-                  owner: this.turns[currentTurnNumber].activePlayer
+                  owner: this.entities[command[1][0].entity],
+                  initialCommand: command[1][0]
                 };
                 this.turns[currentTurnNumber].actions[actionIndex] = action;
               }
@@ -313,80 +313,89 @@
                   }
                   if (playedCard > -1) {
                     action = {
-                      turn: currentTurnNumber,
+                      turn: currentTurnNumber - 1,
                       index: actionIndex++,
                       timestamp: batch.timestamp,
                       type: ': ',
                       data: this.entities[playedCard],
-                      owner: this.turns[currentTurnNumber].activePlayer
+                      owner: this.turns[currentTurnNumber].activePlayer,
+                      initialCommand: command[1][0]
                     };
                     this.turns[currentTurnNumber].actions[actionIndex] = action;
                   }
                 }
-                if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0) {
+                if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0 && (command[1][0].attributes.type === '1' || !command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)) {
                   action = {
-                    turn: currentTurnNumber,
+                    turn: currentTurnNumber - 1,
                     index: actionIndex++,
                     timestamp: batch.timestamp,
                     type: ': ',
                     data: this.entities[command[1][0].attributes.entity],
                     owner: this.turns[currentTurnNumber].activePlayer,
-                    target: this.entities[command[1][0].attributes.target]
+                    target: this.entities[command[1][0].attributes.target],
+                    initialCommand: command[1][0]
                   };
                   this.turns[currentTurnNumber].actions[actionIndex] = action;
                 }
                 if (command[1].length > 0 && command[1][0].attributes.type === '3') {
-                  if (command[1][0].tags) {
-                    dmg = 0;
-                    target = void 0;
-                    ref3 = command[1][0].tags;
-                    for (n = 0, len3 = ref3.length; n < len3; n++) {
-                      tag = ref3[n];
-                      if (tag.tag === 'DAMAGE' && tag.value > 0) {
-                        dmg = tag.value;
-                        target = tag.entity;
+                  console.log('parent target?', parseInt((ref3 = command[1][0].parent) != null ? (ref4 = ref3.attributes) != null ? ref4.target : void 0 : void 0), command[1][0].attributes.entity, command[1][0]);
+                  if (parseInt((ref5 = command[1][0].parent) != null ? (ref6 = ref5.attributes) != null ? ref6.target : void 0 : void 0) <= 0) {
+                    console.log('\tadding', parseInt((ref7 = command[1][0].parent) != null ? (ref8 = ref7.attributes) != null ? ref8.target : void 0 : void 0), command[1][0].attributes.entity, command[1][0]);
+                    if (command[1][0].tags) {
+                      dmg = 0;
+                      target = void 0;
+                      ref9 = command[1][0].tags;
+                      for (n = 0, len3 = ref9.length; n < len3; n++) {
+                        tag = ref9[n];
+                        if (tag.tag === 'DAMAGE' && tag.value > 0) {
+                          dmg = tag.value;
+                          target = tag.entity;
+                        }
                       }
-                    }
-                    if (dmg > 0) {
-                      action = {
-                        turn: currentTurnNumber,
-                        index: actionIndex++,
-                        timestamp: batch.timestamp,
-                        prefix: '\t',
-                        type: ': ',
-                        data: this.entities[command[1][0].attributes.entity],
-                        owner: this.turns[currentTurnNumber].activePlayer,
-                        target: this.entities[target]
-                      };
-                      this.turns[currentTurnNumber].actions[actionIndex] = action;
+                      if (dmg > 0) {
+                        action = {
+                          turn: currentTurnNumber - 1,
+                          index: actionIndex++,
+                          timestamp: batch.timestamp,
+                          prefix: '\t',
+                          type: ': ',
+                          data: this.entities[command[1][0].attributes.entity],
+                          owner: this.turns[currentTurnNumber].activePlayer,
+                          target: this.entities[target],
+                          initialCommand: command[1][0]
+                        };
+                        this.turns[currentTurnNumber].actions[actionIndex] = action;
+                      }
                     }
                   }
                 }
-                if (command[1].length > 0 && command[1][0].showEntity) {
+                if (command[1].length > 0 && command[1][0].showEntity && (command[1][0].attributes.type === '1' || !command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)) {
                   playedCard = -1;
-                  ref4 = command[1][0].showEntity.tags;
-                  for (entityTag in ref4) {
-                    tagValue = ref4[entityTag];
+                  ref10 = command[1][0].showEntity.tags;
+                  for (entityTag in ref10) {
+                    tagValue = ref10[entityTag];
                     if (entityTag === 'ZONE' && tagValue === 1) {
                       playedCard = command[1][0].showEntity.id;
                     }
                   }
-                  ref5 = command[1][0].tags;
-                  for (o = 0, len4 = ref5.length; o < len4; o++) {
-                    tag = ref5[o];
+                  ref11 = command[1][0].tags;
+                  for (o = 0, len4 = ref11.length; o < len4; o++) {
+                    tag = ref11[o];
                     if (tag.tag === 'ZONE' && tag.value === 1) {
                       playedCard = tag.entity;
                     }
                   }
                   if (playedCard > -1) {
                     action = {
-                      turn: currentTurnNumber,
+                      turn: currentTurnNumber - 1,
                       index: actionIndex++,
                       timestamp: batch.timestamp,
                       type: ': ',
                       data: this.entities[command[1][0].showEntity.id] ? this.entities[command[1][0].showEntity.id] : command[1][0].showEntity,
                       owner: this.turns[currentTurnNumber].activePlayer,
-                      debug: command[1][0].showEntity
+                      debugType: 'showEntity',
+                      debug: command[1][0].showEntity,
+                      initialCommand: command[1][0]
                     };
                     if (action.data) {
                       this.turns[currentTurnNumber].actions[actionIndex] = action;
