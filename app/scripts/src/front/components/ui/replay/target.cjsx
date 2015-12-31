@@ -22,7 +22,7 @@ Target = React.createClass
 		playerEl = document.getElementById('externalPlayer')
 		containerTop = playerEl.getBoundingClientRect().top
 		containerLeft = playerEl.getBoundingClientRect().left
-		console.log containerTop, containerLeft
+		console.log 'containerleft', containerLeft
 
 		# If top player attacks, rotate the arrow to have it point down
 		transform = ''
@@ -33,14 +33,17 @@ Target = React.createClass
 		tanAlpha = (sourceDims.centerX - targetDims.centerX) * 1.0 / arrowHeight
 		alpha = Math.atan(tanAlpha) * 180 / Math.PI
 		if sourceDims.centerY < targetDims.centerY
-			alpha = -alpha - 180
+			alpha = -alpha
 
 		console.log 'angle is', alpha
 		transform += 'skewX(' + alpha + 'deg)'
 
 		# And readjust the origin
+		alpha = alpha * Math.PI / 180
 		left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
-		left = left - Math.cos(alpha) * arrowWidth
+		console.log 'readjusted left', left
+		left = left + Math.cos(alpha) * arrowWidth / 2
+		console.log 'final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2
 
 		style = {
 			height: arrowHeight

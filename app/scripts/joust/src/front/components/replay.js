@@ -2,7 +2,8 @@
   var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __slice = [].slice;
 
   console.log('in replay');
 
@@ -43,6 +44,8 @@
   _ = require('lodash');
 
   Replay = (function(_super) {
+    var tap;
+
     __extends(Replay, _super);
 
     function Replay(props) {
@@ -76,7 +79,7 @@
     };
 
     Replay.prototype.render = function() {
-      var bottom, replay, source, target, top;
+      var allCards, bottom, replay, source, target, top;
       replay = this.state.replay;
       console.log('rerendering replay');
       if (replay.players.length === 2) {
@@ -102,7 +105,8 @@
           "entity": replay.opponent,
           "isHidden": true
         }), React.createElement(Hero, {
-          "entity": replay.opponent
+          "entity": replay.opponent,
+          "ref": "topHero"
         }));
         bottom = React.createElement("div", {
           "className": "bottom"
@@ -123,7 +127,8 @@
         }), React.createElement(Play, {
           "entity": replay.player
         }), React.createElement(Hero, {
-          "entity": replay.player
+          "entity": replay.player,
+          "ref": "bottomHero"
         }), React.createElement(Hand, {
           "entity": replay.player,
           "isHidden": false
@@ -131,9 +136,11 @@
       } else {
         console.warn('Missing players', replay.players);
       }
-      if (this.refs['topBoard'] && this.refs['bottomBoard']) {
-        source = this.findCard(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetSource);
-        target = this.findCard(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetDestination);
+      if (this.refs['topBoard'] && this.refs['bottomBoard'] && this.refs['topHero'] && this.refs['bottomHero']) {
+        allCards = this.merge(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap());
+        console.log('merged cards', allCards);
+        source = this.findCard(allCards, replay.targetSource);
+        target = this.findCard(allCards, replay.targetDestination);
       }
       return React.createElement("div", {
         "className": "replay"
@@ -193,16 +200,42 @@
       return this.forceUpdate();
     };
 
-    Replay.prototype.findCard = function(topBoardCards, bottomBoardCards, cardID) {
+    Replay.prototype.findCard = function(allCards, cardID) {
       var card;
-      if (!topBoardCards || !bottomBoardCards || !cardID) {
+      if (!allCards || !cardID) {
         return void 0;
       }
-      card = topBoardCards[cardID];
-      if (!card) {
-        card = bottomBoardCards[cardID];
-      }
+      card = allCards[cardID];
       return card;
+    };
+
+    Replay.prototype.merge = function() {
+      var xs;
+      xs = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      if ((xs != null ? xs.length : void 0) > 0) {
+        return tap({}, function(m) {
+          var k, v, x, _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = xs.length; _i < _len; _i++) {
+            x = xs[_i];
+            _results.push((function() {
+              var _results1;
+              _results1 = [];
+              for (k in x) {
+                v = x[k];
+                _results1.push(m[k] = v);
+              }
+              return _results1;
+            })());
+          }
+          return _results;
+        });
+      }
+    };
+
+    tap = function(o, fn) {
+      fn(o);
+      return o;
     };
 
     return Replay;

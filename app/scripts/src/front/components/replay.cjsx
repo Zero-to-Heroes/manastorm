@@ -60,7 +60,7 @@ class Replay extends React.Component
 				<Health entity={replay.opponent} />
 				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={true} />
-				<Hero entity={replay.opponent} />
+				<Hero entity={replay.opponent} ref="topHero"/>
 			</div>
 
 			bottom = <div className="bottom">
@@ -71,7 +71,7 @@ class Replay extends React.Component
 				<Mana entity={replay.player} />
 				<Health entity={replay.player} />
 				<Play entity={replay.player} />
-				<Hero entity={replay.player} />
+				<Hero entity={replay.player} ref="bottomHero" />
 				<Hand entity={replay.player} isHidden={false} />
 			</div>
 
@@ -79,10 +79,12 @@ class Replay extends React.Component
 			console.warn 'Missing players', replay.players
 
 		#console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
-		if this.refs['topBoard'] && this.refs['bottomBoard'] 
+		if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] 
 			#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
-			source = @findCard this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetSource
-			target = @findCard this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), replay.targetDestination
+			allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap()
+			console.log 'merged cards', allCards
+			source = @findCard allCards, replay.targetSource
+			target = @findCard allCards, replay.targetDestination
 
 
 		# {playButton}
@@ -129,16 +131,20 @@ class Replay extends React.Component
 		@state.replay.play()
 		@forceUpdate()
 
-	findCard: (topBoardCards, bottomBoardCards, cardID) ->
+	findCard: (allCards, cardID) ->
 		#console.log 'finding card', topBoardCards, bottomBoardCards, cardID
-		if !topBoardCards || !bottomBoardCards || !cardID
+		if !allCards || !cardID
 			return undefined
 
 		#console.log 'topBoard cardsMap', topBoardCards, cardID
-		card = topBoardCards[cardID]
-		if !card
-			card = bottomBoardCards[cardID]
+		card = allCards[cardID]
 		#console.log '\tFound card', card
 		return card
+
+	# https://gist.github.com/sheldonh/6089299
+	merge: (xs...) ->
+	  	if xs?.length > 0
+	    	tap {}, (m) -> m[k] = v for k,v of x for x in xs
+		tap = (o, fn) -> fn(o); o
 
 module.exports = Replay

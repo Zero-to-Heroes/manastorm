@@ -41,6 +41,8 @@ class ReplayPlayer extends EventEmitter
 
 		@finalizeInit()
 
+		@goNextAction()
+
 	start: (timestamp) ->
 		# The timestamp recorded by the game for the beginning, don't touch this
 		@startTimestamp = timestamp

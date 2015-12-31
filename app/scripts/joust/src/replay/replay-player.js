@@ -43,7 +43,8 @@
       this.started = false;
       this.cardUtils = window['parseCardsText'];
       this.parser.parse(this);
-      return this.finalizeInit();
+      this.finalizeInit();
+      return this.goNextAction();
     };
 
     ReplayPlayer.prototype.start = function(timestamp) {

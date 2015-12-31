@@ -8,27 +8,41 @@
   Hero = React.createClass({
     componentDidMount: function() {},
     render: function() {
-      var hero, heroPower, hidden;
+      var hidden;
       if (this.props.entity.tags.MULLIGAN_STATE !== 4) {
         return null;
       }
-      hero = this.props.entity.getHero();
-      heroPower = this.props.entity.getHeroPower();
-      console.log('setting entity', hero, heroPower);
+      this.hero = this.props.entity.getHero();
+      this.heroPower = this.props.entity.getHeroPower();
+      console.log('setting entity', this.hero, this.heroPower);
       hidden = false;
       return React.createElement("div", {
         "className": "hero"
       }, React.createElement(Card, {
-        "entity": hero,
-        "key": hero.id,
+        "entity": this.hero,
+        "key": this.hero.id,
         "isHidden": hidden,
+        "ref": this.hero.id,
         "className": "avatar"
       }), React.createElement(Card, {
-        "entity": heroPower,
-        "key": heroPower.id,
+        "entity": this.heroPower,
+        "key": this.heroPower.id,
         "isHidden": hidden,
+        "ref": this.heroPower.id,
         "className": "power"
       }));
+    },
+    getCardsMap: function() {
+      var result;
+      result = {};
+      if (!this.hero || !this.heroPower) {
+        return result;
+      }
+      console.log('building cards map in hero', this.refs);
+      result[this.hero.id] = this.refs[this.hero.id];
+      result[this.heroPower.id] = this.refs[this.heroPower.id];
+      console.log('\tbuilt cards map', result);
+      return result;
     }
   });
 
