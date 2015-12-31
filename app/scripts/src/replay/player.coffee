@@ -1,4 +1,4 @@
-{zones, zoneNames} = require './enums'
+{zones, zoneNames, cardTypes} = require './enums'
 _ = require 'lodash'
 Entity = require './entity'
 
@@ -23,6 +23,11 @@ class Player extends Entity
 		return _.sortBy board, (entity) -> entity.tags.ZONE_POSITION
 
 	getHero: -> @replay.entities[@tags.HERO_ENTITY]
+
+	getHeroPower: ->
+		heroPower = _.filter @replay.entities, (entity) =>
+			entity.tags.ZONE is zones.PLAY and entity.tags.CARDTYPE is cardTypes.HERO_POWER and entity.tags.CONTROLLER is @tags.CONTROLLER
+		return heroPower[0]
 
 	getOpponent: ->
 		if @tags.CONTROLLER is 1

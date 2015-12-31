@@ -42,6 +42,9 @@
       if (this.props.entity.tags.TAUNT) {
         cls += " card--taunt";
       }
+      if (this.props.className) {
+        cls += " " + this.props.className;
+      }
       if (this.props.stats) {
         stats = React.createElement("div", {
           "className": "card__stats"

@@ -23,6 +23,9 @@ class Card extends React.Component
 		if @props.entity.tags.TAUNT
 			cls += " card--taunt"
 
+		if @props.className
+			cls += " " + @props.className
+
 		if @props.stats
 			stats = <div className="card__stats">
 				<div className="card__stats__attack">{@props.entity.tags.ATK or 0}</div>

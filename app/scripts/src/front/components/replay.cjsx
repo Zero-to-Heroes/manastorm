@@ -5,6 +5,7 @@ ReplayPlayer = require '../../replay/replay-player'
 HSReplayParser = require '../../replay/parsers/hs-replay'
 PlayerName = require './ui/replay/player-name'
 Hand = require './ui/replay/hand'
+Hero = require './ui/replay/hero'
 Deck = require './ui/replay/deck'
 Mulligan = require './ui/replay/mulligan'
 Board = require './ui/replay/board'
@@ -59,6 +60,7 @@ class Replay extends React.Component
 				<Health entity={replay.opponent} />
 				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={true} />
+				<Hero entity={replay.opponent} />
 			</div>
 
 			bottom = <div className="bottom">
@@ -69,6 +71,7 @@ class Replay extends React.Component
 				<Mana entity={replay.player} />
 				<Health entity={replay.player} />
 				<Play entity={replay.player} />
+				<Hero entity={replay.player} />
 				<Hand entity={replay.player} isHidden={false} />
 			</div>
 
@@ -84,6 +87,11 @@ class Replay extends React.Component
 
 		# {playButton}
 		return <div className="replay">
+					<div className="replay__game">
+						{top}
+						{bottom}
+						<Target source={source} target={target} />
+					</div>
 					<form className="replay__controls padded">
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
@@ -91,15 +99,8 @@ class Replay extends React.Component
 							<Button glyph="to-end" onClick={@goNextAction}/>
 							<Button glyph="fast-forward" onClick={@goNextTurn}/>
 						</ButtonGroup>
-
 						<Timeline replay={replay} />
 					</form>
-					<div className="replay__game">
-						{top}
-						{bottom}
-						<Target source={source} target={target} />
-					</div>
-					
 					<GameLog replay={replay} />
 				</div>
 

@@ -5,15 +5,12 @@
 .replay__game {
   border: none;
   background: #DDB570 url(images/felt.png) 50% 50% repeat;
-  padding-bottom: 80px;
 }
 
 .replay__controls {
-  position: absolute;
-  bottom: 50px;
-  background: transparent;
   width: 100%;
   display: table;
+  background: #DDB570 url(images/felt.png) 50% 50% repeat;
 }
 
 .deck {
@@ -26,8 +23,30 @@
   background-size: cover;
 }
 
+.hand {
+  top: -80px;
+}
+
+.bottom .hand {
+  top: auto;
+  bottom: -60px;
+}
+
 .bottom .hand > .card:hover {
-  transform: scale(2);
+  transform: translateY(-60px) scale(2);
+}
+
+.board {
+  position: relative;
+  height: 78px;
+}
+
+.top .board {
+  top: 140px;
+}
+
+.bottom .board {
+  top: 0;
 }
 
 .scrubber {

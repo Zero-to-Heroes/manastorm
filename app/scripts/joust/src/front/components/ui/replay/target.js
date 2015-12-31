@@ -33,7 +33,7 @@
       tanAlpha = (sourceDims.centerX - targetDims.centerX) * 1.0 / arrowHeight;
       alpha = Math.atan(tanAlpha) * 180 / Math.PI;
       if (sourceDims.centerY < targetDims.centerY) {
-        alpha = -alpha;
+        alpha = -alpha - 180;
       }
       console.log('angle is', alpha);
       transform += 'skewX(' + alpha + 'deg)';

@@ -1,9 +1,9 @@
 (function() {
-  var Entity, Player, _, ref, zoneNames, zones,
+  var Entity, Player, _, cardTypes, ref, zoneNames, zones,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
-  ref = require('./enums'), zones = ref.zones, zoneNames = ref.zoneNames;
+  ref = require('./enums'), zones = ref.zones, zoneNames = ref.zoneNames, cardTypes = ref.cardTypes;
 
   _ = require('lodash');
 
@@ -50,6 +50,16 @@
 
     Player.prototype.getHero = function() {
       return this.replay.entities[this.tags.HERO_ENTITY];
+    };
+
+    Player.prototype.getHeroPower = function() {
+      var heroPower;
+      heroPower = _.filter(this.replay.entities, (function(_this) {
+        return function(entity) {
+          return entity.tags.ZONE === zones.PLAY && entity.tags.CARDTYPE === cardTypes.HERO_POWER && entity.tags.CONTROLLER === _this.tags.CONTROLLER;
+        };
+      })(this));
+      return heroPower[0];
     };
 
     Player.prototype.getOpponent = function() {

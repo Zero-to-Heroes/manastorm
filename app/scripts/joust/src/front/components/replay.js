@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
+  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -17,6 +17,8 @@
   PlayerName = require('./ui/replay/player-name');
 
   Hand = require('./ui/replay/hand');
+
+  Hero = require('./ui/replay/hero');
 
   Deck = require('./ui/replay/deck');
 
@@ -99,6 +101,8 @@
         }), React.createElement(Hand, {
           "entity": replay.opponent,
           "isHidden": true
+        }), React.createElement(Hero, {
+          "entity": replay.opponent
         }));
         bottom = React.createElement("div", {
           "className": "bottom"
@@ -118,6 +122,8 @@
           "entity": replay.player
         }), React.createElement(Play, {
           "entity": replay.player
+        }), React.createElement(Hero, {
+          "entity": replay.player
         }), React.createElement(Hand, {
           "entity": replay.player,
           "isHidden": false
@@ -131,7 +137,12 @@
       }
       return React.createElement("div", {
         "className": "replay"
-      }, React.createElement("form", {
+      }, React.createElement("div", {
+        "className": "replay__game"
+      }, top, bottom, React.createElement(Target, {
+        "source": source,
+        "target": target
+      })), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
         "glyph": "fast-backward",
@@ -147,11 +158,6 @@
         "onClick": this.goNextTurn
       })), React.createElement(Timeline, {
         "replay": replay
-      })), React.createElement("div", {
-        "className": "replay__game"
-      }, top, bottom, React.createElement(Target, {
-        "source": source,
-        "target": target
       })), React.createElement(GameLog, {
         "replay": replay
       }));
