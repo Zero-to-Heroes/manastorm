@@ -16,6 +16,7 @@ class ReplayPlayer extends EventEmitter
 		@currentTurn = 0
 		@currentActionInTurn = 0
 		@turnLog = ''
+		@cardUtils = window['parseCardsText']
 
 	init: ->
 		@entities = {}
@@ -34,9 +35,6 @@ class ReplayPlayer extends EventEmitter
 
 		@started = false
 
-		@cardUtils = window['parseCardsText']
-		#console.log 'cardUtils', @cardUtils
-
 		@parser.parse(this)
 
 		@finalizeInit()
@@ -52,6 +50,7 @@ class ReplayPlayer extends EventEmitter
 		@goToTimestamp @currentReplayTime
 
 	goNextAction: ->
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@turnLog = ''
 		@currentActionInTurn++
@@ -184,22 +183,44 @@ class ReplayPlayer extends EventEmitter
 
 	moveTime: (progression) ->
 		target = @getTotalLength() * progression * 1000
-		@goToTimestamp target
+		@moveToTimestamp target
+
+	moveToTimestamp: (timestamp) ->
+		@newStep()
+		@currentTurn = 0
+		@currentActionInTurn = 0
+
+		for i in [1..@turns.length]
+			turn = @turns[i]
+			#console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp
+			if turn.actions?.length > 0 and (turn.actions[turn.actions.length - 1].timestamp - @startTimestamp) * 1000 > timestamp
+				#console.log 'exiting loop', @currentTurn, @currentActionInTurn
+				break
+			@currentTurn = i
+
+			for j in [1..turn.actions.length]
+				#console.log '\tactions', turn.actions, j
+				action = turn.actions[j]
+				#console.log '\tconsidering action', i, j, turn, action
+				if !action or !action.timestamp or (action?.timestamp - @startTimestamp) * 1000 > timestamp
+					#console.log '\t\tBreaking', action, (action?.timestamp - @startTimestamp) * 1000, timestamp
+					break
+				@currentActionInTurn = j
+
+		#console.log 'Going to timetstamp', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		#console.log '\t', timestamp, 1000 * (@turns[@currentTurn].actions[@currentActionInTurn].timestamp - @startTimestamp) + 1, @startTimestamp
+		@goToAction()
 
 	goToTimestamp: (timestamp) ->
 		#console.log 'going to timestamp', timestamp
 		#initialSpeed = @speed
 
 		if (timestamp < @currentReplayTime)
-			@currentReplayTime = timestamp
+			console.log 'going back in time, resetting', timestamp, @currentReplayTime
 			@historyPosition = 0
 			@init()
 
 		@start(@startTimestamp)
-
-		#if (!@interval)
-			#@run()
-			#@changeSpeed(initialSpeed)
 
 		@currentReplayTime = timestamp
 		@update()
@@ -303,7 +324,7 @@ class ReplayPlayer extends EventEmitter
 						#console.log 'batch', i, batch
 						#console.log '\tProcessed end of turn, current player is now', currentPlayer
 
-					# Start of turn draw
+					# Draw cards
 					if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].tag == 'NUM_CARDS_DRAWN_THIS_TURN' && command[1][0].value > 0)
 						#console.log 'batch', i, batch
 						#console.log '\tcommand', j, command
@@ -313,7 +334,7 @@ class ReplayPlayer extends EventEmitter
 								turn: currentTurnNumber
 								index: actionIndex++
 								timestamp: batch.timestamp
-								type: ' draw: '
+								type: ' draw: ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
 								data: @entities[playedCard]
 								owner: @entities[command[1][0].entity]
 								initialCommand: command[1][0]
@@ -368,9 +389,11 @@ class ReplayPlayer extends EventEmitter
 										}
 										@turns[currentTurnNumber].actions[actionIndex] = action
 
+							if command[1][0].attributes.entity == '15'
+								console.log 'considering entity 15', command[1][0], command[1][0].showEntity
 							# Attacked something
 							if command[1].length > 0 and parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
-								#console.log 'considering attack', command[1][0]
+								console.log 'considering attack', command[1][0]
 								action = {
 									turn: currentTurnNumber - 1
 									index: actionIndex++
@@ -392,7 +415,7 @@ class ReplayPlayer extends EventEmitter
 								#console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
 								# If parent action has a target, do nothing
-								if parseInt(command[1][0].parent?.attributes?.target) <= 0
+								if !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0
 
 									#console.log '\tadding', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
@@ -423,12 +446,11 @@ class ReplayPlayer extends EventEmitter
 											}
 											@turns[currentTurnNumber].actions[actionIndex] = action
 
-
 							# Card revealed
 							# TODO: Don't add this when a spell is played, since another action already handles this
-							if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
+							if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
 
-								#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
+								console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
 								playedCard = -1
 
 								# Revealed entities can start in the PLAY zone

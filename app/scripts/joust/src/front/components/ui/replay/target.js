@@ -46,7 +46,7 @@
         if (sourceDims.centerY < targetDims.centerY) {
           transform += 'rotate(180deg) ';
         }
-        tanAlpha = (sourceDims.centerX - targetDims.centerX) * 1.0 / (arrowHeight + 0.0001);
+        tanAlpha = (sourceDims.centerX - targetDims.centerX) * 1.0 / arrowHeight;
         alpha = Math.atan(tanAlpha) * 180 / Math.PI;
         if (sourceDims.centerY < targetDims.centerY) {
           alpha = -alpha;
@@ -56,8 +56,8 @@
         alpha = alpha * Math.PI / 180;
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
         console.log('readjusted left', left);
-        left = left + Math.cos(alpha) * arrowWidth / 2;
-        console.log('final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2);
+        left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2;
+        console.log('final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2);
         console.log('final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop);
         top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop;
         height = arrowHeight;
