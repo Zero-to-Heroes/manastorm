@@ -27,12 +27,18 @@ class Card extends React.Component
 			cls += " " + @props.className
 
 		if @props.entity.tags.DIVINE_SHIELD
-			overlay = <div className="divine-shield"></div>
+			overlay = <div className="overlay divine-shield"></div>
+
+		if @props.entity.tags.SILENCED
+			overlay = <div className="overlay silenced"></div>
 
 		if @props.stats
+			healthClass = "card__stats__health"
+			if @props.entity.tags.DAMAGE > 0
+				healthClass += " damaged"
 			stats = <div className="card__stats">
 				<div className="card__stats__attack">{@props.entity.tags.ATK or 0}</div>
-				<div className="card__stats__health">{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
+				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
 		return <div className={cls} style={style}>
@@ -41,9 +47,9 @@ class Card extends React.Component
 		</div>
 
 	componentDidUpdate: ->
-		#console.log 'updating card dimensions'
 		domNode = ReactDOM.findDOMNode(this)
 		if domNode
+			#console.log 'updating card dimensions'
 			dimensions = domNode.getBoundingClientRect()
 			@centerX = dimensions.left + dimensions.width / 2
 			@centerY = dimensions.top + dimensions.height / 2

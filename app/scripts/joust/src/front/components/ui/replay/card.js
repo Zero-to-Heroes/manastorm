@@ -27,7 +27,7 @@
     };
 
     Card.prototype.render = function() {
-      var art, cls, overlay, stats, style;
+      var art, cls, healthClass, overlay, stats, style;
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/" + this.props.entity.cardID + ".png";
       if (this.props.entity.cardID && !this.props.isHidden) {
         style = {
@@ -47,16 +47,25 @@
       }
       if (this.props.entity.tags.DIVINE_SHIELD) {
         overlay = React.createElement("div", {
-          "className": "divine-shield"
+          "className": "overlay divine-shield"
+        });
+      }
+      if (this.props.entity.tags.SILENCED) {
+        overlay = React.createElement("div", {
+          "className": "overlay silenced"
         });
       }
       if (this.props.stats) {
+        healthClass = "card__stats__health";
+        if (this.props.entity.tags.DAMAGE > 0) {
+          healthClass += " damaged";
+        }
         stats = React.createElement("div", {
           "className": "card__stats"
         }, React.createElement("div", {
           "className": "card__stats__attack"
         }, this.props.entity.tags.ATK || 0), React.createElement("div", {
-          "className": "card__stats__health"
+          "className": healthClass
         }, this.props.entity.tags.HEALTH - (this.props.entity.tags.DAMAGE || 0)));
       }
       return React.createElement("div", {

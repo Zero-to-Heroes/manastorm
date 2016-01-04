@@ -43,12 +43,14 @@
     getCardsMap: function() {
       var result;
       result = {};
-      if (!this.hero || !this.heroPower || !this.weapon) {
+      if (!this.hero || !this.heroPower) {
         return result;
       }
       result[this.hero.id] = this.refs[this.hero.id];
       result[this.heroPower.id] = this.refs[this.heroPower.id];
-      result[this.weapon.id] = this.refs[this.weapon.id];
+      if (this.weapon) {
+        result[this.weapon.id] = this.refs[this.weapon.id];
+      }
       return result;
     }
   });

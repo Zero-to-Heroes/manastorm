@@ -23,14 +23,15 @@ Hero = React.createClass
 	getCardsMap: ->
 		result = {}
 
-		if !@hero || !@heroPower || !@weapon
+		if !@hero || !@heroPower
 			return result
 
 		#console.log 'building cards map in hero', this.refs
 
 		result[@hero.id] = this.refs[@hero.id]
 		result[@heroPower.id] = this.refs[@heroPower.id]
-		result[@weapon.id] = this.refs[@weapon.id]
+		if @weapon
+			result[@weapon.id] = this.refs[@weapon.id]
 
 		#console.log '\tbuilt cards map', result
 
