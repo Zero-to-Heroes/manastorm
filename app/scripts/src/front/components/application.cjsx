@@ -3,7 +3,7 @@ React = require 'react'
 
 module.exports = Application = React.createClass
 	render: ->
-		console.log('rendering application')
+		#console.log('rendering application')
 		<Window>
 			<Toolbar title="Joust" className="title-bar" />
 

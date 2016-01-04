@@ -7,7 +7,6 @@
 
   module.exports = Application = React.createClass({
     render: function() {
-      console.log('rendering application');
       return React.createElement(Window, null, React.createElement(Toolbar, {
         "title": "Joust",
         "className": "title-bar"

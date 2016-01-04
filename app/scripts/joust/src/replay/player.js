@@ -60,6 +60,16 @@
       });
     };
 
+    Player.prototype.getWeapon = function() {
+      var weapon;
+      weapon = _.filter(this.replay.entities, (function(_this) {
+        return function(entity) {
+          return entity.tags.ZONE === zones.PLAY && entity.tags.CONTROLLER === _this.tags.CONTROLLER && entity.tags.CARDTYPE === 7;
+        };
+      })(this));
+      return weapon[0];
+    };
+
     Player.prototype.getHero = function() {
       return this.replay.entities[this.tags.HERO_ENTITY];
     };

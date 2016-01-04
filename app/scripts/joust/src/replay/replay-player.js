@@ -57,16 +57,12 @@
     };
 
     ReplayPlayer.prototype.goNextAction = function() {
-      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
       this.newStep();
       this.turnLog = '';
       this.currentActionInTurn++;
-      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
-        console.log('going to next action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
         return this.goToAction();
       } else {
-        console.log('going directly to next turn', this.currentTurn + 1);
         return this.goNextTurn();
       }
     };
@@ -75,18 +71,13 @@
       this.newStep();
       this.turnLog = '';
       this.currentActionInTurn--;
-      console.log('going to previous action', this.currentActionInTurn);
       if (this.currentActionInTurn === 1) {
-        console.log('going directly to beginning of turn', this.currentTurn);
         this.goPreviousTurn();
         return this.goNextTurn();
       } else if (this.currentActionInTurn <= 0) {
-        console.log('going directly to end of previous turn', this.currentTurn - 1);
         this.goPreviousTurn();
-        console.log('moved back to previous turn', this.currentTurn);
         this.currentActionInTurn = this.turns[this.currentTurn].actions.length - 1;
         if (this.currentActionInTurn > 0) {
-          console.log('moving to action', this.currentActionInTurn);
           return this.goToAction();
         }
       } else if (this.turns[this.currentTurn]) {
@@ -98,9 +89,7 @@
       var action, card, cardName, owner, ownerCard, target, targetTimestamp;
       this.newStep();
       action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-      console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
       targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
-      console.log('executing action', action, action.data);
       card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
       owner = action.owner.name;
       if (!owner) {
@@ -115,7 +104,6 @@
         this.targetDestination = target.id;
         this.turnLog += ' -> ' + this.cardUtils.localizeName(this.cardUtils.getCard(target.cardID));
       }
-      console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
@@ -144,7 +132,6 @@
       this.newStep();
       this.currentActionInTurn = 0;
       this.currentTurn--;
-      console.log('going to previous turn', this.currentTurn, this.currentActionInTurn);
       targetTimestamp = this.getTotalLength() * 1000;
       if (this.currentTurn <= 0) {
         targetTimestamp = 0;
@@ -160,8 +147,7 @@
       } else {
         this.turnLog = 't' + this.turns[this.currentTurn].turn + ': ' + this.turns[this.currentTurn].activePlayer.name;
       }
-      this.goToTimestamp(targetTimestamp);
-      return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
+      return this.goToTimestamp(targetTimestamp);
     };
 
     ReplayPlayer.prototype.newStep = function() {
@@ -215,7 +201,6 @@
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
       if (timestamp < this.currentReplayTime) {
-        console.log('going back in time, resetting', timestamp, this.currentReplayTime);
         this.historyPosition = 0;
         this.init();
       }
@@ -234,7 +219,6 @@
       results = [];
       while (this.historyPosition < this.history.length) {
         if (elapsed > this.history[this.historyPosition].timestamp - this.startTimestamp) {
-          console.log('processing', this.history[this.historyPosition]);
           this.history[this.historyPosition].execute(this);
           results.push(this.historyPosition++);
         } else {
@@ -434,18 +418,22 @@
                 }
                 if (command[1].length > 0 && command[1][0].showEntity && (command[1][0].attributes.type === '1' || (command[1][0].attributes.type !== '3' && (!command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)))) {
                   playedCard = -1;
-                  ref5 = command[1][0].showEntity.tags;
-                  for (entityTag in ref5) {
-                    tagValue = ref5[entityTag];
-                    if (entityTag === 'ZONE' && tagValue === 1) {
-                      playedCard = command[1][0].showEntity.id;
+                  if (command[1][0].showEntity.tags) {
+                    ref5 = command[1][0].showEntity.tags;
+                    for (entityTag in ref5) {
+                      tagValue = ref5[entityTag];
+                      if (entityTag === 'ZONE' && tagValue === 1) {
+                        playedCard = command[1][0].showEntity.id;
+                      }
                     }
                   }
-                  ref6 = command[1][0].tags;
-                  for (p = 0, len5 = ref6.length; p < len5; p++) {
-                    tag = ref6[p];
-                    if (tag.tag === 'ZONE' && tag.value === 1) {
-                      playedCard = tag.entity;
+                  if (command[1][0].tags) {
+                    ref6 = command[1][0].tags;
+                    for (p = 0, len5 = ref6.length; p < len5; p++) {
+                      tag = ref6[p];
+                      if (tag.tag === 'ZONE' && tag.value === 1) {
+                        playedCard = tag.entity;
+                      }
                     }
                   }
                   if (playedCard > -1) {
@@ -474,7 +462,6 @@
             }
           }
         }
-        console.log(this.turns.length, 'game turns at position', this.turns);
       }
       if (parseInt(this.opponent.id) === parseInt(this.mainPlayerId)) {
         tempOpponent = this.player;
@@ -492,10 +479,7 @@
         entity = new Entity(this);
       }
       this.entities[definition.id] = entity;
-      entity.update(definition);
-      if (definition.id === 77) {
-        return console.log('receving Squire token', definition, entity);
-      }
+      return entity.update(definition);
     };
 
     ReplayPlayer.prototype.receiveTagChange = function(change) {

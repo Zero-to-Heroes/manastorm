@@ -18,7 +18,6 @@
         "component": this.Replay,
         "replay": xmlReplay
       }));
-      console.log('created routes', routes);
       router = React.createElement(Router, {
         "history": createMemoryHistory()
       }, routes);

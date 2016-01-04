@@ -68,9 +68,11 @@
     Card.prototype.componentDidUpdate = function() {
       var dimensions, domNode;
       domNode = ReactDOM.findDOMNode(this);
-      dimensions = domNode.getBoundingClientRect();
-      this.centerX = dimensions.left + dimensions.width / 2;
-      return this.centerY = dimensions.top + dimensions.height / 2;
+      if (domNode) {
+        dimensions = domNode.getBoundingClientRect();
+        this.centerX = dimensions.left + dimensions.width / 2;
+        return this.centerY = dimensions.top + dimensions.height / 2;
+      }
     };
 
     Card.prototype.getDimensions = function() {

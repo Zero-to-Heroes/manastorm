@@ -46,19 +46,15 @@
           return console.error('error while parsing xml', error);
         };
       })(this));
-      this.stream = new Stream(this.xmlReplay).pipe(this.sax);
-      return console.log('replay parsed', this.replay);
+      return this.stream = new Stream(this.xmlReplay).pipe(this.sax);
     };
 
     HSReplayParser.prototype.rootState = function(node) {
-      var ref, tag;
+      var tag;
       switch (node.name) {
         case 'Game':
           return this.replay.start(tsToSeconds(node.attributes.ts));
         case 'Action':
-          if ((node != null ? (ref = node.attributes) != null ? ref.entity : void 0 : void 0) === '70') {
-            console.log('\tDebug', node);
-          }
           this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
           return this.state.push('action');
         case 'TagChange':
@@ -155,7 +151,6 @@
           };
         case 'FullEntity':
           this.state.pop();
-          console.log('\tclosing full entity', this.entityDefinition);
           this.replay.enqueue(ts, 'receiveEntity', this.entityDefinition);
           return this.entityDefinition = {
             tags: {}
@@ -187,10 +182,7 @@
             this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
           }
           if (node.attributes.name) {
-            this.entityDefinition.name = node.attributes.name;
-          }
-          if (this.entityDefinition.id === 69) {
-            return console.log('parsing reinforce token', this.entityDefinition, node);
+            return this.entityDefinition.name = node.attributes.name;
           }
           break;
         case 'TagChange':

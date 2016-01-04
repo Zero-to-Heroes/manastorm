@@ -1,6 +1,7 @@
 React = require 'react'
 Card = require './card'
 HeroCard = require './herocard'
+Weapon = require './weapon'
 
 Hero = React.createClass
 	componentDidMount: ->
@@ -10,25 +11,26 @@ Hero = React.createClass
 
 		@hero = @props.entity.getHero()
 		@heroPower = @props.entity.getHeroPower()
+		@weapon = @props.entity.getWeapon()
 		@secrets = @props.entity.getSecrets()
-		#console.log 'setting entity', @hero, @heroPower
-		hidden = false
 			
 		return 	<div className="hero">
-					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} isHidden={hidden} ref={@hero.id} className="avatar"/>
-					<Card entity={@heroPower} key={@heroPower.id} isHidden={hidden} ref={@heroPower.id} className="power"/>
+					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} className="weapon"/>
+					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} ref={@hero.id} className="avatar"/>
+					<Card entity={@heroPower} key={@heroPower.id} ref={@heroPower.id} className="power"/>
 				</div>
 
 	getCardsMap: ->
 		result = {}
 
-		if !@hero || !@heroPower
+		if !@hero || !@heroPower || !@weapon
 			return result
 
 		#console.log 'building cards map in hero', this.refs
 
 		result[@hero.id] = this.refs[@hero.id]
 		result[@heroPower.id] = this.refs[@heroPower.id]
+		result[@weapon.id] = this.refs[@weapon.id]
 
 		#console.log '\tbuilt cards map', result
 

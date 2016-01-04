@@ -12,7 +12,7 @@ routes = {
 					<Route path="/replay" component={@Replay} replay={xmlReplay}/>
 				</Route>
 
-		console.log 'created routes', routes
+		#console.log 'created routes', routes
 		router = <Router history={createMemoryHistory()}>{routes}</Router>
 
 		externalPlayer = document.getElementById('externalPlayer');

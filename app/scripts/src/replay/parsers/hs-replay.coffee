@@ -30,7 +30,7 @@ class HSReplayParser
 		#@stream = fs.createReadStream(@path).pipe(@sax)
 		#console.log 'preparing to parse replay'
 		@stream = new Stream(@xmlReplay).pipe(@sax)
-		console.log 'replay parsed', @replay
+		#console.log 'replay parsed', @replay
 
 	rootState: (node) ->
 		#console.log '\tparsing node', node.name, node
@@ -40,8 +40,8 @@ class HSReplayParser
 
 			when 'Action'
 				#console.log 'enqueue action from rootState', node
-				if (node?.attributes?.entity == '70')
-					console.log '\tDebug', node
+				#if (node?.attributes?.entity == '70')
+					#console.log '\tDebug', node
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 				@state.push('action')
 
@@ -121,7 +121,7 @@ class HSReplayParser
 				@entityDefinition = {tags: {}}
 			when 'FullEntity'
 				@state.pop()
-				console.log '\tclosing full entity', @entityDefinition
+				#console.log '\tclosing full entity', @entityDefinition
 				@replay.enqueue ts, 'receiveEntity', @entityDefinition
 				@entityDefinition = {tags: {}}
 			when 'ShowEntity'
@@ -149,8 +149,8 @@ class HSReplayParser
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
-				if @entityDefinition.id is 69
-					console.log 'parsing reinforce token', @entityDefinition, node
+				#if @entityDefinition.id is 69
+				#console.log 'parsing reinforce token', @entityDefinition, node
 
 			when 'TagChange'
 				tag = {
