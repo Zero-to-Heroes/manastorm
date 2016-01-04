@@ -48,6 +48,18 @@
       });
     };
 
+    Player.prototype.getSecrets = function() {
+      var secrets;
+      secrets = _.filter(this.replay.entities, (function(_this) {
+        return function(entity) {
+          return entity.tags.ZONE === zones.SECRET && entity.tags.CONTROLLER === _this.tags.CONTROLLER;
+        };
+      })(this));
+      return _.sortBy(secrets, function(entity) {
+        return entity.tags.ZONE_POSITION;
+      });
+    };
+
     Player.prototype.getHero = function() {
       return this.replay.entities[this.tags.HERO_ENTITY];
     };

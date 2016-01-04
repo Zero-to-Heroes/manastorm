@@ -12,9 +12,9 @@ Target = React.createClass
 		return null unless @props.source && @props.target
 
 		sourceDims = @props.source.getDimensions()
-		console.log 'sourceDims', sourceDims
+		#console.log 'sourceDims', sourceDims
 		targetDims = @props.target.getDimensions()
-		console.log 'targetDims', targetDims
+		#console.log 'targetDims', targetDims
 
 		arrowWidth = Math.abs(sourceDims.centerX - targetDims.centerX)
 		arrowHeight = Math.abs(sourceDims.centerY - targetDims.centerY)
@@ -22,7 +22,7 @@ Target = React.createClass
 		playerEl = document.getElementById('externalPlayer')
 		containerTop = playerEl.getBoundingClientRect().top
 		containerLeft = playerEl.getBoundingClientRect().left
-		console.log 'containerleft', containerLeft
+		#console.log 'containerleft', containerLeft
 
 		top = undefined
 		height = undefined
@@ -30,7 +30,7 @@ Target = React.createClass
 
 		# If on the same line, it's easy
 		if sourceDims.centerY == targetDims.centerY
-			console.log 'Same line interaction'
+			#console.log 'Same line interaction'
 			left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
 			height = arrowWidth
 
@@ -43,7 +43,7 @@ Target = React.createClass
 				left += height / 2
 
 			top = sourceDims.centerY - containerTop - height / 2
-			console.log 'top', top, containerTop
+			#console.log 'top', top, containerTop
 
 		else 
 			# If top player attacks, rotate the arrow to have it point down
@@ -56,17 +56,17 @@ Target = React.createClass
 			if sourceDims.centerY < targetDims.centerY
 				alpha = -alpha
 
-			console.log 'angle is', alpha
+			#console.log 'angle is', alpha
 			transform += 'skewX(' + alpha + 'deg)'
 
 			# And readjust the origin
 			alpha = alpha * Math.PI / 180
 			left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
-			console.log 'readjusted left', left
+			#console.log 'readjusted left', left
 			left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2
 			#console.log 'final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2
-			console.log 'final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2
-			console.log 'final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop
+			#console.log 'final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2
+			#console.log 'final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop
 
 			top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop
 			height = arrowHeight
@@ -77,7 +77,7 @@ Target = React.createClass
 			left: left
 			transform: transform
 		}
-		console.log 'applying style', style
+		#console.log 'applying style', style
 		return <div className="target" style={style} />
 
 module.exports = Target

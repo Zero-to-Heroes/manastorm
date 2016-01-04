@@ -1,5 +1,6 @@
 React = require 'react'
 Card = require './card'
+HeroCard = require './herocard'
 
 Hero = React.createClass
 	componentDidMount: ->
@@ -9,11 +10,12 @@ Hero = React.createClass
 
 		@hero = @props.entity.getHero()
 		@heroPower = @props.entity.getHeroPower()
+		@secrets = @props.entity.getSecrets()
 		#console.log 'setting entity', @hero, @heroPower
 		hidden = false
 			
 		return 	<div className="hero">
-					<Card entity={@hero} key={@hero.id} isHidden={hidden} ref={@hero.id} className="avatar"/>
+					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} isHidden={hidden} ref={@hero.id} className="avatar"/>
 					<Card entity={@heroPower} key={@heroPower.id} isHidden={hidden} ref={@heroPower.id} className="power"/>
 				</div>
 

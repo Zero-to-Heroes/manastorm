@@ -26,6 +26,9 @@ class Card extends React.Component
 		if @props.className
 			cls += " " + @props.className
 
+		if @props.entity.tags.DIVINE_SHIELD
+			overlay = <div className="divine-shield"></div>
+
 		if @props.stats
 			stats = <div className="card__stats">
 				<div className="card__stats__attack">{@props.entity.tags.ATK or 0}</div>
@@ -33,6 +36,7 @@ class Card extends React.Component
 			</div>
 
 		return <div className={cls} style={style}>
+			{overlay}
 			{stats}
 		</div>
 

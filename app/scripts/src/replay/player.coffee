@@ -22,6 +22,12 @@ class Player extends Entity
 
 		return _.sortBy board, (entity) -> entity.tags.ZONE_POSITION
 
+	getSecrets: ->
+		secrets = _.filter @replay.entities, (entity) =>
+			entity.tags.ZONE is zones.SECRET and entity.tags.CONTROLLER is @tags.CONTROLLER
+
+		return _.sortBy secrets, (entity) -> entity.tags.ZONE_POSITION
+
 	getHero: -> @replay.entities[@tags.HERO_ENTITY]
 
 	getHeroPower: ->

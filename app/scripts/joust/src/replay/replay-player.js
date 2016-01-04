@@ -95,7 +95,7 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var action, card, owner, ownerCard, target, targetTimestamp;
+      var action, card, cardName, owner, ownerCard, target, targetTimestamp;
       this.newStep();
       action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
       console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
@@ -105,13 +105,10 @@
       owner = action.owner.name;
       if (!owner) {
         ownerCard = this.entities[action.owner];
-        console.log('ownerCard', ownerCard, action.owner);
-        console.log('\tcardID', ownerCard.cardID);
-        console.log('\treal card', this.cardUtils.getCard(ownerCard.cardID));
         owner = this.cardUtils.localizeName(this.cardUtils.getCard(ownerCard.cardID));
-        console.log('\tlocalized name', owner);
       }
-      this.turnLog = owner + action.type + this.cardUtils.localizeName(this.cardUtils.getCard(card));
+      cardName = action.secret ? 'Secret' : this.cardUtils.localizeName(this.cardUtils.getCard(card));
+      this.turnLog = owner + action.type + cardName;
       if (action.target) {
         target = this.entities[action.target];
         this.targetSource = action != null ? action.data.id : void 0;
@@ -213,7 +210,6 @@
           this.currentActionInTurn = j;
         }
       }
-      console.log('\t', timestamp, 1000 * (this.turns[this.currentTurn].actions[this.currentActionInTurn].timestamp - this.startTimestamp) + 1, this.startTimestamp);
       return this.goToAction();
     };
 
@@ -275,7 +271,7 @@
     };
 
     ReplayPlayer.prototype.finalizeInit = function() {
-      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, o, p, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, ref5, ref6, tag, tagValue, target, tempOpponent, turnNumber;
+      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, o, p, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, ref5, ref6, secret, tag, tagValue, target, tempOpponent, turnNumber;
       this.goToTimestamp(this.currentReplayTime);
       this.update();
       players = [this.player, this.opponent];
@@ -344,6 +340,9 @@
                     if (tag.tag === 'ZONE' && tag.value === 1) {
                       playedCard = tag.entity;
                     }
+                    if (tag.tag === 'SECRET' && tag.value === 1) {
+                      secret = true;
+                    }
                   }
                   if (playedCard > -1) {
                     action = {
@@ -351,6 +350,7 @@
                       index: actionIndex++,
                       timestamp: batch.timestamp,
                       type: ': ',
+                      secret: secret,
                       data: this.entities[playedCard],
                       owner: this.turns[currentTurnNumber].activePlayer,
                       initialCommand: command[1][0]
@@ -375,11 +375,7 @@
                     }
                   }
                 }
-                if (command[1][0].attributes.entity === '15') {
-                  console.log('considering entity 15', command[1][0], command[1][0].showEntity);
-                }
                 if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0 && (command[1][0].attributes.type === '1' || !command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)) {
-                  console.log('considering attack', command[1][0]);
                   action = {
                     turn: currentTurnNumber - 1,
                     index: actionIndex++,
@@ -420,10 +416,23 @@
                         this.turns[currentTurnNumber].actions[actionIndex] = action;
                       }
                     }
+                    if (command[1][0].fullEntity) {
+                      action = {
+                        turn: currentTurnNumber - 1,
+                        index: actionIndex++,
+                        timestamp: batch.timestamp,
+                        prefix: '\t',
+                        type: ': ',
+                        data: this.entities[command[1][0].attributes.entity],
+                        owner: this.turns[currentTurnNumber].activePlayer,
+                        target: target,
+                        initialCommand: command[1][0]
+                      };
+                      this.turns[currentTurnNumber].actions[actionIndex] = action;
+                    }
                   }
                 }
                 if (command[1].length > 0 && command[1][0].showEntity && (command[1][0].attributes.type === '1' || (command[1][0].attributes.type !== '3' && (!command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)))) {
-                  console.log('considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]);
                   playedCard = -1;
                   ref5 = command[1][0].showEntity.tags;
                   for (entityTag in ref5) {

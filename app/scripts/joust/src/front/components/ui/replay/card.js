@@ -27,7 +27,7 @@
     };
 
     Card.prototype.render = function() {
-      var art, cls, stats, style;
+      var art, cls, overlay, stats, style;
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/" + this.props.entity.cardID + ".png";
       if (this.props.entity.cardID && !this.props.isHidden) {
         style = {
@@ -45,6 +45,11 @@
       if (this.props.className) {
         cls += " " + this.props.className;
       }
+      if (this.props.entity.tags.DIVINE_SHIELD) {
+        overlay = React.createElement("div", {
+          "className": "divine-shield"
+        });
+      }
       if (this.props.stats) {
         stats = React.createElement("div", {
           "className": "card__stats"
@@ -57,7 +62,7 @@
       return React.createElement("div", {
         "className": cls,
         "style": style
-      }, stats);
+      }, overlay, stats);
     };
 
     Card.prototype.componentDidUpdate = function() {

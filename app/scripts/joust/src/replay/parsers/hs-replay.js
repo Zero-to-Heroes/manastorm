@@ -41,6 +41,11 @@
           return _this.onCloseTag();
         };
       })(this));
+      this.sax.on('error', (function(_this) {
+        return function(error) {
+          return console.error('error while parsing xml', error);
+        };
+      })(this));
       this.stream = new Stream(this.xmlReplay).pipe(this.sax);
       return console.log('replay parsed', this.replay);
     };
@@ -150,6 +155,7 @@
           };
         case 'FullEntity':
           this.state.pop();
+          console.log('\tclosing full entity', this.entityDefinition);
           this.replay.enqueue(ts, 'receiveEntity', this.entityDefinition);
           return this.entityDefinition = {
             tags: {}
@@ -170,9 +176,11 @@
         case 'FullEntity':
           this.state.push('entity');
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
-            this.entityDefinition.parent = this.stack[this.stack.length - 2];
+          } else {
+            this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
@@ -181,8 +189,8 @@
           if (node.attributes.name) {
             this.entityDefinition.name = node.attributes.name;
           }
-          if (this.entityDefinition.id === 77) {
-            return console.log('parsing Squire token', this.entityDefinition, node);
+          if (this.entityDefinition.id === 69) {
+            return console.log('parsing reinforce token', this.entityDefinition, node);
           }
           break;
         case 'TagChange':

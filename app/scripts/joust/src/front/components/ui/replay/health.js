@@ -18,7 +18,7 @@
 
     Health.prototype.componentDidMount = function() {
       var hero;
-      hero = this.props.entity.getHero();
+      hero = this.props.entity;
       this.subs = new SubscriptionList;
       this.healthSub = subscribe(hero, 'tag-changed:HEALTH tag-changed:DAMAGE', (function(_this) {
         return function() {
@@ -28,7 +28,7 @@
       this.subs.add(this.healthSub);
       return this.subs.add(this.props.entity, 'tag-changed:HERO', (function(_this) {
         return function() {
-          _this.healthSub.move(_this.props.entity.getHero());
+          _this.healthSub.move(_this.props.entity);
           return _this.forceUpdate();
         };
       })(this));
@@ -37,13 +37,17 @@
     Health.prototype.componentWillUnmount = function() {};
 
     Health.prototype.render = function() {
-      var hero;
-      hero = this.props.entity.getHero();
+      var cls, hero;
+      hero = this.props.entity;
       if (!hero) {
         return null;
       }
+      cls = 'health';
+      if (hero.tags.DAMAGE > 0) {
+        cls += ' damaged';
+      }
       return React.createElement("div", {
-        "className": "health"
+        "className": cls
       }, hero.tags.HEALTH - (hero.tags.DAMAGE || 0));
     };
 

@@ -103,12 +103,13 @@ class ReplayPlayer extends EventEmitter
 		owner = action.owner.name 
 		if !owner
 			ownerCard = @entities[action.owner]
-			console.log 'ownerCard', ownerCard, action.owner
-			console.log '\tcardID', ownerCard.cardID
-			console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
+			#console.log 'ownerCard', ownerCard, action.owner
+			#console.log '\tcardID', ownerCard.cardID
+			#console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
 			owner = @cardUtils.localizeName(@cardUtils.getCard(ownerCard.cardID))
-			console.log '\tlocalized name', owner
-		@turnLog = owner + action.type + @cardUtils.localizeName(@cardUtils.getCard(card))
+			#console.log '\tlocalized name', owner
+		cardName = if action.secret then 'Secret' else @cardUtils.localizeName(@cardUtils.getCard(card))
+		@turnLog = owner + action.type + cardName
 
 		if action.target
 			target = @entities[action.target]
@@ -354,8 +355,10 @@ class ReplayPlayer extends EventEmitter
 
 								for tag in command[1][0].tags
 									#console.log '\ttag', tag.tag, tag.value, tag
-									if (tag.tag == 'ZONE' && tag.value == 1)
+									if (tag.tag == 'ZONE' && tag.value == 1) 
 										playedCard = tag.entity
+									if tag.tag == 'SECRET' and tag.value == 1
+										secret = true
 
 								if (playedCard > -1)
 									#console.log 'batch', i, batch
@@ -366,12 +369,16 @@ class ReplayPlayer extends EventEmitter
 										index: actionIndex++
 										timestamp: batch.timestamp
 										type: ': '
+										secret: secret
 										data: @entities[playedCard]
 										owner: @turns[currentTurnNumber].activePlayer
 										initialCommand: command[1][0]
 									}
 									@turns[currentTurnNumber].actions[actionIndex] = action
 									#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
+
+								#Played a secret
+
 
 							# Deaths. Not really an action, but useful to see clearly what happens
 							if command[1].length > 0 and command[1][0].tags and command[1][0].attributes.type == '6' 
@@ -389,11 +396,9 @@ class ReplayPlayer extends EventEmitter
 										}
 										@turns[currentTurnNumber].actions[actionIndex] = action
 
-							if command[1][0].attributes.entity == '15'
-								console.log 'considering entity 15', command[1][0], command[1][0].showEntity
 							# Attacked something
 							if command[1].length > 0 and parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
-								console.log 'considering attack', command[1][0]
+								#console.log 'considering attack', command[1][0]
 								action = {
 									turn: currentTurnNumber - 1
 									index: actionIndex++
@@ -417,7 +422,7 @@ class ReplayPlayer extends EventEmitter
 								# If parent action has a target, do nothing
 								if !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0
 
-									#console.log '\tadding', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
+									#console.log '\tpower used, registering action?', command[1][0].attributes.entity, command[1][0]
 
 									# Does it do damage?
 									if command[1][0].tags
@@ -446,11 +451,29 @@ class ReplayPlayer extends EventEmitter
 											}
 											@turns[currentTurnNumber].actions[actionIndex] = action
 
+									if command[1][0].fullEntity 
+										action = {
+											turn: currentTurnNumber - 1
+											index: actionIndex++
+											timestamp: batch.timestamp
+											prefix: '\t'
+											type: ': '
+											data: @entities[command[1][0].attributes.entity]
+											owner: @turns[currentTurnNumber].activePlayer
+											# Don't store the full entity, because it's possible the target 
+											# doesn't exist yet when parsing the replay
+											# (it's the case for created tokens)
+											#@entities[target]
+											target: target
+											initialCommand: command[1][0]
+										}
+										@turns[currentTurnNumber].actions[actionIndex] = action
+
 							# Card revealed
 							# TODO: Don't add this when a spell is played, since another action already handles this
 							if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
 
-								console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
+								#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
 								playedCard = -1
 
 								# Revealed entities can start in the PLAY zone

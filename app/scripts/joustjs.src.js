@@ -7,7 +7,7 @@ var joustjs = {
 
 	loadReplay: function(replayXml) {
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
-		// console.log('string xml', strReplayXml);
+		//console.log('string xml', strReplayXml);
 
 		//require('coffee-react/register');
 		var bundle = require('./joust/src/front/bundle.js');

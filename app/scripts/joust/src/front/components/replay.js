@@ -96,8 +96,6 @@
           "isHidden": true
         }), React.createElement(Mana, {
           "entity": replay.opponent
-        }), React.createElement(Health, {
-          "entity": replay.opponent
         }), React.createElement(Play, {
           "entity": replay.opponent
         }), React.createElement(Hand, {
@@ -120,8 +118,6 @@
           "entity": replay.player,
           "isHidden": false
         }), React.createElement(Mana, {
-          "entity": replay.player
-        }), React.createElement(Health, {
           "entity": replay.player
         }), React.createElement(Play, {
           "entity": replay.player

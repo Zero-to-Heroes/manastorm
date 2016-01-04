@@ -24,6 +24,8 @@ class HSReplayParser
 
 		@sax.on 'opentag', (node) => @onOpenTag(node)
 		@sax.on 'closetag', => @onCloseTag()
+		@sax.on 'error', (error) =>
+			console.error 'error while parsing xml', error
 
 		#@stream = fs.createReadStream(@path).pipe(@sax)
 		#console.log 'preparing to parse replay'
@@ -119,6 +121,7 @@ class HSReplayParser
 				@entityDefinition = {tags: {}}
 			when 'FullEntity'
 				@state.pop()
+				console.log '\tclosing full entity', @entityDefinition
 				@replay.enqueue ts, 'receiveEntity', @entityDefinition
 				@entityDefinition = {tags: {}}
 			when 'ShowEntity'
@@ -131,9 +134,13 @@ class HSReplayParser
 			when 'ShowEntity', 'FullEntity'
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
-				if node.name == 'ShowEntity'
+				@entityDefinition.parent = @stack[@stack.length - 2]
+
+				if node.name is 'ShowEntity'
 					@stack[@stack.length - 2].showEntity = @entityDefinition
-					@entityDefinition.parent = @stack[@stack.length - 2]
+				# Need that to distinguish actions that create tokens
+				else 
+					@stack[@stack.length - 2].fullEntity = @entityDefinition
 
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
@@ -142,8 +149,8 @@ class HSReplayParser
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
-				if @entityDefinition.id is 77
-					console.log 'parsing Squire token', @entityDefinition, node
+				if @entityDefinition.id is 69
+					console.log 'parsing reinforce token', @entityDefinition, node
 
 			when 'TagChange'
 				tag = {
@@ -156,6 +163,8 @@ class HSReplayParser
 					tag.parent.tags = []
 				tag.parent.tags.push(tag)
 
+				#console.log '\tparsing tagchange', @stack[@stack.length - 1], @stack[@stack.length - 2]
+
 				@replay.enqueue null, 'receiveTagChange', tag
 
 			when 'Action'
@@ -164,6 +173,9 @@ class HSReplayParser
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
 				node.parent = @stack[@stack.length - 2]
+
+				#console.log 'parsing action', node
+
 				@state.push('action')
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 
@@ -196,11 +208,13 @@ class HSReplayParser
 			ts = null
 		switch node.name
 			when 'Action'
+				#console.log 'closing action state', node, @entityDefinition
 				node = @state.pop()
 
 	onOpenTag: (node) ->
 		#console.log 'opening tag', node
 		@stack.push(node)
+		#console.log 'opening tag', node.name
 		#if @stack.length > 1
 		#	node.parent = @stack[@stack.length - 2]
 		#	node.parent.child = node
@@ -210,7 +224,7 @@ class HSReplayParser
 
 	onCloseTag: () ->
 		node = @stack.pop()
-		#console.log 'closing action tag', node
+		#console.log 'closing tag', node.name
 		@["#{@state[@state.length-1]}StateClose"]?(node)
 
 

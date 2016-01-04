@@ -1,9 +1,11 @@
 (function() {
-  var Card, Hero, React;
+  var Card, Hero, HeroCard, React;
 
   React = require('react');
 
   Card = require('./card');
+
+  HeroCard = require('./herocard');
 
   Hero = React.createClass({
     componentDidMount: function() {},
@@ -14,12 +16,14 @@
       }
       this.hero = this.props.entity.getHero();
       this.heroPower = this.props.entity.getHeroPower();
+      this.secrets = this.props.entity.getSecrets();
       hidden = false;
       return React.createElement("div", {
         "className": "hero"
-      }, React.createElement(Card, {
+      }, React.createElement(HeroCard, {
         "entity": this.hero,
         "key": this.hero.id,
+        "secrets": this.secrets,
         "isHidden": hidden,
         "ref": this.hero.id,
         "className": "avatar"

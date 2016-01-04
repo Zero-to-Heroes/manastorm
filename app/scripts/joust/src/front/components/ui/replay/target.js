@@ -17,20 +17,16 @@
         return null;
       }
       sourceDims = this.props.source.getDimensions();
-      console.log('sourceDims', sourceDims);
       targetDims = this.props.target.getDimensions();
-      console.log('targetDims', targetDims);
       arrowWidth = Math.abs(sourceDims.centerX - targetDims.centerX);
       arrowHeight = Math.abs(sourceDims.centerY - targetDims.centerY);
       playerEl = document.getElementById('externalPlayer');
       containerTop = playerEl.getBoundingClientRect().top;
       containerLeft = playerEl.getBoundingClientRect().left;
-      console.log('containerleft', containerLeft);
       top = void 0;
       height = void 0;
       transform = '';
       if (sourceDims.centerY === targetDims.centerY) {
-        console.log('Same line interaction');
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
         height = arrowWidth;
         if (sourceDims.centerX < targetDims.centerX) {
@@ -41,7 +37,6 @@
           left += height / 2;
         }
         top = sourceDims.centerY - containerTop - height / 2;
-        console.log('top', top, containerTop);
       } else {
         if (sourceDims.centerY < targetDims.centerY) {
           transform += 'rotate(180deg) ';
@@ -51,14 +46,10 @@
         if (sourceDims.centerY < targetDims.centerY) {
           alpha = -alpha;
         }
-        console.log('angle is', alpha);
         transform += 'skewX(' + alpha + 'deg)';
         alpha = alpha * Math.PI / 180;
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
-        console.log('readjusted left', left);
         left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2;
-        console.log('final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2);
-        console.log('final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop);
         top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop;
         height = arrowHeight;
       }
@@ -68,7 +59,6 @@
         left: left,
         transform: transform
       };
-      console.log('applying style', style);
       return React.createElement("div", {
         "className": "target",
         "style": style
