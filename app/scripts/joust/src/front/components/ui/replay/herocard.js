@@ -30,7 +30,7 @@
           background: "url(" + art + ") top left no-repeat",
           backgroundSize: '100% auto'
         };
-        cls = "card";
+        cls = "game-card";
       }
       if (this.props.className) {
         cls += " " + this.props.className;

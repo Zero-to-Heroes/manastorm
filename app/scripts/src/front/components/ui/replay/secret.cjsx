@@ -9,8 +9,6 @@ class Secret extends Card
 
 	render: ->
 
-		cls = 'secret'
-
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/secrets/#{@props.entity.tags.CLASS}.png"
 
 		style =

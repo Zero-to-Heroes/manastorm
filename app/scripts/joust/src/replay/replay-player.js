@@ -55,9 +55,7 @@
     };
 
     ReplayPlayer.prototype.autoPlay = function() {
-      console.log('playing, previous speed', this.previousSpeed);
       this.speed = this.previousSpeed || 1;
-      console.log('speed', this.speed);
       if (this.speed > 0) {
         return this.interval = setInterval(((function(_this) {
           return function() {
@@ -113,23 +111,25 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var action, card, cardName, owner, ownerCard, target, targetTimestamp;
+      var action, card, cardLink, owner, ownerCard, target, targetTimestamp;
       this.newStep();
       action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
       targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
+      console.log('executing action', action, action.data);
       card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
       owner = action.owner.name;
       if (!owner) {
         ownerCard = this.entities[action.owner];
-        owner = this.cardUtils.localizeName(this.cardUtils.getCard(ownerCard.cardID));
+        owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
       }
-      cardName = action.secret ? 'Secret' : this.cardUtils.localizeName(this.cardUtils.getCard(card));
-      this.turnLog = owner + action.type + cardName;
+      console.log('building card link for', card, this.cardUtils.getCard(card));
+      cardLink = action.secret ? 'Secret' : this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
+      this.turnLog = owner + action.type + cardLink;
       if (action.target) {
         target = this.entities[action.target];
         this.targetSource = action != null ? action.data.id : void 0;
         this.targetDestination = target.id;
-        this.turnLog += ' -> ' + this.cardUtils.localizeName(this.cardUtils.getCard(target.cardID));
+        this.turnLog += ' -> ' + this.cardUtils.buildCardLink(this.cardUtils.getCard(target.cardID));
       }
       return this.goToTimestamp(targetTimestamp);
     };

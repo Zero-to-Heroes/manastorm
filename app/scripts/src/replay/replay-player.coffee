@@ -111,7 +111,7 @@ class ReplayPlayer extends EventEmitter
 		action = @turns[@currentTurn].actions[@currentActionInTurn]
 		#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 		targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-		#console.log 'executing action', action, action.data
+		console.log 'executing action', action, action.data
 		card = if action?.data then action.data['cardID'] else ''
 
 		owner = action.owner.name 
@@ -120,16 +120,17 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'ownerCard', ownerCard, action.owner
 			#console.log '\tcardID', ownerCard.cardID
 			#console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
-			owner = @cardUtils.localizeName(@cardUtils.getCard(ownerCard.cardID))
+			owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
 			#console.log '\tlocalized name', owner
-		cardName = if action.secret then 'Secret' else @cardUtils.localizeName(@cardUtils.getCard(card))
-		@turnLog = owner + action.type + cardName
+		console.log 'building card link for', card, @cardUtils.getCard(card)
+		cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
+		@turnLog = owner + action.type + cardLink
 
 		if action.target
 			target = @entities[action.target]
 			@targetSource = action?.data.id
 			@targetDestination = target.id
-			@turnLog += ' -> ' + @cardUtils.localizeName(@cardUtils.getCard(target.cardID))
+			@turnLog += ' -> ' + @cardUtils.buildCardLink(@cardUtils.getCard(target.cardID))
 
 		#console.log @turnLog
 

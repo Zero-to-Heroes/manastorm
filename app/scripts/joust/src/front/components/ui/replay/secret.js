@@ -24,7 +24,6 @@
 
     Secret.prototype.render = function() {
       var art, cls, style;
-      cls = 'secret';
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/secrets/" + this.props.entity.tags.CLASS + ".png";
       style = {
         background: "url(" + art + ") top left no-repeat",

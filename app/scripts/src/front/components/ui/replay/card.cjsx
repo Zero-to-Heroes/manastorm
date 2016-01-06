@@ -15,10 +15,10 @@ class Card extends React.Component
 			style =
 				background: "url(#{art}) top left no-repeat"
 				backgroundSize: '100% auto'
-			cls = "card"
+			cls = "game-card"
 		else
 			style = {}
-			cls = "card card--unknown"
+			cls = "game-card card--unknown"
 
 		if @props.entity.tags.TAUNT
 			cls += " card--taunt"

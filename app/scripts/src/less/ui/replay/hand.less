@@ -6,7 +6,7 @@
 	height: 143px;
 	top: -40px;
 
-	.card {
+	.game-card {
 		display: inline-block;
 		top: 0;
 		position: relative;
@@ -25,7 +25,7 @@
 	bottom: -40px;
 }
 
-.bottom .hand > .card {
+.bottom .hand > .game-card {
 	&:hover {
 		top: -70px;
 		transform: scale(1.5);
@@ -34,23 +34,23 @@
 	}
 }
 
-.hand .card.animate-enter {
+.hand .game-card.animate-enter {
 	opacity: 0.1;
 	transform: translateX(30px);
 	margin-left: -30px;
 }
-.hand .card.animate-enter-active {
+.hand .game-card.animate-enter-active {
 	opacity: 1;
 	transform: translateX(0);
 	margin-left: 0;
 	transition: opacity 0.5s, transform 0.7s, margin-left 0.7s;
 }
-.hand .card.animate-leave {
+.hand .game-card.animate-leave {
 	opacity: 1;
 	transform: translateY(0);
 	margin-left: 0;
 }
-.hand .card.animate-leave-active {
+.hand .game-card.animate-leave-active {
 	opacity: 0;
 	transform: translateY(-40px);
 	margin-left: -48px;

@@ -18,7 +18,7 @@ class Weapon extends Card
 		style =
 			background: "url(#{art}) top left no-repeat"
 			backgroundSize: '100% auto'
-		cls = "card"
+		cls = "game-card"
 
 		if @props.className
 			cls += " " + @props.className
