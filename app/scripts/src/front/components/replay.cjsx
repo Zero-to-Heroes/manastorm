@@ -86,6 +86,11 @@ class Replay extends React.Component
 
 
 		# {playButton}
+		playButton = <Button glyph="play" onClick={@onClickPlay} />
+
+		if @state.replay.speed > 0
+			playButton = <Button glyph="pause" onClick={@onClickPause}/>
+
 		return <div className="replay">
 					<div className="replay__game">
 						{top}
@@ -96,10 +101,22 @@ class Replay extends React.Component
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
 							<Button glyph="to-start" onClick={@goPreviousAction}/>
+							{playButton}
 							<Button glyph="to-end" onClick={@goNextAction}/>
 							<Button glyph="fast-forward" onClick={@goNextTurn}/>
 						</ButtonGroup>
 						<Timeline replay={replay} />
+						<div className="playback-speed">
+							<div className="dropup"> 
+								<button className="btn btn-default dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
+								<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
+									<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
+									<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
+									<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
+									<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
+								</ul> 
+							</div>
+						</div>
 					</form>
 					<GameLog replay={replay} />
 				</div>
@@ -126,7 +143,16 @@ class Replay extends React.Component
 
 	onClickPlay: (e) =>
 		e.preventDefault()
-		@state.replay.play()
+		@state.replay.autoPlay()
+		@forceUpdate()
+
+	onClickPause: (e) =>
+		e.preventDefault()
+		@state.replay.pause()
+		@forceUpdate()
+
+	onClickChangeSpeed: (speed) ->
+		@state.replay.changeSpeed speed
 		@forceUpdate()
 
 	findCard: (allCards, cardID) ->

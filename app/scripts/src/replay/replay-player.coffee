@@ -31,9 +31,11 @@ class ReplayPlayer extends EventEmitter
 		@lastBatch = null
 
 		@startTimestamp = null
+		@frequency = 2000
 		@currentReplayTime = 200
 
 		@started = false
+		@speed = 0
 
 		@parser.parse(this)
 
@@ -46,8 +48,20 @@ class ReplayPlayer extends EventEmitter
 		@startTimestamp = timestamp
 		@started = true
 
-	play: ->
-		@goToTimestamp @currentReplayTime
+	autoPlay: ->
+		@speed = @previousSpeed || 1
+		if @speed > 0
+			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
+
+	pause: ->
+		@previousSpeed = @speed
+		@speed = 0
+		clearInterval(@interval)
+
+	changeSpeed: (speed) ->
+		@speed = speed
+		clearInterval(@interval)
+		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	goNextAction: ->
 		#console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn

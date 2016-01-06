@@ -40,8 +40,10 @@
       this.historyPosition = 0;
       this.lastBatch = null;
       this.startTimestamp = null;
+      this.frequency = 2000;
       this.currentReplayTime = 200;
       this.started = false;
+      this.speed = 0;
       this.parser.parse(this);
       this.finalizeInit();
       return this.goNextAction();
@@ -52,8 +54,33 @@
       return this.started = true;
     };
 
-    ReplayPlayer.prototype.play = function() {
-      return this.goToTimestamp(this.currentReplayTime);
+    ReplayPlayer.prototype.autoPlay = function() {
+      console.log('playing, previous speed', this.previousSpeed);
+      this.speed = this.previousSpeed || 1;
+      console.log('speed', this.speed);
+      if (this.speed > 0) {
+        return this.interval = setInterval(((function(_this) {
+          return function() {
+            return _this.goNextAction();
+          };
+        })(this)), this.frequency / this.speed);
+      }
+    };
+
+    ReplayPlayer.prototype.pause = function() {
+      this.previousSpeed = this.speed;
+      this.speed = 0;
+      return clearInterval(this.interval);
+    };
+
+    ReplayPlayer.prototype.changeSpeed = function(speed) {
+      this.speed = speed;
+      clearInterval(this.interval);
+      return this.interval = setInterval(((function(_this) {
+        return function() {
+          return _this.goNextAction();
+        };
+      })(this)), this.frequency / this.speed);
     };
 
     ReplayPlayer.prototype.goNextAction = function() {
