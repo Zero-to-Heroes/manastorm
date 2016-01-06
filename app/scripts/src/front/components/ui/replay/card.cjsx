@@ -9,7 +9,8 @@ class Card extends React.Component
 			@forceUpdate()
 
 	render: ->
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
+		locale = if window.localStorage.language then window.localStorage.language else ''
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{locale}/#{@props.entity.cardID}.png"
 
 		if @props.entity.cardID && !@props.isHidden
 			style =
