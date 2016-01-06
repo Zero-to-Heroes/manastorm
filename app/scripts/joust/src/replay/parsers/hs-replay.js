@@ -53,7 +53,7 @@
       var tag;
       switch (node.name) {
         case 'Game':
-          return this.replay.start(tsToSeconds(node.attributes.ts));
+          return this.replay.startTimestamp = tsToSeconds(node.attributes.ts);
         case 'Action':
           this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
           return this.state.push('action');

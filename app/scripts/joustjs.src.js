@@ -1,5 +1,15 @@
 var joustjs = {
 
+	execute: function(review, text) {
+		if (!text) return '';
+		if (!window.replay) return text;
+
+		// Get the appropriate timestamp (if any)
+		text = window.replay.replaceKeywordsWithTimestamp(text);
+
+		return text;
+	},
+
 	init: function(config, review) {
 		var replayXml = review.replayXml;
 		joustjs.loadReplay(replayXml);
@@ -17,13 +27,11 @@ var joustjs = {
 	},
 
 	goToTimestamp: function(timestamp) {
-		var timestampOnlyRegex = /\d?\d:\d?\d(:\d\d\d)?/;
+		var timestampOnlyRegex = /\d?\d:\d?\d?/;
 		var time = timestamp.match(timestampOnlyRegex)[0];
 		var timeComponents = time.split(':');
-		var millis = timeComponents[0] * 60 * 1000 + timeComponents[1] * 1000;
-		if (timeComponents[2])
-			millis += timeComponents[2];
-		window.replay.goToTimestamp(millis);
+		var secs = parseInt(timeComponents[0]) * 60 + parseInt(timeComponents[1]);
+		window.replay.moveToTimestamp(secs);
 	}
 
 }

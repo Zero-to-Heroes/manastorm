@@ -36,7 +36,7 @@ class HSReplayParser
 		#console.log '\tparsing node', node.name, node
 		switch node.name
 			when 'Game'
-				@replay.start(tsToSeconds(node.attributes.ts))
+				@replay.startTimestamp = tsToSeconds(node.attributes.ts)
 
 			when 'Action'
 				#console.log 'enqueue action from rootState', node

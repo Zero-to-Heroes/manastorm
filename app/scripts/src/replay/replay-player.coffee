@@ -30,7 +30,6 @@ class ReplayPlayer extends EventEmitter
 		@historyPosition = 0
 		@lastBatch = null
 
-		@startTimestamp = null
 		@frequency = 2000
 		@currentReplayTime = 200
 
@@ -41,12 +40,11 @@ class ReplayPlayer extends EventEmitter
 
 		@finalizeInit()
 
+		#@startTimestamp = @turns[1].timestamp
+
 		@goNextAction()
 
-	start: (timestamp) ->
-		# The timestamp recorded by the game for the beginning, don't touch this
-		@startTimestamp = timestamp
-		@started = true
+		console.log 'replay init done', @turns
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -80,22 +78,21 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'going directly to next turn', @currentTurn + 1
 			@goNextTurn()
 
-
 	goPreviousAction: ->
 		@newStep()
 		@turnLog = ''
+		console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
 		@currentActionInTurn--
-		#console.log 'going to previous action', @currentActionInTurn
 
 		if @currentActionInTurn == 1
-			#console.log 'going directly to beginning of turn', @currentTurn
+			console.log 'going directly to beginning of turn', @currentTurn
 			@goPreviousTurn()
 			@goNextTurn()
 
 		else if @currentActionInTurn <= 0
-			#console.log 'going directly to end of previous turn', @currentTurn - 1
+			console.log 'going directly to end of previous turn', @currentTurn - 1
 			@goPreviousTurn()
-			#console.log 'moved back to previous turn', @currentTurn
+			console.log 'moved back to previous turn', @currentTurn
 			@currentActionInTurn = @turns[@currentTurn].actions.length - 1
 			if @currentActionInTurn > 0
 				#console.log 'moving to action', @currentActionInTurn
@@ -103,35 +100,42 @@ class ReplayPlayer extends EventEmitter
 
 		# Navigating within the same turn
 		else if @turns[@currentTurn]
-			@goToAction()
-			
+			@goToAction()		
 
 	goToAction: ->
 		@newStep()
-		action = @turns[@currentTurn].actions[@currentActionInTurn]
-		#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
-		targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-		console.log 'executing action', action, action.data
-		card = if action?.data then action.data['cardID'] else ''
+		console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
+		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
-		owner = action.owner.name 
-		if !owner
-			ownerCard = @entities[action.owner]
-			#console.log 'ownerCard', ownerCard, action.owner
-			#console.log '\tcardID', ownerCard.cardID
-			#console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
-			owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-			#console.log '\tlocalized name', owner
-		console.log 'building card link for', card, @cardUtils.getCard(card)
-		cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
-		@turnLog = owner + action.type + cardLink
+		if @currentActionInTurn >= 0
+			action = @turns[@currentTurn].actions[@currentActionInTurn]
+			console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
+			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
+			console.log 'executing action', action, action.data, @startTimestamp
+			card = if action?.data then action.data['cardID'] else ''
 
-		if action.target
-			target = @entities[action.target]
-			@targetSource = action?.data.id
-			@targetDestination = target.id
-			@turnLog += ' -> ' + @cardUtils.buildCardLink(@cardUtils.getCard(target.cardID))
+			owner = action.owner.name 
+			if !owner
+				ownerCard = @entities[action.owner]
+				#console.log 'ownerCard', ownerCard, action.owner
+				#console.log '\tcardID', ownerCard.cardID
+				#console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
+				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
+				#console.log '\tlocalized name', owner
+			console.log 'building card link for', card, @cardUtils.getCard(card)
+			cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
+			@turnLog = owner + action.type + cardLink
 
+			if action.target
+				target = @entities[action.target]
+				@targetSource = action?.data.id
+				@targetDestination = target.id
+				@turnLog += ' -> ' + @cardUtils.buildCardLink(@cardUtils.getCard(target.cardID))
+
+		# This probably happens only for Mulligan
+		else
+			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
+			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
 		#console.log @turnLog
 
 		@goToTimestamp targetTimestamp
@@ -160,14 +164,12 @@ class ReplayPlayer extends EventEmitter
 		@newStep()
 		# Directly go after the card draw
 		@currentActionInTurn = 0
-		@currentTurn--;
-		#console.log 'going to previous turn', @currentTurn, @currentActionInTurn
+		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
+		@currentTurn = Math.max(@currentTurn - 1, 1)
 
-		targetTimestamp = @getTotalLength() * 1000
-
-		if (@currentTurn <= 0)
-			targetTimestamp = 0
-			@currentTurn = 0
+		if (@currentTurn <= 1)
+			targetTimestamp = 200
+			@currentTurn = 1
 		# Directly go after the card draw
 		else if (@currentTurn <= @turns.length && @turns[@currentTurn].actions && @turns[@currentTurn].actions.length > 0)
 			@currentActionInTurn = 1
@@ -176,13 +178,16 @@ class ReplayPlayer extends EventEmitter
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 
 		if @turns[@currentTurn].turn is 'Mulligan'
+			console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
 			@turnLog = @turns[@currentTurn].turn
+			@currentTurn = 0
+			@currentActionInTurn = 0
 		else 
 			@turnLog = 't' + @turns[@currentTurn].turn + ': ' + @turns[@currentTurn].activePlayer.name
 
 		@goToTimestamp targetTimestamp
 
-		#console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
+		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
 	newStep: ->
 		@targetSource = undefined
@@ -202,33 +207,46 @@ class ReplayPlayer extends EventEmitter
 		@moveToTimestamp target
 
 	moveToTimestamp: (timestamp) ->
+		console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp
+		timestamp += @startTimestamp
 		@newStep()
-		@currentTurn = 0
-		@currentActionInTurn = 0
+		@currentTurn = -1
+		@currentActionInTurn = -1
 
 		for i in [1..@turns.length]
 			turn = @turns[i]
 			#console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp
-			if turn.actions?.length > 0 and (turn.actions[turn.actions.length - 1].timestamp - @startTimestamp) * 1000 > timestamp
+			if turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp
 				#console.log 'exiting loop', @currentTurn, @currentActionInTurn
 				break
 			@currentTurn = i
 
-			for j in [1..turn.actions.length]
-				#console.log '\tactions', turn.actions, j
-				action = turn.actions[j]
-				#console.log '\tconsidering action', i, j, turn, action
-				if !action or !action.timestamp or (action?.timestamp - @startTimestamp) * 1000 > timestamp
-					#console.log '\t\tBreaking', action, (action?.timestamp - @startTimestamp) * 1000, timestamp
-					break
-				@currentActionInTurn = j
+			if turn.actions.length > 0
+				for j in [1..turn.actions.length - 1]
+					#console.log '\tactions', turn.actions, j
+					action = turn.actions[j]
+					#console.log '\t\tconsidering action', i, j, turn, action
+					if !action or !action.timestamp or (action?.timestamp) > timestamp
+						#console.log '\t\tBreaking', action, (action?.timestamp), timestamp
+						break
+					@currentActionInTurn = j
 
-		#console.log 'Going to timetstamp', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
-		#console.log '\t', timestamp, 1000 * (@turns[@currentTurn].actions[@currentActionInTurn].timestamp - @startTimestamp) + 1, @startTimestamp
-		@goToAction()
+		if @currentActionInTurn <= 1
+			console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			if (@currentTurn <= 1)
+				@goPreviousTurn()
+			else
+				@currentTurn = Math.max(@currentTurn - 1, 1)
+				@goToAction()
+				@goNextTurn()
+
+		else
+			console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			@goToAction()
+		
 
 	goToTimestamp: (timestamp) ->
-		#console.log 'going to timestamp', timestamp
+		console.log 'going to timestamp', timestamp
 		#initialSpeed = @speed
 
 		if (timestamp < @currentReplayTime)
@@ -236,12 +254,58 @@ class ReplayPlayer extends EventEmitter
 			@historyPosition = 0
 			@init()
 
-		@start(@startTimestamp)
-
 		@currentReplayTime = timestamp
 		@update()
 
 		@emit 'moved-timestamp'
+
+	# Replace the tN keywords
+	replaceKeywordsWithTimestamp: (text) ->
+		turnRegex = /(t|T)\d?\d(:|\s|,|\.)/gm
+		mulliganRegex = /(m|M)ulligan(:|\s)/gm
+		roundRegex = /(r|R)\d?\d(:|\s|,|\.)/gm
+
+		that = this
+		matches = text.match(turnRegex)
+		console.log 'turn matches', matches
+
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				console.log '\tmatch', match
+				turnNumber = parseInt(match.substring 1, match.length - 1)
+				console.log '\tturnNumber', turnNumber + 1
+				turn = that.turns[turnNumber + 1]
+				console.log '\tturn', turn
+				if turn
+					timestamp = turn.timestamp + 1
+					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
+					console.log '\tformattedTimeStamp', formattedTimeStamp
+					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
+
+		matches = text.match(mulliganRegex)
+
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				turn = that.turns[1]
+				timestamp = turn.timestamp
+				console.log 'timestamp', timestamp, that.startTimestamp
+				formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
+				console.log 'formatted time stamp', formattedTimeStamp
+				text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
+
+		console.log 'modified text', text
+		return text
+
+	formatTimeStamp: (length) ->
+		totalSeconds = "" + Math.floor(length % 60)
+		if totalSeconds.length < 2
+			totalSeconds = "0" + totalSeconds
+		totalMinutes = Math.floor(length / 60)
+		if totalMinutes.length < 2
+			totalMinutes = "0" + totalMinutes
+
+		return totalMinutes + ':' + totalSeconds
 
 	update: ->
 		#@currentReplayTime += @frequency * @speed
@@ -307,9 +371,9 @@ class ReplayPlayer extends EventEmitter
 						@turns[turnNumber] = {
 							historyPosition: i
 							turn: 'Mulligan'
-							timestamp: batch.timestamp || 0
+							timestamp: batch.timestamp
 							actions: []
-							activePlayer: currentPlayer
+							#activePlayer: currentPlayer
 						}
 						@turns.length++
 						turnNumber++
