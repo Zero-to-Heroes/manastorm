@@ -90,16 +90,12 @@
     ReplayPlayer.prototype.goPreviousAction = function() {
       this.newStep();
       this.turnLog = '';
-      console.log('going to previous action', this.currentActionInTurn, this.currentActionInTurn - 1, this.currentTurn);
       this.currentActionInTurn--;
       if (this.currentActionInTurn === 1) {
-        console.log('going directly to beginning of turn', this.currentTurn);
         this.goPreviousTurn();
         return this.goNextTurn();
       } else if (this.currentActionInTurn <= 0) {
-        console.log('going directly to end of previous turn', this.currentTurn - 1);
         this.goPreviousTurn();
-        console.log('moved back to previous turn', this.currentTurn);
         this.currentActionInTurn = this.turns[this.currentTurn].actions.length - 1;
         if (this.currentActionInTurn > 0) {
           return this.goToAction();
@@ -138,6 +134,7 @@
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
         this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
+      console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
@@ -167,7 +164,6 @@
       var targetTimestamp;
       this.newStep();
       this.currentActionInTurn = 0;
-      console.log('going to previous turn', this.currentTurn, this.currentTurn - 1, this.currentActionInTurn, this.turns);
       this.currentTurn = Math.max(this.currentTurn - 1, 1);
       if (this.currentTurn <= 1) {
         targetTimestamp = 200;
@@ -179,15 +175,13 @@
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       }
       if (this.turns[this.currentTurn].turn === 'Mulligan') {
-        console.log('in Mulligan', this.turns[this.currentTurn], this.currentTurn, targetTimestamp);
         this.turnLog = this.turns[this.currentTurn].turn;
         this.currentTurn = 0;
         this.currentActionInTurn = 0;
       } else {
         this.turnLog = 't' + this.turns[this.currentTurn].turn + ': ' + this.turns[this.currentTurn].activePlayer.name;
       }
-      this.goToTimestamp(targetTimestamp);
-      return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
+      return this.goToTimestamp(targetTimestamp);
     };
 
     ReplayPlayer.prototype.newStep = function() {
@@ -219,7 +213,6 @@
 
     ReplayPlayer.prototype.moveToTimestamp = function(timestamp) {
       var action, i, j, k, l, ref, ref1, ref2, turn;
-      console.log('moving to timestamp', timestamp, this.startTimestamp, timestamp + this.startTimestamp);
       timestamp += this.startTimestamp;
       this.newStep();
       this.currentTurn = -1;
@@ -241,7 +234,6 @@
         }
       }
       if (this.currentActionInTurn <= 1) {
-        console.log('Going to turn', timestamp, this.currentTurn, this.currentActionInTurn, this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         if (this.currentTurn <= 1) {
           return this.goPreviousTurn();
         } else {
@@ -250,13 +242,11 @@
           return this.goNextTurn();
         }
       } else {
-        console.log('Going to action', timestamp, this.currentTurn, this.currentActionInTurn, this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         return this.goToAction();
       }
     };
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
-      console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
         this.historyPosition = 0;
         this.init();
@@ -277,21 +267,16 @@
       if (matches && matches.length > 0) {
         matches.forEach(function(match) {
           var formattedTimeStamp, inputTurnNumber, timestamp, turn, turnNumber;
-          console.log('\tmatch', match);
           inputTurnNumber = parseInt(match.substring(1, match.length - 1));
-          console.log('\tinputTurnNumber', inputTurnNumber);
           if (that.turns[2].activePlayer === that.player) {
             turnNumber = inputTurnNumber * 2;
           } else {
             turnNumber = inputTurnNumber * 2 + 1;
           }
           turn = that.turns[turnNumber];
-          console.log('\tturn', turn);
           if (turn) {
             timestamp = turn.timestamp + 1;
-            console.log('\ttimestamp', timestamp - that.startTimestamp);
             formattedTimeStamp = that.formatTimeStamp(timestamp - that.startTimestamp);
-            console.log('\tformattedTimeStamp', formattedTimeStamp);
             return text = text.replace(match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>');
           }
         });
@@ -300,21 +285,16 @@
       if (matches && matches.length > 0) {
         matches.forEach(function(match) {
           var formattedTimeStamp, inputTurnNumber, timestamp, turn, turnNumber;
-          console.log('\tmatch', match);
           inputTurnNumber = parseInt(match.substring(1, match.length - 1));
-          console.log('\tinputTurnNumber', inputTurnNumber);
           if (that.turns[2].activePlayer === that.opponent) {
             turnNumber = inputTurnNumber * 2;
           } else {
             turnNumber = inputTurnNumber * 2 + 1;
           }
           turn = that.turns[turnNumber];
-          console.log('\tturn', turn);
           if (turn) {
             timestamp = turn.timestamp + 1;
-            console.log('\ttimestamp', timestamp - that.startTimestamp);
             formattedTimeStamp = that.formatTimeStamp(timestamp - that.startTimestamp);
-            console.log('\tformattedTimeStamp', formattedTimeStamp);
             return text = text.replace(match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>');
           }
         });
@@ -325,13 +305,10 @@
           var formattedTimeStamp, timestamp, turn;
           turn = that.turns[1];
           timestamp = turn.timestamp;
-          console.log('timestamp', timestamp, that.startTimestamp);
           formattedTimeStamp = that.formatTimeStamp(timestamp - that.startTimestamp);
-          console.log('formatted time stamp', formattedTimeStamp);
           return text = text.replace(match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>');
         });
       }
-      console.log('modified text', text);
       return text;
     };
 
@@ -357,6 +334,7 @@
       results = [];
       while (this.historyPosition < this.history.length) {
         if (elapsed > this.history[this.historyPosition].timestamp - this.startTimestamp) {
+          console.log('processing', this.history[this.historyPosition]);
           this.history[this.historyPosition].execute(this);
           results.push(this.historyPosition++);
         } else {
@@ -393,7 +371,7 @@
     };
 
     ReplayPlayer.prototype.finalizeInit = function() {
-      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, o, p, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, ref5, ref6, secret, tag, tagValue, target, tempOpponent, turnNumber;
+      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, dmg, entityTag, excluded, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, o, p, playedCard, playerIndex, players, ref, ref1, ref2, ref3, ref4, ref5, ref6, secret, tag, tagValue, target, tempOpponent, turnNumber;
       this.goToTimestamp(this.currentReplayTime);
       this.update();
       players = [this.player, this.opponent];
@@ -455,6 +433,7 @@
               if (this.turns[currentTurnNumber]) {
                 if (command[1].length > 0 && command[1][0].tags) {
                   playedCard = -1;
+                  excluded = false;
                   ref2 = command[1][0].tags;
                   for (m = 0, len2 = ref2.length; m < len2; m++) {
                     tag = ref2[m];
@@ -464,8 +443,11 @@
                     if (tag.tag === 'SECRET' && tag.value === 1) {
                       secret = true;
                     }
+                    if (tag.tag === 'ATTACHED') {
+                      excluded = true;
+                    }
                   }
-                  if (playedCard > -1) {
+                  if (playedCard > -1 && !excluded) {
                     action = {
                       turn: currentTurnNumber - 1,
                       index: actionIndex++,
@@ -474,7 +456,8 @@
                       secret: secret,
                       data: this.entities[playedCard],
                       owner: this.turns[currentTurnNumber].activePlayer,
-                      initialCommand: command[1][0]
+                      initialCommand: command[1][0],
+                      debugType: 'played card'
                     };
                     this.turns[currentTurnNumber].actions[actionIndex] = action;
                   }
@@ -505,7 +488,8 @@
                     data: this.entities[command[1][0].attributes.entity],
                     owner: this.turns[currentTurnNumber].activePlayer,
                     target: command[1][0].attributes.target,
-                    initialCommand: command[1][0]
+                    initialCommand: command[1][0],
+                    debugType: 'attack with complex conditions'
                   };
                   this.turns[currentTurnNumber].actions[actionIndex] = action;
                 }
@@ -532,7 +516,8 @@
                           data: this.entities[command[1][0].attributes.entity],
                           owner: this.turns[currentTurnNumber].activePlayer,
                           target: target,
-                          initialCommand: command[1][0]
+                          initialCommand: command[1][0],
+                          debugType: 'power 3 dmg'
                         };
                         this.turns[currentTurnNumber].actions[actionIndex] = action;
                       }
@@ -547,7 +532,8 @@
                         data: this.entities[command[1][0].attributes.entity],
                         owner: this.turns[currentTurnNumber].activePlayer,
                         target: target,
-                        initialCommand: command[1][0]
+                        initialCommand: command[1][0],
+                        debugType: 'power 3'
                       };
                       this.turns[currentTurnNumber].actions[actionIndex] = action;
                     }

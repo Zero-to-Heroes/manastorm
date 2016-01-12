@@ -82,18 +82,18 @@ class ReplayPlayer extends EventEmitter
 	goPreviousAction: ->
 		@newStep()
 		@turnLog = ''
-		console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
+		#console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
 		@currentActionInTurn--
 
 		if @currentActionInTurn == 1
-			console.log 'going directly to beginning of turn', @currentTurn
+			#console.log 'going directly to beginning of turn', @currentTurn
 			@goPreviousTurn()
 			@goNextTurn()
 
 		else if @currentActionInTurn <= 0
-			console.log 'going directly to end of previous turn', @currentTurn - 1
+			#console.log 'going directly to end of previous turn', @currentTurn - 1
 			@goPreviousTurn()
-			console.log 'moved back to previous turn', @currentTurn
+			#console.log 'moved back to previous turn', @currentTurn
 			@currentActionInTurn = @turns[@currentTurn].actions.length - 1
 			if @currentActionInTurn > 0
 				#console.log 'moving to action', @currentActionInTurn
@@ -118,11 +118,7 @@ class ReplayPlayer extends EventEmitter
 			owner = action.owner.name 
 			if !owner
 				ownerCard = @entities[action.owner]
-				#console.log 'ownerCard', ownerCard, action.owner
-				#console.log '\tcardID', ownerCard.cardID
-				#console.log '\treal card', @cardUtils.getCard(ownerCard.cardID)
 				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-				#console.log '\tlocalized name', owner
 			console.log 'building card link for', card, @cardUtils.getCard(card)
 			cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
 			@turnLog = owner + action.type + cardLink
@@ -137,7 +133,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
-		#console.log @turnLog
+		console.log @turnLog
 
 		@goToTimestamp targetTimestamp
 
@@ -167,7 +163,7 @@ class ReplayPlayer extends EventEmitter
 		@newStep()
 		# Directly go after the card draw
 		@currentActionInTurn = 0
-		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
+		#console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
 		@currentTurn = Math.max(@currentTurn - 1, 1)
 
 		if (@currentTurn <= 1)
@@ -181,7 +177,7 @@ class ReplayPlayer extends EventEmitter
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 
 		if @turns[@currentTurn].turn is 'Mulligan'
-			console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
+			#console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
 			@turnLog = @turns[@currentTurn].turn
 			@currentTurn = 0
 			@currentActionInTurn = 0
@@ -190,7 +186,7 @@ class ReplayPlayer extends EventEmitter
 
 		@goToTimestamp targetTimestamp
 
-		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
+		#console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
 	newStep: ->
 		@targetSource = undefined
@@ -210,7 +206,7 @@ class ReplayPlayer extends EventEmitter
 		@moveToTimestamp target
 
 	moveToTimestamp: (timestamp) ->
-		console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp
+		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp
 		timestamp += @startTimestamp
 		@newStep()
 		@currentTurn = -1
@@ -235,7 +231,7 @@ class ReplayPlayer extends EventEmitter
 					@currentActionInTurn = j
 
 		if @currentActionInTurn <= 1
-			console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 			if (@currentTurn <= 1)
 				@goPreviousTurn()
 			else
@@ -244,12 +240,12 @@ class ReplayPlayer extends EventEmitter
 				@goNextTurn()
 
 		else
-			console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 			@goToAction()
 		
 
 	goToTimestamp: (timestamp) ->
-		console.log 'going to timestamp', timestamp
+		#console.log 'going to timestamp', timestamp
 		#initialSpeed = @speed
 
 		if (timestamp < @currentReplayTime)
@@ -274,42 +270,42 @@ class ReplayPlayer extends EventEmitter
 
 		if matches and matches.length > 0
 			matches.forEach (match) ->
-				console.log '\tmatch', match
+				#console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				console.log '\tinputTurnNumber', inputTurnNumber
+				#console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
 				if that.turns[2].activePlayer == that.player
 					turnNumber = inputTurnNumber * 2
 				else
 					turnNumber = inputTurnNumber * 2 + 1
 				turn = that.turns[turnNumber]
-				console.log '\tturn', turn
+				#console.log '\tturn', turn
 				if turn
 					timestamp = turn.timestamp + 1
-					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					#console.log '\ttimestamp', (timestamp - that.startTimestamp)
 					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					console.log '\tformattedTimeStamp', formattedTimeStamp
+					#console.log '\tformattedTimeStamp', formattedTimeStamp
 					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
 
 		matches = text.match(opoonentTurnRegex)
 
 		if matches and matches.length > 0
 			matches.forEach (match) ->
-				console.log '\tmatch', match
+				#console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				console.log '\tinputTurnNumber', inputTurnNumber
+				#console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
 				if that.turns[2].activePlayer == that.opponent
 					turnNumber = inputTurnNumber * 2
 				else
 					turnNumber = inputTurnNumber * 2 + 1
 				turn = that.turns[turnNumber]
-				console.log '\tturn', turn
+				#console.log '\tturn', turn
 				if turn
 					timestamp = turn.timestamp + 1
-					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					#console.log '\ttimestamp', (timestamp - that.startTimestamp)
 					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					console.log '\tformattedTimeStamp', formattedTimeStamp
+					#console.log '\tformattedTimeStamp', formattedTimeStamp
 					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
 
 		matches = text.match(mulliganRegex)
@@ -318,12 +314,12 @@ class ReplayPlayer extends EventEmitter
 			matches.forEach (match) ->
 				turn = that.turns[1]
 				timestamp = turn.timestamp
-				console.log 'timestamp', timestamp, that.startTimestamp
+				#console.log 'timestamp', timestamp, that.startTimestamp
 				formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-				console.log 'formatted time stamp', formattedTimeStamp
+				#console.log 'formatted time stamp', formattedTimeStamp
 				text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
 
-		console.log 'modified text', text
+		#console.log 'modified text', text
 		return text
 
 	formatTimeStamp: (length) ->
@@ -344,7 +340,7 @@ class ReplayPlayer extends EventEmitter
 		elapsed = @getElapsed()
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				#console.log 'processing', @history[@historyPosition]
+				console.log 'processing', @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else
@@ -459,16 +455,22 @@ class ReplayPlayer extends EventEmitter
 							if command[1].length > 0 and command[1][0].tags
 
 								playedCard = -1
-								#console.log 'considering action', currentTurnNumber, command[1][0].tags, command
+								#if command[1][0].attributes.entity == '49'
+									#console.log 'considering action', currentTurnNumber, command[1][0].tags, command
 
+								excluded = false
 								for tag in command[1][0].tags
 									#console.log '\ttag', tag.tag, tag.value, tag
 									if (tag.tag == 'ZONE' && tag.value == 1) 
 										playedCard = tag.entity
 									if tag.tag == 'SECRET' and tag.value == 1
 										secret = true
+									# Those are effects that are added to a creature (like Cruel Taskmaster's bonus)
+									# We don't want to treat them as a significant action, so we ignore them
+									if tag.tag == 'ATTACHED'
+										excluded = true
 
-								if (playedCard > -1)
+								if playedCard > -1 and !excluded
 									#console.log 'batch', i, batch
 									#console.log '\tcommand', j, command
 									#console.log '\t\tadding action to turn', currentTurnNumber, command[1][0].tags, command
@@ -481,6 +483,7 @@ class ReplayPlayer extends EventEmitter
 										data: @entities[playedCard]
 										owner: @turns[currentTurnNumber].activePlayer
 										initialCommand: command[1][0]
+										debugType: 'played card'
 									}
 									@turns[currentTurnNumber].actions[actionIndex] = action
 									#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
@@ -516,6 +519,7 @@ class ReplayPlayer extends EventEmitter
 									owner: @turns[currentTurnNumber].activePlayer
 									target: command[1][0].attributes.target
 									initialCommand: command[1][0]
+									debugType: 'attack with complex conditions'
 								}
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding attack to turn', @turns[currentTurnNumber].actions[actionIndex]
@@ -556,6 +560,7 @@ class ReplayPlayer extends EventEmitter
 												#@entities[target]
 												target: target
 												initialCommand: command[1][0]
+												debugType: 'power 3 dmg'
 											}
 											@turns[currentTurnNumber].actions[actionIndex] = action
 
@@ -574,6 +579,7 @@ class ReplayPlayer extends EventEmitter
 											#@entities[target]
 											target: target
 											initialCommand: command[1][0]
+											debugType: 'power 3'
 										}
 										@turns[currentTurnNumber].actions[actionIndex] = action
 

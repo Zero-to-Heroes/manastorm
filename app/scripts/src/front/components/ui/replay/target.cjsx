@@ -32,15 +32,16 @@ Target = React.createClass
 		if sourceDims.centerY == targetDims.centerY
 			#console.log 'Same line interaction'
 			left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
+			#console.log 'initial left', left
 			height = arrowWidth
 
 			# All the height business is because we rotate around the center and not the top
 			if sourceDims.centerX < targetDims.centerX
 				transform += 'rotate(90deg) '
-				left -= height / 2
+				left += height / 2
 			else
 				transform += 'rotate(-90deg) '
-				left += height / 2
+				left -= height / 2
 
 			top = sourceDims.centerY - containerTop - height / 2
 			#console.log 'top', top, containerTop
