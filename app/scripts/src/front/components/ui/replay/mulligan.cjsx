@@ -1,5 +1,6 @@
 React = require 'react'
 Card = require './card'
+ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
 _ = require 'lodash'
 {subscribe} = require '../../../../subscription'
 
@@ -18,8 +19,10 @@ class Mulligan extends React.Component
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
 			<Card entity={entity} key={entity.id} isHidden={hidden} />
 
-		return <div className="mulligan">
-			{cards}
-		</div>
+		return <ReactCSSTransitionGroup component="div" className="mulligan"
+					transitionName="animate" transitionEnterTimeout={700}
+					transitionLeaveTimeout={700}>
+				{cards}
+			</ReactCSSTransitionGroup>
 
 module.exports = Mulligan
