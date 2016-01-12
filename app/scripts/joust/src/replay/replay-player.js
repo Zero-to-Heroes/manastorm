@@ -207,7 +207,7 @@
 
     ReplayPlayer.prototype.moveTime = function(progression) {
       var target;
-      target = this.getTotalLength() * progression * 1000;
+      target = this.getTotalLength() * progression;
       return this.moveToTimestamp(target);
     };
 

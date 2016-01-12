@@ -202,7 +202,7 @@ class ReplayPlayer extends EventEmitter
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
 	moveTime: (progression) ->
-		target = @getTotalLength() * progression * 1000
+		target = @getTotalLength() * progression
 		@moveToTimestamp target
 
 	moveToTimestamp: (timestamp) ->
