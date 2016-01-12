@@ -75,15 +75,15 @@
         case 'ShowEntity':
           this.state.push('entity');
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
-          if (node.name === 'ShowEntity') {
-            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
-            node.parent = this.stack[this.stack.length - 2];
-          }
           if (node.attributes.cardID) {
             this.entityDefinition.cardID = node.attributes.cardID;
           }
           if (node.attributes.name) {
-            return this.entityDefinition.name = node.attributes.name;
+            this.entityDefinition.name = node.attributes.name;
+          }
+          if (node.name === 'ShowEntity') {
+            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            return node.parent = this.stack[this.stack.length - 2];
           }
           break;
         case 'Options':
@@ -171,18 +171,21 @@
         case 'FullEntity':
           this.state.push('entity');
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          if (node.attributes.cardID) {
+            this.entityDefinition.cardID = node.attributes.cardID;
+            this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
+          }
+          if (node.attributes.name) {
+            this.entityDefinition.name = node.attributes.name;
+          }
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
           } else {
             this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
-          if (node.attributes.cardID) {
-            this.entityDefinition.cardID = node.attributes.cardID;
-            this.replay.mainPlayer(this.stack[this.stack.length - 2].attributes.entity);
-          }
-          if (node.attributes.name) {
-            return this.entityDefinition.name = node.attributes.name;
+          if (this.entityDefinition.id === 72) {
+            return console.log('parsing bluegill', this.entityDefinition, node);
           }
           break;
         case 'TagChange':

@@ -19,6 +19,9 @@ class HeroCard extends Card
 		if @props.className
 			cls += " " + @props.className
 
+		if @props.entity.tags.FROZEN
+			overlay = <div className="overlay frozen"></div>
+			
 		if @props.secrets
 			secrets = @props.secrets.map (entity) ->
 				<Secret entity={entity} key={entity.id} />

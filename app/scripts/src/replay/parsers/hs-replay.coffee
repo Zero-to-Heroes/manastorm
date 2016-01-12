@@ -62,14 +62,16 @@ class HSReplayParser
 				# console.log '\tpushing game entity to state', node
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
-				if node.name == 'ShowEntity'
-					@stack[@stack.length - 2].showEntity = @entityDefinition
-					node.parent = @stack[@stack.length - 2]
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
 					#console.log 'giving name to card', node.attributes.cardID, @entityDefinition.id, @entityDefinition
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
+
+				#@entityDefinition.originalDefinition = @replay.clone(@entityDefinition)
+				if node.name == 'ShowEntity'
+					@stack[@stack.length - 2].showEntity = @entityDefinition
+					node.parent = @stack[@stack.length - 2]
 
 			when 'Options'
 				@state.push('options')
@@ -121,7 +123,6 @@ class HSReplayParser
 				@entityDefinition = {tags: {}}
 			when 'FullEntity'
 				@state.pop()
-				#console.log '\tclosing full entity', @entityDefinition
 				@replay.enqueue ts, 'receiveEntity', @entityDefinition
 				@entityDefinition = {tags: {}}
 			when 'ShowEntity'
@@ -134,13 +135,6 @@ class HSReplayParser
 			when 'ShowEntity', 'FullEntity'
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
-				@entityDefinition.parent = @stack[@stack.length - 2]
-
-				if node.name is 'ShowEntity'
-					@stack[@stack.length - 2].showEntity = @entityDefinition
-				# Need that to distinguish actions that create tokens
-				else 
-					@stack[@stack.length - 2].fullEntity = @entityDefinition
 
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
@@ -149,8 +143,17 @@ class HSReplayParser
 				if node.attributes.name
 					@entityDefinition.name = node.attributes.name
 
-				#if @entityDefinition.id is 69
-				#console.log 'parsing reinforce token', @entityDefinition, node
+				#@entityDefinition.originalDefinition = @replay.clone(@entityDefinition)
+
+				@entityDefinition.parent = @stack[@stack.length - 2]
+				if node.name is 'ShowEntity'
+					@stack[@stack.length - 2].showEntity = @entityDefinition
+				# Need that to distinguish actions that create tokens
+				else 
+					@stack[@stack.length - 2].fullEntity = @entityDefinition
+
+				if @entityDefinition.id is 72
+					console.log 'parsing bluegill', @entityDefinition, node
 
 			when 'TagChange'
 				tag = {
@@ -226,6 +229,8 @@ class HSReplayParser
 		node = @stack.pop()
 		#console.log 'closing tag', node.name
 		@["#{@state[@state.length-1]}StateClose"]?(node)
+
+
 
 
 module.exports = HSReplayParser

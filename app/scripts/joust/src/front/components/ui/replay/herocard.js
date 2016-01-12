@@ -23,7 +23,7 @@
     }
 
     HeroCard.prototype.render = function() {
-      var art, cls, secrets, style;
+      var art, cls, overlay, secrets, style;
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/" + this.props.entity.cardID + ".png";
       if (this.props.entity.cardID && !this.props.isHidden) {
         style = {
@@ -34,6 +34,11 @@
       }
       if (this.props.className) {
         cls += " " + this.props.className;
+      }
+      if (this.props.entity.tags.FROZEN) {
+        overlay = React.createElement("div", {
+          "className": "overlay frozen"
+        });
       }
       if (this.props.secrets) {
         secrets = this.props.secrets.map(function(entity) {
