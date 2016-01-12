@@ -371,7 +371,7 @@
     };
 
     ReplayPlayer.prototype.finalizeInit = function() {
-      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, definition, dmg, entity, entityTag, excluded, i, j, k, l, len, len1, len2, len3, len4, len5, len6, len7, m, n, o, p, playedCard, playerIndex, players, q, r, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, secret, tag, tagValue, target, tempOpponent, turnNumber;
+      var action, actionIndex, batch, command, currentPlayer, currentTurnNumber, definition, dmg, entity, entityTag, excluded, i, info, j, k, l, len, len1, len2, len3, len4, len5, len6, len7, len8, len9, m, meta, n, o, p, playedCard, playerIndex, players, q, r, ref, ref1, ref10, ref11, ref12, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, s, secret, t, tag, tagValue, target, tempOpponent, turnNumber;
       this.goToTimestamp(this.currentReplayTime);
       this.update();
       players = [this.player, this.opponent];
@@ -460,7 +460,7 @@
           if (command[0] === 'receiveAction') {
             currentTurnNumber = turnNumber - 1;
             if (this.turns[currentTurnNumber]) {
-              if (command[1].length > 0 && command[1][0].tags) {
+              if (command[1][0].tags) {
                 playedCard = -1;
                 excluded = false;
                 ref4 = command[1][0].tags;
@@ -491,10 +491,35 @@
                   this.turns[currentTurnNumber].actions[actionIndex] = action;
                 }
               }
-              if (command[1].length > 0 && command[1][0].tags && command[1][0].attributes.type === '6') {
-                ref5 = command[1][0].tags;
-                for (p = 0, len5 = ref5.length; p < len5; p++) {
-                  tag = ref5[p];
+              if (command[1][0].tags && command[1][0].attributes.type === '5' && ((ref5 = command[1][0].meta) != null ? ref5.length : void 0) > 0) {
+                ref6 = command[1][0].meta;
+                for (p = 0, len5 = ref6.length; p < len5; p++) {
+                  meta = ref6[p];
+                  if (meta.meta === 'TARGET' && ((ref7 = meta.info) != null ? ref7.length : void 0) > 0) {
+                    ref8 = meta.info;
+                    for (q = 0, len6 = ref8.length; q < len6; q++) {
+                      info = ref8[q];
+                      action = {
+                        turn: currentTurnNumber - 1,
+                        index: actionIndex++,
+                        timestamp: batch.timestamp,
+                        target: info.entity,
+                        type: ': ',
+                        data: this.entities[command[1][0].attributes.entity],
+                        owner: this.getController(this.entities[command[1][0].attributes.entity].tags.CONTROLLER),
+                        initialCommand: command[1][0],
+                        debugType: 'trigger effect card'
+                      };
+                      this.turns[currentTurnNumber].actions[actionIndex] = action;
+                      console.error('Added action', action);
+                    }
+                  }
+                }
+              }
+              if (command[1][0].tags && command[1][0].attributes.type === '6') {
+                ref9 = command[1][0].tags;
+                for (r = 0, len7 = ref9.length; r < len7; r++) {
+                  tag = ref9[r];
                   if (tag.tag === 'ZONE' && tag.value === 4) {
                     action = {
                       turn: currentTurnNumber - 1,
@@ -508,7 +533,7 @@
                   }
                 }
               }
-              if (command[1].length > 0 && parseInt(command[1][0].attributes.target) > 0 && (command[1][0].attributes.type === '1' || !command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)) {
+              if (parseInt(command[1][0].attributes.target) > 0 && (command[1][0].attributes.type === '1' || !command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)) {
                 action = {
                   turn: currentTurnNumber - 1,
                   index: actionIndex++,
@@ -527,9 +552,9 @@
                   if (command[1][0].tags) {
                     dmg = 0;
                     target = void 0;
-                    ref6 = command[1][0].tags;
-                    for (q = 0, len6 = ref6.length; q < len6; q++) {
-                      tag = ref6[q];
+                    ref10 = command[1][0].tags;
+                    for (s = 0, len8 = ref10.length; s < len8; s++) {
+                      tag = ref10[s];
                       if (tag.tag === 'DAMAGE' && tag.value > 0) {
                         dmg = tag.value;
                         target = tag.entity;
@@ -572,18 +597,18 @@
               if (command[1].length > 0 && command[1][0].showEntity && (command[1][0].attributes.type === '1' || (command[1][0].attributes.type !== '3' && (!command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0)))) {
                 playedCard = -1;
                 if (command[1][0].showEntity.tags) {
-                  ref7 = command[1][0].showEntity.tags;
-                  for (entityTag in ref7) {
-                    tagValue = ref7[entityTag];
+                  ref11 = command[1][0].showEntity.tags;
+                  for (entityTag in ref11) {
+                    tagValue = ref11[entityTag];
                     if (entityTag === 'ZONE' && tagValue === 1) {
                       playedCard = command[1][0].showEntity.id;
                     }
                   }
                 }
                 if (command[1][0].tags) {
-                  ref8 = command[1][0].tags;
-                  for (r = 0, len7 = ref8.length; r < len7; r++) {
-                    tag = ref8[r];
+                  ref12 = command[1][0].tags;
+                  for (t = 0, len9 = ref12.length; t < len9; t++) {
+                    tag = ref12[t];
                     if (tag.tag === 'ZONE' && tag.value === 1) {
                       playedCard = tag.entity;
                     }

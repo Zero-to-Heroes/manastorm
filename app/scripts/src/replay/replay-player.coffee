@@ -479,7 +479,7 @@ class ReplayPlayer extends EventEmitter
 					if (@turns[currentTurnNumber])
 
 						# Played a card
-						if command[1].length > 0 and command[1][0].tags
+						if command[1][0].tags
 
 							playedCard = -1
 							#if command[1][0].attributes.entity == '49'
@@ -515,11 +515,27 @@ class ReplayPlayer extends EventEmitter
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
-							#Played a secret
-
+						# Trigger with targets
+						if command[1][0].tags and command[1][0].attributes.type == '5' and command[1][0].meta?.length > 0
+							for meta in command[1][0].meta
+								if meta.meta == 'TARGET' && meta.info?.length > 0
+									for info in meta.info
+										action = {
+											turn: currentTurnNumber - 1
+											index: actionIndex++
+											timestamp: batch.timestamp
+											target: info.entity
+											type: ': trigger '
+											data: @entities[command[1][0].attributes.entity]
+											owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER) #@turns[currentTurnNumber].activePlayer
+											initialCommand: command[1][0]
+											debugType: 'trigger effect card'
+										}
+										@turns[currentTurnNumber].actions[actionIndex] = action
+										console.error 'Added action', action
 
 						# Deaths. Not really an action, but useful to see clearly what happens
-						if command[1].length > 0 and command[1][0].tags and command[1][0].attributes.type == '6' 
+						if command[1][0].tags and command[1][0].attributes.type == '6' 
 
 							for tag in command[1][0].tags
 								# Graveyard
@@ -535,7 +551,7 @@ class ReplayPlayer extends EventEmitter
 									@turns[currentTurnNumber].actions[actionIndex] = action
 
 						# Attacked something
-						if command[1].length > 0 and parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
+						if parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
 							#console.log 'considering attack', command[1][0]
 							action = {
 								turn: currentTurnNumber - 1

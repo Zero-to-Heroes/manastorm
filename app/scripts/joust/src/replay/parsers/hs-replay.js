@@ -1,11 +1,11 @@
 (function() {
-  var HSReplayParser, Stream, sax, tagNames, tsToSeconds;
+  var HSReplayParser, Stream, metaTagNames, ref, sax, tagNames, tsToSeconds;
 
   Stream = require('string-stream');
 
   sax = require('sax');
 
-  tagNames = require('../enums').tagNames;
+  ref = require('../enums'), tagNames = ref.tagNames, metaTagNames = ref.metaTagNames;
 
   tsToSeconds = function(ts) {
     var hours, minutes, parts, seconds;
@@ -26,6 +26,7 @@
       };
       this.actionDefinition = {};
       this.stack = [];
+      console.log('meta tags', metaTagNames);
     }
 
     HSReplayParser.prototype.parse = function(replay) {
@@ -200,6 +201,18 @@
           }
           tag.parent.tags.push(tag);
           return this.replay.enqueue(null, 'receiveTagChange', tag);
+        case 'MetaData':
+          this.metaData = {
+            meta: metaTagNames[node.attributes.meta],
+            parent: this.stack[this.stack.length - 2]
+          };
+          if (!this.metaData.parent.meta) {
+            this.metaData.parent.meta = [];
+          }
+          this.metaData.parent.meta.push(this.metaData);
+          return this.state.push('metaData');
+        case 'Info':
+          return console.error('info, shouldnt happen');
         case 'Action':
           node.parent = this.stack[this.stack.length - 2];
           this.state.push('action');
@@ -215,6 +228,28 @@
             cards: []
           };
           return this.state.push('choices');
+      }
+    };
+
+    HSReplayParser.prototype.metaDataState = function(node) {
+      var info;
+      switch (node.name) {
+        case 'Info':
+          info = {
+            entity: parseInt(node.attributes.id),
+            parent: this.metaData
+          };
+          if (!info.parent.info) {
+            info.parent.info = [];
+          }
+          return info.parent.info.push(info);
+      }
+    };
+
+    HSReplayParser.prototype.metaDataStateClose = function(node) {
+      switch (node.name) {
+        case 'MetaData':
+          return this.state.pop();
       }
     };
 

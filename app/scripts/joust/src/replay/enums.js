@@ -1,5 +1,5 @@
 (function() {
-  var _, cardTypes, tagNames, tags, zoneNames, zones;
+  var _, cardTypes, metaTagNames, metaTags, tagNames, tags, zoneNames, zones;
 
   _ = require('lodash');
 
@@ -275,9 +275,20 @@
     HERO_POWER: 10
   };
 
+  metaTags = {
+    TARGET: 0,
+    DAMAGE: 1,
+    HEALING: 2,
+    JOUST: 3
+  };
+
+  metaTagNames = _.invert(metaTags);
+
   module.exports = {
     tags: tags,
     tagNames: tagNames,
+    metaTags: metaTags,
+    metaTagNames: metaTagNames,
     zones: zones,
     zoneNames: zoneNames,
     cardTypes: cardTypes

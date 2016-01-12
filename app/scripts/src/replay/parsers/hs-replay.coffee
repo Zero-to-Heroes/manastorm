@@ -1,6 +1,6 @@
 Stream = require 'string-stream'
 sax = require 'sax'
-{tagNames} = require '../enums'
+{tagNames, metaTagNames} = require '../enums'
 
 tsToSeconds = (ts) ->
 	parts = ts.split(':')
@@ -17,6 +17,7 @@ class HSReplayParser
 		@entityDefinition = {tags: {}}
 		@actionDefinition = {}
 		@stack = []
+		console.log 'meta tags', metaTagNames
 
 	parse: (replay) ->
 		@replay = replay
@@ -170,6 +171,23 @@ class HSReplayParser
 
 				@replay.enqueue null, 'receiveTagChange', tag
 
+			when 'MetaData'
+				#console.error 'parsing MetaData'
+				@metaData = {
+					meta: metaTagNames[node.attributes.meta]
+					parent: @stack[@stack.length - 2]
+				}
+
+				if (!@metaData.parent.meta)
+					@metaData.parent.meta = []
+
+				@metaData.parent.meta.push(@metaData)
+				#console.log '\tmetadata', @metaData
+				@state.push('metaData')
+
+			when 'Info'
+				console.error 'info, shouldnt happen'
+
 			when 'Action'
 				#console.log 'enqueue action from actionState', node, @stack[@stack.length - 1], @stack[@stack.length - 2]
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
@@ -192,6 +210,27 @@ class HSReplayParser
 					ts: tsToSeconds(node.attributes.ts)
 					cards: []
 				@state.push('choices')
+
+	metaDataState: (node) ->
+		#console.log '\tin meta data state', node
+		switch node.name
+			when 'Info'
+				#console.log '\t\tconsidering info node', node
+				info = {
+					entity: parseInt(node.attributes.id)
+					parent: @metaData
+				}
+
+				if (!info.parent.info)
+					info.parent.info = []
+
+				info.parent.info.push(info)
+				#console.log '\t\tinfo', info
+
+	metaDataStateClose: (node) ->
+		switch node.name
+			when 'MetaData'
+				@state.pop()
 
 	choicesState: (node) ->
 		switch node.name

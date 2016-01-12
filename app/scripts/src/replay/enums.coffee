@@ -279,4 +279,12 @@ cardTypes =
 	TOKEN: 9
 	HERO_POWER: 10
 
-module.exports = {tags, tagNames, zones, zoneNames, cardTypes}
+metaTags =
+	TARGET: 0
+	DAMAGE: 1
+	HEALING: 2
+	JOUST: 3
+
+metaTagNames = _.invert(metaTags)
+
+module.exports = {tags, tagNames, metaTags, metaTagNames, zones, zoneNames, cardTypes}
