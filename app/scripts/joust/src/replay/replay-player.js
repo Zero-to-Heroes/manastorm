@@ -212,36 +212,52 @@
     };
 
     ReplayPlayer.prototype.moveToTimestamp = function(timestamp) {
-      var action, i, j, k, l, ref, ref1, ref2, turn;
+      var action, i, j, k, l, ref, ref1, ref2, ref3, ref4, ref5, ref6, turn;
+      console.log('moving to timestamp', timestamp, this.startTimestamp, timestamp + this.startTimestamp, this.turns);
       timestamp += this.startTimestamp;
       this.newStep();
       this.currentTurn = -1;
       this.currentActionInTurn = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        if (((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) {
+        console.log('turn', i, turn, (ref1 = turn.actions[turn.actions.length - 1]) != null ? ref1.timestamp : void 0, timestamp, ((ref2 = turn.actions) != null ? ref2.length : void 0) === 0, turn.timestamp > timestamp);
+        if ((((ref3 = turn.actions) != null ? ref3.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) || (((ref4 = turn.actions) != null ? ref4.length : void 0) === 0 && turn.timestamp > timestamp)) {
+          console.log('exiting loop', this.currentTurn, this.currentActionInTurn);
           break;
         }
         this.currentTurn = i;
         if (turn.actions.length > 0) {
-          for (j = l = 1, ref2 = turn.actions.length - 1; 1 <= ref2 ? l <= ref2 : l >= ref2; j = 1 <= ref2 ? ++l : --l) {
+          for (j = l = 1, ref5 = turn.actions.length - 1; 1 <= ref5 ? l <= ref5 : l >= ref5; j = 1 <= ref5 ? ++l : --l) {
+            console.log('\tactions', turn.actions, j);
             action = turn.actions[j];
+            console.log('\t\tconsidering action', i, j, turn, action);
             if (!action || !action.timestamp || (action != null ? action.timestamp : void 0) > timestamp) {
+              console.log('\t\tBreaking', action, (action != null ? action.timestamp : void 0), timestamp);
               break;
             }
             this.currentActionInTurn = j;
           }
         }
       }
-      if (this.currentActionInTurn <= 1) {
-        if (this.currentTurn <= 1) {
-          return this.goPreviousTurn();
-        } else {
-          this.currentTurn = Math.max(this.currentTurn - 1, 1);
-          this.goToAction();
-          return this.goNextTurn();
-        }
+      if (this.currentTurn === -1) {
+        console.log('Going back to mulligan');
+        this.currentTurn = 0;
+        this.currentActionInTurn = 0;
+        this.historyPosition = 0;
+        return this.init();
+      } else if (this.currentTurn === 1) {
+        this.currentTurn = 0;
+        this.currentActionInTurn = 0;
+        this.historyPosition = 0;
+        this.init();
+        return this.goNextTurn();
+      } else if (this.currentActionInTurn <= 1) {
+        console.log('Going to turn', timestamp, this.currentTurn, this.currentActionInTurn, (ref6 = this.turns[this.currentTurn]) != null ? ref6.actions[this.currentActionInTurn] : void 0);
+        this.currentTurn = Math.max(this.currentTurn - 1, 1);
+        this.goToAction();
+        return this.goNextTurn();
       } else {
+        console.log('Going to action', timestamp, this.currentTurn, this.currentActionInTurn, this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         return this.goToAction();
       }
     };
@@ -392,15 +408,11 @@
           }
           if (command[0] === 'receiveEntity') {
             if (command[1].length > 0 && command[1][0].id && !this.entities[command[1][0].id]) {
-              console.log('prepopulating received entities', command[1][0]);
               entity = new Entity(this);
               definition = _.cloneDeep(command[1][0]);
               this.entities[definition.id] = entity;
               definition.tags.ZONE = 6;
-              console.log('\tcloned definition', definition, command[1][0]);
               entity.update(definition);
-              console.log('\tupdated entity', entity);
-              console.log('\tadding entity', command[1][0].id, this.entities[command[1][0].id]);
             }
           }
         }
@@ -504,14 +516,13 @@
                         index: actionIndex++,
                         timestamp: batch.timestamp,
                         target: info.entity,
-                        type: ': ',
+                        type: ': trigger ',
                         data: this.entities[command[1][0].attributes.entity],
                         owner: this.getController(this.entities[command[1][0].attributes.entity].tags.CONTROLLER),
                         initialCommand: command[1][0],
                         debugType: 'trigger effect card'
                       };
                       this.turns[currentTurnNumber].actions[actionIndex] = action;
-                      console.error('Added action', action);
                     }
                   }
                 }
@@ -652,7 +663,6 @@
 
     ReplayPlayer.prototype.receiveEntity = function(definition) {
       var entity;
-      console.log('receiving entity', definition.id, definition);
       if (this.entities[definition.id]) {
         entity = this.entities[definition.id];
       } else {

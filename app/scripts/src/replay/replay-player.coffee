@@ -206,7 +206,7 @@ class ReplayPlayer extends EventEmitter
 		@moveToTimestamp target
 
 	moveToTimestamp: (timestamp) ->
-		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp
+		console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
 		timestamp += @startTimestamp
 		@newStep()
 		@currentTurn = -1
@@ -214,33 +214,44 @@ class ReplayPlayer extends EventEmitter
 
 		for i in [1..@turns.length]
 			turn = @turns[i]
-			#console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp
-			if turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp
-				#console.log 'exiting loop', @currentTurn, @currentActionInTurn
+			console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp, turn.actions?.length == 0, turn.timestamp > timestamp
+			if (turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
+				console.log 'exiting loop', @currentTurn, @currentActionInTurn
 				break
 			@currentTurn = i
 
 			if turn.actions.length > 0
 				for j in [1..turn.actions.length - 1]
-					#console.log '\tactions', turn.actions, j
+					console.log '\tactions', turn.actions, j
 					action = turn.actions[j]
-					#console.log '\t\tconsidering action', i, j, turn, action
+					console.log '\t\tconsidering action', i, j, turn, action
 					if !action or !action.timestamp or (action?.timestamp) > timestamp
-						#console.log '\t\tBreaking', action, (action?.timestamp), timestamp
+						console.log '\t\tBreaking', action, (action?.timestamp), timestamp
 						break
 					@currentActionInTurn = j
 
-		if @currentActionInTurn <= 1
-			#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
-			if (@currentTurn <= 1)
-				@goPreviousTurn()
-			else
-				@currentTurn = Math.max(@currentTurn - 1, 1)
-				@goToAction()
-				@goNextTurn()
+		if @currentTurn == -1
+			console.log 'Going back to mulligan'
+			@currentTurn = 0
+			@currentActionInTurn = 0
+			@historyPosition = 0
+			@init()
+
+		else if @currentTurn == 1
+			@currentTurn = 0
+			@currentActionInTurn = 0
+			@historyPosition = 0
+			@init()
+			@goNextTurn()
+
+		else if @currentActionInTurn <= 1
+			console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
+			@currentTurn = Math.max(@currentTurn - 1, 1)
+			@goToAction()
+			@goNextTurn()
 
 		else
-			#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 			@goToAction()
 		
 
@@ -393,16 +404,16 @@ class ReplayPlayer extends EventEmitter
 						#console.log '\t\tUpdated entity', @entities[command[1][0].id]
 				if (command[0] == 'receiveEntity')
 					if (command[1].length > 0 && command[1][0].id && !@entities[command[1][0].id]) 
-						console.log 'prepopulating received entities', command[1][0]
+						#console.log 'prepopulating received entities', command[1][0]
 						entity = new Entity(this)
 						definition = _.cloneDeep command[1][0]
 						@entities[definition.id] = entity
 						# Entity not in the game yet
 						definition.tags.ZONE = 6
-						console.log '\tcloned definition', definition, command[1][0]
+						#console.log '\tcloned definition', definition, command[1][0]
 						entity.update(definition)
-						console.log '\tupdated entity', entity
-						console.log '\tadding entity', command[1][0].id, @entities[command[1][0].id]
+						#console.log '\tupdated entity', entity
+						#console.log '\tadding entity', command[1][0].id, @entities[command[1][0].id]
 
 		# Build the list of turns along with the history position of each
 		# TODO extract that to another file
@@ -532,7 +543,7 @@ class ReplayPlayer extends EventEmitter
 											debugType: 'trigger effect card'
 										}
 										@turns[currentTurnNumber].actions[actionIndex] = action
-										console.error 'Added action', action
+										#console.log 'Added action', action
 
 						# Deaths. Not really an action, but useful to see clearly what happens
 						if command[1][0].tags and command[1][0].attributes.type == '6' 
@@ -690,7 +701,7 @@ class ReplayPlayer extends EventEmitter
 		return @opponent
 
 	receiveEntity: (definition) ->
-		console.log 'receiving entity', definition.id, definition
+		#console.log 'receiving entity', definition.id, definition
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else

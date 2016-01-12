@@ -181,12 +181,9 @@
           }
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (node.name === 'ShowEntity') {
-            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            return this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
           } else {
-            this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
-          }
-          if (this.entityDefinition.id === 72) {
-            return console.log('parsing bluegill', this.entityDefinition, node);
+            return this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
           break;
         case 'TagChange':

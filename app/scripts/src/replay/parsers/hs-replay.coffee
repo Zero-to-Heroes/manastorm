@@ -153,8 +153,8 @@ class HSReplayParser
 				else 
 					@stack[@stack.length - 2].fullEntity = @entityDefinition
 
-				if @entityDefinition.id is 72
-					console.log 'parsing bluegill', @entityDefinition, node
+				#if @entityDefinition.id is 72
+					#console.log 'parsing bluegill', @entityDefinition, node
 
 			when 'TagChange'
 				tag = {
