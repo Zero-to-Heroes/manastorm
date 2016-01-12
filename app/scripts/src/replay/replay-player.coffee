@@ -10,9 +10,6 @@ class ReplayPlayer extends EventEmitter
 
 		window.replay = this
 
-		@turns = {
-			length: 0
-		}
 		@currentTurn = 0
 		@currentActionInTurn = 0
 		@turnLog = ''
@@ -35,6 +32,10 @@ class ReplayPlayer extends EventEmitter
 
 		@started = false
 		@speed = 0
+
+		@turns = {
+			length: 0
+		}
 
 		@parser.parse(this)
 
