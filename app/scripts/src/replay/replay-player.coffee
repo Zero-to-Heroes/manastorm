@@ -63,20 +63,20 @@ class ReplayPlayer extends EventEmitter
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	goNextAction: ->
-		#console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@turnLog = ''
 		@currentActionInTurn++
 
-		#console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
-			#console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
+			console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
 			@goToAction()
 
 		# Going to the next turn
 		else 
-			#console.log 'going directly to next turn', @currentTurn + 1
+			console.log 'going directly to next turn', @currentTurn + 1
 			@goNextTurn()
 
 	goPreviousAction: ->
@@ -150,12 +150,9 @@ class ReplayPlayer extends EventEmitter
 
 		targetTimestamp = @getTotalLength() * 1000
 
-		# Directly go after the card draw
-		if (@currentTurn <= @turns.length && @turns[@currentTurn].actions && @turns[@currentTurn].actions.length > 0)
-			@currentActionInTurn = 1
-			targetTimestamp = 1000 * (@turns[@currentTurn].actions[@currentActionInTurn].timestamp - @startTimestamp) + 1
-		else
-			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
+		# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
+		# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
+		targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 
 		@goToTimestamp targetTimestamp
 
@@ -256,8 +253,7 @@ class ReplayPlayer extends EventEmitter
 		
 
 	goToTimestamp: (timestamp) ->
-		#console.log 'going to timestamp', timestamp
-		#initialSpeed = @speed
+		console.log 'going to timestamp', timestamp
 
 		if (timestamp < @currentReplayTime)
 			#console.log 'going back in time, resetting', timestamp, @currentReplayTime
