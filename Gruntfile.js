@@ -67,10 +67,30 @@ module.exports = function (grunt) {
 			}
 		},
 
+		uglify: {
+   	 		dist: {
+      			files: {
+        			'<%= yeoman.app %>/scripts/out/dist/joustjs.js': ['<%= yeoman.app %>/scripts/out/joustjs.js']
+      			}
+    		}
+  		},
+
+  		cssmin: {
+  			options: {
+    			shorthandCompacting: false,
+    			roundingPrecision: -1
+  			},
+  			dist: {
+    			files: {
+      				'<%= yeoman.app %>/scripts/out/dist/joustjs.css': ['<%= yeoman.app %>/scripts/out/joustjs.css']
+    			}
+  			}
+		},
+
 		copy: {
 		  	main: {
 		  		expand: true,
-		    	src: '<%= yeoman.app %>/scripts/out/*',
+		    	src: '<%= yeoman.app %>/scripts/out/dist/*',
 		    	dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
 		    	flatten: true
 		  	}
@@ -79,6 +99,16 @@ module.exports = function (grunt) {
 
 
 	grunt.registerTask('default', [
+		'less',
+		'coffee',
+		'cjsx',
+		'browserify',
+		'uglify',
+		'cssmin',
+		'copy'
+	]);
+
+	grunt.registerTask('dev', [
 		'less',
 		'coffee',
 		'cjsx',

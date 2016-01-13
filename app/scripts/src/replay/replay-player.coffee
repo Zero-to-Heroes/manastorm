@@ -45,7 +45,7 @@ class ReplayPlayer extends EventEmitter
 
 		@goNextAction()
 
-		console.log 'replay init done', @turns
+		#console.log 'replay init done', @turns
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -63,20 +63,20 @@ class ReplayPlayer extends EventEmitter
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	goNextAction: ->
-		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		#console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@turnLog = ''
 		@currentActionInTurn++
 
-		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		#console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
-			console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
+			#console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
 			@goToAction()
 
 		# Going to the next turn
 		else 
-			console.log 'going directly to next turn', @currentTurn + 1
+			#console.log 'going directly to next turn', @currentTurn + 1
 			@goNextTurn()
 
 	goPreviousAction: ->
@@ -105,21 +105,21 @@ class ReplayPlayer extends EventEmitter
 
 	goToAction: ->
 		@newStep()
-		console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
-		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
+		#console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
+		#console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
-			console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
+			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-			console.log 'executing action', action, action.data, @startTimestamp
+			#console.log 'executing action', action, action.data, @startTimestamp
 			card = if action?.data then action.data['cardID'] else ''
 
 			owner = action.owner.name 
 			if !owner
 				ownerCard = @entities[action.owner]
 				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-			console.log 'building card link for', card, @cardUtils.getCard(card)
+			#console.log 'building card link for', card, @cardUtils.getCard(card)
 			cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
 			@turnLog = owner + action.type + cardLink
 
@@ -133,7 +133,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
-		console.log @turnLog
+		#console.log @turnLog
 
 		@goToTimestamp targetTimestamp
 
@@ -203,7 +203,7 @@ class ReplayPlayer extends EventEmitter
 		@moveToTimestamp target
 
 	moveToTimestamp: (timestamp) ->
-		console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
+		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
 		timestamp += @startTimestamp
 		@newStep()
 		@currentTurn = -1
@@ -211,24 +211,24 @@ class ReplayPlayer extends EventEmitter
 
 		for i in [1..@turns.length]
 			turn = @turns[i]
-			console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp, turn.actions?.length == 0, turn.timestamp > timestamp
+			#console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp, turn.actions?.length == 0, turn.timestamp > timestamp
 			if (turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
-				console.log 'exiting loop', @currentTurn, @currentActionInTurn
+				#console.log 'exiting loop', @currentTurn, @currentActionInTurn
 				break
 			@currentTurn = i
 
 			if turn.actions.length > 0
 				for j in [1..turn.actions.length - 1]
-					console.log '\tactions', turn.actions, j
+					#console.log '\tactions', turn.actions, j
 					action = turn.actions[j]
-					console.log '\t\tconsidering action', i, j, turn, action
+					#console.log '\t\tconsidering action', i, j, turn, action
 					if !action or !action.timestamp or (action?.timestamp) > timestamp
-						console.log '\t\tBreaking', action, (action?.timestamp), timestamp
+						#console.log '\t\tBreaking', action, (action?.timestamp), timestamp
 						break
 					@currentActionInTurn = j
 
 		if @currentTurn == -1
-			console.log 'Going back to mulligan'
+			#console.log 'Going back to mulligan'
 			@currentTurn = 0
 			@currentActionInTurn = 0
 			@historyPosition = 0
@@ -242,18 +242,18 @@ class ReplayPlayer extends EventEmitter
 			@goNextTurn()
 
 		else if @currentActionInTurn <= 1
-			console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
+			#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
 			@currentTurn = Math.max(@currentTurn - 1, 1)
 			@goToAction()
 			@goNextTurn()
 
 		else
-			console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+			#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 			@goToAction()
 		
 
 	goToTimestamp: (timestamp) ->
-		console.log 'going to timestamp', timestamp
+		#console.log 'going to timestamp', timestamp
 
 		if (timestamp < @currentReplayTime)
 			#console.log 'going back in time, resetting', timestamp, @currentReplayTime
@@ -347,7 +347,7 @@ class ReplayPlayer extends EventEmitter
 		elapsed = @getElapsed()
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				console.log 'processing', @history[@historyPosition]
+				#console.log 'processing', @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else
@@ -473,7 +473,7 @@ class ReplayPlayer extends EventEmitter
 							turn: currentTurnNumber
 							index: actionIndex++
 							timestamp: batch.timestamp
-							type: ' draw: ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
+							type: ': draw ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
 							data: @entities[playedCard]
 							owner: @entities[command[1][0].entity]
 							initialCommand: command[1][0]
