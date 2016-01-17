@@ -110,17 +110,24 @@ class ReplayPlayer extends EventEmitter
 
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
-			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
+			console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
 			#console.log 'executing action', action, action.data, @startTimestamp
 			card = if action?.data then action.data['cardID'] else ''
 
 			owner = action.owner.name 
 			if !owner
+				console.log 'no owner', action.owner, action
 				ownerCard = @entities[action.owner]
 				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
 			#console.log 'building card link for', card, @cardUtils.getCard(card)
-			cardLink = if action.secret then 'Secret' else @cardUtils.buildCardLink(@cardUtils.getCard(card))
+			cardLink = @cardUtils.buildCardLink(@cardUtils.getCard(card))
+			if action.secret
+				if cardLink?.length > 0
+					#console.log action
+					cardLink += ' -> Secret'
+				else
+					cardLink = 'Secret'
 			@turnLog = owner + action.type + cardLink
 
 			if action.target
@@ -497,16 +504,58 @@ class ReplayPlayer extends EventEmitter
 							#console.log 'updated mulligan', @turns[currentTurnNumber]
 
 						# Played a card
-						if command[1][0].tags
+						if command[1][0].tags and command[1][0].attributes.type != '5'
 
 							playedCard = -1
 							#if command[1][0].attributes.entity == '49'
 								#console.log 'considering action', currentTurnNumber, command[1][0].tags, command
 
 							excluded = false
+							secret = false
 							for tag in command[1][0].tags
 								#console.log '\ttag', tag.tag, tag.value, tag
-								if (tag.tag == 'ZONE' && tag.value == 1) 
+								# Either in play or a secret
+								if tag.tag == 'ZONE' and tag.value in [1, 7]
+									playedCard = tag.entity
+								if tag.tag == 'SECRET' and tag.value == 1
+									secret = true
+								# Those are effects that are added to a creature (like Cruel Taskmaster's bonus)
+								# We don't want to treat them as a significant action, so we ignore them
+								if tag.tag == 'ATTACHED'
+									excluded = true
+
+							if playedCard > -1 and !excluded
+								#console.log 'batch', i, batch
+								#console.log '\tcommand', j, command
+								#console.log '\t\tadding action to turn', currentTurnNumber, command[1][0].tags, command
+								action = {
+									turn: currentTurnNumber - 1
+									index: actionIndex++
+									timestamp: batch.timestamp
+									type: ': '
+									secret: secret
+									# If it's a secret, we want to know who put it in play
+									data: @entities[playedCard]
+									owner: @turns[currentTurnNumber].activePlayer
+									initialCommand: command[1][0]
+									debugType: 'played card'
+								}
+								@turns[currentTurnNumber].actions[actionIndex] = action
+								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
+
+						# Other trigger
+						if command[1][0].tags and command[1][0].attributes.type == '5'
+
+							playedCard = -1
+							#if command[1][0].attributes.entity == '49'
+								#console.log 'considering action', currentTurnNumber, command[1][0].tags, command
+
+							excluded = false
+							secret = false
+							for tag in command[1][0].tags
+								#console.log '\ttag', tag.tag, tag.value, tag
+								# Either in play or a secret
+								if tag.tag == 'ZONE' and tag.value in [1, 7]
 									playedCard = tag.entity
 								if tag.tag == 'SECRET' and tag.value == 1
 									secret = true
@@ -526,9 +575,10 @@ class ReplayPlayer extends EventEmitter
 									type: ': '
 									secret: secret
 									data: @entities[playedCard]
-									owner: @turns[currentTurnNumber].activePlayer
+									# It's a trigger, we log who caused it to trigger
+									owner: command[1][0].attributes.entity
 									initialCommand: command[1][0]
-									debugType: 'played card'
+									debugType: 'played card from tigger'
 								}
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
