@@ -94,6 +94,7 @@
           "ref": "topBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.opponent,
+          "mulligan": replay.turns[1].opponentMulligan,
           "isHidden": true
         }), React.createElement(Mana, {
           "entity": replay.opponent
@@ -117,6 +118,7 @@
           "ref": "bottomBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.player,
+          "mulligan": replay.turns[1].playerMulligan,
           "isHidden": false
         }), React.createElement(Mana, {
           "entity": replay.player

@@ -17,7 +17,6 @@ class HSReplayParser
 		@entityDefinition = {tags: {}}
 		@actionDefinition = {}
 		@stack = []
-		console.log 'meta tags', metaTagNames
 
 	parse: (replay) ->
 		@replay = replay
@@ -155,6 +154,17 @@ class HSReplayParser
 
 				#if @entityDefinition.id is 72
 					#console.log 'parsing bluegill', @entityDefinition, node
+
+			when 'HideEntity'
+				console.log 'in HideEntity'
+				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
+				@entityDefinition.parent = @stack[@stack.length - 2]
+
+				if !@entityDefinition.parent.hideEntities
+					@entityDefinition.parent.hideEntities = []
+				@entityDefinition.parent.hideEntities.push(@entityDefinition.id)
+				console.log 'adding hideentity', @entityDefinition, node
+
 
 			when 'TagChange'
 				tag = {

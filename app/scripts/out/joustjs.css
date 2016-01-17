@@ -1704,6 +1704,18 @@
 .hearthstone #externalPlayer .mulligan .card--unknown {
   background-size: 89px auto;
 }
+.hearthstone #externalPlayer .mulligan .discarded:after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: "X";
+  font-size: 6em;
+  color: red;
+  line-height: 1.5em;
+  text-align: center;
+}
 .hearthstone #externalPlayer .bottom .mulligan > .game-card:hover {
   transform: scale(2) translateY(-50px);
   transition: transform 0.5s;

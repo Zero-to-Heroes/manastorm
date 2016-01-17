@@ -136,6 +136,7 @@
           "ref": "topBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.opponent,
+          "mulligan": replay.turns[1].opponentMulligan,
           "isHidden": true
         }), React.createElement(Mana, {
           "entity": replay.opponent
@@ -159,6 +160,7 @@
           "ref": "bottomBoard"
         }), React.createElement(Mulligan, {
           "entity": replay.player,
+          "mulligan": replay.turns[1].playerMulligan,
           "isHidden": false
         }), React.createElement(Mana, {
           "entity": replay.player
@@ -500,6 +502,9 @@
       }
       if (this.props.className) {
         cls += " " + this.props.className;
+      }
+      if (this.props.isDiscarded) {
+        cls += " discarded";
       }
       if (this.props.entity.tags.DIVINE_SHIELD) {
         overlay = React.createElement("div", {
@@ -998,7 +1003,8 @@
           return React.createElement(Card, {
             "entity": entity,
             "key": entity.id,
-            "isHidden": hidden
+            "isHidden": hidden,
+            "isDiscarded": _this.props.mulligan.indexOf(entity.id) !== -1
           });
         };
       })(this));
@@ -1983,7 +1989,6 @@ arguments[4][4][0].apply(exports,arguments)
       };
       this.actionDefinition = {};
       this.stack = [];
-      console.log('meta tags', metaTagNames);
     }
 
     HSReplayParser.prototype.parse = function(replay) {
@@ -2143,6 +2148,15 @@ arguments[4][4][0].apply(exports,arguments)
             return this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
           break;
+        case 'HideEntity':
+          console.log('in HideEntity');
+          this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          this.entityDefinition.parent = this.stack[this.stack.length - 2];
+          if (!this.entityDefinition.parent.hideEntities) {
+            this.entityDefinition.parent.hideEntities = [];
+          }
+          this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
+          return console.log('adding hideentity', this.entityDefinition, node);
         case 'TagChange':
           tag = {
             entity: parseInt(node.attributes.entity),
@@ -2436,8 +2450,7 @@ arguments[4][4][0].apply(exports,arguments)
       };
       this.parser.parse(this);
       this.finalizeInit();
-      this.goNextAction();
-      return console.log('replay init done', this.turns);
+      return this.goNextAction();
     };
 
     ReplayPlayer.prototype.autoPlay = function() {
@@ -2468,16 +2481,12 @@ arguments[4][4][0].apply(exports,arguments)
     };
 
     ReplayPlayer.prototype.goNextAction = function() {
-      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
       this.newStep();
       this.turnLog = '';
       this.currentActionInTurn++;
-      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
-        console.log('going to next action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
         return this.goToAction();
       } else {
-        console.log('going directly to next turn', this.currentTurn + 1);
         return this.goNextTurn();
       }
     };
@@ -2503,20 +2512,15 @@ arguments[4][4][0].apply(exports,arguments)
     ReplayPlayer.prototype.goToAction = function() {
       var action, card, cardLink, owner, ownerCard, ref, target, targetTimestamp;
       this.newStep();
-      console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
-      console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
-        console.log('executing action', action, action.data, this.startTimestamp);
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
         if (!owner) {
           ownerCard = this.entities[action.owner];
           owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
         }
-        console.log('building card link for', card, this.cardUtils.getCard(card));
         cardLink = action.secret ? 'Secret' : this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
         this.turnLog = owner + action.type + cardLink;
         if (action.target) {
@@ -2529,7 +2533,6 @@ arguments[4][4][0].apply(exports,arguments)
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
         this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
-      console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
@@ -2602,27 +2605,21 @@ arguments[4][4][0].apply(exports,arguments)
     };
 
     ReplayPlayer.prototype.moveToTimestamp = function(timestamp) {
-      var action, i, j, k, l, ref, ref1, ref2, ref3, ref4, ref5, ref6, turn;
-      console.log('moving to timestamp', timestamp, this.startTimestamp, timestamp + this.startTimestamp, this.turns);
+      var action, i, j, k, l, ref, ref1, ref2, ref3, turn;
       timestamp += this.startTimestamp;
       this.newStep();
       this.currentTurn = -1;
       this.currentActionInTurn = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        console.log('turn', i, turn, (ref1 = turn.actions[turn.actions.length - 1]) != null ? ref1.timestamp : void 0, timestamp, ((ref2 = turn.actions) != null ? ref2.length : void 0) === 0, turn.timestamp > timestamp);
-        if ((((ref3 = turn.actions) != null ? ref3.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) || (((ref4 = turn.actions) != null ? ref4.length : void 0) === 0 && turn.timestamp > timestamp)) {
-          console.log('exiting loop', this.currentTurn, this.currentActionInTurn);
+        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
           break;
         }
         this.currentTurn = i;
         if (turn.actions.length > 0) {
-          for (j = l = 1, ref5 = turn.actions.length - 1; 1 <= ref5 ? l <= ref5 : l >= ref5; j = 1 <= ref5 ? ++l : --l) {
-            console.log('\tactions', turn.actions, j);
+          for (j = l = 1, ref3 = turn.actions.length - 1; 1 <= ref3 ? l <= ref3 : l >= ref3; j = 1 <= ref3 ? ++l : --l) {
             action = turn.actions[j];
-            console.log('\t\tconsidering action', i, j, turn, action);
             if (!action || !action.timestamp || (action != null ? action.timestamp : void 0) > timestamp) {
-              console.log('\t\tBreaking', action, (action != null ? action.timestamp : void 0), timestamp);
               break;
             }
             this.currentActionInTurn = j;
@@ -2630,7 +2627,6 @@ arguments[4][4][0].apply(exports,arguments)
         }
       }
       if (this.currentTurn === -1) {
-        console.log('Going back to mulligan');
         this.currentTurn = 0;
         this.currentActionInTurn = 0;
         this.historyPosition = 0;
@@ -2642,18 +2638,15 @@ arguments[4][4][0].apply(exports,arguments)
         this.init();
         return this.goNextTurn();
       } else if (this.currentActionInTurn <= 1) {
-        console.log('Going to turn', timestamp, this.currentTurn, this.currentActionInTurn, (ref6 = this.turns[this.currentTurn]) != null ? ref6.actions[this.currentActionInTurn] : void 0);
         this.currentTurn = Math.max(this.currentTurn - 1, 1);
         this.goToAction();
         return this.goNextTurn();
       } else {
-        console.log('Going to action', timestamp, this.currentTurn, this.currentActionInTurn, this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         return this.goToAction();
       }
     };
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
-      console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
         this.historyPosition = 0;
         this.init();
@@ -2741,7 +2734,6 @@ arguments[4][4][0].apply(exports,arguments)
       results = [];
       while (this.historyPosition < this.history.length) {
         if (elapsed > this.history[this.historyPosition].timestamp - this.startTimestamp) {
-          console.log('processing', this.history[this.historyPosition]);
           this.history[this.historyPosition].execute(this);
           results.push(this.historyPosition++);
         } else {
@@ -2822,6 +2814,8 @@ arguments[4][4][0].apply(exports,arguments)
             this.turns[turnNumber] = {
               historyPosition: i,
               turn: 'Mulligan',
+              playerMulligan: [],
+              opponentMulligan: [],
               timestamp: batch.timestamp,
               actions: []
             };
@@ -2852,7 +2846,7 @@ arguments[4][4][0].apply(exports,arguments)
                 turn: currentTurnNumber,
                 index: actionIndex++,
                 timestamp: batch.timestamp,
-                type: ' draw: ',
+                type: ': draw ',
                 data: this.entities[playedCard],
                 owner: this.entities[command[1][0].entity],
                 initialCommand: command[1][0]
@@ -2863,6 +2857,13 @@ arguments[4][4][0].apply(exports,arguments)
           if (command[0] === 'receiveAction') {
             currentTurnNumber = turnNumber - 1;
             if (this.turns[currentTurnNumber]) {
+              if (command[1][0].attributes.type === '5' && currentTurnNumber === 1 && command[1][0].hideEntities) {
+                if (command[1][0].attributes.entity === this.mainPlayerId) {
+                  this.turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities;
+                } else {
+                  this.turns[currentTurnNumber].opponentMulligan = command[1][0].hideEntities;
+                }
+              }
               if (command[1][0].tags) {
                 playedCard = -1;
                 excluded = false;

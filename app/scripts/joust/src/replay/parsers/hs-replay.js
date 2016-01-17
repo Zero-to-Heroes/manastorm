@@ -26,7 +26,6 @@
       };
       this.actionDefinition = {};
       this.stack = [];
-      console.log('meta tags', metaTagNames);
     }
 
     HSReplayParser.prototype.parse = function(replay) {
@@ -186,6 +185,15 @@
             return this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
           break;
+        case 'HideEntity':
+          console.log('in HideEntity');
+          this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
+          this.entityDefinition.parent = this.stack[this.stack.length - 2];
+          if (!this.entityDefinition.parent.hideEntities) {
+            this.entityDefinition.parent.hideEntities = [];
+          }
+          this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
+          return console.log('adding hideentity', this.entityDefinition, node);
         case 'TagChange':
           tag = {
             entity: parseInt(node.attributes.entity),

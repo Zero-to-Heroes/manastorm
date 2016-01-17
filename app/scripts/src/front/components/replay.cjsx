@@ -55,7 +55,7 @@ class Replay extends React.Component
 				<PlayerName entity={replay.opponent} />
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} ref="topBoard"/>
-				<Mulligan entity={replay.opponent} isHidden={true} />
+				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={true} />
 				<Mana entity={replay.opponent} />
 				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={true} />
@@ -66,7 +66,7 @@ class Replay extends React.Component
 				<PlayerName entity={replay.player} />
 				<Deck entity={replay.player} />
 				<Board entity={replay.player} ref="bottomBoard"/>
-				<Mulligan entity={replay.player} isHidden={false} />
+				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Play entity={replay.player} />
 				<Hero entity={replay.player} ref="bottomHero" />

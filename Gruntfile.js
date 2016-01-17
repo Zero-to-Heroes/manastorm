@@ -49,51 +49,57 @@ module.exports = function (grunt) {
 
 		browserify: {
 			options: {
-			  	browserifyOptions: {
-			    	standalone: 'joustjs'
-			  	},
-			  	plugin: [
-                    [ "browserify-derequire" ]
-                ]
+				browserifyOptions: {
+					standalone: 'joustjs'
+				},
+				plugin: [
+					[ "browserify-derequire" ]
+				]
 			},
 			'<%= yeoman.app %>/scripts/out/joustjs.js': ['<%= yeoman.app %>/scripts/joustjs.src.js', '<%= yeoman.app %>/scripts/joust/**/*.js']
 		},
 
 		less: {
 			development: {
-			    files: {
-			      	"<%= yeoman.app %>/scripts/out/joustjs.css": '<%= yeoman.app %>/scripts/src/less/styles.less'
-			    }
+				files: {
+					"<%= yeoman.app %>/scripts/out/joustjs.css": '<%= yeoman.app %>/scripts/src/less/styles.less'
+				}
 			}
 		},
 
 		uglify: {
-   	 		dist: {
-      			files: {
-        			'<%= yeoman.app %>/scripts/out/dist/joustjs.js': ['<%= yeoman.app %>/scripts/out/joustjs.js']
-      			}
-    		}
-  		},
+			dist: {
+				files: {
+					'<%= yeoman.app %>/scripts/out/dist/joustjs.js': ['<%= yeoman.app %>/scripts/out/joustjs.js']
+				}
+			}
+		},
 
-  		cssmin: {
-  			options: {
-    			shorthandCompacting: false,
-    			roundingPrecision: -1
-  			},
-  			dist: {
-    			files: {
-      				'<%= yeoman.app %>/scripts/out/dist/joustjs.css': ['<%= yeoman.app %>/scripts/out/joustjs.css']
-    			}
-  			}
+		cssmin: {
+			options: {
+				shorthandCompacting: false,
+				roundingPrecision: -1
+			},
+			dist: {
+				files: {
+					'<%= yeoman.app %>/scripts/out/dist/joustjs.css': ['<%= yeoman.app %>/scripts/out/joustjs.css']
+				}
+			}
 		},
 
 		copy: {
-		  	main: {
-		  		expand: true,
-		    	src: '<%= yeoman.app %>/scripts/out/dist/*',
-		    	dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
-		    	flatten: true
-		  	}
+			main: {
+				expand: true,
+				src: '<%= yeoman.app %>/scripts/out/dist/*',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				flatten: true
+			},
+			dev: {
+				expand: true,
+				src: '<%= yeoman.app %>/scripts/out/*',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				flatten: true
+			}
 		}
 	});
 
@@ -105,7 +111,7 @@ module.exports = function (grunt) {
 		'browserify',
 		'uglify',
 		'cssmin',
-		'copy'
+		'copy:main'
 	]);
 
 	grunt.registerTask('dev', [
@@ -113,6 +119,6 @@ module.exports = function (grunt) {
 		'coffee',
 		'cjsx',
 		'browserify',
-		'copy'
+		'copy:dev'
 	]);
 };

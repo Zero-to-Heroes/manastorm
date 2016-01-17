@@ -27,6 +27,9 @@ class Card extends React.Component
 		if @props.className
 			cls += " " + @props.className
 
+		if @props.isDiscarded
+			cls += " discarded"
+
 		if @props.entity.tags.DIVINE_SHIELD
 			overlay = <div className="overlay divine-shield"></div>
 

@@ -43,7 +43,8 @@
           return React.createElement(Card, {
             "entity": entity,
             "key": entity.id,
-            "isHidden": hidden
+            "isHidden": hidden,
+            "isDiscarded": _this.props.mulligan.indexOf(entity.id) !== -1
           });
         };
       })(this));

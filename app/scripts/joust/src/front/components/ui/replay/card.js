@@ -46,6 +46,9 @@
       if (this.props.className) {
         cls += " " + this.props.className;
       }
+      if (this.props.isDiscarded) {
+        cls += " discarded";
+      }
       if (this.props.entity.tags.DIVINE_SHIELD) {
         overlay = React.createElement("div", {
           "className": "overlay divine-shield"

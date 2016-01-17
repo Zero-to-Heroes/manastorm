@@ -430,6 +430,8 @@ class ReplayPlayer extends EventEmitter
 					@turns[turnNumber] = {
 						historyPosition: i
 						turn: 'Mulligan'
+						playerMulligan: []
+						opponentMulligan: []
 						timestamp: batch.timestamp
 						actions: []
 						#activePlayer: currentPlayer
@@ -484,6 +486,15 @@ class ReplayPlayer extends EventEmitter
 				if (command[0] == 'receiveAction')
 					currentTurnNumber = turnNumber - 1
 					if (@turns[currentTurnNumber])
+
+						# Mulligan
+						if command[1][0].attributes.type == '5' and currentTurnNumber == 1 and command[1][0].hideEntities
+							#console.log 'updating mulligan', command[1][0], @mainPlayerId
+							if command[1][0].attributes.entity == @mainPlayerId
+								@turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities
+							else
+								@turns[currentTurnNumber].opponentMulligan = command[1][0].hideEntities
+							#console.log 'updated mulligan', @turns[currentTurnNumber]
 
 						# Played a card
 						if command[1][0].tags
