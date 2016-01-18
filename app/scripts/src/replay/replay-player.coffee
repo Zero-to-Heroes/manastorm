@@ -120,10 +120,10 @@ class ReplayPlayer extends EventEmitter
 				console.log 'no owner', action.owner, action
 				ownerCard = @entities[action.owner]
 				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-			#console.log 'building card link for', card, @cardUtils.getCard(card)
+			console.log 'building card link for', card, @cardUtils.getCard(card)
 			cardLink = @cardUtils.buildCardLink(@cardUtils.getCard(card))
 			if action.secret
-				if cardLink?.length > 0
+				if cardLink?.length > 0 and action.publicSecret
 					#console.log action
 					cardLink += ' -> Secret'
 				else
@@ -519,6 +519,7 @@ class ReplayPlayer extends EventEmitter
 									playedCard = tag.entity
 								if tag.tag == 'SECRET' and tag.value == 1
 									secret = true
+									publicSecret = command[1][0].attributes.type == '7' and @turns[currentTurnNumber].activePlayer.id == @mainPlayerId
 								# Those are effects that are added to a creature (like Cruel Taskmaster's bonus)
 								# We don't want to treat them as a significant action, so we ignore them
 								if tag.tag == 'ATTACHED'
@@ -534,6 +535,7 @@ class ReplayPlayer extends EventEmitter
 									timestamp: batch.timestamp
 									type: ': '
 									secret: secret
+									publicSecret: publicSecret
 									# If it's a secret, we want to know who put it in play
 									data: @entities[playedCard]
 									owner: @turns[currentTurnNumber].activePlayer
@@ -542,6 +544,47 @@ class ReplayPlayer extends EventEmitter
 								}
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
+
+						# Card revealed
+						# TODO: Don't add this when a spell is played, since another action already handles this
+						# Also, don't reveal enchantments as "showentities"
+						if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
+
+							#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
+							playedCard = -1
+
+							# Revealed entities can start in the PLAY zone
+							if command[1][0].showEntity.tags
+								for entityTag, tagValue of command[1][0].showEntity.tags
+									#console.log '\t\tLooking at ', entityTag, tagValue
+									if (entityTag == 'ZONE' && tagValue == 1)
+										playedCard = command[1][0].showEntity.id
+
+							# Don't consider mulligan choices for now
+							if command[1][0].tags
+								for tag in command[1][0].tags
+									#console.log '\ttag', tag.tag, tag.value, tag
+									if (tag.tag == 'ZONE' && tag.value == 1)
+										playedCard = tag.entity
+
+							if (playedCard > -1)
+								#console.log '\tconsidering further'
+								action = {
+									turn: currentTurnNumber - 1
+									index: actionIndex++
+									timestamp: batch.timestamp
+									type: ': '
+									data: if @entities[command[1][0].showEntity.id] then @entities[command[1][0].showEntity.id] else command[1][0].showEntity
+									owner: @turns[currentTurnNumber].activePlayer
+									debugType: 'showEntity'
+									debug: command[1][0].showEntity
+									initialCommand: command[1][0]
+								}
+								if (action.data)
+									#console.log 'batch', i, batch
+									#console.log '\tcommand', j, command
+									#console.log '\t\tadding showEntity', command[1][0].showEntity, action
+									@turns[currentTurnNumber].actions[actionIndex] = action
 
 						# Other trigger
 						if command[1][0].tags and command[1][0].attributes.type == '5'
@@ -583,24 +626,25 @@ class ReplayPlayer extends EventEmitter
 								@turns[currentTurnNumber].actions[actionIndex] = action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
-						# Trigger with targets
-						if command[1][0].tags and command[1][0].attributes.type == '5' and command[1][0].meta?.length > 0
+						# Trigger with targets (or play that triggers some effects with targets, like Antique Healbot)
+						if command[1][0].tags and command[1][0].attributes.type in ['3', '5'] and command[1][0].meta?.length > 0
 							for meta in command[1][0].meta
-								if meta.meta == 'TARGET' && meta.info?.length > 0
-									for info in meta.info
-										action = {
-											turn: currentTurnNumber - 1
-											index: actionIndex++
-											timestamp: batch.timestamp
-											target: info.entity
-											type: ': trigger '
-											data: @entities[command[1][0].attributes.entity]
-											owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER) #@turns[currentTurnNumber].activePlayer
-											initialCommand: command[1][0]
-											debugType: 'trigger effect card'
-										}
-										@turns[currentTurnNumber].actions[actionIndex] = action
-										#console.log 'Added action', action
+								for info in meta.info
+									# Don't add targeted triggers if parent is already targeted - we would log the same thing twice
+									if meta.meta == 'TARGET' and meta.info?.length > 0 and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) != info.entity)
+											action = {
+												turn: currentTurnNumber - 1
+												index: actionIndex++
+												timestamp: batch.timestamp
+												target: info.entity
+												type: ': trigger '
+												data: @entities[command[1][0].attributes.entity]
+												owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER) #@turns[currentTurnNumber].activePlayer
+												initialCommand: command[1][0]
+												debugType: 'trigger effect card'
+											}
+											@turns[currentTurnNumber].actions[actionIndex] = action
+											#console.log 'Added action', action
 
 						# Deaths. Not really an action, but useful to see clearly what happens
 						if command[1][0].tags and command[1][0].attributes.type == '6' 
@@ -639,7 +683,7 @@ class ReplayPlayer extends EventEmitter
 						# This also includes all effects from spells, which is too verbose. Don't add the action
 						# if it results from a spell being played
 						# 5 is to include triggering effects, like Piloted Shredder summoning of a minion
-						if (command[1].length > 0 && (command[1][0].attributes.type == '3' or command[1][0].attributes.type == '5'))
+						if command[1][0].attributes.type in ['3' ,'5']
 
 							#console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
 
@@ -676,7 +720,9 @@ class ReplayPlayer extends EventEmitter
 										}
 										@turns[currentTurnNumber].actions[actionIndex] = action
 
-								if command[1][0].fullEntity 
+								# Don't include enchantments - we are already logging the fact that they are played
+								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6
+
 									action = {
 										turn: currentTurnNumber - 1
 										index: actionIndex++
@@ -698,48 +744,26 @@ class ReplayPlayer extends EventEmitter
 									}
 									@turns[currentTurnNumber].actions[actionIndex] = action
 
-						# Card revealed
-						# TODO: Don't add this when a spell is played, since another action already handles this
-						if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
+								# Armor buff
+								if command[1][0].tags
+									armor = 0
+									for tag in command[1][0].tags
+										if tag.tag == 'ARMOR' and tag.value > 0
+											armor = tag.value
 
-							#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
-							playedCard = -1
-
-							# Revealed entities can start in the PLAY zone
-							if command[1][0].showEntity.tags
-								for entityTag, tagValue of command[1][0].showEntity.tags
-									#console.log '\t\tLooking at ', entityTag, tagValue
-									if (entityTag == 'ZONE' && tagValue == 1)
-										playedCard = command[1][0].showEntity.id
-
-							# Don't consider mulligan choices for now
-							if command[1][0].tags
-								for tag in command[1][0].tags
-									#console.log '\ttag', tag.tag, tag.value, tag
-									if (tag.tag == 'ZONE' && tag.value == 1)
-										playedCard = tag.entity
-
-							if (playedCard > -1)
-								#console.log '\tconsidering further'
-								action = {
-										turn: currentTurnNumber - 1
-										index: actionIndex++
-										timestamp: batch.timestamp
-										type: ': '
-										data: if @entities[command[1][0].showEntity.id] then @entities[command[1][0].showEntity.id] else command[1][0].showEntity
-										owner: @turns[currentTurnNumber].activePlayer
-										debugType: 'showEntity'
-										debug: command[1][0].showEntity
-										initialCommand: command[1][0]
-								}
-								if (action.data)
-									#console.log 'batch', i, batch
-									#console.log '\tcommand', j, command
-									#console.log '\t\tadding showEntity', command[1][0].showEntity, action
-									@turns[currentTurnNumber].actions[actionIndex] = action
-
-
-
+									if armor > 0
+										action = {
+											turn: currentTurnNumber - 1
+											index: actionIndex++
+											timestamp: batch.timestamp
+											prefix: '\t'
+											type: ': '
+											data: @entities[command[1][0].attributes.entity]
+											owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER)
+											initialCommand: command[1][0]
+											debugType: 'armor'
+										}
+										@turns[currentTurnNumber].actions[actionIndex] = action
 
 			#console.log @turns.length, 'game turns at position', @turns
 

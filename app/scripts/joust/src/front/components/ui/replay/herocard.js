@@ -1,5 +1,5 @@
 (function() {
-  var Card, Health, HeroCard, React, ReactDOM, Secret, subscribe,
+  var Armor, Card, Health, HeroCard, React, ReactDOM, Secret, subscribe,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -12,6 +12,8 @@
   Secret = require('./Secret');
 
   Health = require('./health');
+
+  Armor = require('./armor');
 
   subscribe = require('../../../../subscription').subscribe;
 
@@ -51,7 +53,9 @@
       return React.createElement("div", {
         "className": cls,
         "style": style
-      }, secrets, React.createElement(Health, {
+      }, secrets, React.createElement(Armor, {
+        "entity": this.props.entity
+      }), React.createElement(Health, {
         "entity": this.props.entity
       }));
     };

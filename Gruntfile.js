@@ -47,6 +47,12 @@ module.exports = function (grunt) {
 			}
 		},
 
+		removelogging: {
+			dist: {
+				src: "<%= yeoman.app %>/scripts/joust/**/*.js"
+			}
+		},
+
 		browserify: {
 			options: {
 				browserifyOptions: {
@@ -108,6 +114,7 @@ module.exports = function (grunt) {
 		'less',
 		'coffee',
 		'cjsx',
+		'removelogging',
 		'browserify',
 		'uglify',
 		'cssmin',

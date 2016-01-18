@@ -3,6 +3,7 @@ ReactDOM = require 'react-dom'
 Card = require './card'
 Secret = require './Secret'
 Health = require './health'
+Armor = require './armor'
 {subscribe} = require '../../../../subscription'
 
 class HeroCard extends Card
@@ -30,6 +31,7 @@ class HeroCard extends Card
 
 		return 	<div className={cls} style={style}>
 					{secrets}
+					<Armor entity={@props.entity}/>
 					<Health entity={@props.entity}/>
 				</div>
 

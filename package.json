@@ -11,6 +11,7 @@
     "event-kit": "^1.4.1",
     "grunt-contrib-copy": "^0.8.2",
     "grunt-contrib-less": "^1.1.0",
+    "grunt-remove-logging": "^0.2.0",
     "history": "^1.13.1",
     "jquery": "^2.1.4",
     "lodash": "^3.10.1",
