@@ -43,7 +43,7 @@
       })(this));
       this.sax.on('error', (function(_this) {
         return function(error) {
-          return console.error('error while parsing xml', error);
+          return 
         };
       })(this));
       return this.stream = new Stream(this.xmlReplay).pipe(this.sax);
@@ -186,14 +186,14 @@
           }
           break;
         case 'HideEntity':
-          console.log('in HideEntity');
+          
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (!this.entityDefinition.parent.hideEntities) {
             this.entityDefinition.parent.hideEntities = [];
           }
           this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
-          return console.log('adding hideentity', this.entityDefinition, node);
+          return 
         case 'TagChange':
           tag = {
             entity: parseInt(node.attributes.entity),
@@ -217,7 +217,7 @@
           this.metaData.parent.meta.push(this.metaData);
           return this.state.push('metaData');
         case 'Info':
-          return console.error('info, shouldnt happen');
+          return 
         case 'Action':
           node.parent = this.stack[this.stack.length - 2];
           this.state.push('action');

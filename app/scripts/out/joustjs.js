@@ -47,7 +47,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  console.log('in replay');
+  
 
   React = _dereq_('react');
 
@@ -174,7 +174,7 @@
           "isHidden": false
         }));
       } else {
-        console.warn('Missing players', replay.players);
+        
       }
       if (this.refs['topBoard'] && this.refs['bottomBoard'] && this.refs['topHero'] && this.refs['bottomHero']) {
         allCards = this.merge(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap());
@@ -2069,7 +2069,7 @@ arguments[4][4][0].apply(exports,arguments)
       })(this));
       this.sax.on('error', (function(_this) {
         return function(error) {
-          return console.error('error while parsing xml', error);
+          return 
         };
       })(this));
       return this.stream = new Stream(this.xmlReplay).pipe(this.sax);
@@ -2212,14 +2212,14 @@ arguments[4][4][0].apply(exports,arguments)
           }
           break;
         case 'HideEntity':
-          console.log('in HideEntity');
+          
           this.entityDefinition.id = parseInt(node.attributes.entity || node.attributes.id);
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (!this.entityDefinition.parent.hideEntities) {
             this.entityDefinition.parent.hideEntities = [];
           }
           this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
-          return console.log('adding hideentity', this.entityDefinition, node);
+          return 
         case 'TagChange':
           tag = {
             entity: parseInt(node.attributes.entity),
@@ -2243,7 +2243,7 @@ arguments[4][4][0].apply(exports,arguments)
           this.metaData.parent.meta.push(this.metaData);
           return this.state.push('metaData');
         case 'Info':
-          return console.error('info, shouldnt happen');
+          return 
         case 'Action':
           node.parent = this.stack[this.stack.length - 2];
           this.state.push('action');
@@ -2577,16 +2577,16 @@ arguments[4][4][0].apply(exports,arguments)
       this.newStep();
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
+        
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
         if (!owner) {
-          console.log('no owner', action.owner, action);
+          
           ownerCard = this.entities[action.owner];
           owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
         }
-        console.log('building card link for', card, this.cardUtils.getCard(card));
+        
         cardLink = this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
         if (action.secret) {
           if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {

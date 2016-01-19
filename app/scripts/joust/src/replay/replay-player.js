@@ -109,16 +109,16 @@
       this.newStep();
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
+        
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
         if (!owner) {
-          console.log('no owner', action.owner, action);
+          
           ownerCard = this.entities[action.owner];
           owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
         }
-        console.log('building card link for', card, this.cardUtils.getCard(card));
+        
         cardLink = this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
         if (action.secret) {
           if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
