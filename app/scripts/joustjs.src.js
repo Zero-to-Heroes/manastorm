@@ -16,6 +16,7 @@ var joustjs = {
 	},
 
 	loadReplay: function(replayXml) {
+		console.log('serializing to string', replayXml)
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
 		//console.log('string xml', strReplayXml);
 

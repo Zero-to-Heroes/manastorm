@@ -14,8 +14,7 @@ class Card extends React.Component
 
 		if @props.entity.cardID && !@props.isHidden
 			style =
-				background: "url(#{art}) top left no-repeat"
-				backgroundSize: '100% auto'
+				backgroundImage: "url(#{art})"
 			cls = "game-card"
 		else
 			style = {}

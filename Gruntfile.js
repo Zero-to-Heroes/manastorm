@@ -97,13 +97,13 @@ module.exports = function (grunt) {
 			main: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/dist/*',
-				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'G:\\Source\\coaching\\yo\\app\\plugins\\joustjs/',
 				flatten: true
 			},
 			dev: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/*',
-				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'G:\\Source\\coaching\\yo\\app\\plugins\\joustjs/',
 				flatten: true
 			}
 		}

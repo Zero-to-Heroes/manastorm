@@ -63,40 +63,40 @@ class ReplayPlayer extends EventEmitter
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	goNextAction: ->
-		#console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@turnLog = ''
 		@currentActionInTurn++
 
-		#console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
-			#console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
+			console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
 			@goToAction()
 
 		# Going to the next turn
 		else 
-			#console.log 'going directly to next turn', @currentTurn + 1
+			console.log 'going directly to next turn', @currentTurn + 1
 			@goNextTurn()
 
 	goPreviousAction: ->
 		@newStep()
 		@turnLog = ''
-		#console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
+		console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
 		@currentActionInTurn--
 
 		if @currentActionInTurn == 1
-			#console.log 'going directly to beginning of turn', @currentTurn
+			console.log 'going directly to beginning of turn', @currentTurn
 			@goPreviousTurn()
 			@goNextTurn()
 
 		else if @currentActionInTurn <= 0
-			#console.log 'going directly to end of previous turn', @currentTurn - 1
+			console.log 'going directly to end of previous turn', @currentTurn - 1
 			@goPreviousTurn()
-			#console.log 'moved back to previous turn', @currentTurn
+			console.log 'moved back to previous turn', @currentTurn
 			@currentActionInTurn = @turns[@currentTurn].actions.length - 1
 			if @currentActionInTurn > 0
-				#console.log 'moving to action', @currentActionInTurn
+				console.log 'moving to action', @currentActionInTurn
 				@goToAction()
 
 		# Navigating within the same turn
@@ -105,14 +105,14 @@ class ReplayPlayer extends EventEmitter
 
 	goToAction: ->
 		@newStep()
-		#console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
-		#console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
+		console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
+		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-			#console.log 'executing action', action, action.data, @startTimestamp
+			console.log 'executing action', action, action.data, @startTimestamp
 			card = if action?.data then action.data['cardID'] else ''
 
 			owner = action.owner.name 
@@ -124,11 +124,14 @@ class ReplayPlayer extends EventEmitter
 			cardLink = @cardUtils.buildCardLink(@cardUtils.getCard(card))
 			if action.secret
 				if cardLink?.length > 0 and action.publicSecret
-					#console.log action
+					console.log 'action', action
 					cardLink += ' -> Secret'
 				else
 					cardLink = 'Secret'
-			@turnLog = owner + action.type + cardLink
+			creator = ''
+			if action.creator
+				creator = @cardUtils.buildCardLink(@cardUtils.getCard(action.creator.cardID)) + ': '
+			@turnLog = owner + action.type + creator + cardLink
 
 			if action.target
 				target = @entities[action.target]
@@ -140,7 +143,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
-		#console.log @turnLog
+		console.log @turnLog
 
 		@goToTimestamp targetTimestamp
 
@@ -167,7 +170,7 @@ class ReplayPlayer extends EventEmitter
 		@newStep()
 		# Directly go after the card draw
 		@currentActionInTurn = 0
-		#console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
+		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
 		@currentTurn = Math.max(@currentTurn - 1, 1)
 
 		if (@currentTurn <= 1)
@@ -181,7 +184,7 @@ class ReplayPlayer extends EventEmitter
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 
 		if @turns[@currentTurn].turn is 'Mulligan'
-			#console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
+			console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
 			@turnLog = @turns[@currentTurn].turn
 			@currentTurn = 0
 			@currentActionInTurn = 0
@@ -190,7 +193,7 @@ class ReplayPlayer extends EventEmitter
 
 		@goToTimestamp targetTimestamp
 
-		#console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
+		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
 	newStep: ->
 		@targetSource = undefined
@@ -723,11 +726,14 @@ class ReplayPlayer extends EventEmitter
 								# Don't include enchantments - we are already logging the fact that they are played
 								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6
 
+
+
 									action = {
 										turn: currentTurnNumber - 1
 										index: actionIndex++
 										timestamp: batch.timestamp
 										prefix: '\t'
+										creator: @entities[command[1][0].attributes.entity]
 										type: ': '
 										# This caused invoked minions from triggers to be detected as the minion who triggered them
 										#data: @entities[command[1][0].attributes.entity]

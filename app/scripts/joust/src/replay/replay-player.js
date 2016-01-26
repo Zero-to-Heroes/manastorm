@@ -76,12 +76,16 @@
     };
 
     ReplayPlayer.prototype.goNextAction = function() {
+      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
       this.newStep();
       this.turnLog = '';
       this.currentActionInTurn++;
+      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
+        console.log('going to next action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
         return this.goToAction();
       } else {
+        console.log('going directly to next turn', this.currentTurn + 1);
         return this.goNextTurn();
       }
     };
@@ -89,14 +93,19 @@
     ReplayPlayer.prototype.goPreviousAction = function() {
       this.newStep();
       this.turnLog = '';
+      console.log('going to previous action', this.currentActionInTurn, this.currentActionInTurn - 1, this.currentTurn);
       this.currentActionInTurn--;
       if (this.currentActionInTurn === 1) {
+        console.log('going directly to beginning of turn', this.currentTurn);
         this.goPreviousTurn();
         return this.goNextTurn();
       } else if (this.currentActionInTurn <= 0) {
+        console.log('going directly to end of previous turn', this.currentTurn - 1);
         this.goPreviousTurn();
+        console.log('moved back to previous turn', this.currentTurn);
         this.currentActionInTurn = this.turns[this.currentTurn].actions.length - 1;
         if (this.currentActionInTurn > 0) {
+          console.log('moving to action', this.currentActionInTurn);
           return this.goToAction();
         }
       } else if (this.turns[this.currentTurn]) {
@@ -105,29 +114,37 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var action, card, cardLink, owner, ownerCard, ref, target, targetTimestamp;
+      var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
       this.newStep();
+      console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
+      console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        
+        console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
+        console.log('executing action', action, action.data, this.startTimestamp);
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
         if (!owner) {
-          
+          console.log('no owner', action.owner, action);
           ownerCard = this.entities[action.owner];
           owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
         }
-        
+        console.log('building card link for', card, this.cardUtils.getCard(card));
         cardLink = this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
         if (action.secret) {
           if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
+            console.log('action', action);
             cardLink += ' -> Secret';
           } else {
             cardLink = 'Secret';
           }
         }
-        this.turnLog = owner + action.type + cardLink;
+        creator = '';
+        if (action.creator) {
+          creator = this.cardUtils.buildCardLink(this.cardUtils.getCard(action.creator.cardID)) + ': ';
+        }
+        this.turnLog = owner + action.type + creator + cardLink;
         if (action.target) {
           target = this.entities[action.target];
           this.targetSource = action != null ? action.data.id : void 0;
@@ -138,6 +155,7 @@
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
         this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
+      console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
@@ -162,6 +180,7 @@
       var targetTimestamp;
       this.newStep();
       this.currentActionInTurn = 0;
+      console.log('going to previous turn', this.currentTurn, this.currentTurn - 1, this.currentActionInTurn, this.turns);
       this.currentTurn = Math.max(this.currentTurn - 1, 1);
       if (this.currentTurn <= 1) {
         targetTimestamp = 200;
@@ -173,13 +192,15 @@
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       }
       if (this.turns[this.currentTurn].turn === 'Mulligan') {
+        console.log('in Mulligan', this.turns[this.currentTurn], this.currentTurn, targetTimestamp);
         this.turnLog = this.turns[this.currentTurn].turn;
         this.currentTurn = 0;
         this.currentActionInTurn = 0;
       } else {
         this.turnLog = 't' + this.turns[this.currentTurn].turn + ': ' + this.turns[this.currentTurn].activePlayer.name;
       }
-      return this.goToTimestamp(targetTimestamp);
+      this.goToTimestamp(targetTimestamp);
+      return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
     };
 
     ReplayPlayer.prototype.newStep = function() {
@@ -662,6 +683,7 @@
                       index: actionIndex++,
                       timestamp: batch.timestamp,
                       prefix: '\t',
+                      creator: this.entities[command[1][0].attributes.entity],
                       type: ': ',
                       data: this.entities[command[1][0].fullEntity.id],
                       owner: this.getController(command[1][0].fullEntity.tags.CONTROLLER),

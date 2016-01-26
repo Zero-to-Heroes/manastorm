@@ -32,8 +32,7 @@
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards" + locale + "/" + this.props.entity.cardID + ".png";
       if (this.props.entity.cardID && !this.props.isHidden) {
         style = {
-          background: "url(" + art + ") top left no-repeat",
-          backgroundSize: '100% auto'
+          backgroundImage: "url(" + art + ")"
         };
         cls = "game-card";
       } else {
