@@ -1632,6 +1632,12 @@
   transition: transform 0.5s, top 0.6s;
   z-index: 10;
 }
+.hearthstone #externalPlayer .top .hand > .game-card:hover {
+  top: 100px;
+  transform: scale(1.5);
+  transition: transform 0.5s, top 0.6s;
+  z-index: 10;
+}
 .hearthstone #externalPlayer .hand .game-card.animate-enter {
   opacity: 0.1;
   transform: translateX(30px);
@@ -1930,6 +1936,12 @@
   display: table-cell;
   width: 70px;
   vertical-align: middle;
+}
+.hearthstone #externalPlayer .additional-controls {
+  color: black;
+  position: absolute;
+  padding: 10px;
+  z-index: 2;
 }
 .hearthstone #externalPlayer .target {
   position: absolute;

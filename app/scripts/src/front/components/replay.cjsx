@@ -26,6 +26,8 @@ class Replay extends React.Component
 
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
 
+		@showAllCards = false
+
 		subscribe @state.replay, 'players-ready', =>
 			#console.log 'in players-ready' 
 			@callback
@@ -55,10 +57,10 @@ class Replay extends React.Component
 				<PlayerName entity={replay.opponent} />
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} ref="topBoard"/>
-				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={true} />
+				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
 				<Mana entity={replay.opponent} />
 				<Play entity={replay.opponent} />
-				<Hand entity={replay.opponent} isHidden={true} />
+				<Hand entity={replay.opponent} isHidden={!@showAllCards} />
 				<Hero entity={replay.opponent} ref="topHero"/>
 			</div>
 
@@ -92,6 +94,11 @@ class Replay extends React.Component
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
 		return <div className="replay">
+					<div className="additional-controls">
+						<label>
+							<input type="checkbox" checked={@showAllCards} onChange={@onShowCardsChange} />Try to show hidden cards
+						</label>
+					</div>
 					<div className="replay__game">
 						{top}
 						{bottom}
@@ -153,6 +160,11 @@ class Replay extends React.Component
 
 	onClickChangeSpeed: (speed) ->
 		@state.replay.changeSpeed speed
+		@forceUpdate()
+
+	onShowCardsChange: =>
+		@showAllCards = !@showAllCards
+		console.log 'changed', @showAllCards
 		@forceUpdate()
 
 	findCard: (allCards, cardID) ->

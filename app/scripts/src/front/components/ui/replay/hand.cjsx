@@ -36,7 +36,7 @@ Hand = React.createClass
 
 		hidden = @props.isHidden
 		cards = active.map (entity) ->
-			<Card entity={entity} key={entity.id} isHidden={hidden}/>
+			<Card entity={entity} key={entity.id} isHidden={hidden} />
 
 		return <ReactCSSTransitionGroup component="div" className="hand"
 					transitionName="animate" transitionEnterTimeout={700}

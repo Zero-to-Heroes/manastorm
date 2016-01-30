@@ -5,7 +5,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  
+  console.log('in replay');
 
   React = require('react');
 
@@ -49,6 +49,7 @@
     __extends(Replay, _super);
 
     function Replay(props) {
+      this.onShowCardsChange = __bind(this.onShowCardsChange, this);
       this.onClickPause = __bind(this.onClickPause, this);
       this.onClickPlay = __bind(this.onClickPlay, this);
       this.goPreviousTurn = __bind(this.goPreviousTurn, this);
@@ -60,6 +61,7 @@
       this.state = {
         replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
       };
+      this.showAllCards = false;
       subscribe(this.state.replay, 'players-ready', (function(_this) {
         return function() {
           return _this.callback;
@@ -95,14 +97,14 @@
         }), React.createElement(Mulligan, {
           "entity": replay.opponent,
           "mulligan": replay.turns[1].opponentMulligan,
-          "isHidden": true
+          "isHidden": !this.showAllCards
         }), React.createElement(Mana, {
           "entity": replay.opponent
         }), React.createElement(Play, {
           "entity": replay.opponent
         }), React.createElement(Hand, {
           "entity": replay.opponent,
-          "isHidden": true
+          "isHidden": !this.showAllCards
         }), React.createElement(Hero, {
           "entity": replay.opponent,
           "ref": "topHero"
@@ -132,7 +134,7 @@
           "isHidden": false
         }));
       } else {
-        
+        console.warn('Missing players', replay.players);
       }
       if (this.refs['topBoard'] && this.refs['bottomBoard'] && this.refs['topHero'] && this.refs['bottomHero']) {
         allCards = this.merge(this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap());
@@ -152,6 +154,12 @@
       return React.createElement("div", {
         "className": "replay"
       }, React.createElement("div", {
+        "className": "additional-controls"
+      }, React.createElement("label", null, React.createElement("input", {
+        "type": "checkbox",
+        "checked": this.showAllCards,
+        "onChange": this.onShowCardsChange
+      }), "Try to show hidden cards")), React.createElement("div", {
         "className": "replay__game"
       }, top, bottom, React.createElement(Target, {
         "source": source,
@@ -239,6 +247,12 @@
 
     Replay.prototype.onClickChangeSpeed = function(speed) {
       this.state.replay.changeSpeed(speed);
+      return this.forceUpdate();
+    };
+
+    Replay.prototype.onShowCardsChange = function() {
+      this.showAllCards = !this.showAllCards;
+      console.log('changed', this.showAllCards);
       return this.forceUpdate();
     };
 
