@@ -16,6 +16,7 @@ class ReplayPlayer extends EventEmitter
 		@cardUtils = window['parseCardsText']
 
 	init: ->
+		console.log 'starting init'
 		@entities = {}
 		@players = []
 
@@ -168,19 +169,19 @@ class ReplayPlayer extends EventEmitter
 
 	goPreviousTurn: ->
 		@newStep()
-		# Directly go after the card draw
 		@currentActionInTurn = 0
-		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @currentActionInTurn, @turns
+		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @turns
 		@currentTurn = Math.max(@currentTurn - 1, 1)
 
 		if (@currentTurn <= 1)
 			targetTimestamp = 200
 			@currentTurn = 1
-		# Directly go after the card draw
-		else if (@currentTurn <= @turns.length && @turns[@currentTurn].actions && @turns[@currentTurn].actions.length > 0)
+		else if (@currentTurn <= @turns.length && @turns[@currentTurn].actions && @turns[@currentTurn].actions.length > 1)
 			@currentActionInTurn = 1
+			console.log '\tGoing to action', @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (@turns[@currentTurn].actions[@currentActionInTurn].timestamp - @startTimestamp) + 1
 		else
+			console.log '\tGoing to turn', @turns[@currentTurn]
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 
 		if @turns[@currentTurn].turn is 'Mulligan'
@@ -188,10 +189,15 @@ class ReplayPlayer extends EventEmitter
 			@turnLog = @turns[@currentTurn].turn
 			@currentTurn = 0
 			@currentActionInTurn = 0
+			@goToTimestamp targetTimestamp
 		else 
-			@turnLog = 't' + @turns[@currentTurn].turn + ': ' + @turns[@currentTurn].activePlayer.name
+			@goToTimestamp targetTimestamp
+			#@goNextAction()
+			if @turns[@currentTurn].activePlayer == @player
+				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
+			else
+				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
-		@goToTimestamp targetTimestamp
 
 		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
