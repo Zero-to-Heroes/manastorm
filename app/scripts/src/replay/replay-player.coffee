@@ -54,7 +54,8 @@ class ReplayPlayer extends EventEmitter
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	pause: ->
-		@previousSpeed = @speed
+		if @speed > 0
+			@previousSpeed = @speed
 		@speed = 0
 		clearInterval(@interval)
 

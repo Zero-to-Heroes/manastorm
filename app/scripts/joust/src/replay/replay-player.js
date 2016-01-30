@@ -61,7 +61,9 @@
     };
 
     ReplayPlayer.prototype.pause = function() {
-      this.previousSpeed = this.speed;
+      if (this.speed > 0) {
+        this.previousSpeed = this.speed;
+      }
       this.speed = 0;
       return clearInterval(this.interval);
     };

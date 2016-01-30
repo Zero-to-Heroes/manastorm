@@ -134,21 +134,25 @@ class Replay extends React.Component
 
 	goNextAction: (e) =>
 		e.preventDefault()
+		@state.replay.pause()
 		@state.replay.goNextAction()
 		@forceUpdate()
 
 	goPreviousAction: (e) =>
 		e.preventDefault()
+		@state.replay.pause()
 		@state.replay.goPreviousAction()
 		@forceUpdate()
 
 	goNextTurn: (e) =>
 		e.preventDefault()
+		@state.replay.pause()
 		@state.replay.goNextTurn()
 		@forceUpdate()
 
 	goPreviousTurn: (e) =>
 		e.preventDefault()
+		@state.replay.pause()
 		@state.replay.goPreviousTurn()
 		@forceUpdate()
 
