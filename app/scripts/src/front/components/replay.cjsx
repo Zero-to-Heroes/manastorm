@@ -27,6 +27,7 @@ class Replay extends React.Component
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
 
 		@showAllCards = false
+		@mainPlayerSwitched = false
 
 		subscribe @state.replay, 'players-ready', =>
 			#console.log 'in players-ready' 
@@ -98,6 +99,9 @@ class Replay extends React.Component
 						<label>
 							<input type="checkbox" checked={@showAllCards} onChange={@onShowCardsChange} />Try to show hidden cards
 						</label>
+						<label>
+							<input type="checkbox" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} />Switch main player
+						</label>
 					</div>
 					<div className="replay__game">
 						{top}
@@ -164,7 +168,11 @@ class Replay extends React.Component
 
 	onShowCardsChange: =>
 		@showAllCards = !@showAllCards
-		console.log 'changed', @showAllCards
+		@forceUpdate()
+
+	onMainPlayerSwitchedChange: =>
+		@mainPlayerSwitched = !@mainPlayerSwitched
+		@state.replay.switchMainPlayer()
 		@forceUpdate()
 
 	findCard: (allCards, cardID) ->

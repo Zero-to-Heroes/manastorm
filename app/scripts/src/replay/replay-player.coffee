@@ -777,10 +777,16 @@ class ReplayPlayer extends EventEmitter
 		# We use the revealed cards in hand to know this
 		#console.log 'finalizing init, player are', @player, @opponent, @players
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
-			tempOpponent = @player
-			@player = @opponent
-			@opponent = tempOpponent
+			@switchMainPlayer()
+			#tempOpponent = @player
+			#@player = @opponent
+			#@opponent = tempOpponent
 		@emit 'players-ready'
+
+	switchMainPlayer: ->
+		tempOpponent = @player
+		@player = @opponent
+		@opponent = tempOpponent
 
 	getController: (controllerId) ->
 		if @player.tags.CONTROLLER == controllerId

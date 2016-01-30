@@ -49,6 +49,7 @@
     __extends(Replay, _super);
 
     function Replay(props) {
+      this.onMainPlayerSwitchedChange = __bind(this.onMainPlayerSwitchedChange, this);
       this.onShowCardsChange = __bind(this.onShowCardsChange, this);
       this.onClickPause = __bind(this.onClickPause, this);
       this.onClickPlay = __bind(this.onClickPlay, this);
@@ -62,6 +63,7 @@
         replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
       };
       this.showAllCards = false;
+      this.mainPlayerSwitched = false;
       subscribe(this.state.replay, 'players-ready', (function(_this) {
         return function() {
           return _this.callback;
@@ -159,7 +161,11 @@
         "type": "checkbox",
         "checked": this.showAllCards,
         "onChange": this.onShowCardsChange
-      }), "Try to show hidden cards")), React.createElement("div", {
+      }), "Try to show hidden cards"), React.createElement("label", null, React.createElement("input", {
+        "type": "checkbox",
+        "checked": this.mainPlayerSwitched,
+        "onChange": this.onMainPlayerSwitchedChange
+      }), "Switch main player")), React.createElement("div", {
         "className": "replay__game"
       }, top, bottom, React.createElement(Target, {
         "source": source,
@@ -252,7 +258,12 @@
 
     Replay.prototype.onShowCardsChange = function() {
       this.showAllCards = !this.showAllCards;
-      console.log('changed', this.showAllCards);
+      return this.forceUpdate();
+    };
+
+    Replay.prototype.onMainPlayerSwitchedChange = function() {
+      this.mainPlayerSwitched = !this.mainPlayerSwitched;
+      this.state.replay.switchMainPlayer();
       return this.forceUpdate();
     };
 
