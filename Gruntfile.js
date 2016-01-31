@@ -49,7 +49,10 @@ module.exports = function (grunt) {
 
 		removelogging: {
 			dist: {
-				src: "<%= yeoman.app %>/scripts/joust/**/*.js"
+				src: "<%= yeoman.app %>/scripts/joust/**/*.js",
+				options: {
+					methods: ['log', 'debug']
+				}
 			}
 		},
 

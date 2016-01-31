@@ -64,6 +64,59 @@ class ReplayPlayer extends EventEmitter
 		clearInterval(@interval)
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
+	buildGameLog: ->
+		console.log 'building full game log'
+
+		fullLog = ''
+
+		initialTurn = @currentTurn
+		initialAction = @currentActionInTurn
+		@currentTurn = 1
+		@currentActionInTurn = 0
+
+		@buildCardLink = @buildLogCardLink
+
+		while @turns[@currentTurn]
+			@newStep()
+			@turnLog = ''
+			@currentActionInTurn++
+
+			# Navigating within the same turn
+			if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
+				@buildActionLog()
+				fullLog += '\t'
+				console.log @turnLog
+				console.log '\tinitial action', @turns[@currentTurn].actions[@currentActionInTurn]
+				if @turns[@currentTurn].actions[@currentActionInTurn].initialCommand.indent
+					for indent in [0..@turns[@currentTurn].actions[@currentActionInTurn].initialCommand.indent - 1]
+						fullLog += '\t'
+
+			# Going to the next turn
+			else
+				@currentActionInTurn = 0
+				@currentTurn++;
+
+				if @turns[@currentTurn]
+					if @turns[@currentTurn].turn is 'Mulligan'
+						@turnLog = @turns[@currentTurn].turn
+					else if @turns[@currentTurn].activePlayer == @player
+						@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
+					else
+						@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
+
+			fullLog += @turnLog + '\n'
+
+		@buildCardLink = @cardUtils.buildCardLink
+
+		@currentTurn = initialTurn
+		@currentActionInTurn = initialAction
+
+		console.log 'game log'
+		console.info 'experimental: full game log\n', fullLog
+
+	buildLogCardLink: (card) ->
+		return if card then card.name else ''
+
 	goNextAction: ->
 		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
@@ -72,13 +125,11 @@ class ReplayPlayer extends EventEmitter
 
 		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
-		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
-			console.log 'going to next action', @currentActionInTurn, @turns[@currentTurn].actions
-			@goToAction()
+		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
+			@buildActionLog()
 
 		# Going to the next turn
 		else 
-			console.log 'going directly to next turn', @currentTurn + 1
 			@goNextTurn()
 
 	goPreviousAction: ->
@@ -110,29 +161,36 @@ class ReplayPlayer extends EventEmitter
 		console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
 		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
+		targetTimestamp = @buildActionLog()
+
+		console.log @turnLog
+
+		@goToTimestamp targetTimestamp
+
+	buildActionLog: ->
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
-			console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
+			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-			console.log 'executing action', action, action.data, @startTimestamp
+			#console.log 'executing action', action, action.data, @startTimestamp
 			card = if action?.data then action.data['cardID'] else ''
 
 			owner = action.owner.name 
 			if !owner
-				console.log 'no owner', action.owner, action
+				#console.log 'no owner', action.owner, action
 				ownerCard = @entities[action.owner]
-				owner = @cardUtils.buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-			console.log 'building card link for', card, @cardUtils.getCard(card)
-			cardLink = @cardUtils.buildCardLink(@cardUtils.getCard(card))
+				owner = @buildCardLink(@cardUtils.getCard(ownerCard.cardID))
+			#console.log 'building card link for', card, @cardUtils.getCard(card)
+			cardLink = @buildCardLink(@cardUtils.getCard(card))
 			if action.secret
 				if cardLink?.length > 0 and action.publicSecret
-					console.log 'action', action
+					#console.log 'action', action
 					cardLink += ' -> Secret'
 				else
 					cardLink = 'Secret'
 			creator = ''
 			if action.creator
-				creator = @cardUtils.buildCardLink(@cardUtils.getCard(action.creator.cardID)) + ': '
+				creator = @buildCardLink(@cardUtils.getCard(action.creator.cardID)) + ': '
 			@turnLog = owner + action.type + creator + cardLink
 
 			if action.target
@@ -140,20 +198,23 @@ class ReplayPlayer extends EventEmitter
 				@targetSource = action?.data.id
 				@targetDestination = target.id
 				@targetType = action.actionType
-				@turnLog += ' -> ' + @cardUtils.buildCardLink(@cardUtils.getCard(target.cardID))
+				@turnLog += ' -> ' + @buildCardLink(@cardUtils.getCard(target.cardID))
 
 		# This probably happens only for Mulligan
 		else
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
-		console.log @turnLog
 
-		@goToTimestamp targetTimestamp
+		return targetTimestamp
 
 	goNextTurn: ->
 		@newStep()
 		@currentActionInTurn = 0
 		@currentTurn++;
+
+		if !@turns[@currentTurn]
+			return
+
 		if @turns[@currentTurn].turn is 'Mulligan'
 			@turnLog = @turns[@currentTurn].turn
 		else if @turns[@currentTurn].activePlayer == @player
@@ -274,10 +335,10 @@ class ReplayPlayer extends EventEmitter
 		
 
 	goToTimestamp: (timestamp) ->
-		#console.log 'going to timestamp', timestamp
+		console.log 'going to timestamp', timestamp
 
 		if (timestamp < @currentReplayTime)
-			#console.log 'going back in time, resetting', timestamp, @currentReplayTime
+			console.log 'going back in time, resetting', timestamp, @currentReplayTime
 			@historyPosition = 0
 			@init()
 
@@ -492,6 +553,8 @@ class ReplayPlayer extends EventEmitter
 					#console.log '\tcommand', j, command
 					# Don't add card draws that are at the beginning of the game
 					if @turns[currentTurnNumber]
+						#Draws are tags, but we consider them like an action in the log, so we need to manually offset the indentation
+						command[1][0].indent = if command[1][0].indent > 1 then command[1][0].indent - 1 else undefined
 						action = {
 							turn: currentTurnNumber
 							index: actionIndex++
@@ -700,12 +763,8 @@ class ReplayPlayer extends EventEmitter
 						# 5 is to include triggering effects, like Piloted Shredder summoning of a minion
 						if command[1][0].attributes.type in ['3' ,'5']
 
-							#console.log 'parent target?', parseInt(command[1][0].parent?.attributes?.target), command[1][0].attributes.entity, command[1][0]
-
 							# If parent action has a target, do nothing
 							if !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0
-
-								#console.log '\tpower used, registering action?', command[1][0].attributes.entity, command[1][0]
 
 								# Does it do damage?
 								if command[1][0].tags
@@ -738,7 +797,26 @@ class ReplayPlayer extends EventEmitter
 								# Don't include enchantments - we are already logging the fact that they are played
 								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6
 
-
+									# Also log what creates the new entities. Can be hero power 
+									# HP are logged in a bit of a weird way, so we need to manually adjust their offset
+									if command[1][0].parent
+										for tag in command[1][0].parent.tags
+											if (tag.tag == 'HEROPOWER_ACTIVATIONS_THIS_TURN' && tag.value > 0)
+												command[1][0].indent = if command[1][0].indent > 1 then command[1][0].indent - 1 else undefined
+												command[1][0].fullEntity.indent = if command[1][0].fullEntity.indent > 1 then command[1][0].fullEntity.indent - 1 else undefined
+									
+									action = {
+										turn: currentTurnNumber - 1
+										index: actionIndex++
+										timestamp: batch.timestamp
+										prefix: '\t'
+										type: ': '
+										data: @entities[command[1][0].attributes.entity]
+										owner: @turns[currentTurnNumber].activePlayer
+										initialCommand: command[1][0]
+										debugType: 'power 3 root'
+									}
+									@turns[currentTurnNumber].actions[actionIndex] = action
 
 									action = {
 										turn: currentTurnNumber - 1
@@ -756,7 +834,7 @@ class ReplayPlayer extends EventEmitter
 										# (it's the case for created tokens)
 										#@entities[target]
 										target: target
-										initialCommand: command[1][0]
+										initialCommand: command[1][0].fullEntity
 										debugType: 'power 3'
 										debug: @entities
 									}

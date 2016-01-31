@@ -165,7 +165,7 @@
     };
 
     HSReplayParser.prototype.actionState = function(node) {
-      var tag;
+      var ref1, ref2, ref3, ref4, tag;
       switch (node.name) {
         case 'ShowEntity':
         case 'FullEntity':
@@ -180,9 +180,9 @@
           }
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (node.name === 'ShowEntity') {
-            return this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
           } else {
-            return this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
+            this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
           }
           break;
         case 'HideEntity':
@@ -191,7 +191,8 @@
           if (!this.entityDefinition.parent.hideEntities) {
             this.entityDefinition.parent.hideEntities = [];
           }
-          return this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
+          this.entityDefinition.parent.hideEntities.push(this.entityDefinition.id);
+          break;
         case 'TagChange':
           tag = {
             entity: parseInt(node.attributes.entity),
@@ -203,7 +204,9 @@
             tag.parent.tags = [];
           }
           tag.parent.tags.push(tag);
-          return this.replay.enqueue(null, 'receiveTagChange', tag);
+          tag.indent = ((ref1 = tag.parent) != null ? ref1.indent : void 0) ? tag.parent.indent + 1 : 1;
+          this.replay.enqueue(null, 'receiveTagChange', tag);
+          break;
         case 'MetaData':
           this.metaData = {
             meta: metaTagNames[node.attributes.meta],
@@ -213,13 +216,18 @@
             this.metaData.parent.meta = [];
           }
           this.metaData.parent.meta.push(this.metaData);
-          return this.state.push('metaData');
+          this.metaData.indent = ((ref2 = this.metaData.parent) != null ? ref2.indent : void 0) ? this.metaData.parent.indent + 1 : 1;
+          this.state.push('metaData');
+          break;
         case 'Info':
-          return console.error('info, shouldnt happen');
+          console.error('info, shouldnt happen');
+          break;
         case 'Action':
           node.parent = this.stack[this.stack.length - 2];
+          node.indent = ((ref3 = node.parent) != null ? ref3.indent : void 0) ? node.parent.indent + 1 : 1;
           this.state.push('action');
-          return this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
+          this.replay.enqueue(tsToSeconds(node.attributes.ts), 'receiveAction', node);
+          break;
         case 'Choices':
           this.choices = {
             entity: parseInt(node.attributes.entity),
@@ -230,8 +238,9 @@
             ts: tsToSeconds(node.attributes.ts),
             cards: []
           };
-          return this.state.push('choices');
+          this.state.push('choices');
       }
+      return this.entityDefinition.indent = ((ref4 = this.entityDefinition.parent) != null ? ref4.indent : void 0) ? this.entityDefinition.parent.indent + 1 : 1;
     };
 
     HSReplayParser.prototype.metaDataState = function(node) {

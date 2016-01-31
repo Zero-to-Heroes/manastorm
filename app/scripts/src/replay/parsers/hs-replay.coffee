@@ -174,6 +174,7 @@ class HSReplayParser
 				if (!tag.parent.tags)
 					tag.parent.tags = []
 				tag.parent.tags.push(tag)
+				tag.indent = if tag.parent?.indent then tag.parent.indent + 1 else 1
 
 				#console.log '\tparsing tagchange', @stack[@stack.length - 1], @stack[@stack.length - 2]
 
@@ -190,6 +191,7 @@ class HSReplayParser
 					@metaData.parent.meta = []
 
 				@metaData.parent.meta.push(@metaData)
+				@metaData.indent = if @metaData.parent?.indent then @metaData.parent.indent + 1 else 1
 				#console.log '\tmetadata', @metaData
 				@state.push('metaData')
 
@@ -202,6 +204,7 @@ class HSReplayParser
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
 				node.parent = @stack[@stack.length - 2]
+				node.indent = if node.parent?.indent then node.parent.indent + 1 else 1
 
 				#console.log 'parsing action', node
 
@@ -218,6 +221,8 @@ class HSReplayParser
 					ts: tsToSeconds(node.attributes.ts)
 					cards: []
 				@state.push('choices')
+
+		@entityDefinition.indent = if @entityDefinition.parent?.indent then @entityDefinition.parent.indent + 1 else 1
 
 	metaDataState: (node) ->
 		#console.log '\tin meta data state', node

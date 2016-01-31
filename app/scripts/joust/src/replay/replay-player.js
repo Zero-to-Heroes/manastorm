@@ -28,7 +28,7 @@
     }
 
     ReplayPlayer.prototype.init = function() {
-      console.log('starting init');
+      
       this.entities = {};
       this.players = [];
       this.game = null;
@@ -78,17 +78,68 @@
       })(this)), this.frequency / this.speed);
     };
 
+    ReplayPlayer.prototype.buildGameLog = function() {
+      var fullLog, indent, initialAction, initialTurn, k, ref;
+      
+      fullLog = '';
+      initialTurn = this.currentTurn;
+      initialAction = this.currentActionInTurn;
+      this.currentTurn = 1;
+      this.currentActionInTurn = 0;
+      this.buildCardLink = this.buildLogCardLink;
+      while (this.turns[this.currentTurn]) {
+        this.newStep();
+        this.turnLog = '';
+        this.currentActionInTurn++;
+        if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
+          this.buildActionLog();
+          fullLog += '\t';
+          
+          
+          if (this.turns[this.currentTurn].actions[this.currentActionInTurn].initialCommand.indent) {
+            for (indent = k = 0, ref = this.turns[this.currentTurn].actions[this.currentActionInTurn].initialCommand.indent - 1; 0 <= ref ? k <= ref : k >= ref; indent = 0 <= ref ? ++k : --k) {
+              fullLog += '\t';
+            }
+          }
+        } else {
+          this.currentActionInTurn = 0;
+          this.currentTurn++;
+          if (this.turns[this.currentTurn]) {
+            if (this.turns[this.currentTurn].turn === 'Mulligan') {
+              this.turnLog = this.turns[this.currentTurn].turn;
+            } else if (this.turns[this.currentTurn].activePlayer === this.player) {
+              this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + ': ' + this.turns[this.currentTurn].activePlayer.name;
+            } else {
+              this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
+            }
+          }
+        }
+        fullLog += this.turnLog + '\n';
+      }
+      this.buildCardLink = this.cardUtils.buildCardLink;
+      this.currentTurn = initialTurn;
+      this.currentActionInTurn = initialAction;
+      
+      return console.info('experimental: full game log', fullLog);
+    };
+
+    ReplayPlayer.prototype.buildLogCardLink = function(card) {
+      if (card) {
+        return card.name;
+      } else {
+        return '';
+      }
+    };
+
     ReplayPlayer.prototype.goNextAction = function() {
-      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
+      
       this.newStep();
       this.turnLog = '';
       this.currentActionInTurn++;
-      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
+      
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
-        console.log('going to next action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
-        return this.goToAction();
+        return this.buildActionLog();
       } else {
-        console.log('going directly to next turn', this.currentTurn + 1);
         return this.goNextTurn();
       }
     };
@@ -96,19 +147,19 @@
     ReplayPlayer.prototype.goPreviousAction = function() {
       this.newStep();
       this.turnLog = '';
-      console.log('going to previous action', this.currentActionInTurn, this.currentActionInTurn - 1, this.currentTurn);
+      
       this.currentActionInTurn--;
       if (this.currentActionInTurn === 1) {
-        console.log('going directly to beginning of turn', this.currentTurn);
+        
         this.goPreviousTurn();
         return this.goNextTurn();
       } else if (this.currentActionInTurn <= 0) {
-        console.log('going directly to end of previous turn', this.currentTurn - 1);
+        
         this.goPreviousTurn();
-        console.log('moved back to previous turn', this.currentTurn);
+        
         this.currentActionInTurn = this.turns[this.currentTurn].actions.length - 1;
         if (this.currentActionInTurn > 0) {
-          console.log('moving to action', this.currentActionInTurn);
+          
           return this.goToAction();
         }
       } else if (this.turns[this.currentTurn]) {
@@ -117,27 +168,29 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
+      var targetTimestamp;
       this.newStep();
-      console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
-      console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
+      
+      
+      targetTimestamp = this.buildActionLog();
+      
+      return this.goToTimestamp(targetTimestamp);
+    };
+
+    ReplayPlayer.prototype.buildActionLog = function() {
+      var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        console.log('action', this.currentActionInTurn, this.turns[this.currentTurn], this.turns[this.currentTurn].actions[this.currentActionInTurn]);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
-        console.log('executing action', action, action.data, this.startTimestamp);
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
         if (!owner) {
-          console.log('no owner', action.owner, action);
           ownerCard = this.entities[action.owner];
-          owner = this.cardUtils.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
+          owner = this.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
         }
-        console.log('building card link for', card, this.cardUtils.getCard(card));
-        cardLink = this.cardUtils.buildCardLink(this.cardUtils.getCard(card));
+        cardLink = this.buildCardLink(this.cardUtils.getCard(card));
         if (action.secret) {
           if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
-            console.log('action', action);
             cardLink += ' -> Secret';
           } else {
             cardLink = 'Secret';
@@ -145,7 +198,7 @@
         }
         creator = '';
         if (action.creator) {
-          creator = this.cardUtils.buildCardLink(this.cardUtils.getCard(action.creator.cardID)) + ': ';
+          creator = this.buildCardLink(this.cardUtils.getCard(action.creator.cardID)) + ': ';
         }
         this.turnLog = owner + action.type + creator + cardLink;
         if (action.target) {
@@ -153,14 +206,13 @@
           this.targetSource = action != null ? action.data.id : void 0;
           this.targetDestination = target.id;
           this.targetType = action.actionType;
-          this.turnLog += ' -> ' + this.cardUtils.buildCardLink(this.cardUtils.getCard(target.cardID));
+          this.turnLog += ' -> ' + this.buildCardLink(this.cardUtils.getCard(target.cardID));
         }
       } else {
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
         this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
-      console.log(this.turnLog);
-      return this.goToTimestamp(targetTimestamp);
+      return targetTimestamp;
     };
 
     ReplayPlayer.prototype.goNextTurn = function() {
@@ -168,6 +220,9 @@
       this.newStep();
       this.currentActionInTurn = 0;
       this.currentTurn++;
+      if (!this.turns[this.currentTurn]) {
+        return;
+      }
       if (this.turns[this.currentTurn].turn === 'Mulligan') {
         this.turnLog = this.turns[this.currentTurn].turn;
       } else if (this.turns[this.currentTurn].activePlayer === this.player) {
@@ -184,21 +239,21 @@
       var targetTimestamp;
       this.newStep();
       this.currentActionInTurn = 0;
-      console.log('going to previous turn', this.currentTurn, this.currentTurn - 1, this.turns);
+      
       this.currentTurn = Math.max(this.currentTurn - 1, 1);
       if (this.currentTurn <= 1) {
         targetTimestamp = 200;
         this.currentTurn = 1;
       } else if (this.currentTurn <= this.turns.length && this.turns[this.currentTurn].actions && this.turns[this.currentTurn].actions.length > 1) {
         this.currentActionInTurn = 1;
-        console.log('\tGoing to action', this.turns[this.currentTurn].actions[this.currentActionInTurn]);
+        
         targetTimestamp = 1000 * (this.turns[this.currentTurn].actions[this.currentActionInTurn].timestamp - this.startTimestamp) + 1;
       } else {
-        console.log('\tGoing to turn', this.turns[this.currentTurn]);
+        
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       }
       if (this.turns[this.currentTurn].turn === 'Mulligan') {
-        console.log('in Mulligan', this.turns[this.currentTurn], this.currentTurn, targetTimestamp);
+        
         this.turnLog = this.turns[this.currentTurn].turn;
         this.currentTurn = 0;
         this.currentActionInTurn = 0;
@@ -211,7 +266,7 @@
           this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
         }
       }
-      return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
+      return 
     };
 
     ReplayPlayer.prototype.getActivePlayer = function() {
@@ -288,7 +343,9 @@
     };
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
+      
       if (timestamp < this.currentReplayTime) {
+        
         this.historyPosition = 0;
         this.init();
       }
@@ -411,7 +468,7 @@
     };
 
     ReplayPlayer.prototype.finalizeInit = function() {
-      var action, actionIndex, armor, batch, command, currentPlayer, currentTurnNumber, definition, dmg, entity, entityTag, excluded, i, info, j, k, l, len, len1, len10, len11, len2, len3, len4, len5, len6, len7, len8, len9, m, meta, n, o, p, playedCard, playerIndex, players, publicSecret, q, r, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, s, secret, t, tag, tagValue, target, turnNumber, u, v;
+      var action, actionIndex, armor, batch, command, currentPlayer, currentTurnNumber, definition, dmg, entity, entityTag, excluded, i, info, j, k, l, len, len1, len10, len11, len12, len2, len3, len4, len5, len6, len7, len8, len9, m, meta, n, o, p, playedCard, playerIndex, players, publicSecret, q, r, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, s, secret, t, tag, tagValue, target, turnNumber, u, v, w;
       this.goToTimestamp(this.currentReplayTime);
       this.update();
       players = [this.player, this.opponent];
@@ -483,6 +540,7 @@
           }
           if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].tag === 'NUM_CARDS_DRAWN_THIS_TURN' && command[1][0].value > 0) {
             if (this.turns[currentTurnNumber]) {
+              command[1][0].indent = command[1][0].indent > 1 ? command[1][0].indent - 1 : void 0;
               action = {
                 turn: currentTurnNumber,
                 index: actionIndex++,
@@ -694,6 +752,28 @@
                     }
                   }
                   if (command[1][0].fullEntity && command[1][0].fullEntity.tags.CARDTYPE !== 6) {
+                    if (command[1][0].parent) {
+                      ref18 = command[1][0].parent.tags;
+                      for (v = 0, len11 = ref18.length; v < len11; v++) {
+                        tag = ref18[v];
+                        if (tag.tag === 'HEROPOWER_ACTIVATIONS_THIS_TURN' && tag.value > 0) {
+                          command[1][0].indent = command[1][0].indent > 1 ? command[1][0].indent - 1 : void 0;
+                          command[1][0].fullEntity.indent = command[1][0].fullEntity.indent > 1 ? command[1][0].fullEntity.indent - 1 : void 0;
+                        }
+                      }
+                    }
+                    action = {
+                      turn: currentTurnNumber - 1,
+                      index: actionIndex++,
+                      timestamp: batch.timestamp,
+                      prefix: '\t',
+                      type: ': ',
+                      data: this.entities[command[1][0].attributes.entity],
+                      owner: this.turns[currentTurnNumber].activePlayer,
+                      initialCommand: command[1][0],
+                      debugType: 'power 3 root'
+                    };
+                    this.turns[currentTurnNumber].actions[actionIndex] = action;
                     action = {
                       turn: currentTurnNumber - 1,
                       index: actionIndex++,
@@ -704,7 +784,7 @@
                       data: this.entities[command[1][0].fullEntity.id],
                       owner: this.getController(command[1][0].fullEntity.tags.CONTROLLER),
                       target: target,
-                      initialCommand: command[1][0],
+                      initialCommand: command[1][0].fullEntity,
                       debugType: 'power 3',
                       debug: this.entities
                     };
@@ -712,9 +792,9 @@
                   }
                   if (command[1][0].tags) {
                     armor = 0;
-                    ref18 = command[1][0].tags;
-                    for (v = 0, len11 = ref18.length; v < len11; v++) {
-                      tag = ref18[v];
+                    ref19 = command[1][0].tags;
+                    for (w = 0, len12 = ref19.length; w < len12; w++) {
+                      tag = ref19[w];
                       if (tag.tag === 'ARMOR' && tag.value > 0) {
                         armor = tag.value;
                       }
