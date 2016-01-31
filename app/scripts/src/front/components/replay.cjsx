@@ -108,7 +108,7 @@ class Replay extends React.Component
 					<div className="replay__game">
 						{top}
 						{bottom}
-						<Target source={source} target={target} />
+						<Target source={source} target={target} type={replay.targetType}/>
 					</div>
 					<form className="replay__controls padded">
 						<ButtonGroup>

@@ -1,15 +1,24 @@
 .target {
 	position: absolute;
-	background-color: red;
+	background-color: #409ACC;
   	width: 4px;
+
+  	&::after {
+		content: '';
+		display: block; 
+		left: -8px;
+		position: absolute;
+		border-bottom: 10px solid #409ACC;
+		border-left: 10px solid transparent;
+		border-right: 10px solid transparent;
+	}
+
+  	&.attack {
+		background-color: red;
+  	}
+
+  	&.attack::after {
+		border-bottom: 10px solid red;
+  	}
 }
 
-.target:after {
-	content: '';
-	display: block; 
-	left: -8px;
-	position: absolute;
-	border-bottom: 10px solid red;
-	border-left: 10px solid transparent;
-	border-right: 10px solid transparent;
-}

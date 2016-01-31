@@ -139,6 +139,7 @@ class ReplayPlayer extends EventEmitter
 				target = @entities[action.target]
 				@targetSource = action?.data.id
 				@targetDestination = target.id
+				@targetType = action.actionType
 				@turnLog += ' -> ' + @cardUtils.buildCardLink(@cardUtils.getCard(target.cardID))
 
 		# This probably happens only for Mulligan
@@ -683,6 +684,7 @@ class ReplayPlayer extends EventEmitter
 								index: actionIndex++
 								timestamp: batch.timestamp
 								type: ': '
+								actionType: 'attack'
 								data: @entities[command[1][0].attributes.entity]
 								owner: @turns[currentTurnNumber].activePlayer
 								target: command[1][0].attributes.target

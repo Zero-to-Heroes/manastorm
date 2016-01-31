@@ -175,7 +175,8 @@
         "className": "replay__game"
       }, top, bottom, React.createElement(Target, {
         "source": source,
-        "target": target
+        "target": target,
+        "type": replay.targetType
       })), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {

@@ -12,7 +12,7 @@
   Target = React.createClass({
     componentDidMount: function() {},
     render: function() {
-      var alpha, arrowHeight, arrowWidth, containerLeft, containerTop, height, left, playerEl, sourceDims, style, tanAlpha, targetDims, top, transform;
+      var alpha, arrowHeight, arrowWidth, cls, containerLeft, containerTop, height, left, playerEl, sourceDims, style, tanAlpha, targetDims, top, transform;
       if (!(this.props.source && this.props.target)) {
         return null;
       }
@@ -53,6 +53,7 @@
         top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop;
         height = arrowHeight;
       }
+      cls = "target " + this.props.type;
       style = {
         height: height,
         top: top,
@@ -60,7 +61,7 @@
         transform: transform
       };
       return React.createElement("div", {
-        "className": "target",
+        "className": cls,
         "style": style
       });
     }

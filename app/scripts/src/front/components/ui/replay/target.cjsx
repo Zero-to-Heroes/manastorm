@@ -72,6 +72,8 @@ Target = React.createClass
 			top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop
 			height = arrowHeight
 
+		cls = "target " + @props.type
+
 		style = {
 			height: height
 			top: top
@@ -79,6 +81,6 @@ Target = React.createClass
 			transform: transform
 		}
 		#console.log 'applying style', style
-		return <div className="target" style={style} />
+		return <div className={cls} style={style} />
 
 module.exports = Target

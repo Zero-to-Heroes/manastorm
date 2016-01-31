@@ -152,6 +152,7 @@
           target = this.entities[action.target];
           this.targetSource = action != null ? action.data.id : void 0;
           this.targetDestination = target.id;
+          this.targetType = action.actionType;
           this.turnLog += ' -> ' + this.cardUtils.buildCardLink(this.cardUtils.getCard(target.cardID));
         }
       } else {
@@ -654,6 +655,7 @@
                   index: actionIndex++,
                   timestamp: batch.timestamp,
                   type: ': ',
+                  actionType: 'attack',
                   data: this.entities[command[1][0].attributes.entity],
                   owner: this.turns[currentTurnNumber].activePlayer,
                   target: command[1][0].attributes.target,
