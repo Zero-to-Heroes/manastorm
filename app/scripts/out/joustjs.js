@@ -120,8 +120,6 @@
       })(this));
       this.state.replay.init();
       
-      this.state.replay.buildGameLog();
-      
     }
 
     Replay.prototype.componentWillUnmount = function() {};
@@ -2581,6 +2579,7 @@ arguments[4][4][0].apply(exports,arguments)
       };
       this.parser.parse(this);
       this.finalizeInit();
+      this.buildCardLink = this.cardUtils.buildCardLink;
       return this.goNextAction();
     };
 
@@ -2621,7 +2620,6 @@ arguments[4][4][0].apply(exports,arguments)
       initialAction = this.currentActionInTurn;
       this.currentTurn = 1;
       this.currentActionInTurn = 0;
-      this.buildCardLink = this.buildLogCardLink;
       while (this.turns[this.currentTurn]) {
         this.newStep();
         this.turnLog = '';
@@ -2673,7 +2671,7 @@ arguments[4][4][0].apply(exports,arguments)
       this.currentActionInTurn++;
       
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
-        return this.buildActionLog();
+        return this.goToAction();
       } else {
         return this.goNextTurn();
       }

@@ -42,6 +42,8 @@ class ReplayPlayer extends EventEmitter
 
 		@finalizeInit()
 
+		@buildCardLink = @cardUtils.buildCardLink
+
 		#@startTimestamp = @turns[1].timestamp
 
 		@goNextAction()
@@ -73,8 +75,6 @@ class ReplayPlayer extends EventEmitter
 		initialAction = @currentActionInTurn
 		@currentTurn = 1
 		@currentActionInTurn = 0
-
-		@buildCardLink = @buildLogCardLink
 
 		while @turns[@currentTurn]
 			@newStep()
@@ -126,7 +126,7 @@ class ReplayPlayer extends EventEmitter
 		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
-			@buildActionLog()
+			@goToAction()
 
 		# Going to the next turn
 		else 

@@ -46,6 +46,7 @@
       };
       this.parser.parse(this);
       this.finalizeInit();
+      this.buildCardLink = this.cardUtils.buildCardLink;
       return this.goNextAction();
     };
 
@@ -86,7 +87,6 @@
       initialAction = this.currentActionInTurn;
       this.currentTurn = 1;
       this.currentActionInTurn = 0;
-      this.buildCardLink = this.buildLogCardLink;
       while (this.turns[this.currentTurn]) {
         this.newStep();
         this.turnLog = '';
@@ -138,7 +138,7 @@
       this.currentActionInTurn++;
       
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
-        return this.buildActionLog();
+        return this.goToAction();
       } else {
         return this.goNextTurn();
       }

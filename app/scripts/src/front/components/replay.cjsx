@@ -41,8 +41,8 @@ class Replay extends React.Component
 		#console.log('sub', @sub)
 		@state.replay.init()
 		console.log 'first init done'
-		@state.replay.buildGameLog()
-		console.log 'log built'
+		#@state.replay.buildGameLog()
+		#console.log 'log built'
 		#@state.replay.init()
 		#console.log 'second init done'
 

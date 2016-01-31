@@ -78,8 +78,6 @@
       })(this));
       this.state.replay.init();
       
-      this.state.replay.buildGameLog();
-      
     }
 
     Replay.prototype.componentWillUnmount = function() {};
