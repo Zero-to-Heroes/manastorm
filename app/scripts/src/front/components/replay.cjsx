@@ -17,6 +17,7 @@ GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
 Target = require './ui/replay/target'
 
+ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../subscription'
 _ = require 'lodash'
 
@@ -57,7 +58,7 @@ class Replay extends React.Component
 			top = <div className="top">
 				<PlayerName entity={replay.opponent} />
 				<Deck entity={replay.opponent} />
-				<Board entity={replay.opponent} ref="topBoard"/>
+				<Board entity={replay.opponent} ref="topBoard" tooltips={true}/>
 				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
 				<Mana entity={replay.opponent} />
 				<Play entity={replay.opponent} />
@@ -68,7 +69,7 @@ class Replay extends React.Component
 			bottom = <div className="bottom">
 				<PlayerName entity={replay.player} />
 				<Deck entity={replay.player} />
-				<Board entity={replay.player} ref="bottomBoard"/>
+				<Board entity={replay.player} ref="bottomBoard" tooltips={true}/>
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Play entity={replay.player} />
@@ -95,6 +96,7 @@ class Replay extends React.Component
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
 		return <div className="replay">
+					<ReactTooltip />
 					<div className="additional-controls">
 						<label>
 							<input type="checkbox" checked={@showAllCards} onChange={@onShowCardsChange} />Try to show hidden cards

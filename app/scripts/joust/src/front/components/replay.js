@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
+  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -38,6 +38,8 @@
   Play = require('./ui/replay/play');
 
   Target = require('./ui/replay/target');
+
+  ReactTooltip = require("react-tooltip");
 
   subscribe = require('../../subscription').subscribe;
 
@@ -95,7 +97,8 @@
           "entity": replay.opponent
         }), React.createElement(Board, {
           "entity": replay.opponent,
-          "ref": "topBoard"
+          "ref": "topBoard",
+          "tooltips": true
         }), React.createElement(Mulligan, {
           "entity": replay.opponent,
           "mulligan": replay.turns[1].opponentMulligan,
@@ -119,7 +122,8 @@
           "entity": replay.player
         }), React.createElement(Board, {
           "entity": replay.player,
-          "ref": "bottomBoard"
+          "ref": "bottomBoard",
+          "tooltips": true
         }), React.createElement(Mulligan, {
           "entity": replay.player,
           "mulligan": replay.turns[1].playerMulligan,
@@ -155,7 +159,7 @@
       }
       return React.createElement("div", {
         "className": "replay"
-      }, React.createElement("div", {
+      }, React.createElement(ReactTooltip, null), React.createElement("div", {
         "className": "additional-controls"
       }, React.createElement("label", null, React.createElement("input", {
         "type": "checkbox",

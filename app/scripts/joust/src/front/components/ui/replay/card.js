@@ -27,7 +27,7 @@
     };
 
     Card.prototype.render = function() {
-      var art, cls, healthClass, locale, overlay, stats, style;
+      var art, cls, healthClass, link, locale, overlay, stats, style;
       locale = window.localStorage.language && window.localStorage.language !== 'en' ? '/' + window.localStorage.language : '';
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards" + locale + "/" + this.props.entity.cardID + ".png";
       if (this.props.entity.cardID && !this.props.isHidden) {
@@ -76,10 +76,24 @@
           "className": healthClass
         }, this.props.entity.tags.HEALTH - (this.props.entity.tags.DAMAGE || 0)));
       }
-      return React.createElement("div", {
-        "className": cls,
-        "style": style
-      }, overlay, stats);
+      if (this.props.tooltip) {
+        link = '<img src="' + art + '">';
+        return React.createElement("div", {
+          "className": cls,
+          "style": style,
+          "data-tip": link,
+          "data-html": true,
+          "data-place": "right",
+          "data-effect": "solid",
+          "data-delay-show": "100",
+          "data-class": "card-tooltip"
+        }, overlay, stats);
+      } else {
+        return React.createElement("div", {
+          "className": cls,
+          "style": style
+        }, overlay, stats);
+      }
     };
 
     Card.prototype.componentDidUpdate = function() {

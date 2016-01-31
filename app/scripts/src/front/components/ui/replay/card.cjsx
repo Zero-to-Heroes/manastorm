@@ -47,10 +47,19 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
-		return <div className={cls} style={style}>
-			{overlay}
-			{stats}
-		</div>
+		if @props.tooltip
+			link = '<img src="' + art + '">';
+			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+				{overlay}
+				{stats}
+			</div>
+
+		else
+			return <div className={cls} style={style}>
+				{overlay}
+				{stats}
+			</div>
+
 
 	componentDidUpdate: ->
 		domNode = ReactDOM.findDOMNode(this)

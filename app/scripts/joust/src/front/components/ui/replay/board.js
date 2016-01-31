@@ -34,15 +34,17 @@
     };
 
     Board.prototype.render = function() {
-      var cards, cardsMap;
+      var cards, cardsMap, tooltip;
       cardsMap = [];
+      tooltip = this.props.tooltips;
       cards = this.props.entity.getBoard().map(function(entity) {
         var cardDiv;
         cardDiv = React.createElement(Card, {
           "entity": entity,
           "key": entity.id,
           "stats": true,
-          "ref": entity.id
+          "ref": entity.id,
+          "tooltip": tooltip
         });
         cardsMap.push(entity.id);
         return cardDiv;
