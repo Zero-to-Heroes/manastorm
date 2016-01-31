@@ -13,8 +13,13 @@
     }
 
     PlayerName.prototype.render = function() {
+      var cls;
+      cls = "player-name";
+      if (this.props.isActive) {
+        cls += " active";
+      }
       return React.createElement("div", {
-        "className": "player-name"
+        "className": cls
       }, this.props.entity.name);
     };
 

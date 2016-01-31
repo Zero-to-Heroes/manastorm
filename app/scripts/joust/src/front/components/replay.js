@@ -92,7 +92,8 @@
         top = React.createElement("div", {
           "className": "top"
         }, React.createElement(PlayerName, {
-          "entity": replay.opponent
+          "entity": replay.opponent,
+          "isActive": replay.opponent.id === replay.getActivePlayer().id
         }), React.createElement(Deck, {
           "entity": replay.opponent
         }), React.createElement(Board, {
@@ -117,7 +118,8 @@
         bottom = React.createElement("div", {
           "className": "bottom"
         }, React.createElement(PlayerName, {
-          "entity": replay.player
+          "entity": replay.player,
+          "isActive": replay.player.id === replay.getActivePlayer().id
         }), React.createElement(Deck, {
           "entity": replay.player
         }), React.createElement(Board, {

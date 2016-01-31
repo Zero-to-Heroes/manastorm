@@ -56,7 +56,7 @@ class Replay extends React.Component
 			#console.log 'All players are here'
 
 			top = <div className="top">
-				<PlayerName entity={replay.opponent} />
+				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} ref="topBoard" tooltips={true}/>
 				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
@@ -67,7 +67,7 @@ class Replay extends React.Component
 			</div>
 
 			bottom = <div className="bottom">
-				<PlayerName entity={replay.player} />
+				<PlayerName entity={replay.player} isActive={replay.player.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.player} />
 				<Board entity={replay.player} ref="bottomBoard" tooltips={true}/>
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />

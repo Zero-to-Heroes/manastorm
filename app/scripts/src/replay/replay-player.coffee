@@ -202,6 +202,9 @@ class ReplayPlayer extends EventEmitter
 
 		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
+	getActivePlayer: ->
+		return @turns[@currentTurn].activePlayer || {}
+
 	newStep: ->
 		@targetSource = undefined
 		@targetDestination = undefined

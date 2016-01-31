@@ -213,6 +213,10 @@
       return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
     };
 
+    ReplayPlayer.prototype.getActivePlayer = function() {
+      return this.turns[this.currentTurn].activePlayer || {};
+    };
+
     ReplayPlayer.prototype.newStep = function() {
       this.targetSource = void 0;
       return this.targetDestination = void 0;

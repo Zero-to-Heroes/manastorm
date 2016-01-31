@@ -22,4 +22,12 @@
 		width: 0;
 		height: 0;
 	}
+
+	&.active {
+		background: rgba(117, 234, 143, 0.5);
+	}
+
+	&.active::after {
+		border-color: transparent transparent transparent rgba(117, 234, 143, 0.5);
+	}
 }
