@@ -2655,7 +2655,7 @@ arguments[4][4][0].apply(exports,arguments)
       this.currentTurn = initialTurn;
       this.currentActionInTurn = initialAction;
       
-      return console.info('experimental: full game log', fullLog);
+      return console.info('experimental: full game log\n', fullLog);
     };
 
     ReplayPlayer.prototype.buildLogCardLink = function(card) {
@@ -3561,7 +3561,7 @@ var joustjs = {
 	},
 
 	loadReplay: function(replayXml) {
-		console.log('serializing to string', replayXml)
+		// console.log('serializing to string', replayXml)
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
 		//console.log('string xml', strReplayXml);
 
@@ -3577,7 +3577,7 @@ var joustjs = {
 		var time = timestamp.match(timestampOnlyRegex)[0];
 		var timeComponents = time.split(':');
 		var secs = parseInt(timeComponents[0]) * 60 + parseInt(timeComponents[1]);
-		console.log('going to timestamp', secs, timestamp)
+		// console.log('going to timestamp', secs, timestamp)
 		window.replay.moveToTimestamp(secs);
 	}
 

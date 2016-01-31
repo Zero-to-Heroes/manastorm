@@ -120,7 +120,7 @@
       this.currentTurn = initialTurn;
       this.currentActionInTurn = initialAction;
       
-      return console.info('experimental: full game log', fullLog);
+      return console.info('experimental: full game log\n', fullLog);
     };
 
     ReplayPlayer.prototype.buildLogCardLink = function(card) {
