@@ -1446,6 +1446,8 @@
 .hearthstone #externalPlayer .application {
   display: flex;
   flex-grow: 1;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .title-bar {
   height: 2.4rem;
@@ -1470,6 +1472,8 @@
   box-sizing: border-box;
   align-items: stretch;
   flex-grow: 1;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .replay__game {
   flex-grow: 1;
@@ -1478,6 +1482,8 @@
   background: #d1c16c url(../../image/felt.png) 50% 50% repeat;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .replay__controls {
   flex-grow: 0;
@@ -1485,18 +1491,24 @@
   margin-bottom: 0;
   display: flex;
   flex-direction: row;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .replay__game > .top {
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 50%;
   position: relative;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .replay__game > .bottom {
   flex-grow: 1;
   flex-shrink: 1;
   flex-basis: 50%;
   position: relative;
+  min-height: 0;
+  min-width: 0;
 }
 .hearthstone #externalPlayer .player-name {
   background: rgba(0, 0, 0, 0.5);
