@@ -28,9 +28,10 @@ class Weapon extends Card
 					<div className="card__stats__health">{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</div>
 				</div>
 
+		link = '<img src="' + art + '">';
 
-		return 	<div className={cls} style={style}>
-					{stats}
-				</div>
+		return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+				{stats}
+			</div>
 
 module.exports = Weapon

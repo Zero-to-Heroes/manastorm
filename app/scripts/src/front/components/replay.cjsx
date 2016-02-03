@@ -16,6 +16,7 @@ Timeline = require './ui/replay/timeline'
 GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
 Target = require './ui/replay/target'
+Turn = require './ui/replay/turn'
 
 ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../subscription'
@@ -41,8 +42,8 @@ class Replay extends React.Component
 		#console.log('sub', @sub)
 		@state.replay.init()
 		console.log 'first init done'
-		#@state.replay.buildGameLog()
-		#console.log 'log built'
+		@state.replay.buildGameLog()
+		console.log 'log built'
 		#@state.replay.init()
 		#console.log 'second init done'
 
@@ -114,6 +115,7 @@ class Replay extends React.Component
 						{top}
 						{bottom}
 						<Target source={source} target={target} type={replay.targetType}/>
+						<Turn replay={replay} />
 					</div>
 					<form className="replay__controls padded">
 						<ButtonGroup>

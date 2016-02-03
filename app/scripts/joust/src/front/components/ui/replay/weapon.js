@@ -25,7 +25,7 @@
     Weapon.prototype.componentDidMount = function() {};
 
     Weapon.prototype.render = function() {
-      var art, cls, stats, style, _ref;
+      var art, cls, link, stats, style, _ref;
       if (!((_ref = this.props.entity) != null ? _ref.cardID : void 0)) {
         return null;
       }
@@ -45,9 +45,16 @@
       }, this.props.entity.tags.ATK || 0), React.createElement("div", {
         "className": "card__stats__health"
       }, this.props.entity.tags.DURABILITY - (this.props.entity.tags.DAMAGE || 0)));
+      link = '<img src="' + art + '">';
       return React.createElement("div", {
         "className": cls,
-        "style": style
+        "style": style,
+        "data-tip": link,
+        "data-html": true,
+        "data-place": "right",
+        "data-effect": "solid",
+        "data-delay-show": "100",
+        "data-class": "card-tooltip"
       }, stats);
     };
 

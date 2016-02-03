@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, subscribe, _, _ref,
+  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, Turn, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -38,6 +38,8 @@
   Play = require('./ui/replay/play');
 
   Target = require('./ui/replay/target');
+
+  Turn = require('./ui/replay/turn');
 
   ReactTooltip = require("react-tooltip");
 
@@ -78,6 +80,8 @@
       })(this));
       this.state.replay.init();
       console.log('first init done');
+      this.state.replay.buildGameLog();
+      console.log('log built');
     }
 
     Replay.prototype.componentWillUnmount = function() {};
@@ -178,6 +182,8 @@
         "source": source,
         "target": target,
         "type": replay.targetType
+      }), React.createElement(Turn, {
+        "replay": replay
       })), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {

@@ -87,6 +87,7 @@
       initialAction = this.currentActionInTurn;
       this.currentTurn = 1;
       this.currentActionInTurn = 0;
+      this.buildCardLink = this.buildLogCardLink;
       while (this.turns[this.currentTurn]) {
         this.newStep();
         this.turnLog = '';
@@ -128,6 +129,16 @@
         return card.name;
       } else {
         return '';
+      }
+    };
+
+    ReplayPlayer.prototype.getCurrentTurnString = function() {
+      if (this.turns[this.currentTurn].turn === 'Mulligan') {
+        return 'Mulligan';
+      } else if (this.turns[this.currentTurn].activePlayer === this.player) {
+        return 'Turn ' + Math.ceil(this.turns[this.currentTurn].turn / 2);
+      } else {
+        return 'Turn ' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o';
       }
     };
 

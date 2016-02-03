@@ -76,6 +76,8 @@ class ReplayPlayer extends EventEmitter
 		@currentTurn = 1
 		@currentActionInTurn = 0
 
+		@buildCardLink = @buildLogCardLink
+
 		while @turns[@currentTurn]
 			@newStep()
 			@turnLog = ''
@@ -116,6 +118,14 @@ class ReplayPlayer extends EventEmitter
 
 	buildLogCardLink: (card) ->
 		return if card then card.name else ''
+
+	getCurrentTurnString: ->
+		if @turns[@currentTurn].turn is 'Mulligan'
+			return 'Mulligan'
+		else if @turns[@currentTurn].activePlayer == @player
+			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2)
+		else
+			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
 	goNextAction: ->
 		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
