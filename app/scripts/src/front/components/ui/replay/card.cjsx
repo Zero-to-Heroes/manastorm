@@ -47,7 +47,8 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
-		if @props.tooltip
+		# Don't use tooltips if we don't know what card it is - or shouldn't know
+		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
 			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 				{overlay}

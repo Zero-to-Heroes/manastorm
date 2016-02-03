@@ -76,7 +76,7 @@
           "className": healthClass
         }, this.props.entity.tags.HEALTH - (this.props.entity.tags.DAMAGE || 0)));
       }
-      if (this.props.tooltip) {
+      if (this.props.entity.cardID && !this.props.isHidden) {
         link = '<img src="' + art + '">';
         return React.createElement("div", {
           "className": cls,
