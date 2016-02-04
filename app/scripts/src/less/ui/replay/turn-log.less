@@ -7,3 +7,36 @@
 	z-index: 2;
 	padding: 15px;
 }
+
+.turn-log .turn {
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.1em;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+	margin-top: 20px;
+}
+
+.turn-log .main-player {
+	color: #0070DE;
+}
+
+.turn-log .opponent {
+	color: #F58CBA;
+}
+
+.turn-log p {
+	margin-bottom: 0;
+}
+
+.turn-log .log-container {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	height: 100%;
+	padding-right: 10px;
+
+	// Could do something a bit fancy later on
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+

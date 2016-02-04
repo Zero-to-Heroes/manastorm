@@ -1,5 +1,5 @@
 (function() {
-  var React, ReactCSSTransitionGroup, SubscriptionList, TurnLog, _;
+  var PlayerNameDisplayLog, React, ReactCSSTransitionGroup, SubscriptionList, TurnDisplayLog, TurnLog, _;
 
   React = require('react');
 
@@ -13,20 +13,43 @@
     componentDidMount: function() {
       this.subs = new SubscriptionList;
       this.replay = this.props.replay;
-      this.subs.add(this.replay, 'new-log', (function(_this) {
-        return function(action) {};
+      this.logs = [];
+      this.logIndex = 0;
+      this.subs.add(this.replay, 'new-action', (function(_this) {
+        return function(action) {
+          var newLog;
+          newLog = _this.buildActionLog(action);
+          _this.logs.push(newLog);
+          return _this.forceUpdate();
+        };
       })(this));
-      return this.logHtml = '';
+      this.subs.add(this.replay, 'new-turn', (function(_this) {
+        return function(turn) {
+          var newLog;
+          newLog = _this.buildTurnLog(turn);
+          _this.logs.push(newLog);
+          return _this.forceUpdate();
+        };
+      })(this));
+      this.subs.add(this.replay, 'reset', (function(_this) {
+        return function() {
+          _this.logs = [];
+          return _this.forceUpdate();
+        };
+      })(this));
+      this.replay.forceReemit();
+      this.logHtml = '';
+      return console.log('component mounted');
     },
     render: function() {
-      return null;
+      if (!this.props.show) {
+        return null;
+      }
       return React.createElement("div", {
         "className": "turn-log background-white"
-      }, React.createElement("p", {
-        "dangerouslySetInnerHTML": {
-          __html: this.logHtml
-        }
-      }));
+      }, React.createElement("div", {
+        "className": "log-container"
+      }, this.logs));
     },
     buildActionLog: function(action) {
       var card, cardLink, creator, newLog, owner, ownerCard, target;
@@ -53,7 +76,63 @@
         target = this.replay.entities[action.target];
         newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
       }
-      return newLog;
+      return React.createElement("p", {
+        "className": "action",
+        "key": this.logIndex++,
+        "dangerouslySetInnerHTML": {
+          __html: newLog
+        }
+      });
+    },
+    buildTurnLog: function(turn) {
+      console.log('building turn log', turn);
+      if (turn) {
+        if (turn.turn === 'Mulligan') {
+          return React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, "Mulligan");
+        } else {
+          return React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, React.createElement(TurnDisplayLog, {
+            "turn": turn,
+            "active": turn.activePlayer === this.replay.player,
+            "name": turn.activePlayer.name
+          }));
+        }
+      }
+    }
+  });
+
+  TurnDisplayLog = React.createClass({
+    render: function() {
+      if (this.props.active) {
+        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
+          "active": true,
+          "name": this.props.name
+        }));
+      } else {
+        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
+          "active": false,
+          "name": this.props.name
+        }));
+      }
+    }
+  });
+
+  PlayerNameDisplayLog = React.createClass({
+    render: function() {
+      if (this.props.active) {
+        return React.createElement("span", {
+          "className": "main-player"
+        }, this.props.name);
+      } else {
+        return React.createElement("span", {
+          "className": "opponent"
+        }, this.props.name);
+      }
     }
   });
 

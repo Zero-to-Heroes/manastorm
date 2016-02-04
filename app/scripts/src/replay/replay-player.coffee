@@ -19,6 +19,7 @@ class ReplayPlayer extends EventEmitter
 		console.log 'starting init'
 		@entities = {}
 		@players = []
+		@emit 'reset'
 
 		@game = null
 		@player = null
@@ -172,7 +173,6 @@ class ReplayPlayer extends EventEmitter
 		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
 		targetTimestamp = @buildActionLog()
-		@aggregatedLog += @turnLog + '\n'
 
 		console.log @turnLog
 
@@ -182,7 +182,7 @@ class ReplayPlayer extends EventEmitter
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 
-			@emit 'new-log', action
+			@emit 'new-action', action
 			
 			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
@@ -215,11 +215,11 @@ class ReplayPlayer extends EventEmitter
 				@turnLog += ' -> ' + @buildCardLink(@cardUtils.getCard(target.cardID))
 
 		# This probably happens only for Mulligan
-		else
-			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
-			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
+		#else
+			#targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
+			#@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
 
-		@emit 'new-log', @turnLog
+			#@emit 'new-turn', @turns[@currentTurn]
 
 		return targetTimestamp
 
@@ -238,7 +238,8 @@ class ReplayPlayer extends EventEmitter
 		else
 			@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
-		@emit 'new-log', @turnLog
+		console.log 'emit new-turn in goNextTurn', @turns[@currentTurn]
+		@emit 'new-turn', @turns[@currentTurn]
 		targetTimestamp = @getTotalLength() * 1000
 
 		# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
@@ -278,7 +279,9 @@ class ReplayPlayer extends EventEmitter
 			else
 				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
-		@emit 'new-log', @turnLog
+		#console.log 'emit new-turn in goPreviousTurn'
+		#Don't emit anything, since we'll go back and redo the whole history
+		#@emit 'new-turn', @turns[@currentTurn]
 
 		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 
@@ -357,6 +360,7 @@ class ReplayPlayer extends EventEmitter
 
 		if (timestamp < @currentReplayTime)
 			console.log 'going back in time, resetting', timestamp, @currentReplayTime
+			@emit 'reset'
 			@historyPosition = 0
 			@init()
 
@@ -577,7 +581,7 @@ class ReplayPlayer extends EventEmitter
 							turn: currentTurnNumber
 							index: actionIndex++
 							timestamp: batch.timestamp
-							type: ': draw ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
+							type: ' draws ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
 							data: @entities[playedCard]
 							owner: @entities[command[1][0].entity]
 							initialCommand: command[1][0]
@@ -948,5 +952,8 @@ class ReplayPlayer extends EventEmitter
 			@lastBatch = new HistoryBatch(timestamp, [command, args])
 			@history.push(@lastBatch)
 		return @lastBatch
+
+	forceReemit: ->
+		@emit 'new-turn', @turns[@currentTurn]
 
 module.exports = ReplayPlayer

@@ -88,8 +88,6 @@
       };
     }
 
-    Replay.prototype.componentWillUnmount = function() {};
-
     Replay.prototype.callback = function() {
       return this.forceUpdate();
     };
@@ -188,7 +186,8 @@
         "type": replay.targetType
       }), React.createElement(Turn, {
         "replay": replay,
-        "onClick": this.onTurnClick
+        "onClick": this.onTurnClick,
+        "active": this.displayConf.showLog
       })), React.createElement(TurnLog, {
         "show": this.displayConf.showLog,
         "replay": replay

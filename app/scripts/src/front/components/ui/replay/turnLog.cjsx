@@ -10,18 +10,36 @@ TurnLog = React.createClass
 
 		@replay = @props.replay
 
-		@subs.add @replay, 'new-log', (action) =>
-			#newLog = @buildActionLog action
-			#@logHtml += newLog + '<br/>'
-			#@forceUpdate()
+		@logs = []
+		@logIndex = 0
+
+		@subs.add @replay, 'new-action', (action) =>
+			newLog = @buildActionLog action
+			@logs.push newLog
+			@forceUpdate()
+
+		@subs.add @replay, 'new-turn', (turn) =>
+			newLog = @buildTurnLog turn
+			@logs.push newLog
+			@forceUpdate()
+
+		@subs.add @replay, 'reset',  =>
+			@logs = []
+			@forceUpdate()
+
+		@replay.forceReemit()
 
 		@logHtml = ''
 
+		console.log 'component mounted'
+
 	render: ->
-		return null #unless @props.show
+		return null unless @props.show
 
 		return 	<div className="turn-log background-white">
-				<p dangerouslySetInnerHTML={{__html: @logHtml}}></p>
+				<div className="log-container">
+					{@logs}
+				</div>
 			</div>
 
 	buildActionLog: (action) ->
@@ -47,6 +65,37 @@ TurnLog = React.createClass
 			target = @replay.entities[action.target]
 			newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
 
-		newLog
+		return <p className="action" key={@logIndex++} dangerouslySetInnerHTML={{__html: newLog}}></p>
+
+	buildTurnLog: (turn) ->
+		console.log 'building turn log', turn
+		if turn
+			if turn.turn is 'Mulligan'
+				return <p className="turn" key={@logIndex++}>Mulligan</p>
+			else 
+				return <p className="turn" key={@logIndex++}>
+						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
+					</p>
+
+TurnDisplayLog = React.createClass
+	render: ->
+		if @props.active
+			return <span>
+				{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}
+				<PlayerNameDisplayLog active={true} name={@props.name} />
+			</span>
+		else
+			return <span>
+				{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}
+				<PlayerNameDisplayLog active={false} name={@props.name} />
+			</span>
+
+PlayerNameDisplayLog = React.createClass
+	render: ->
+		if @props.active 
+			return <span className="main-player">{@props.name}</span>
+		else
+			return <span className="opponent">{@props.name}</span>
+
 
 module.exports = TurnLog

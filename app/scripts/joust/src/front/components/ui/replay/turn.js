@@ -11,11 +11,16 @@
 
   Turn = React.createClass({
     render: function() {
+      var cls;
       if (!this.props.replay) {
         return null;
       }
+      cls = 'current-turn';
+      if (this.props.active) {
+        cls += ' active';
+      }
       return React.createElement("div", {
-        "className": "current-turn",
+        "className": cls,
         "onClick": this.props.onClick
       }, React.createElement("span", null, this.props.replay.getCurrentTurnString()));
     }

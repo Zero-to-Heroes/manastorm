@@ -31,6 +31,7 @@
       console.log('starting init');
       this.entities = {};
       this.players = [];
+      this.emit('reset');
       this.game = null;
       this.player = null;
       this.opponent = null;
@@ -184,16 +185,15 @@
       console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
       console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
       targetTimestamp = this.buildActionLog();
-      this.aggregatedLog += this.turnLog + '\n';
       console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
     ReplayPlayer.prototype.buildActionLog = function() {
-      var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
+      var action, card, cardLink, creator, owner, ownerCard, target, targetTimestamp;
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        this.emit('new-log', action);
+        this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -221,11 +221,7 @@
           this.targetType = action.actionType;
           this.turnLog += ' -> ' + this.buildCardLink(this.cardUtils.getCard(target.cardID));
         }
-      } else {
-        targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
-        this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
-      this.emit('new-log', this.turnLog);
       return targetTimestamp;
     };
 
@@ -244,7 +240,8 @@
       } else {
         this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
       }
-      this.emit('new-log', this.turnLog);
+      console.log('emit new-turn in goNextTurn', this.turns[this.currentTurn]);
+      this.emit('new-turn', this.turns[this.currentTurn]);
       targetTimestamp = this.getTotalLength() * 1000;
       targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       return this.goToTimestamp(targetTimestamp);
@@ -281,7 +278,6 @@
           this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
         }
       }
-      this.emit('new-log', this.turnLog);
       return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
     };
 
@@ -362,6 +358,7 @@
       console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
         console.log('going back in time, resetting', timestamp, this.currentReplayTime);
+        this.emit('reset');
         this.historyPosition = 0;
         this.init();
       }
@@ -561,7 +558,7 @@
                 turn: currentTurnNumber,
                 index: actionIndex++,
                 timestamp: batch.timestamp,
-                type: ': draw ',
+                type: ' draws ',
                 data: this.entities[playedCard],
                 owner: this.entities[command[1][0].entity],
                 initialCommand: command[1][0]
@@ -910,6 +907,10 @@
         this.history.push(this.lastBatch);
       }
       return this.lastBatch;
+    };
+
+    ReplayPlayer.prototype.forceReemit = function() {
+      return this.emit('new-turn', this.turns[this.currentTurn]);
     };
 
     return ReplayPlayer;

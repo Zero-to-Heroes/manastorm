@@ -52,9 +52,6 @@ class Replay extends React.Component
 			showLog: false
 		}
 
-	componentWillUnmount: ->
-		#@sub.off()
-
 	callback: =>
 		#console.log 'in callback'
 		@forceUpdate()
@@ -100,7 +97,6 @@ class Replay extends React.Component
 			source = @findCard allCards, replay.targetSource
 			target = @findCard allCards, replay.targetDestination
 
-
 		# {playButton}
 		playButton = <Button glyph="play" onClick={@onClickPlay} />
 
@@ -121,7 +117,7 @@ class Replay extends React.Component
 						{top}
 						{bottom}
 						<Target source={source} target={target} type={replay.targetType}/>
-						<Turn replay={replay} onClick={@onTurnClick} />
+						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} />
 					<form className="replay__controls padded">

@@ -130,8 +130,6 @@
       };
     }
 
-    Replay.prototype.componentWillUnmount = function() {};
-
     Replay.prototype.callback = function() {
       return this.forceUpdate();
     };
@@ -230,7 +228,8 @@
         "type": replay.targetType
       }), React.createElement(Turn, {
         "replay": replay,
-        "onClick": this.onTurnClick
+        "onClick": this.onTurnClick,
+        "active": this.displayConf.showLog
       })), React.createElement(TurnLog, {
         "show": this.displayConf.showLog,
         "replay": replay
@@ -1550,11 +1549,16 @@ arguments[4][4][0].apply(exports,arguments)
 
   Turn = React.createClass({
     render: function() {
+      var cls;
       if (!this.props.replay) {
         return null;
       }
+      cls = 'current-turn';
+      if (this.props.active) {
+        cls += ' active';
+      }
       return React.createElement("div", {
-        "className": "current-turn",
+        "className": cls,
         "onClick": this.props.onClick
       }, React.createElement("span", null, this.props.replay.getCurrentTurnString()));
     }
@@ -1566,7 +1570,7 @@ arguments[4][4][0].apply(exports,arguments)
 
 },{"../../../../subscription-list":33,"lodash":149,"react":587,"react-addons-css-transition-group":150}],24:[function(_dereq_,module,exports){
 (function() {
-  var React, ReactCSSTransitionGroup, SubscriptionList, TurnLog, _;
+  var PlayerNameDisplayLog, React, ReactCSSTransitionGroup, SubscriptionList, TurnDisplayLog, TurnLog, _;
 
   React = _dereq_('react');
 
@@ -1580,20 +1584,43 @@ arguments[4][4][0].apply(exports,arguments)
     componentDidMount: function() {
       this.subs = new SubscriptionList;
       this.replay = this.props.replay;
-      this.subs.add(this.replay, 'new-log', (function(_this) {
-        return function(action) {};
+      this.logs = [];
+      this.logIndex = 0;
+      this.subs.add(this.replay, 'new-action', (function(_this) {
+        return function(action) {
+          var newLog;
+          newLog = _this.buildActionLog(action);
+          _this.logs.push(newLog);
+          return _this.forceUpdate();
+        };
       })(this));
-      return this.logHtml = '';
+      this.subs.add(this.replay, 'new-turn', (function(_this) {
+        return function(turn) {
+          var newLog;
+          newLog = _this.buildTurnLog(turn);
+          _this.logs.push(newLog);
+          return _this.forceUpdate();
+        };
+      })(this));
+      this.subs.add(this.replay, 'reset', (function(_this) {
+        return function() {
+          _this.logs = [];
+          return _this.forceUpdate();
+        };
+      })(this));
+      this.replay.forceReemit();
+      this.logHtml = '';
+      return console.log('component mounted');
     },
     render: function() {
-      return null;
+      if (!this.props.show) {
+        return null;
+      }
       return React.createElement("div", {
         "className": "turn-log background-white"
-      }, React.createElement("p", {
-        "dangerouslySetInnerHTML": {
-          __html: this.logHtml
-        }
-      }));
+      }, React.createElement("div", {
+        "className": "log-container"
+      }, this.logs));
     },
     buildActionLog: function(action) {
       var card, cardLink, creator, newLog, owner, ownerCard, target;
@@ -1620,7 +1647,63 @@ arguments[4][4][0].apply(exports,arguments)
         target = this.replay.entities[action.target];
         newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
       }
-      return newLog;
+      return React.createElement("p", {
+        "className": "action",
+        "key": this.logIndex++,
+        "dangerouslySetInnerHTML": {
+          __html: newLog
+        }
+      });
+    },
+    buildTurnLog: function(turn) {
+      console.log('building turn log', turn);
+      if (turn) {
+        if (turn.turn === 'Mulligan') {
+          return React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, "Mulligan");
+        } else {
+          return React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, React.createElement(TurnDisplayLog, {
+            "turn": turn,
+            "active": turn.activePlayer === this.replay.player,
+            "name": turn.activePlayer.name
+          }));
+        }
+      }
+    }
+  });
+
+  TurnDisplayLog = React.createClass({
+    render: function() {
+      if (this.props.active) {
+        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
+          "active": true,
+          "name": this.props.name
+        }));
+      } else {
+        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
+          "active": false,
+          "name": this.props.name
+        }));
+      }
+    }
+  });
+
+  PlayerNameDisplayLog = React.createClass({
+    render: function() {
+      if (this.props.active) {
+        return React.createElement("span", {
+          "className": "main-player"
+        }, this.props.name);
+      } else {
+        return React.createElement("span", {
+          "className": "opponent"
+        }, this.props.name);
+      }
     }
   });
 
@@ -2711,6 +2794,7 @@ arguments[4][4][0].apply(exports,arguments)
       console.log('starting init');
       this.entities = {};
       this.players = [];
+      this.emit('reset');
       this.game = null;
       this.player = null;
       this.opponent = null;
@@ -2864,16 +2948,15 @@ arguments[4][4][0].apply(exports,arguments)
       console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
       console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
       targetTimestamp = this.buildActionLog();
-      this.aggregatedLog += this.turnLog + '\n';
       console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
 
     ReplayPlayer.prototype.buildActionLog = function() {
-      var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
+      var action, card, cardLink, creator, owner, ownerCard, target, targetTimestamp;
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        this.emit('new-log', action);
+        this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -2901,11 +2984,7 @@ arguments[4][4][0].apply(exports,arguments)
           this.targetType = action.actionType;
           this.turnLog += ' -> ' + this.buildCardLink(this.cardUtils.getCard(target.cardID));
         }
-      } else {
-        targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
-        this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
-      this.emit('new-log', this.turnLog);
       return targetTimestamp;
     };
 
@@ -2924,7 +3003,8 @@ arguments[4][4][0].apply(exports,arguments)
       } else {
         this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
       }
-      this.emit('new-log', this.turnLog);
+      console.log('emit new-turn in goNextTurn', this.turns[this.currentTurn]);
+      this.emit('new-turn', this.turns[this.currentTurn]);
       targetTimestamp = this.getTotalLength() * 1000;
       targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       return this.goToTimestamp(targetTimestamp);
@@ -2961,7 +3041,6 @@ arguments[4][4][0].apply(exports,arguments)
           this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
         }
       }
-      this.emit('new-log', this.turnLog);
       return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
     };
 
@@ -3042,6 +3121,7 @@ arguments[4][4][0].apply(exports,arguments)
       console.log('going to timestamp', timestamp);
       if (timestamp < this.currentReplayTime) {
         console.log('going back in time, resetting', timestamp, this.currentReplayTime);
+        this.emit('reset');
         this.historyPosition = 0;
         this.init();
       }
@@ -3241,7 +3321,7 @@ arguments[4][4][0].apply(exports,arguments)
                 turn: currentTurnNumber,
                 index: actionIndex++,
                 timestamp: batch.timestamp,
-                type: ': draw ',
+                type: ' draws ',
                 data: this.entities[playedCard],
                 owner: this.entities[command[1][0].entity],
                 initialCommand: command[1][0]
@@ -3590,6 +3670,10 @@ arguments[4][4][0].apply(exports,arguments)
         this.history.push(this.lastBatch);
       }
       return this.lastBatch;
+    };
+
+    ReplayPlayer.prototype.forceReemit = function() {
+      return this.emit('new-turn', this.turns[this.currentTurn]);
     };
 
     return ReplayPlayer;
