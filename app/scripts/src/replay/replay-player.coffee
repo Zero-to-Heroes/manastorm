@@ -12,7 +12,6 @@ class ReplayPlayer extends EventEmitter
 
 		@currentTurn = 0
 		@currentActionInTurn = 0
-		@turnLog = ''
 		@cardUtils = window['parseCardsText']
 
 	init: ->
@@ -76,7 +75,6 @@ class ReplayPlayer extends EventEmitter
 	goNextAction: ->
 		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
-		@turnLog = ''
 		@currentActionInTurn++
 
 		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
@@ -91,13 +89,6 @@ class ReplayPlayer extends EventEmitter
 
 			if !@turns[@currentTurn]
 				return
-
-			if @turns[@currentTurn].turn is 'Mulligan'
-				@turnLog = @turns[@currentTurn].turn
-			else if @turns[@currentTurn].activePlayer == @player
-				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
-			else
-				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
 			@emit 'new-turn', @turns[@currentTurn]
 
@@ -115,7 +106,6 @@ class ReplayPlayer extends EventEmitter
 
 	goPreviousAction: ->
 		@newStep()
-		@turnLog = ''
 
 		if @currentActionInTurn == 1
 			targetTurn = @currentTurn
@@ -148,7 +138,6 @@ class ReplayPlayer extends EventEmitter
 
 	goPreviousTurn: ->
 		@newStep()
-		@turnLog = ''
 
 		# else
 		targetTurn = @currentTurn - 1
@@ -162,8 +151,12 @@ class ReplayPlayer extends EventEmitter
 
 	goToAction: ->
 		@newStep()
-		targetTimestamp = @buildActionLog()
-		@goToTimestamp targetTimestamp
+
+		if @currentActionInTurn >= 0
+			action = @turns[@currentTurn].actions[@currentActionInTurn]
+			@emit 'new-action', action
+			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
+			@goToTimestamp targetTimestamp
 
 
 	# ========================
@@ -204,37 +197,10 @@ class ReplayPlayer extends EventEmitter
 
 		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
 			@goNextAction()
-
-
-		# if @currentTurn == -1
-		# 	#console.log 'Going back to mulligan'
-		# 	@currentTurn = 0
-		# 	@currentActionInTurn = 0
-		# 	@historyPosition = 0
-		# 	@init()
-
-		# else if @currentTurn == 1
-		# 	@currentTurn = 0
-		# 	@currentActionInTurn = 0
-		# 	@historyPosition = 0
-		# 	@init()
-		# 	@goNextTurn()
-
-		# else if @currentActionInTurn <= 1
-		# 	#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
-		# 	@currentTurn = Math.max(@currentTurn - 1, 1)
-		# 	@goToAction()
-		# 	@goNextTurn()
-
-		# else
-		# 	#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
-		# 	@goToAction()
 		
 
 	goToTimestamp: (timestamp) ->
-		# console.log 'going to timestamp', timestamp
-
-		if (timestamp < @currentReplayTime)
+		if timestamp < @currentReplayTime
 			console.log 'going back in time, resetting', timestamp, @currentReplayTime
 			@emit 'reset'
 			@historyPosition = 0
@@ -244,55 +210,7 @@ class ReplayPlayer extends EventEmitter
 		@update()
 
 		@emit 'moved-timestamp'
-
-
-	buildActionLog: ->
-		if @currentActionInTurn >= 0
-			action = @turns[@currentTurn].actions[@currentActionInTurn]
-
-			@emit 'new-action', action
-			
-			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
-			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
-			#console.log 'executing action', action, action.data, @startTimestamp
-			card = if action?.data then action.data['cardID'] else ''
-
-			owner = action.owner.name 
-			if !owner
-				#console.log 'no owner', action.owner, action
-				ownerCard = @entities[action.owner]
-				owner = @buildCardLink(@cardUtils.getCard(ownerCard.cardID))
-			#console.log 'building card link for', card, @cardUtils.getCard(card)
-			cardLink = @buildCardLink(@cardUtils.getCard(card))
-			if action.secret
-				if cardLink?.length > 0 and action.publicSecret
-					#console.log 'action', action
-					cardLink += ' -> Secret'
-				else
-					cardLink = 'Secret'
-			creator = ''
-			if action.creator
-				creator = @buildCardLink(@cardUtils.getCard(action.creator.cardID)) + ': '
-			@turnLog = owner + action.type + creator + cardLink
-
-			if action.target
-				target = @entities[action.target]
-				@targetSource = action?.data.id
-				@targetDestination = target.id
-				@targetType = action.actionType
-				@turnLog += ' -> ' + @buildCardLink(@cardUtils.getCard(target.cardID))
-
-		# This probably happens only for Mulligan
-		#else
-			#targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
-			#@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
-
-			#@emit 'new-turn', @turns[@currentTurn]
-
-		return targetTimestamp
-
-
-	
+		
 
 	getActivePlayer: ->
 		return @turns[@currentTurn].activePlayer || {}
@@ -900,5 +818,8 @@ class ReplayPlayer extends EventEmitter
 
 	forceReemit: ->
 		@emit 'new-turn', @turns[@currentTurn]
+
+	notifyNewLog: (log) ->
+		@emit 'new-log', log
 
 module.exports = ReplayPlayer

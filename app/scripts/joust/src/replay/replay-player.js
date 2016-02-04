@@ -23,7 +23,6 @@
       window.replay = this;
       this.currentTurn = 0;
       this.currentActionInTurn = 0;
-      this.turnLog = '';
       this.cardUtils = window['parseCardsText'];
     }
 
@@ -93,7 +92,6 @@
     ReplayPlayer.prototype.goNextAction = function() {
       var targetTimestamp;
       this.newStep();
-      this.turnLog = '';
       this.currentActionInTurn++;
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
@@ -102,13 +100,6 @@
         this.currentActionInTurn = 0;
         if (!this.turns[this.currentTurn]) {
           return;
-        }
-        if (this.turns[this.currentTurn].turn === 'Mulligan') {
-          this.turnLog = this.turns[this.currentTurn].turn;
-        } else if (this.turns[this.currentTurn].activePlayer === this.player) {
-          this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + ': ' + this.turns[this.currentTurn].activePlayer.name;
-        } else {
-          this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
         }
         this.emit('new-turn', this.turns[this.currentTurn]);
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
@@ -129,7 +120,6 @@
     ReplayPlayer.prototype.goPreviousAction = function() {
       var results, targetAction, targetTurn;
       this.newStep();
-      this.turnLog = '';
       if (this.currentActionInTurn === 1) {
         targetTurn = this.currentTurn;
         targetAction = 0;
@@ -159,7 +149,6 @@
     ReplayPlayer.prototype.goPreviousTurn = function() {
       var results, targetTurn;
       this.newStep();
-      this.turnLog = '';
       targetTurn = this.currentTurn - 1;
       this.currentTurn = 0;
       this.currentActionInTurn = 0;
@@ -172,10 +161,14 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var targetTimestamp;
+      var action, targetTimestamp;
       this.newStep();
-      targetTimestamp = this.buildActionLog();
-      return this.goToTimestamp(targetTimestamp);
+      if (this.currentActionInTurn >= 0) {
+        action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
+        this.emit('new-action', action);
+        targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
+        return this.goToTimestamp(targetTimestamp);
+      }
     };
 
     ReplayPlayer.prototype.moveTime = function(progression) {
@@ -230,42 +223,6 @@
       this.currentReplayTime = timestamp;
       this.update();
       return this.emit('moved-timestamp');
-    };
-
-    ReplayPlayer.prototype.buildActionLog = function() {
-      var action, card, cardLink, creator, owner, ownerCard, target, targetTimestamp;
-      if (this.currentActionInTurn >= 0) {
-        action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
-        this.emit('new-action', action);
-        targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
-        card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
-        owner = action.owner.name;
-        if (!owner) {
-          ownerCard = this.entities[action.owner];
-          owner = this.buildCardLink(this.cardUtils.getCard(ownerCard.cardID));
-        }
-        cardLink = this.buildCardLink(this.cardUtils.getCard(card));
-        if (action.secret) {
-          if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
-            cardLink += ' -> Secret';
-          } else {
-            cardLink = 'Secret';
-          }
-        }
-        creator = '';
-        if (action.creator) {
-          creator = this.buildCardLink(this.cardUtils.getCard(action.creator.cardID)) + ': ';
-        }
-        this.turnLog = owner + action.type + creator + cardLink;
-        if (action.target) {
-          target = this.entities[action.target];
-          this.targetSource = action != null ? action.data.id : void 0;
-          this.targetDestination = target.id;
-          this.targetType = action.actionType;
-          this.turnLog += ' -> ' + this.buildCardLink(this.cardUtils.getCard(target.cardID));
-        }
-      }
-      return targetTimestamp;
     };
 
     ReplayPlayer.prototype.getActivePlayer = function() {
@@ -838,6 +795,10 @@
 
     ReplayPlayer.prototype.forceReemit = function() {
       return this.emit('new-turn', this.turns[this.currentTurn]);
+    };
+
+    ReplayPlayer.prototype.notifyNewLog = function(log) {
+      return this.emit('new-log', log);
     };
 
     return ReplayPlayer;

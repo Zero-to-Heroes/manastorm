@@ -40,8 +40,7 @@
         };
       })(this));
       this.replay.forceReemit();
-      this.logHtml = '';
-      return console.log('component mounted');
+      return this.logHtml = '';
     },
     render: function() {
       if (!this.props.show) {
@@ -54,7 +53,7 @@
       }, this.logs));
     },
     buildActionLog: function(action) {
-      var card, cardLink, creator, newLog, owner, ownerCard, target;
+      var card, cardLink, creator, log, newLog, owner, ownerCard, target;
       card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
       owner = action.owner.name;
       if (!owner) {
@@ -78,23 +77,26 @@
         target = this.replay.entities[action.target];
         newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
       }
-      return React.createElement("p", {
+      log = React.createElement("p", {
         "className": "action",
         "key": this.logIndex++,
         "dangerouslySetInnerHTML": {
           __html: newLog
         }
       });
+      this.replay.notifyNewLog(log);
+      return log;
     },
     buildTurnLog: function(turn) {
+      var log;
       if (turn) {
         if (turn.turn === 'Mulligan') {
-          return React.createElement("p", {
+          log = React.createElement("p", {
             "className": "turn",
             "key": this.logIndex++
           }, "Mulligan");
         } else {
-          return React.createElement("p", {
+          log = React.createElement("p", {
             "className": "turn",
             "key": this.logIndex++
           }, React.createElement(TurnDisplayLog, {
@@ -104,6 +106,8 @@
           }));
         }
       }
+      this.replay.notifyNewLog(log);
+      return log;
     },
     componentDidUpdate: function() {
       var node;

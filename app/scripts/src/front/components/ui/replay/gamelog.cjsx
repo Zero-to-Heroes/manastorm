@@ -1,16 +1,19 @@
 React = require 'react'
-$ = require 'jquery'
-bt = require 'react-bootstrap'
+SubscriptionList = require '../../../../subscription-list'
 
 class GameLog extends React.Component
 	componentDidMount: ->
-		#@int = setInterval((=> @forceUpdate()), 500)
+		@subs = new SubscriptionList
 
-	render: ->
 		@replay = @props.replay
 
+		@subs.add @replay, 'new-log', (log) =>
+			@log = log
+			@forceUpdate()
+
+	render: ->
 		<div className="game-log">
-			<p dangerouslySetInnerHTML={{__html: @replay.turnLog}}></p>
+			{@log}
 		</div>
 
 

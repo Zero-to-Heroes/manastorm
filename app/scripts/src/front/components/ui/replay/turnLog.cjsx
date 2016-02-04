@@ -32,17 +32,14 @@ TurnLog = React.createClass
 
 		@logHtml = ''
 
-		console.log 'component mounted'
-
 	render: ->
 		return null unless @props.show
 
 		return 	<div className="turn-log background-white">
-				<div className="log-container">
-					{@logs}
+					<div className="log-container">
+						{@logs}
+					</div>
 				</div>
-			</div>
-
 
 
 	buildActionLog: (action) ->
@@ -69,17 +66,25 @@ TurnLog = React.createClass
 			newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
 
 		# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
-		return <p className="action" key={@logIndex++} dangerouslySetInnerHTML={{__html: newLog}}></p>
+		log = <p className="action" key={@logIndex++} dangerouslySetInnerHTML={{__html: newLog}}></p>
+
+		@replay.notifyNewLog log
+
+		return log
 
 	buildTurnLog: (turn) ->
 		# console.log 'building turn log', turn
 		if turn
 			if turn.turn is 'Mulligan'
-				return <p className="turn" key={@logIndex++}>Mulligan</p>
+				log = <p className="turn" key={@logIndex++}>Mulligan</p>
 			else 
-				return <p className="turn" key={@logIndex++}>
+				log = <p className="turn" key={@logIndex++}>
 						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
 					</p>
+
+		@replay.notifyNewLog log
+
+		return log
 
 	# componentWillUpdate: ->
 	# 	node = ReactDOM.findDOMNode(this)
