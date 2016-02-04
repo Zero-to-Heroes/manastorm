@@ -95,7 +95,7 @@
       this.currentActionInTurn++;
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
-      } else {
+      } else if (this.turns[this.currentTurn + 1]) {
         this.currentTurn++;
         this.currentActionInTurn = 0;
         if (!this.turns[this.currentTurn]) {
@@ -109,12 +109,14 @@
 
     ReplayPlayer.prototype.goNextTurn = function() {
       var results, turnWhenCommandIssued;
-      turnWhenCommandIssued = this.currentTurn;
-      results = [];
-      while (turnWhenCommandIssued === this.currentTurn) {
-        results.push(this.goNextAction());
+      if (this.turns[this.currentTurn + 1]) {
+        turnWhenCommandIssued = this.currentTurn;
+        results = [];
+        while (turnWhenCommandIssued === this.currentTurn) {
+          results.push(this.goNextAction());
+        }
+        return results;
       }
-      return results;
     };
 
     ReplayPlayer.prototype.goPreviousAction = function() {
@@ -226,7 +228,8 @@
     };
 
     ReplayPlayer.prototype.getActivePlayer = function() {
-      return this.turns[this.currentTurn].activePlayer || {};
+      var ref;
+      return ((ref = this.turns[this.currentTurn]) != null ? ref.activePlayer : void 0) || {};
     };
 
     ReplayPlayer.prototype.newStep = function() {

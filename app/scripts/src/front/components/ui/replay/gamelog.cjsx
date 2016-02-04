@@ -6,6 +6,7 @@ class GameLog extends React.Component
 		@subs = new SubscriptionList
 
 		@replay = @props.replay
+		@logIndex = 0
 
 		@subs.add @replay, 'new-log', (log) =>
 			@log = log

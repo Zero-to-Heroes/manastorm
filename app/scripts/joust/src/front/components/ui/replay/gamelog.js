@@ -17,6 +17,7 @@
     GameLog.prototype.componentDidMount = function() {
       this.subs = new SubscriptionList;
       this.replay = this.props.replay;
+      this.logIndex = 0;
       return this.subs.add(this.replay, 'new-log', (function(_this) {
         return function(log) {
           _this.log = log;

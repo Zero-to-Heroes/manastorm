@@ -83,7 +83,7 @@ class ReplayPlayer extends EventEmitter
 			@goToAction()
 
 		# Going to the next turn
-		else 
+		else if @turns[@currentTurn + 1]
 			@currentTurn++
 			@currentActionInTurn = 0
 
@@ -99,10 +99,11 @@ class ReplayPlayer extends EventEmitter
 			@goToTimestamp targetTimestamp
 
 	goNextTurn: ->
-		turnWhenCommandIssued = @currentTurn
+		if @turns[@currentTurn + 1]
+			turnWhenCommandIssued = @currentTurn
 
-		while turnWhenCommandIssued == @currentTurn
-			@goNextAction()
+			while turnWhenCommandIssued == @currentTurn
+				@goNextAction()
 
 	goPreviousAction: ->
 		@newStep()
@@ -210,10 +211,10 @@ class ReplayPlayer extends EventEmitter
 		@update()
 
 		@emit 'moved-timestamp'
-		
+
 
 	getActivePlayer: ->
-		return @turns[@currentTurn].activePlayer || {}
+		return @turns[@currentTurn]?.activePlayer || {}
 
 	newStep: ->
 		@targetSource = undefined

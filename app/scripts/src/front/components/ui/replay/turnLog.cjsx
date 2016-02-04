@@ -2,6 +2,8 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 SubscriptionList = require '../../../../subscription-list'
 ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
+$ = require 'jquery'
+require 'jquery.scrollTo'
 _ = require 'lodash'
 
 TurnLog = React.createClass
@@ -66,7 +68,7 @@ TurnLog = React.createClass
 			newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
 
 		# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
-		log = <p className="action" key={@logIndex++} dangerouslySetInnerHTML={{__html: newLog}}></p>
+		log = <ActionDisplayLog newLog={newLog} />
 
 		@replay.notifyNewLog log
 
@@ -86,37 +88,49 @@ TurnLog = React.createClass
 
 		return log
 
-	# componentWillUpdate: ->
-	# 	node = ReactDOM.findDOMNode(this)
-	# 	if node
-	# 		@shouldScrollBottom = node.scrollTop + node.clientHeight == node.scrollHeight;
-	# 		console.log 'shouldScrollBottom?', @shouldScrollBottom, node, node.scrollTop, node.clientHeight, node.scrollHeight
-
-	componentDidUpdate: ->
-		node = ReactDOM.findDOMNode(this)
-		if node
-			# console.log 'scrolling', node.scrollTop, node.scrollHeight
-			node.scrollTop = node.scrollHeight
 
 TurnDisplayLog = React.createClass
+	componentDidMount: ->
+		@index = @logIndex++
+		node = ReactDOM.findDOMNode(this)
+		$(node).parent().scrollTo("max")
+		
 	render: ->
 		if @props.active
-			return <span>
+			return <span key={@index}>
 				{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}
 				<PlayerNameDisplayLog active={true} name={@props.name} />
 			</span>
 		else
-			return <span>
+			return <span key={@index}>
 				{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}
 				<PlayerNameDisplayLog active={false} name={@props.name} />
 			</span>
 
 PlayerNameDisplayLog = React.createClass
+	componentDidMount: ->
+		@index = @logIndex++
+		node = ReactDOM.findDOMNode(this)
+		$(node).parent().scrollTo("max")
+	
 	render: ->
 		if @props.active 
-			return <span className="main-player">{@props.name}</span>
+			return <span className="main-player" key={@index}>{@props.name}</span>
 		else
-			return <span className="opponent">{@props.name}</span>
+			return <span className="opponent" key={@index}>{@props.name}</span>
 
+
+ActionDisplayLog = React.createClass
+	componentDidMount: ->
+		@index = @logIndex++
+		node = ReactDOM.findDOMNode(this)
+		$(node).parent().scrollTo("max")
+
+	render: ->
+		return <p className="action" key={@index} dangerouslySetInnerHTML={{__html: @props.newLog}}></p>
+
+	ensureVisible: ->
+
+		console.log 'node position'
 
 module.exports = TurnLog

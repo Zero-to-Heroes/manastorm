@@ -1,5 +1,5 @@
 (function() {
-  var PlayerNameDisplayLog, React, ReactCSSTransitionGroup, ReactDOM, SubscriptionList, TurnDisplayLog, TurnLog, _;
+  var $, ActionDisplayLog, PlayerNameDisplayLog, React, ReactCSSTransitionGroup, ReactDOM, SubscriptionList, TurnDisplayLog, TurnLog, _;
 
   React = require('react');
 
@@ -8,6 +8,10 @@
   SubscriptionList = require('../../../../subscription-list');
 
   ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+
+  $ = require('jquery');
+
+  require('jquery.scrollTo');
 
   _ = require('lodash');
 
@@ -77,12 +81,8 @@
         target = this.replay.entities[action.target];
         newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
       }
-      log = React.createElement("p", {
-        "className": "action",
-        "key": this.logIndex++,
-        "dangerouslySetInnerHTML": {
-          __html: newLog
-        }
+      log = React.createElement(ActionDisplayLog, {
+        "newLog": newLog
       });
       this.replay.notifyNewLog(log);
       return log;
@@ -108,25 +108,28 @@
       }
       this.replay.notifyNewLog(log);
       return log;
-    },
-    componentDidUpdate: function() {
-      var node;
-      node = ReactDOM.findDOMNode(this);
-      if (node) {
-        return node.scrollTop = node.scrollHeight;
-      }
     }
   });
 
   TurnDisplayLog = React.createClass({
+    componentDidMount: function() {
+      var node;
+      this.index = this.logIndex++;
+      node = ReactDOM.findDOMNode(this);
+      return $(node).parent().scrollTo("max");
+    },
     render: function() {
       if (this.props.active) {
-        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
+        return React.createElement("span", {
+          "key": this.index
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
           "active": true,
           "name": this.props.name
         }));
       } else {
-        return React.createElement("span", null, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
+        return React.createElement("span", {
+          "key": this.index
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.props.name
         }));
@@ -135,16 +138,45 @@
   });
 
   PlayerNameDisplayLog = React.createClass({
+    componentDidMount: function() {
+      var node;
+      this.index = this.logIndex++;
+      node = ReactDOM.findDOMNode(this);
+      return $(node).parent().scrollTo("max");
+    },
     render: function() {
       if (this.props.active) {
         return React.createElement("span", {
-          "className": "main-player"
+          "className": "main-player",
+          "key": this.index
         }, this.props.name);
       } else {
         return React.createElement("span", {
-          "className": "opponent"
+          "className": "opponent",
+          "key": this.index
         }, this.props.name);
       }
+    }
+  });
+
+  ActionDisplayLog = React.createClass({
+    componentDidMount: function() {
+      var node;
+      this.index = this.logIndex++;
+      node = ReactDOM.findDOMNode(this);
+      return $(node).parent().scrollTo("max");
+    },
+    render: function() {
+      return React.createElement("p", {
+        "className": "action",
+        "key": this.index,
+        "dangerouslySetInnerHTML": {
+          __html: this.props.newLog
+        }
+      });
+    },
+    ensureVisible: function() {
+      return console.log('node position');
     }
   });
 
