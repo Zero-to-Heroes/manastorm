@@ -39,17 +39,11 @@ class ReplayPlayer extends EventEmitter
 			length: 0
 		}
 
-		@parser.parse(this)
-
-		@finalizeInit()
-
 		@buildCardLink = @cardUtils.buildCardLink
 
-		#@startTimestamp = @turns[1].timestamp
-
+		@parser.parse(this)
+		@finalizeInit()
 		@goNextAction()
-
-		#console.log 'replay init done', @turns
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -67,59 +61,6 @@ class ReplayPlayer extends EventEmitter
 		clearInterval(@interval)
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
-	buildGameLog: ->
-		console.log 'building full game log'
-
-		fullLog = ''
-
-		initialTurn = @currentTurn
-		initialAction = @currentActionInTurn
-		@currentTurn = 1
-		@currentActionInTurn = 0
-
-		@buildCardLink = @buildLogCardLink
-
-		while @turns[@currentTurn]
-			@newStep()
-			@turnLog = ''
-			@currentActionInTurn++
-
-			# Navigating within the same turn
-			if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1)
-				@buildActionLog()
-				fullLog += '\t'
-				console.log @turnLog
-				console.log '\tinitial action', @turns[@currentTurn].actions[@currentActionInTurn]
-				if @turns[@currentTurn].actions[@currentActionInTurn].initialCommand.indent
-					for indent in [0..@turns[@currentTurn].actions[@currentActionInTurn].initialCommand.indent - 1]
-						fullLog += '\t'
-
-			# Going to the next turn
-			else
-				@currentActionInTurn = 0
-				@currentTurn++;
-
-				if @turns[@currentTurn]
-					if @turns[@currentTurn].turn is 'Mulligan'
-						@turnLog = @turns[@currentTurn].turn
-					else if @turns[@currentTurn].activePlayer == @player
-						@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
-					else
-						@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
-
-			fullLog += @turnLog + '\n'
-
-		@buildCardLink = @cardUtils.buildCardLink
-
-		@currentTurn = initialTurn
-		@currentActionInTurn = initialAction
-
-		console.log 'game log'
-		console.info 'experimental: full game log\n', fullLog
-
-	buildLogCardLink: (card) ->
-		return if card then card.name else ''
-
 	getCurrentTurnString: ->
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return 'Mulligan'
@@ -128,55 +69,182 @@ class ReplayPlayer extends EventEmitter
 		else
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
+
+	# ========================
+	# Moving inside the replay (with player controls)
+	# ========================
 	goNextAction: ->
-		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@turnLog = ''
 		@currentActionInTurn++
 
-		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
 			@goToAction()
 
 		# Going to the next turn
 		else 
-			@goNextTurn()
+			@currentTurn++
+			@currentActionInTurn = 0
+
+			if !@turns[@currentTurn]
+				return
+
+			if @turns[@currentTurn].turn is 'Mulligan'
+				@turnLog = @turns[@currentTurn].turn
+			else if @turns[@currentTurn].activePlayer == @player
+				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
+			else
+				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
+
+			@emit 'new-turn', @turns[@currentTurn]
+
+			# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
+			# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
+			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
+
+			@goToTimestamp targetTimestamp
+
+	goNextTurn: ->
+		turnWhenCommandIssued = @currentTurn
+
+		while turnWhenCommandIssued == @currentTurn
+			@goNextAction()
 
 	goPreviousAction: ->
 		@newStep()
 		@turnLog = ''
-		console.log 'going to previous action', @currentActionInTurn, @currentActionInTurn - 1, @currentTurn
-		@currentActionInTurn--
 
 		if @currentActionInTurn == 1
-			console.log 'going directly to beginning of turn', @currentTurn
-			@goPreviousTurn()
-			@goNextTurn()
+			targetTurn = @currentTurn
+			targetAction = 0
+
+		# Go to Mulligan
+		else if @currentActionInTurn <= 0 and @currentTurn <= 2
+			targetTurn = 0
+			targetAction = 0
 
 		else if @currentActionInTurn <= 0
-			console.log 'going directly to end of previous turn', @currentTurn - 1
-			@goPreviousTurn()
-			console.log 'moved back to previous turn', @currentTurn
-			@currentActionInTurn = @turns[@currentTurn].actions.length - 1
-			if @currentActionInTurn > 0
-				console.log 'moving to action', @currentActionInTurn
-				@goToAction()
+			# console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
+			targetTurn = @currentTurn - 1
+			targetAction = @turns[targetTurn].actions.length - 1
 
-		# Navigating within the same turn
-		else if @turns[@currentTurn]
-			@goToAction()		
+		else
+			targetTurn = @currentTurn
+			targetAction = @currentActionInTurn - 1
+
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@init()
+
+		# Mulligan
+		if targetTurn == 0 and targetAction == 0
+			return
+
+		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
+			@goNextAction()
+
+	goPreviousTurn: ->
+		@newStep()
+		@turnLog = ''
+
+		# else
+		targetTurn = @currentTurn - 1
+
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@init()
+
+		while @currentTurn != targetTurn
+			@goNextAction()
 
 	goToAction: ->
 		@newStep()
-		console.log 'currentTurn', @currentTurn, @turns[@currentTurn]
-		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
-
 		targetTimestamp = @buildActionLog()
-
-		console.log @turnLog
-
 		@goToTimestamp targetTimestamp
+
+
+	# ========================
+	# Moving inside the replay (with direct timestamp manipulation)
+	# ========================
+	moveTime: (progression) ->
+		target = @getTotalLength() * progression
+		@moveToTimestamp target
+
+	moveToTimestamp: (timestamp) ->
+		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
+		timestamp += @startTimestamp
+		@newStep()
+		targetTurn = -1
+		targetAction = -1
+
+		for i in [1..@turns.length]
+			turn = @turns[i]
+			if (turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
+				break
+			targetTurn = i
+
+			if turn.actions.length > 0
+				for j in [1..turn.actions.length - 1]
+					action = turn.actions[j]
+					if !action or !action.timestamp or (action?.timestamp) > timestamp
+						break
+					targetAction = j
+
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@init()
+		console.log 'moveToTimestamp init done', targetTurn, targetAction
+
+		# Mulligan
+		if targetTurn <= 1 or targetAction < 0
+			return
+
+		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
+			@goNextAction()
+
+
+		# if @currentTurn == -1
+		# 	#console.log 'Going back to mulligan'
+		# 	@currentTurn = 0
+		# 	@currentActionInTurn = 0
+		# 	@historyPosition = 0
+		# 	@init()
+
+		# else if @currentTurn == 1
+		# 	@currentTurn = 0
+		# 	@currentActionInTurn = 0
+		# 	@historyPosition = 0
+		# 	@init()
+		# 	@goNextTurn()
+
+		# else if @currentActionInTurn <= 1
+		# 	#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
+		# 	@currentTurn = Math.max(@currentTurn - 1, 1)
+		# 	@goToAction()
+		# 	@goNextTurn()
+
+		# else
+		# 	#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		# 	@goToAction()
+		
+
+	goToTimestamp: (timestamp) ->
+		# console.log 'going to timestamp', timestamp
+
+		if (timestamp < @currentReplayTime)
+			console.log 'going back in time, resetting', timestamp, @currentReplayTime
+			@emit 'reset'
+			@historyPosition = 0
+			@init()
+
+		@currentReplayTime = timestamp
+		@update()
+
+		@emit 'moved-timestamp'
+
 
 	buildActionLog: ->
 		if @currentActionInTurn >= 0
@@ -223,67 +291,8 @@ class ReplayPlayer extends EventEmitter
 
 		return targetTimestamp
 
-	goNextTurn: ->
-		@newStep()
-		@currentActionInTurn = 0
-		@currentTurn++;
 
-		if !@turns[@currentTurn]
-			return
-
-		if @turns[@currentTurn].turn is 'Mulligan'
-			@turnLog = @turns[@currentTurn].turn
-		else if @turns[@currentTurn].activePlayer == @player
-			@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
-		else
-			@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
-
-		console.log 'emit new-turn in goNextTurn', @turns[@currentTurn]
-		@emit 'new-turn', @turns[@currentTurn]
-		targetTimestamp = @getTotalLength() * 1000
-
-		# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
-		# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
-		targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
-
-		@goToTimestamp targetTimestamp
-
-	goPreviousTurn: ->
-		@newStep()
-		@currentActionInTurn = 0
-		console.log 'going to previous turn', @currentTurn, @currentTurn - 1, @turns
-		@currentTurn = Math.max(@currentTurn - 1, 1)
-
-		if (@currentTurn <= 1)
-			targetTimestamp = 200
-			@currentTurn = 1
-		else if (@currentTurn <= @turns.length && @turns[@currentTurn].actions && @turns[@currentTurn].actions.length > 1)
-			@currentActionInTurn = 1
-			console.log '\tGoing to action', @turns[@currentTurn].actions[@currentActionInTurn]
-			targetTimestamp = 1000 * (@turns[@currentTurn].actions[@currentActionInTurn].timestamp - @startTimestamp) + 1
-		else
-			console.log '\tGoing to turn', @turns[@currentTurn]
-			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
-
-		if @turns[@currentTurn].turn is 'Mulligan'
-			console.log 'in Mulligan', @turns[@currentTurn], @currentTurn, targetTimestamp
-			@turnLog = @turns[@currentTurn].turn
-			@currentTurn = 0
-			@currentActionInTurn = 0
-			@goToTimestamp targetTimestamp
-		else 
-			@goToTimestamp targetTimestamp
-			#@goNextAction()
-			if @turns[@currentTurn].activePlayer == @player
-				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + ': ' + @turns[@currentTurn].activePlayer.name
-			else
-				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
-
-		#console.log 'emit new-turn in goPreviousTurn'
-		#Don't emit anything, since we'll go back and redo the whole history
-		#@emit 'new-turn', @turns[@currentTurn]
-
-		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
+	
 
 	getActivePlayer: ->
 		return @turns[@currentTurn].activePlayer || {}
@@ -301,73 +310,7 @@ class ReplayPlayer extends EventEmitter
 	getTimestamps: ->
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
-	moveTime: (progression) ->
-		target = @getTotalLength() * progression
-		@moveToTimestamp target
-
-	moveToTimestamp: (timestamp) ->
-		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
-		timestamp += @startTimestamp
-		@newStep()
-		@currentTurn = -1
-		@currentActionInTurn = -1
-
-		for i in [1..@turns.length]
-			turn = @turns[i]
-			#console.log 'turn', i, turn, turn.actions[turn.actions.length - 1]?.timestamp, timestamp, turn.actions?.length == 0, turn.timestamp > timestamp
-			if (turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
-				#console.log 'exiting loop', @currentTurn, @currentActionInTurn
-				break
-			@currentTurn = i
-
-			if turn.actions.length > 0
-				for j in [1..turn.actions.length - 1]
-					#console.log '\tactions', turn.actions, j
-					action = turn.actions[j]
-					#console.log '\t\tconsidering action', i, j, turn, action
-					if !action or !action.timestamp or (action?.timestamp) > timestamp
-						#console.log '\t\tBreaking', action, (action?.timestamp), timestamp
-						break
-					@currentActionInTurn = j
-
-		if @currentTurn == -1
-			#console.log 'Going back to mulligan'
-			@currentTurn = 0
-			@currentActionInTurn = 0
-			@historyPosition = 0
-			@init()
-
-		else if @currentTurn == 1
-			@currentTurn = 0
-			@currentActionInTurn = 0
-			@historyPosition = 0
-			@init()
-			@goNextTurn()
-
-		else if @currentActionInTurn <= 1
-			#console.log 'Going to turn', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn]?.actions[@currentActionInTurn]
-			@currentTurn = Math.max(@currentTurn - 1, 1)
-			@goToAction()
-			@goNextTurn()
-
-		else
-			#console.log 'Going to action', timestamp, @currentTurn, @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
-			@goToAction()
-		
-
-	goToTimestamp: (timestamp) ->
-		console.log 'going to timestamp', timestamp
-
-		if (timestamp < @currentReplayTime)
-			console.log 'going back in time, resetting', timestamp, @currentReplayTime
-			@emit 'reset'
-			@historyPosition = 0
-			@init()
-
-		@currentReplayTime = timestamp
-		@update()
-
-		@emit 'moved-timestamp'
+	
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
@@ -893,6 +836,8 @@ class ReplayPlayer extends EventEmitter
 			#tempOpponent = @player
 			#@player = @opponent
 			#@opponent = tempOpponent
+
+		@emit 'game-generated', this
 		@emit 'players-ready'
 
 	switchMainPlayer: ->

@@ -82,9 +82,8 @@
         };
       })(this));
       this.state.replay.init();
-      this.state.replay.buildGameLog();
       this.displayConf = {
-        showLog: false
+        showLog: true
       };
     }
 

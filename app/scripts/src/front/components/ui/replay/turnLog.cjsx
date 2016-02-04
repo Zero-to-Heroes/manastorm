@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 SubscriptionList = require '../../../../subscription-list'
 ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
 _ = require 'lodash'
@@ -42,13 +43,15 @@ TurnLog = React.createClass
 				</div>
 			</div>
 
+
+
 	buildActionLog: (action) ->
 		card = if action?.data then action.data['cardID'] else ''
 
 		owner = action.owner.name 
 		if !owner
-			ownerCard = @entities[action.owner]
-			owner = @replay.buildCardLink(@replay.getCard(ownerCard.cardID))
+			ownerCard = @replay.entities[action.owner]
+			owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 		if action.secret
 			if cardLink?.length > 0 and action.publicSecret
@@ -65,10 +68,11 @@ TurnLog = React.createClass
 			target = @replay.entities[action.target]
 			newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
 
+		# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
 		return <p className="action" key={@logIndex++} dangerouslySetInnerHTML={{__html: newLog}}></p>
 
 	buildTurnLog: (turn) ->
-		console.log 'building turn log', turn
+		# console.log 'building turn log', turn
 		if turn
 			if turn.turn is 'Mulligan'
 				return <p className="turn" key={@logIndex++}>Mulligan</p>
@@ -76,6 +80,18 @@ TurnLog = React.createClass
 				return <p className="turn" key={@logIndex++}>
 						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
 					</p>
+
+	# componentWillUpdate: ->
+	# 	node = ReactDOM.findDOMNode(this)
+	# 	if node
+	# 		@shouldScrollBottom = node.scrollTop + node.clientHeight == node.scrollHeight;
+	# 		console.log 'shouldScrollBottom?', @shouldScrollBottom, node, node.scrollTop, node.clientHeight, node.scrollHeight
+
+	componentDidUpdate: ->
+		node = ReactDOM.findDOMNode(this)
+		if node
+			# console.log 'scrolling', node.scrollTop, node.scrollHeight
+			node.scrollTop = node.scrollHeight
 
 TurnDisplayLog = React.createClass
 	render: ->

@@ -1,7 +1,9 @@
 (function() {
-  var PlayerNameDisplayLog, React, ReactCSSTransitionGroup, SubscriptionList, TurnDisplayLog, TurnLog, _;
+  var PlayerNameDisplayLog, React, ReactCSSTransitionGroup, ReactDOM, SubscriptionList, TurnDisplayLog, TurnLog, _;
 
   React = require('react');
+
+  ReactDOM = require('react-dom');
 
   SubscriptionList = require('../../../../subscription-list');
 
@@ -56,8 +58,8 @@
       card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
       owner = action.owner.name;
       if (!owner) {
-        ownerCard = this.entities[action.owner];
-        owner = this.replay.buildCardLink(this.replay.getCard(ownerCard.cardID));
+        ownerCard = this.replay.entities[action.owner];
+        owner = this.replay.buildCardLink(this.replay.cardUtils.getCard(ownerCard.cardID));
       }
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       if (action.secret) {
@@ -85,7 +87,6 @@
       });
     },
     buildTurnLog: function(turn) {
-      console.log('building turn log', turn);
       if (turn) {
         if (turn.turn === 'Mulligan') {
           return React.createElement("p", {
@@ -102,6 +103,13 @@
             "name": turn.activePlayer.name
           }));
         }
+      }
+    },
+    componentDidUpdate: function() {
+      var node;
+      node = ReactDOM.findDOMNode(this);
+      if (node) {
+        return node.scrollTop = node.scrollHeight;
       }
     }
   });
