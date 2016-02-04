@@ -8,8 +8,9 @@ Turn = React.createClass
 	render: ->
 		return null unless @props.replay
 
-		return 	<div className="current-turn">
+		return 	<div className="current-turn" onClick={@props.onClick} >
 					<span>{@props.replay.getCurrentTurnString()}</span>
 				</div>
+
 
 module.exports = Turn

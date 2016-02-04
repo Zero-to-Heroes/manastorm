@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, Turn, subscribe, _, _ref,
+  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, Turn, TurnLog, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -41,6 +41,8 @@
 
   Turn = require('./ui/replay/turn');
 
+  TurnLog = require('./ui/replay/turnLog');
+
   ReactTooltip = require("react-tooltip");
 
   subscribe = require('../../subscription').subscribe;
@@ -53,6 +55,7 @@
     __extends(Replay, _super);
 
     function Replay(props) {
+      this.onTurnClick = __bind(this.onTurnClick, this);
       this.onMainPlayerSwitchedChange = __bind(this.onMainPlayerSwitchedChange, this);
       this.onShowCardsChange = __bind(this.onShowCardsChange, this);
       this.onClickPause = __bind(this.onClickPause, this);
@@ -79,9 +82,10 @@
         };
       })(this));
       this.state.replay.init();
-      console.log('first init done');
       this.state.replay.buildGameLog();
-      console.log('log built');
+      this.displayConf = {
+        showLog: false
+      };
     }
 
     Replay.prototype.componentWillUnmount = function() {};
@@ -183,8 +187,12 @@
         "target": target,
         "type": replay.targetType
       }), React.createElement(Turn, {
+        "replay": replay,
+        "onClick": this.onTurnClick
+      })), React.createElement(TurnLog, {
+        "show": this.displayConf.showLog,
         "replay": replay
-      })), React.createElement("form", {
+      }), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
         "glyph": "fast-backward",
@@ -282,6 +290,13 @@
     Replay.prototype.onMainPlayerSwitchedChange = function() {
       this.mainPlayerSwitched = !this.mainPlayerSwitched;
       this.state.replay.switchMainPlayer();
+      return this.forceUpdate();
+    };
+
+    Replay.prototype.onTurnClick = function(e) {
+      console.log('clicked on turn');
+      e.preventDefault();
+      this.displayConf.showLog = !this.displayConf.showLog;
       return this.forceUpdate();
     };
 

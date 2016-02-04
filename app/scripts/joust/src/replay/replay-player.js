@@ -184,6 +184,7 @@
       console.log('currentTurn', this.currentTurn, this.turns[this.currentTurn]);
       console.log('currentActionInTurn', this.currentActionInTurn, this.turns[this.currentTurn].actions);
       targetTimestamp = this.buildActionLog();
+      this.aggregatedLog += this.turnLog + '\n';
       console.log(this.turnLog);
       return this.goToTimestamp(targetTimestamp);
     };
@@ -192,6 +193,7 @@
       var action, card, cardLink, creator, owner, ownerCard, ref, target, targetTimestamp;
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
+        this.emit('new-log', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -223,6 +225,7 @@
         targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
         this.turnLog = this.turns[this.currentTurn].turn + ((ref = this.turns[this.currentTurn].activePlayer) != null ? ref.name : void 0);
       }
+      this.emit('new-log', this.turnLog);
       return targetTimestamp;
     };
 
@@ -241,6 +244,7 @@
       } else {
         this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
       }
+      this.emit('new-log', this.turnLog);
       targetTimestamp = this.getTotalLength() * 1000;
       targetTimestamp = 1000 * (this.turns[this.currentTurn].timestamp - this.startTimestamp) + 1;
       return this.goToTimestamp(targetTimestamp);
@@ -277,6 +281,7 @@
           this.turnLog = 't' + Math.ceil(this.turns[this.currentTurn].turn / 2) + 'o: ' + this.turns[this.currentTurn].activePlayer.name;
         }
       }
+      this.emit('new-log', this.turnLog);
       return console.log('at previous turn', this.currentTurn, this.currentActionInTurn, this.turnLog);
     };
 

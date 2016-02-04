@@ -17,6 +17,7 @@ GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
 Target = require './ui/replay/target'
 Turn = require './ui/replay/turn'
+TurnLog = require './ui/replay/turnLog'
 
 ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../subscription'
@@ -41,11 +42,15 @@ class Replay extends React.Component
 
 		#console.log('sub', @sub)
 		@state.replay.init()
-		console.log 'first init done'
+		#console.log 'first init done'
 		@state.replay.buildGameLog()
-		console.log 'log built'
+		#console.log 'log built'
 		#@state.replay.init()
 		#console.log 'second init done'
+
+		@displayConf = {
+			showLog: false
+		}
 
 	componentWillUnmount: ->
 		#@sub.off()
@@ -56,6 +61,7 @@ class Replay extends React.Component
 
 	render: ->
 		replay = @state.replay
+
 		#console.log 'rerendering replay'
 
 		if replay.players.length == 2
@@ -115,8 +121,9 @@ class Replay extends React.Component
 						{top}
 						{bottom}
 						<Target source={source} target={target} type={replay.targetType}/>
-						<Turn replay={replay} />
+						<Turn replay={replay} onClick={@onTurnClick} />
 					</div>
+					<TurnLog show={@displayConf.showLog} replay={replay} />
 					<form className="replay__controls padded">
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
@@ -187,6 +194,13 @@ class Replay extends React.Component
 		@mainPlayerSwitched = !@mainPlayerSwitched
 		@state.replay.switchMainPlayer()
 		@forceUpdate()
+
+	onTurnClick: (e) =>
+		console.log 'clicked on turn'
+		e.preventDefault()
+		@displayConf.showLog = !@displayConf.showLog
+		@forceUpdate()
+
 
 	findCard: (allCards, cardID) ->
 		#console.log 'finding card', topBoardCards, bottomBoardCards, cardID

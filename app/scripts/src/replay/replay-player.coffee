@@ -172,6 +172,7 @@ class ReplayPlayer extends EventEmitter
 		console.log 'currentActionInTurn', @currentActionInTurn, @turns[@currentTurn].actions
 
 		targetTimestamp = @buildActionLog()
+		@aggregatedLog += @turnLog + '\n'
 
 		console.log @turnLog
 
@@ -180,6 +181,9 @@ class ReplayPlayer extends EventEmitter
 	buildActionLog: ->
 		if @currentActionInTurn >= 0
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
+
+			@emit 'new-log', action
+			
 			#console.log 'action', @currentActionInTurn, @turns[@currentTurn], @turns[@currentTurn].actions[@currentActionInTurn]
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
 			#console.log 'executing action', action, action.data, @startTimestamp
@@ -215,6 +219,8 @@ class ReplayPlayer extends EventEmitter
 			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
 			@turnLog = @turns[@currentTurn].turn + @turns[@currentTurn].activePlayer?.name
 
+		@emit 'new-log', @turnLog
+
 		return targetTimestamp
 
 	goNextTurn: ->
@@ -232,6 +238,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
+		@emit 'new-log', @turnLog
 		targetTimestamp = @getTotalLength() * 1000
 
 		# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
@@ -271,6 +278,7 @@ class ReplayPlayer extends EventEmitter
 			else
 				@turnLog = 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o: ' + @turns[@currentTurn].activePlayer.name
 
+		@emit 'new-log', @turnLog
 
 		console.log 'at previous turn', @currentTurn, @currentActionInTurn, @turnLog
 

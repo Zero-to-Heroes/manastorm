@@ -1,5 +1,5 @@
 (function() {
-  var React, ReactCSSTransitionGroup, SubscriptionList, Turn, _;
+  var React, ReactCSSTransitionGroup, SubscriptionList, TurnLog, _;
 
   React = require('react');
 
@@ -9,18 +9,17 @@
 
   _ = require('lodash');
 
-  Turn = React.createClass({
+  TurnLog = React.createClass({
     render: function() {
-      if (!this.props.replay) {
+      if (!this.props.show) {
         return null;
       }
       return React.createElement("div", {
-        "className": "current-turn",
-        "onClick": this.props.onClick
-      }, React.createElement("span", null, this.props.replay.getCurrentTurnString()));
+        "className": "turn-log"
+      });
     }
   });
 
-  module.exports = Turn;
+  module.exports = TurnLog;
 
 }).call(this);

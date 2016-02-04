@@ -2025,13 +2025,23 @@
   width: 75px;
   height: 45px;
   text-align: center;
-  padding: 10px 10px 0 15px;
+  padding: 10px 6px 0 12px;
   color: black;
   background-image: url('images/turn-button.png');
   background-size: contain;
   background-repeat: no-repeat;
   font-weight: bold;
   font-family: belwe, serif;
+  /*cursor: pointer;*/
+}
+.hearthstone #externalPlayer .turn-log {
+  position: absolute;
+  width: 400px;
+  top: 0;
+  right: -416px;
+  height: 750px;
+  z-index: 2;
+  padding: 15px;
 }
 .hearthstone #externalPlayer .card-tooltip {
   background-color: transparent;
