@@ -167,7 +167,10 @@ class ReplayPlayer extends EventEmitter
 		target = @getTotalLength() * progression
 		@moveToTimestamp target
 
+	# Interface with the external world
 	moveToTimestamp: (timestamp) ->
+		@pause()
+		
 		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
 		timestamp += @startTimestamp
 		@newStep()

@@ -181,6 +181,7 @@
 
     ReplayPlayer.prototype.moveToTimestamp = function(timestamp) {
       var action, i, j, k, l, ref, ref1, ref2, ref3, results, targetAction, targetTurn, turn;
+      this.pause();
       timestamp += this.startTimestamp;
       this.newStep();
       targetTurn = -1;
