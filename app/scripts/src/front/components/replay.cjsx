@@ -72,7 +72,7 @@ class Replay extends React.Component
 				<Mana entity={replay.opponent} />
 				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={!@showAllCards} />
-				<Hero entity={replay.opponent} ref="topHero"/>
+				<Hero entity={replay.opponent} ref="topHero" showConcealedInformation={@showAllCards}/>
 			</div>
 
 			bottom = <div className="bottom">
@@ -82,7 +82,7 @@ class Replay extends React.Component
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Play entity={replay.player} />
-				<Hero entity={replay.player} ref="bottomHero" />
+				<Hero entity={replay.player} ref="bottomHero" showConcealedInformation={true}/>
 				<Hand entity={replay.player} isHidden={false} />
 			</div>
 

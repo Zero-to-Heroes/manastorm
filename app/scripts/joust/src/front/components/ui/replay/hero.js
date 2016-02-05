@@ -32,6 +32,7 @@
         "key": this.hero.id,
         "secrets": this.secrets,
         "ref": this.hero.id,
+        "showSecrets": this.props.showConcealedInformation,
         "className": "avatar"
       }), React.createElement(Card, {
         "entity": this.heroPower,

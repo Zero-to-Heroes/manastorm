@@ -19,6 +19,12 @@ class Secret extends Card
 		if @props.className
 			cls += " " + @props.className
 
-		return <div className={cls} style={style}></div>
+		if @props.showSecret
+			locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
+			cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
+			link = '<img src="' + cardArt + '">'
+			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip"></div>
+		else
+			return <div className={cls} style={style}></div>
 
 module.exports = Secret

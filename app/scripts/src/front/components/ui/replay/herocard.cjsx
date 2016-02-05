@@ -24,8 +24,9 @@ class HeroCard extends Card
 			overlay = <div className="overlay frozen"></div>
 			
 		if @props.secrets
+			show = @props.showSecrets
 			secrets = @props.secrets.map (entity) ->
-				<Secret entity={entity} key={entity.id} />
+				<Secret entity={entity} key={entity.id} showSecret={show}/>
 			#console.log 'rendering secrets', @props.secrets, secrets
 
 

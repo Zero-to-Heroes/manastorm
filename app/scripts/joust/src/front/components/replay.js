@@ -119,7 +119,8 @@
           "isHidden": !this.showAllCards
         }), React.createElement(Hero, {
           "entity": replay.opponent,
-          "ref": "topHero"
+          "ref": "topHero",
+          "showConcealedInformation": this.showAllCards
         }));
         bottom = React.createElement("div", {
           "className": "bottom"
@@ -142,7 +143,8 @@
           "entity": replay.player
         }), React.createElement(Hero, {
           "entity": replay.player,
-          "ref": "bottomHero"
+          "ref": "bottomHero",
+          "showConcealedInformation": true
         }), React.createElement(Hand, {
           "entity": replay.player,
           "isHidden": false

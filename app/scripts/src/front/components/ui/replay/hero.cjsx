@@ -16,7 +16,7 @@ Hero = React.createClass
 			
 		return 	<div className="hero">
 					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} className="weapon"/>
-					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} ref={@hero.id} className="avatar"/>
+					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} ref={@hero.id} showSecrets={@props.showConcealedInformation} className="avatar"/>
 					<Card entity={@heroPower} key={@heroPower.id} ref={@heroPower.id} className="power"/>
 				</div>
 

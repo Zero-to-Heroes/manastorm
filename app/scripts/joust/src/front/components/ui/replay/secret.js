@@ -23,7 +23,7 @@
     }
 
     Secret.prototype.render = function() {
-      var art, cls, style;
+      var art, cardArt, cls, link, locale, style;
       art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/secrets/" + this.props.entity.tags.CLASS + ".png";
       style = {
         background: "url(" + art + ") top left no-repeat",
@@ -33,10 +33,26 @@
       if (this.props.className) {
         cls += " " + this.props.className;
       }
-      return React.createElement("div", {
-        "className": cls,
-        "style": style
-      });
+      if (this.props.showSecret) {
+        locale = window.localStorage.language && window.localStorage.language !== 'en' ? '/' + window.localStorage.language : '';
+        cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards" + locale + "/" + this.props.entity.cardID + ".png";
+        link = '<img src="' + cardArt + '">';
+        return React.createElement("div", {
+          "className": cls,
+          "style": style,
+          "data-tip": link,
+          "data-html": true,
+          "data-place": "right",
+          "data-effect": "solid",
+          "data-delay-show": "100",
+          "data-class": "card-tooltip"
+        });
+      } else {
+        return React.createElement("div", {
+          "className": cls,
+          "style": style
+        });
+      }
     };
 
     return Secret;
