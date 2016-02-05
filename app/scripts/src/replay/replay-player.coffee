@@ -157,6 +157,13 @@ class ReplayPlayer extends EventEmitter
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			@emit 'new-action', action
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
+
+			if action.target
+				target = @entities[action.target]
+				@targetSource = action?.data.id
+				@targetDestination = target.id
+				@targetType = action.actionType
+
 			@goToTimestamp targetTimestamp
 
 
@@ -170,7 +177,7 @@ class ReplayPlayer extends EventEmitter
 	# Interface with the external world
 	moveToTimestamp: (timestamp) ->
 		@pause()
-		
+
 		#console.log 'moving to timestamp', timestamp, @startTimestamp, timestamp + @startTimestamp, @turns
 		timestamp += @startTimestamp
 		@newStep()
@@ -190,9 +197,15 @@ class ReplayPlayer extends EventEmitter
 						break
 					targetAction = j
 
+		# TODO: reset only if move backwards
 		@currentTurn = 0
 		@currentActionInTurn = 0
+		@historyPosition = 0
 		@init()
+
+		@currentReplayTime = timestamp
+		@update()
+
 		console.log 'moveToTimestamp init done', targetTurn, targetAction
 
 		# Mulligan

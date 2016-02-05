@@ -163,12 +163,18 @@
     };
 
     ReplayPlayer.prototype.goToAction = function() {
-      var action, targetTimestamp;
+      var action, target, targetTimestamp;
       this.newStep();
       if (this.currentActionInTurn >= 0) {
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
         this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
+        if (action.target) {
+          target = this.entities[action.target];
+          this.targetSource = action != null ? action.data.id : void 0;
+          this.targetDestination = target.id;
+          this.targetType = action.actionType;
+        }
         return this.goToTimestamp(targetTimestamp);
       }
     };
@@ -204,7 +210,10 @@
       }
       this.currentTurn = 0;
       this.currentActionInTurn = 0;
+      this.historyPosition = 0;
       this.init();
+      this.currentReplayTime = timestamp;
+      this.update();
       console.log('moveToTimestamp init done', targetTurn, targetAction);
       if (targetTurn <= 1 || targetAction < 0) {
         return;

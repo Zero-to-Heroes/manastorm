@@ -12,9 +12,9 @@ Target = React.createClass
 		return null unless @props.source && @props.target
 
 		sourceDims = @props.source.getDimensions()
-		#console.log 'sourceDims', sourceDims
+		console.log 'sourceDims', sourceDims
 		targetDims = @props.target.getDimensions()
-		#console.log 'targetDims', targetDims
+		console.log 'targetDims', targetDims
 
 		arrowWidth = Math.abs(sourceDims.centerX - targetDims.centerX)
 		arrowHeight = Math.abs(sourceDims.centerY - targetDims.centerY)
@@ -22,26 +22,30 @@ Target = React.createClass
 		playerEl = document.getElementById('externalPlayer')
 		containerTop = playerEl.getBoundingClientRect().top
 		containerLeft = playerEl.getBoundingClientRect().left
-		#console.log 'containerleft', containerLeft
 
 		top = undefined
 		height = undefined
 		transform = ''
 
 		# If on the same line, it's easy
-		if sourceDims.centerY == targetDims.centerY
-			#console.log 'Same line interaction'
+		# Also, if they are close enough (like Hero Power on self), treat as though on same line, 
+		# otherwise the deformation destroys the arrow wompletely
+		if Math.abs(sourceDims.centerY - targetDims.centerY) < 10
+			console.log 'Same line interaction'
 			left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
-			#console.log 'initial left', left
+			console.log 'initial left', left
 			height = arrowWidth
 
 			# All the height business is because we rotate around the center and not the top
 			if sourceDims.centerX < targetDims.centerX
 				transform += 'rotate(90deg) '
-				left += height / 2
+				#left += height / 2
+				#console.log 'new lefts', left
 			else
 				transform += 'rotate(-90deg) '
-				left -= height / 2
+			
+			# Becuase the initial left is always the one most of the left, we always add to it
+			left += height / 2
 
 			top = sourceDims.centerY - containerTop - height / 2
 			#console.log 'top', top, containerTop
@@ -57,17 +61,17 @@ Target = React.createClass
 			if sourceDims.centerY < targetDims.centerY
 				alpha = -alpha
 
-			#console.log 'angle is', alpha
+			console.log 'angle is', alpha
 			transform += 'skewX(' + alpha + 'deg)'
 
 			# And readjust the origin
 			alpha = alpha * Math.PI / 180
 			left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft
-			#console.log 'readjusted left', left
+			console.log 'readjusted left', left
 			left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2
-			#console.log 'final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2
-			#console.log 'final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2
-			#console.log 'final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop
+			console.log 'final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2
+			console.log 'final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2
+			console.log 'final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop
 
 			top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop
 			height = arrowHeight
@@ -80,7 +84,7 @@ Target = React.createClass
 			left: left
 			transform: transform
 		}
-		#console.log 'applying style', style
+		console.log 'applying style', style
 		return <div className={cls} style={style} />
 
 module.exports = Target
