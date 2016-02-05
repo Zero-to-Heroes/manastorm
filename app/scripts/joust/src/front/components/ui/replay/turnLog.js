@@ -43,8 +43,7 @@
           return _this.forceUpdate();
         };
       })(this));
-      this.replay.forceReemit();
-      return this.logHtml = '';
+      return this.replay.forceReemit();
     },
     render: function() {
       if (!this.props.show) {
@@ -58,34 +57,45 @@
     },
     buildActionLog: function(action) {
       var card, cardLink, creator, log, newLog, owner, ownerCard, target;
-      card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
-      owner = action.owner.name;
-      if (!owner) {
-        ownerCard = this.replay.entities[action.owner];
-        owner = this.replay.buildCardLink(this.replay.cardUtils.getCard(ownerCard.cardID));
-      }
-      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
-      if (action.secret) {
-        if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
-          cardLink += ' -> Secret';
-        } else {
-          cardLink = 'Secret';
+      if (action.actionType === 'secret-revealed') {
+        card = action.data['cardID'];
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+        newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>';
+        log = React.createElement(ActionDisplayLog, {
+          "newLog": newLog
+        });
+        this.replay.notifyNewLog(log);
+        return log;
+      } else {
+        card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+        owner = action.owner.name;
+        if (!owner) {
+          ownerCard = this.replay.entities[action.owner];
+          owner = this.replay.buildCardLink(this.replay.cardUtils.getCard(ownerCard.cardID));
         }
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+        if (action.secret) {
+          if ((cardLink != null ? cardLink.length : void 0) > 0 && action.publicSecret) {
+            cardLink += ' -> Secret';
+          } else {
+            cardLink = 'Secret';
+          }
+        }
+        creator = '';
+        if (action.creator) {
+          creator = this.replay.buildCardLink(this.replay.cardUtils.getCard(action.creator.cardID)) + ': ';
+        }
+        newLog = owner + action.type + creator + cardLink;
+        if (action.target) {
+          target = this.replay.entities[action.target];
+          newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
+        }
+        log = React.createElement(ActionDisplayLog, {
+          "newLog": newLog
+        });
+        this.replay.notifyNewLog(log);
+        return log;
       }
-      creator = '';
-      if (action.creator) {
-        creator = this.replay.buildCardLink(this.replay.cardUtils.getCard(action.creator.cardID)) + ': ';
-      }
-      newLog = owner + action.type + creator + cardLink;
-      if (action.target) {
-        target = this.replay.entities[action.target];
-        newLog += ' -> ' + this.replay.buildCardLink(this.replay.cardUtils.getCard(target.cardID));
-      }
-      log = React.createElement(ActionDisplayLog, {
-        "newLog": newLog
-      });
-      this.replay.notifyNewLog(log);
-      return log;
     },
     buildTurnLog: function(turn) {
       var log;

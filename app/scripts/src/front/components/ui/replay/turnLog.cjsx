@@ -32,8 +32,6 @@ TurnLog = React.createClass
 
 		@replay.forceReemit()
 
-		@logHtml = ''
-
 	render: ->
 		return null unless @props.show
 
@@ -45,34 +43,47 @@ TurnLog = React.createClass
 
 
 	buildActionLog: (action) ->
-		card = if action?.data then action.data['cardID'] else ''
+		# Starting to structure things a bit
+		if action.actionType == 'secret-revealed'
+			card = action.data['cardID']
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
-		owner = action.owner.name 
-		if !owner
-			ownerCard = @replay.entities[action.owner]
-			owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-		if action.secret
-			if cardLink?.length > 0 and action.publicSecret
-				#console.log 'action', action
-				cardLink += ' -> Secret'
-			else
-				cardLink = 'Secret'
-		creator = ''
-		if action.creator
-			creator = @replay.buildCardLink(@replay.cardUtils.getCard(action.creator.cardID)) + ': '
-		newLog = owner + action.type + creator + cardLink
+			newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>'
+			log = <ActionDisplayLog newLog={newLog} />
 
-		if action.target
-			target = @replay.entities[action.target]
-			newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
+			@replay.notifyNewLog log
 
-		# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
-		log = <ActionDisplayLog newLog={newLog} />
+			return log
 
-		@replay.notifyNewLog log
+		else
+			card = if action?.data then action.data['cardID'] else ''
 
-		return log
+			owner = action.owner.name 
+			if !owner
+				ownerCard = @replay.entities[action.owner]
+				owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			if action.secret
+				if cardLink?.length > 0 and action.publicSecret
+					#console.log 'action', action
+					cardLink += ' -> Secret'
+				else
+					cardLink = 'Secret'
+			creator = ''
+			if action.creator
+				creator = @replay.buildCardLink(@replay.cardUtils.getCard(action.creator.cardID)) + ': '
+			newLog = owner + action.type + creator + cardLink
+
+			if action.target
+				target = @replay.entities[action.target]
+				newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
+
+			# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
+			log = <ActionDisplayLog newLog={newLog} />
+
+			@replay.notifyNewLog log
+
+			return log
 
 	buildTurnLog: (turn) ->
 		# console.log 'building turn log', turn

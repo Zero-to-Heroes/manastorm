@@ -73,19 +73,20 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@currentActionInTurn++
 
-		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
 			@goToAction()
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
+			console.log 'goign to next turn'
 			@currentTurn++
-			@currentActionInTurn = 0
+			@currentActionInTurn = -1
 
 			if !@turns[@currentTurn]
 				return
@@ -127,7 +128,7 @@ class ReplayPlayer extends EventEmitter
 			targetAction = @currentActionInTurn - 1
 
 		@currentTurn = 0
-		@currentActionInTurn = 0
+		@currentActionInTurn = -1
 		@init()
 
 		# Mulligan
@@ -154,6 +155,7 @@ class ReplayPlayer extends EventEmitter
 		@newStep()
 
 		if @currentActionInTurn >= 0
+			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			@emit 'new-action', action
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
@@ -371,44 +373,45 @@ class ReplayPlayer extends EventEmitter
 		turnNumber = 1
 		actionIndex = 0
 		currentPlayer = players[playerIndex]
+		#populate the entities
 		for batch, i in @history
 			for command, j in batch.commands
 				## Populate relevant data for cards
 				if (command[0] == 'receiveShowEntity')
 					if (command[1].length > 0 && command[1][0].id && @entities[command[1][0].id]) 
 						@entities[command[1][0].id].cardID = command[1][0].cardID
-						#console.log 'batch', i, batch
-						#console.log '\tcommand', j, command
-						#console.log '\t\tUpdated entity', @entities[command[1][0].id]
 				if (command[0] == 'receiveEntity')
 					if (command[1].length > 0 && command[1][0].id && !@entities[command[1][0].id]) 
-						#console.log 'prepopulating received entities', command[1][0]
 						entity = new Entity(this)
 						definition = _.cloneDeep command[1][0]
 						@entities[definition.id] = entity
 						# Entity not in the game yet
 						definition.tags.ZONE = 6
-						#console.log '\tcloned definition', definition, command[1][0]
 						entity.update(definition)
-						#console.log '\tupdated entity', entity
-						#console.log '\tadding entity', command[1][0].id, @entities[command[1][0].id]
+
+
+		# Add intrinsic information, like whether the card is a secret
+		for batch, i in @history
+			for command, j in batch.commands
+				if command[0] == 'receiveTagChange'
+					# Adding information that this entity is a secret
+					if command[1][0].tag == 'SECRET' and command[1][0].value == 1
+						@entities[command[1][0].entity].tags[command[1][0].tag] = command[1][0].value
+				if command[0] == 'receiveShowEntity'
+					if command[1][0].tags.SECRET == 1
+						@entities[command[1][0].id].tags.SECRET = 1
 
 		# Build the list of turns along with the history position of each
-		# TODO extract that to another file
-		# TODO something more elegant and modular
 		playerIndex = 0
 		turnNumber = 1
-		actionIndex = 0
+		# actionIndex = 0
 		currentPlayer = players[playerIndex]
-		#console.log 'currentPlayer', currentPlayer, players[0]
 		for batch, i in @history
 			for command, j in batch.commands
 
 				# Mulligan
 				# Add only one command for mulligan start, no need for both
 				if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].entity == 2 && command[1][0].tag == 'MULLIGAN_STATE' && command[1][0].value == 1)
-					#console.log 'batch', i, batch
-					#console.log '\tcommand', j, command
 					@turns[turnNumber] = {
 						historyPosition: i
 						turn: 'Mulligan'
@@ -420,19 +423,14 @@ class ReplayPlayer extends EventEmitter
 					}
 					@turns.length++
 					turnNumber++
-					actionIndex = 0
+					# actionIndex = 0
 					currentPlayer = players[++playerIndex % 2]
-					#console.log 'batch', i, batch
-					#console.log '\tProcessed mulligan, current player is now', currentPlayer
+
 				if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].entity == 3 && command[1][0].tag == 'MULLIGAN_STATE' && command[1][0].value == 1)
 					currentPlayer = players[++playerIndex % 2]	
-					#console.log 'batch', i, batch	
-					#console.log '\tProcessed mulligan, current player is now', currentPlayer				
 
 				# Start of turn
 				if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].entity == 1 && command[1][0].tag == 'STEP' && command[1][0].value == 6)
-					#console.log 'batch', i, batch
-					#console.log '\tcommand', j, command
 					@turns[turnNumber] = {
 						historyPosition: i
 						turn: turnNumber - 1
@@ -442,29 +440,25 @@ class ReplayPlayer extends EventEmitter
 					}
 					@turns.length++
 					turnNumber++
-					actionIndex = 0
+					# actionIndex = 0
 					currentPlayer = players[++playerIndex % 2]
-					#console.log 'batch', i, batch
-					#console.log '\tProcessed end of turn, current player is now', currentPlayer
 
 				# Draw cards
 				if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].tag == 'NUM_CARDS_DRAWN_THIS_TURN' && command[1][0].value > 0)
-					#console.log 'batch', i, batch
-					#console.log '\tcommand', j, command
 					# Don't add card draws that are at the beginning of the game
 					if @turns[currentTurnNumber]
 						#Draws are tags, but we consider them like an action in the log, so we need to manually offset the indentation
 						command[1][0].indent = if command[1][0].indent > 1 then command[1][0].indent - 1 else undefined
 						action = {
 							turn: currentTurnNumber
-							index: actionIndex++
+							# index: actionIndex++
 							timestamp: batch.timestamp
 							type: ' draws ' # + command[1][0].value #Doesn't work that way, need to make a diff with previous value of tag
 							data: @entities[playedCard]
 							owner: @entities[command[1][0].entity]
 							initialCommand: command[1][0]
 						}
-						@turns[currentTurnNumber].actions[actionIndex] = action
+						@addAction currentTurnNumber, action
 
 				# The actual actions
 				if (command[0] == 'receiveAction')
@@ -484,8 +478,6 @@ class ReplayPlayer extends EventEmitter
 						if command[1][0].tags and command[1][0].attributes.type != '5'
 
 							playedCard = -1
-							#if command[1][0].attributes.entity == '49'
-								#console.log 'considering action', currentTurnNumber, command[1][0].tags, command
 
 							excluded = false
 							secret = false
@@ -508,7 +500,7 @@ class ReplayPlayer extends EventEmitter
 								#console.log '\t\tadding action to turn', currentTurnNumber, command[1][0].tags, command
 								action = {
 									turn: currentTurnNumber - 1
-									index: actionIndex++
+									# index: actionIndex++
 									timestamp: batch.timestamp
 									type: ': '
 									secret: secret
@@ -519,13 +511,31 @@ class ReplayPlayer extends EventEmitter
 									initialCommand: command[1][0]
 									debugType: 'played card'
 								}
-								@turns[currentTurnNumber].actions[actionIndex] = action
+								@addAction currentTurnNumber, action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
+
+						# Secret revealed
+						if command[1][0].attributes.entity and command[1][0].attributes.type == '5'
+							entity = @entities[command[1][0].attributes.entity]
+							if entity.tags.SECRET == 1
+								console.log '\tyes', entity, command[1][0]
+								action = {
+									turn: currentTurnNumber - 1
+									# index: actionIndex++
+									# Used to make sure that revealed secrets occur after the action that triggered them
+									timestamp: batch.timestamp + 0.01
+									actionType: 'secret-revealed'
+									data: entity
+									# owner: @turns[currentTurnNumber].activePlayer
+									initialCommand: command[1][0]
+								}
+								@addAction currentTurnNumber, action
+
 
 						# Card revealed
 						# TODO: Don't add this when a spell is played, since another action already handles this
 						# Also, don't reveal enchantments as "showentities"
-						if command[1].length > 0 and command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
+						if command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
 
 							#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
 							playedCard = -1
@@ -548,7 +558,7 @@ class ReplayPlayer extends EventEmitter
 								#console.log '\tconsidering further'
 								action = {
 									turn: currentTurnNumber - 1
-									index: actionIndex++
+									# index: actionIndex++
 									timestamp: batch.timestamp
 									type: ': '
 									data: if @entities[command[1][0].showEntity.id] then @entities[command[1][0].showEntity.id] else command[1][0].showEntity
@@ -561,7 +571,7 @@ class ReplayPlayer extends EventEmitter
 									#console.log 'batch', i, batch
 									#console.log '\tcommand', j, command
 									#console.log '\t\tadding showEntity', command[1][0].showEntity, action
-									@turns[currentTurnNumber].actions[actionIndex] = action
+									@addAction currentTurnNumber, action
 
 						# Other trigger
 						if command[1][0].tags and command[1][0].attributes.type == '5'
@@ -590,7 +600,7 @@ class ReplayPlayer extends EventEmitter
 								#console.log '\t\tadding action to turn', currentTurnNumber, command[1][0].tags, command
 								action = {
 									turn: currentTurnNumber - 1
-									index: actionIndex++
+									# index: actionIndex++
 									timestamp: batch.timestamp
 									type: ': '
 									secret: secret
@@ -600,7 +610,7 @@ class ReplayPlayer extends EventEmitter
 									initialCommand: command[1][0]
 									debugType: 'played card from tigger'
 								}
-								@turns[currentTurnNumber].actions[actionIndex] = action
+								@addAction currentTurnNumber, action
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 						# Trigger with targets (or play that triggers some effects with targets, like Antique Healbot)
@@ -611,7 +621,7 @@ class ReplayPlayer extends EventEmitter
 									if meta.meta == 'TARGET' and meta.info?.length > 0 and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) != info.entity)
 											action = {
 												turn: currentTurnNumber - 1
-												index: actionIndex++
+												# index: actionIndex++
 												timestamp: batch.timestamp
 												target: info.entity
 												type: ': trigger '
@@ -620,7 +630,7 @@ class ReplayPlayer extends EventEmitter
 												initialCommand: command[1][0]
 												debugType: 'trigger effect card'
 											}
-											@turns[currentTurnNumber].actions[actionIndex] = action
+											@addAction currentTurnNumber, action
 											#console.log 'Added action', action
 
 						# Deaths. Not really an action, but useful to see clearly what happens
@@ -631,20 +641,20 @@ class ReplayPlayer extends EventEmitter
 								if (tag.tag == 'ZONE' && tag.value == 4)
 									action = {
 										turn: currentTurnNumber - 1
-										index: actionIndex++
+										# index: actionIndex++
 										timestamp: batch.timestamp
 										type: ' died '
 										owner: tag.entity
 										initialCommand: command[1][0]
 									}
-									@turns[currentTurnNumber].actions[actionIndex] = action
+									@addAction currentTurnNumber, action
 
 						# Attacked something
 						if parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
 							#console.log 'considering attack', command[1][0]
 							action = {
 								turn: currentTurnNumber - 1
-								index: actionIndex++
+								# index: actionIndex++
 								timestamp: batch.timestamp
 								type: ': '
 								actionType: 'attack'
@@ -654,7 +664,7 @@ class ReplayPlayer extends EventEmitter
 								initialCommand: command[1][0]
 								debugType: 'attack with complex conditions'
 							}
-							@turns[currentTurnNumber].actions[actionIndex] = action
+							@addAction currentTurnNumber, action
 							#console.log '\t\tadding attack to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 						# Card powers. Maybe something more than just battlecries?
@@ -678,7 +688,7 @@ class ReplayPlayer extends EventEmitter
 									if dmg > 0
 										action = {
 											turn: currentTurnNumber - 1
-											index: actionIndex++
+											# index: actionIndex++
 											timestamp: batch.timestamp
 											prefix: '\t'
 											type: ': '
@@ -692,7 +702,7 @@ class ReplayPlayer extends EventEmitter
 											initialCommand: command[1][0]
 											debugType: 'power 3 dmg'
 										}
-										@turns[currentTurnNumber].actions[actionIndex] = action
+										@addAction currentTurnNumber, action
 
 								# Don't include enchantments - we are already logging the fact that they are played
 								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6
@@ -707,7 +717,7 @@ class ReplayPlayer extends EventEmitter
 									
 									action = {
 										turn: currentTurnNumber - 1
-										index: actionIndex++
+										# index: actionIndex++
 										timestamp: batch.timestamp
 										prefix: '\t'
 										type: ': '
@@ -716,11 +726,11 @@ class ReplayPlayer extends EventEmitter
 										initialCommand: command[1][0]
 										debugType: 'power 3 root'
 									}
-									@turns[currentTurnNumber].actions[actionIndex] = action
+									@addAction currentTurnNumber, action
 
 									action = {
 										turn: currentTurnNumber - 1
-										index: actionIndex++
+										# index: actionIndex++
 										timestamp: batch.timestamp
 										prefix: '\t'
 										creator: @entities[command[1][0].attributes.entity]
@@ -738,7 +748,7 @@ class ReplayPlayer extends EventEmitter
 										debugType: 'power 3'
 										debug: @entities
 									}
-									@turns[currentTurnNumber].actions[actionIndex] = action
+									@addAction currentTurnNumber, action
 
 								# Armor buff
 								if command[1][0].tags
@@ -750,7 +760,7 @@ class ReplayPlayer extends EventEmitter
 									if armor > 0
 										action = {
 											turn: currentTurnNumber - 1
-											index: actionIndex++
+											# index: actionIndex++
 											timestamp: batch.timestamp
 											prefix: '\t'
 											type: ': '
@@ -759,9 +769,17 @@ class ReplayPlayer extends EventEmitter
 											initialCommand: command[1][0]
 											debugType: 'armor'
 										}
-										@turns[currentTurnNumber].actions[actionIndex] = action
+										@addAction currentTurnNumber, action
 
 			#console.log @turns.length, 'game turns at position', @turns
+
+		# Sort the actions chronologically
+		tempTurnNumber = 1
+		while @turns[tempTurnNumber]
+			sortedActions = _.sortBy @turns[tempTurnNumber].actions, 'timestamp'
+			# console.log 'sorted actions', tempTurnNumber, @turns[tempTurnNumber].actions, sortedActions
+			@turns[tempTurnNumber].actions = sortedActions
+			tempTurnNumber++
 
 		# Find out who is the main player (the one who recorded the game)
 		# We use the revealed cards in hand to know this
@@ -774,6 +792,13 @@ class ReplayPlayer extends EventEmitter
 
 		@emit 'game-generated', this
 		@emit 'players-ready'
+
+	addAction: (currentTurnNumber, action) ->
+		# Actions are registered in batches in the XML (and the game), but we need to make sure that the parent 
+		# actions happen before
+		if action.initialCommand.parent and action.initialCommand.parent.timestamp == action.timestamp
+			action.timestamp += 0.01
+		@turns[currentTurnNumber].actions.push action
 
 	switchMainPlayer: ->
 		tempOpponent = @player
