@@ -23,9 +23,12 @@
       this.logIndex = 0;
       this.subs.add(this.replay, 'new-action', (function(_this) {
         return function(action) {
-          var newLog;
+          var logLine, newLog, _i, _len;
           newLog = _this.buildActionLog(action);
-          _this.logs.push(newLog);
+          for (_i = 0, _len = newLog.length; _i < _len; _i++) {
+            logLine = newLog[_i];
+            _this.logs.push(logLine);
+          }
           return _this.forceUpdate();
         };
       })(this));
@@ -58,14 +61,7 @@
     buildActionLog: function(action) {
       var card, cardLink, creator, log, newLog, owner, ownerCard, target;
       if (action.actionType === 'secret-revealed') {
-        card = action.data['cardID'];
-        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
-        newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>';
-        log = React.createElement(ActionDisplayLog, {
-          "newLog": newLog
-        });
-        this.replay.notifyNewLog(log);
-        return log;
+        log = this.buildSecretRevealedLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -93,18 +89,16 @@
         log = React.createElement(ActionDisplayLog, {
           "newLog": newLog
         });
-        this.replay.notifyNewLog(log);
-        return log;
       }
+      this.replay.notifyNewLog(log);
+      return [log];
     },
     buildTurnLog: function(turn) {
       var log;
       if (turn) {
         if (turn.turn === 'Mulligan') {
-          log = React.createElement("p", {
-            "className": "turn",
-            "key": this.logIndex++
-          }, "Mulligan");
+          log = this.buildMulliganLog(turn);
+          return log;
         } else {
           log = React.createElement("p", {
             "className": "turn",
@@ -114,10 +108,64 @@
             "active": turn.activePlayer === this.replay.player,
             "name": turn.activePlayer.name
           }));
+          this.replay.notifyNewLog(log);
+          return [log];
         }
       }
+    },
+    buildSecretRevealedLog: function(action) {
+      var card, cardLink, log, newLog;
+      card = action.data['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>';
+      log = React.createElement(ActionDisplayLog, {
+        "newLog": newLog
+      });
       this.replay.notifyNewLog(log);
-      return log;
+      return [log];
+    },
+    buildMulliganLog: function(turn) {
+      var card, cardId, cardLink, cardLog, log, logs, mulliganed, _i, _len, _ref, _ref1, _ref2;
+      log = React.createElement("p", {
+        "className": "turn",
+        "key": this.logIndex++
+      }, "Mulligan");
+      this.replay.notifyNewLog(log);
+      logs = [log];
+      if (((_ref = turn.playerMulligan) != null ? _ref.length : void 0) > 0) {
+        _ref1 = turn.playerMulligan;
+        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+          mulliganed = _ref1[_i];
+          cardId = this.replay.entities[mulliganed].cardID;
+          console.log('cardId', cardId);
+          card = this.replay.cardUtils.getCard(cardId);
+          console.log('card', card);
+          cardLink = this.replay.buildCardLink(card);
+          cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+            "active": true,
+            "name": this.replay.player.name
+          }), React.createElement("span", null, " mulliganed "), React.createElement("span", {
+            "dangerouslySetInnerHTML": {
+              __html: cardLink
+            }
+          }));
+          logs.push(cardLog);
+        }
+      }
+      if (((_ref2 = turn.opponentMulligan) != null ? _ref2.length : void 0) > 0) {
+        cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+          "active": false,
+          "name": this.replay.opponent.name
+        }), " discarded ", turn.opponentMulligan.length, " cards");
+        logs.push(cardLog);
+      }
+      return logs;
+    },
+    playerName: function(turn) {
+      return React.createElement(PlayerNameDisplayLog, {
+        "active": turn.activePlayer === this.replay.player,
+        "name": turn.activePlayer.name
+      });
     }
   });
 

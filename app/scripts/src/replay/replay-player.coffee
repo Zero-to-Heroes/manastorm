@@ -468,11 +468,21 @@ class ReplayPlayer extends EventEmitter
 						# Mulligan
 						if command[1][0].attributes.type == '5' and currentTurnNumber == 1 and command[1][0].hideEntities
 							#console.log 'updating mulligan', command[1][0], @mainPlayerId
-							if command[1][0].attributes.entity == @mainPlayerId
-								@turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities
-							else
-								@turns[currentTurnNumber].opponentMulligan = command[1][0].hideEntities
+							# if command[1][0].attributes.entity == @mainPlayerId
+							@turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities
+							# else
+								# @turns[currentTurnNumber].opponentMulligan = command[1][0].hideEntities
 							#console.log 'updated mulligan', @turns[currentTurnNumber]
+
+						# Mulligan opponent
+						if command[1][0].attributes.type == '5' and currentTurnNumber == 1 and command[1][0].attributes.entity != @mainPlayerId
+							console.log 'opponent mulligan', command[1][0]
+
+							mulliganed = []
+							for tag in command[1][0].tags
+								if tag.tag == 'ZONE' and tag.value == 2
+									@turns[currentTurnNumber].opponentMulligan.push tag.entity
+
 
 						# Played a card
 						if command[1][0].tags and command[1][0].attributes.type != '5'
