@@ -49,7 +49,7 @@ class Replay extends React.Component
 		#console.log 'second init done'
 
 		@displayConf = {
-			showLog: true
+			showLog: false
 		}
 
 	callback: =>
@@ -119,7 +119,7 @@ class Replay extends React.Component
 						<Target source={source} target={target} type={replay.targetType}/>
 						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay} />
+					<TurnLog show={@displayConf.showLog} replay={replay}/>
 					<form className="replay__controls padded">
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
@@ -141,7 +141,7 @@ class Replay extends React.Component
 							</div>
 						</div>
 					</form>
-					<GameLog replay={replay} />
+					<GameLog replay={replay} onLogClick={@onTurnClick} />
 				</div>
 
 	goNextAction: (e) =>

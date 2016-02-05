@@ -29,7 +29,10 @@
     GameLog.prototype.render = function() {
       return React.createElement("div", {
         "className": "game-log"
-      }, this.log);
+      }, this.log, React.createElement("button", {
+        "className": "btn btn-default",
+        "onClick": this.props.onLogClick
+      }, React.createElement("span", null, "Show log")));
     };
 
     return GameLog;

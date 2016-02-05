@@ -14,7 +14,8 @@ class GameLog extends React.Component
 
 	render: ->
 		<div className="game-log">
-			{@log}
+			{@log} 
+			<button className="btn btn-default" onClick={@props.onLogClick}><span>Show log</span></button>
 		</div>
 
 

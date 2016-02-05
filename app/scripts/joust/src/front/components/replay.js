@@ -83,7 +83,7 @@
       })(this));
       this.state.replay.init();
       this.displayConf = {
-        showLog: true
+        showLog: false
       };
     }
 
@@ -231,7 +231,8 @@
       }, "4x")), React.createElement("li", null, React.createElement("a", {
         "onClick": this.onClickChangeSpeed.bind(this, 8)
       }, "8x")))))), React.createElement(GameLog, {
-        "replay": replay
+        "replay": replay,
+        "onLogClick": this.onTurnClick
       }));
     };
 
