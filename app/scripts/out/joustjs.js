@@ -47,7 +47,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  console.log('in replay');
+  
 
   React = _dereq_('react');
 
@@ -337,7 +337,7 @@
     };
 
     Replay.prototype.onTurnClick = function(e) {
-      console.log('clicked on turn');
+      
       e.preventDefault();
       this.displayConf.showLog = !this.displayConf.showLog;
       return this.forceUpdate();
@@ -1386,9 +1386,9 @@ arguments[4][4][0].apply(exports,arguments)
         return null;
       }
       sourceDims = this.props.source.getDimensions();
-      console.log('sourceDims', sourceDims);
+      
       targetDims = this.props.target.getDimensions();
-      console.log('targetDims', targetDims);
+      
       arrowWidth = Math.abs(sourceDims.centerX - targetDims.centerX);
       arrowHeight = Math.abs(sourceDims.centerY - targetDims.centerY);
       playerEl = document.getElementById('externalPlayer');
@@ -1398,9 +1398,9 @@ arguments[4][4][0].apply(exports,arguments)
       height = void 0;
       transform = '';
       if (Math.abs(sourceDims.centerY - targetDims.centerY) < 10) {
-        console.log('Same line interaction');
+        
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
-        console.log('initial left', left);
+        
         height = arrowWidth;
         if (sourceDims.centerX < targetDims.centerX) {
           transform += 'rotate(90deg) ';
@@ -1418,15 +1418,15 @@ arguments[4][4][0].apply(exports,arguments)
         if (sourceDims.centerY < targetDims.centerY) {
           alpha = -alpha;
         }
-        console.log('angle is', alpha);
+        
         transform += 'skewX(' + alpha + 'deg)';
         alpha = alpha * Math.PI / 180;
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
-        console.log('readjusted left', left);
+        
         left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2;
-        console.log('final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2);
-        console.log('final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2);
-        console.log('final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop);
+        
+        
+        
         top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop;
         height = arrowHeight;
       }
@@ -1437,7 +1437,7 @@ arguments[4][4][0].apply(exports,arguments)
         left: left,
         transform: transform
       };
-      console.log('applying style', style);
+      
       return React.createElement("div", {
         "className": cls,
         "style": style
@@ -1744,9 +1744,9 @@ arguments[4][4][0].apply(exports,arguments)
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          console.log('cardId', cardId);
+          
           card = this.replay.cardUtils.getCard(cardId);
-          console.log('card', card);
+          
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
             "active": true,
@@ -1841,7 +1841,7 @@ arguments[4][4][0].apply(exports,arguments)
       });
     },
     ensureVisible: function() {
-      return console.log('node position');
+      return 
     }
   });
 
@@ -2928,7 +2928,7 @@ arguments[4][4][0].apply(exports,arguments)
     }
 
     ReplayPlayer.prototype.init = function() {
-      console.log('starting init');
+      
       this.entities = {};
       this.players = [];
       this.emit('reset');
@@ -2992,14 +2992,14 @@ arguments[4][4][0].apply(exports,arguments)
 
     ReplayPlayer.prototype.goNextAction = function() {
       var targetTimestamp;
-      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
+      
       this.newStep();
       this.currentActionInTurn++;
-      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
+      
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
       } else if (this.turns[this.currentTurn + 1]) {
-        console.log('goign to next turn');
+        
         this.currentTurn++;
         this.currentActionInTurn = -1;
         if (!this.turns[this.currentTurn]) {
@@ -3070,7 +3070,7 @@ arguments[4][4][0].apply(exports,arguments)
       var action, target, targetTimestamp;
       this.newStep();
       if (this.currentActionInTurn >= 0) {
-        console.log('going to action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
+        
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
         this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
@@ -3099,7 +3099,8 @@ arguments[4][4][0].apply(exports,arguments)
       targetAction = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
+        
+        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 1 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
           break;
         }
         targetTurn = i;
@@ -3119,7 +3120,7 @@ arguments[4][4][0].apply(exports,arguments)
       this.init();
       this.currentReplayTime = timestamp;
       this.update();
-      console.log('moveToTimestamp init done', targetTurn, targetAction);
+      
       if (targetTurn <= 1 || targetAction < 0) {
         return;
       }
@@ -3132,7 +3133,7 @@ arguments[4][4][0].apply(exports,arguments)
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
       if (timestamp < this.currentReplayTime) {
-        console.log('going back in time, resetting', timestamp, this.currentReplayTime);
+        
         this.emit('reset');
         this.historyPosition = 0;
         this.init();
@@ -3388,7 +3389,7 @@ arguments[4][4][0].apply(exports,arguments)
                 this.turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities;
               }
               if (command[1][0].attributes.type === '5' && currentTurnNumber === 1 && command[1][0].attributes.entity !== this.mainPlayerId) {
-                console.log('opponent mulligan', command[1][0]);
+                
                 mulliganed = [];
                 ref6 = command[1][0].tags;
                 for (q = 0, len6 = ref6.length; q < len6; q++) {
@@ -3434,7 +3435,7 @@ arguments[4][4][0].apply(exports,arguments)
               if (command[1][0].attributes.entity && command[1][0].attributes.type === '5') {
                 entity = this.entities[command[1][0].attributes.entity];
                 if (entity.tags.SECRET === 1) {
-                  console.log('\tyes', entity, command[1][0]);
+                  
                   action = {
                     turn: currentTurnNumber - 1,
                     timestamp: batch.timestamp + 0.01,

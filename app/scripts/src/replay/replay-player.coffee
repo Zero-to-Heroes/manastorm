@@ -188,7 +188,8 @@ class ReplayPlayer extends EventEmitter
 
 		for i in [1..@turns.length]
 			turn = @turns[i]
-			if (turn.actions?.length > 0 and (turn.actions[1].timestamp) > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
+			console.log 'looking at timestamp', turn, turn.actions[1]
+			if (turn.actions?.length > 1 and turn.actions[1].timestamp > timestamp) or (turn.actions?.length == 0 and turn.timestamp > timestamp)
 				break
 			targetTurn = i
 

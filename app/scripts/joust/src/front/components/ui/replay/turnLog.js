@@ -137,9 +137,9 @@
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          console.log('cardId', cardId);
+          
           card = this.replay.cardUtils.getCard(cardId);
-          console.log('card', card);
+          
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
             "active": true,
@@ -234,7 +234,7 @@
       });
     },
     ensureVisible: function() {
-      return console.log('node position');
+      return 
     }
   });
 

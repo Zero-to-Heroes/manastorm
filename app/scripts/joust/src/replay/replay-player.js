@@ -27,7 +27,7 @@
     }
 
     ReplayPlayer.prototype.init = function() {
-      console.log('starting init');
+      
       this.entities = {};
       this.players = [];
       this.emit('reset');
@@ -91,14 +91,14 @@
 
     ReplayPlayer.prototype.goNextAction = function() {
       var targetTimestamp;
-      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
+      
       this.newStep();
       this.currentActionInTurn++;
-      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
+      
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
       } else if (this.turns[this.currentTurn + 1]) {
-        console.log('goign to next turn');
+        
         this.currentTurn++;
         this.currentActionInTurn = -1;
         if (!this.turns[this.currentTurn]) {
@@ -169,7 +169,7 @@
       var action, target, targetTimestamp;
       this.newStep();
       if (this.currentActionInTurn >= 0) {
-        console.log('going to action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
+        
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
         this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
@@ -198,7 +198,8 @@
       targetAction = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
+        
+        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 1 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
           break;
         }
         targetTurn = i;
@@ -218,7 +219,7 @@
       this.init();
       this.currentReplayTime = timestamp;
       this.update();
-      console.log('moveToTimestamp init done', targetTurn, targetAction);
+      
       if (targetTurn <= 1 || targetAction < 0) {
         return;
       }
@@ -231,7 +232,7 @@
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
       if (timestamp < this.currentReplayTime) {
-        console.log('going back in time, resetting', timestamp, this.currentReplayTime);
+        
         this.emit('reset');
         this.historyPosition = 0;
         this.init();
@@ -487,7 +488,7 @@
                 this.turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities;
               }
               if (command[1][0].attributes.type === '5' && currentTurnNumber === 1 && command[1][0].attributes.entity !== this.mainPlayerId) {
-                console.log('opponent mulligan', command[1][0]);
+                
                 mulliganed = [];
                 ref6 = command[1][0].tags;
                 for (q = 0, len6 = ref6.length; q < len6; q++) {
@@ -533,7 +534,7 @@
               if (command[1][0].attributes.entity && command[1][0].attributes.type === '5') {
                 entity = this.entities[command[1][0].attributes.entity];
                 if (entity.tags.SECRET === 1) {
-                  console.log('\tyes', entity, command[1][0]);
+                  
                   action = {
                     turn: currentTurnNumber - 1,
                     timestamp: batch.timestamp + 0.01,
