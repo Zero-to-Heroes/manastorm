@@ -44,6 +44,9 @@ TurnLog = React.createClass
 
 
 	buildActionLog: (action) ->
+		if action.actionType == 'card-draw'
+			console.log 'adding card draw info', action
+			
 		# Starting to structure things a bit
 		if action.actionType == 'secret-revealed'
 			log = @buildSecretRevealedLog action
@@ -134,7 +137,7 @@ TurnLog = React.createClass
 
 		if turn.opponentMulligan?.length > 0
 			cardLog = <p>
-				<PlayerNameDisplayLog active={false} name={@replay.opponent.name} /> discarded {turn.opponentMulligan.length} cards
+				<PlayerNameDisplayLog active={false} name={@replay.opponent.name} /> mulliganed {turn.opponentMulligan.length} cards
 			</p>
 			logs.push cardLog
 

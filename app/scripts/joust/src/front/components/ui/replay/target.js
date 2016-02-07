@@ -17,9 +17,7 @@
         return null;
       }
       sourceDims = this.props.source.getDimensions();
-      
       targetDims = this.props.target.getDimensions();
-      
       arrowWidth = Math.abs(sourceDims.centerX - targetDims.centerX);
       arrowHeight = Math.abs(sourceDims.centerY - targetDims.centerY);
       playerEl = document.getElementById('externalPlayer');
@@ -29,9 +27,7 @@
       height = void 0;
       transform = '';
       if (Math.abs(sourceDims.centerY - targetDims.centerY) < 10) {
-        
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
-        
         height = arrowWidth;
         if (sourceDims.centerX < targetDims.centerX) {
           transform += 'rotate(90deg) ';
@@ -49,15 +45,10 @@
         if (sourceDims.centerY < targetDims.centerY) {
           alpha = -alpha;
         }
-        
         transform += 'skewX(' + alpha + 'deg)';
         alpha = alpha * Math.PI / 180;
         left = Math.min(sourceDims.centerX, targetDims.centerX) - containerLeft;
-        
         left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2;
-        
-        
-        
         top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop;
         height = arrowHeight;
       }
@@ -68,7 +59,6 @@
         left: left,
         transform: transform
       };
-      
       return React.createElement("div", {
         "className": cls,
         "style": style

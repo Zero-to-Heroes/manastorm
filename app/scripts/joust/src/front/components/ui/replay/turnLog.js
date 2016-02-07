@@ -60,6 +60,9 @@
     },
     buildActionLog: function(action) {
       var card, cardLink, creator, log, newLog, owner, ownerCard, target;
+      if (action.actionType === 'card-draw') {
+        
+      }
       if (action.actionType === 'secret-revealed') {
         log = this.buildSecretRevealedLog(action);
       } else {
@@ -156,7 +159,7 @@
         cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.replay.opponent.name
-        }), " discarded ", turn.opponentMulligan.length, " cards");
+        }), " mulliganed ", turn.opponentMulligan.length, " cards");
         logs.push(cardLog);
       }
       return logs;

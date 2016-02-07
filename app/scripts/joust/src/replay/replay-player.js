@@ -190,26 +190,33 @@
     };
 
     ReplayPlayer.prototype.moveToTimestamp = function(timestamp) {
-      var action, i, j, k, l, ref, ref1, ref2, ref3, results, targetAction, targetTurn, turn;
+      var action, i, j, k, l, ref, ref1, ref2, results, targetAction, targetTurn, turn;
       this.pause();
       timestamp += this.startTimestamp;
+      
       this.newStep();
       targetTurn = -1;
       targetAction = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
         
-        if ((((ref1 = turn.actions) != null ? ref1.length : void 0) > 1 && turn.actions[1].timestamp > timestamp) || (((ref2 = turn.actions) != null ? ref2.length : void 0) === 0 && turn.timestamp > timestamp)) {
+        if (turn.timestamp > timestamp) {
+          
+          break;
+        }
+        if (!turn.timestamp > timestamp && ((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[0].timestamp > timestamp) {
           break;
         }
         targetTurn = i;
         if (turn.actions.length > 0) {
-          for (j = l = 1, ref3 = turn.actions.length - 1; 1 <= ref3 ? l <= ref3 : l >= ref3; j = 1 <= ref3 ? ++l : --l) {
+          targetAction = -1;
+          for (j = l = 0, ref2 = turn.actions.length - 1; 0 <= ref2 ? l <= ref2 : l >= ref2; j = 0 <= ref2 ? ++l : --l) {
             action = turn.actions[j];
+            
             if (!action || !action.timestamp || (action != null ? action.timestamp : void 0) > timestamp) {
               break;
             }
-            targetAction = j;
+            targetAction = j - 1;
           }
         }
       }
@@ -217,10 +224,8 @@
       this.currentActionInTurn = 0;
       this.historyPosition = 0;
       this.init();
-      this.currentReplayTime = timestamp;
-      this.update();
       
-      if (targetTurn <= 1 || targetAction < 0) {
+      if (targetTurn <= 1 || targetAction < -1) {
         return;
       }
       results = [];
@@ -439,7 +444,7 @@
         ref5 = batch.commands;
         for (j = p = 0, len5 = ref5.length; p < len5; j = ++p) {
           command = ref5[j];
-          if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].entity === 2 && command[1][0].tag === 'MULLIGAN_STATE' && command[1][0].value === 1) {
+          if (command[0] === 'receiveTagChange' && command[1][0].entity === 2 && command[1][0].tag === 'MULLIGAN_STATE' && command[1][0].value === 1) {
             this.turns[turnNumber] = {
               historyPosition: i,
               turn: 'Mulligan',
@@ -467,12 +472,12 @@
             turnNumber++;
             currentPlayer = players[++playerIndex % 2];
           }
-          if (command[0] === 'receiveTagChange' && command[1].length > 0 && command[1][0].tag === 'NUM_CARDS_DRAWN_THIS_TURN' && command[1][0].value > 0) {
+          if (command[0] === 'receiveTagChange' && command[1][0].tag === 'NUM_CARDS_DRAWN_THIS_TURN' && command[1][0].value > 0) {
             if (this.turns[currentTurnNumber]) {
-              command[1][0].indent = command[1][0].indent > 1 ? command[1][0].indent - 1 : void 0;
               action = {
                 turn: currentTurnNumber,
                 timestamp: batch.timestamp,
+                actionType: 'card-draw',
                 type: ' draws ',
                 data: this.entities[playedCard],
                 owner: this.entities[command[1][0].entity],
@@ -488,7 +493,6 @@
                 this.turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities;
               }
               if (command[1][0].attributes.type === '5' && currentTurnNumber === 1 && command[1][0].attributes.entity !== this.mainPlayerId) {
-                
                 mulliganed = [];
                 ref6 = command[1][0].tags;
                 for (q = 0, len6 = ref6.length; q < len6; q++) {
