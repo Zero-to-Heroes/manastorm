@@ -61,9 +61,9 @@
     buildActionLog: function(action) {
       var card, cardLink, creator, log, newLog, owner, ownerCard, target;
       if (action.actionType === 'card-draw') {
-        
-      }
-      if (action.actionType === 'secret-revealed') {
+        console.log('adding card draw info', action);
+        log = this.buildCardDrawLog(action);
+      } else if (action.actionType === 'secret-revealed') {
         log = this.buildSecretRevealedLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
@@ -127,6 +127,24 @@
       this.replay.notifyNewLog(log);
       return [log];
     },
+    buildCardDrawLog: function(action) {
+      var card, cardLink, drawLog;
+      if (action.owner === this.replay.player) {
+        card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      } else {
+        cardLink = '<span> 1 card </span>';
+      }
+      drawLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+        "active": action.owner === this.replay.player,
+        "name": action.owner.name
+      }), React.createElement("span", null, " draws "), React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }));
+      return drawLog;
+    },
     buildMulliganLog: function(turn) {
       var card, cardId, cardLink, cardLog, log, logs, mulliganed, _i, _len, _ref, _ref1, _ref2;
       log = React.createElement("p", {
@@ -140,14 +158,14 @@
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          
+          console.log('cardId', cardId);
           card = this.replay.cardUtils.getCard(cardId);
-          
+          console.log('card', card);
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
             "active": true,
             "name": this.replay.player.name
-          }), React.createElement("span", null, " mulliganed "), React.createElement("span", {
+          }), React.createElement("span", null, " mulligans "), React.createElement("span", {
             "dangerouslySetInnerHTML": {
               __html: cardLink
             }
@@ -159,7 +177,7 @@
         cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.replay.opponent.name
-        }), " mulliganed ", turn.opponentMulligan.length, " cards");
+        }), " mulligans ", turn.opponentMulligan.length, " cards");
         logs.push(cardLog);
       }
       return logs;
@@ -235,9 +253,6 @@
           __html: this.props.newLog
         }
       });
-    },
-    ensureVisible: function() {
-      return 
     }
   });
 

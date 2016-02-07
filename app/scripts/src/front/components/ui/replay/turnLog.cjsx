@@ -44,11 +44,12 @@ TurnLog = React.createClass
 
 
 	buildActionLog: (action) ->
+		# Starting to structure things a bit
 		if action.actionType == 'card-draw'
 			console.log 'adding card draw info', action
+			log = @buildCardDrawLog action
 			
-		# Starting to structure things a bit
-		if action.actionType == 'secret-revealed'
+		else if action.actionType == 'secret-revealed'
 			log = @buildSecretRevealedLog action
 
 		else
@@ -95,7 +96,7 @@ TurnLog = React.createClass
 				@replay.notifyNewLog log
 				return [log]
 
-
+	
 
 	# ===================
 	# Action specific logs
@@ -110,6 +111,22 @@ TurnLog = React.createClass
 		@replay.notifyNewLog log
 
 		return [log]
+
+	buildCardDrawLog: (action) ->
+		# Don't show hidden information
+		if action.owner == @replay.player
+			card = if action?.data then action.data['cardID'] else ''
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		else
+			cardLink = '<span> 1 card </span>'
+
+		drawLog = <p>
+					<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+					<span> draws </span>
+					<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+				</p>
+
+		return drawLog
 
 	# ===================
 	# Turn specific log
@@ -130,14 +147,14 @@ TurnLog = React.createClass
 				cardLink = @replay.buildCardLink(card)
 				cardLog = <p>
 							<PlayerNameDisplayLog active={true} name={@replay.player.name} />
-							<span> mulliganed </span>
+							<span> mulligans </span>
 							<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 						</p>
 				logs.push cardLog
 
 		if turn.opponentMulligan?.length > 0
 			cardLog = <p>
-				<PlayerNameDisplayLog active={false} name={@replay.opponent.name} /> mulliganed {turn.opponentMulligan.length} cards
+				<PlayerNameDisplayLog active={false} name={@replay.opponent.name} /> mulligans {turn.opponentMulligan.length} cards
 			</p>
 			logs.push cardLog
 
@@ -192,9 +209,5 @@ ActionDisplayLog = React.createClass
 
 	render: ->
 		return <p className="action" key={@index} dangerouslySetInnerHTML={{__html: @props.newLog}}></p>
-
-	ensureVisible: ->
-
-		console.log 'node position'
 
 module.exports = TurnLog

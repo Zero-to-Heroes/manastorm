@@ -10,8 +10,11 @@ class ActionParser extends EventEmitter
 
 		@player = @replay.player
 		@opponent = @replay.opponent
+		@mainPlayerId = @replay.mainPlayerId
 		@history = @replay.history
 		@entities = @replay.entities
+		@turns = @replay.turns
+		@getController = @replay.getController
 
 	populateEntities: ->
 		players = [@player, @opponent]
@@ -21,7 +24,8 @@ class ActionParser extends EventEmitter
 		turnNumber = 1
 		actionIndex = 0
 		currentPlayer = players[playerIndex]
-		#populate the entities
+
+		# populate the entities
 		for batch, i in @history
 			for command, j in batch.commands
 				## Populate relevant data for cards
@@ -49,8 +53,9 @@ class ActionParser extends EventEmitter
 						@entities[command[1][0].id].tags.SECRET = 1
 
 
-	buildTurns: ->
+	parseActions: ->
 		# Build the list of turns along with the history position of each
+		players = [@player, @opponent]
 		playerIndex = 0
 		turnNumber = 1
 		currentPlayer = players[playerIndex]
@@ -88,22 +93,13 @@ class ActionParser extends EventEmitter
 					turnNumber++
 					currentPlayer = players[++playerIndex % 2]
 
-
-	parseActions: ->
-		# Build the list of turns along with the history position of each
-		playerIndex = 0
-		turnNumber = 1
-		currentPlayer = players[playerIndex]
-		for batch, i in @history
-			for command, j in batch.commands
-
 				# Draw cards - 1 - Simply a card arriving in hand
 				if command[0] == 'receiveTagChange' and command[1][0].tag == 'ZONE' and command[1][0].value == 3
 					# Don't add card draws that are at the beginning of the game or during Mulligan
-					if currentTurnNumber >= 1
-
+					if currentTurnNumber >= 2
 						currentCommand = command[1][0]
-						while currentCommand and currentCommand.entity not in ['2', '3']
+						console.log 'currentCommand', currentCommand
+						while currentCommand.parent and currentCommand.entity not in ['2', '3']
 							currentCommand = currentCommand.parent
 						if !currentCommand
 							console.warn 'no one drew this card????', command[1][0]
@@ -114,11 +110,33 @@ class ActionParser extends EventEmitter
 							actionType: 'card-draw'
 							type: ' draws '
 							data: @entities[command[1][0].entity]
-							owner: @entities[currentCommand.entity]
+							owner: @entities[currentCommand.attributes.entity]
 							initialCommand: command[1][0]
 						}
 						@addAction currentTurnNumber, action
 
+				# Draw cards - 2 - The player draws a card, thus revealing a full entity
+				if command[0] == 'receiveAction' and command[1][0].type = '5' and command[1][0].showEntity
+					# Don't add card draws that are at the beginning of the game or during Mulligan
+					if currentTurnNumber >= 2
+						if command[1][0].showEntity.tags.ZONE == 3
+							currentCommand = command[1][0]
+							while currentCommand.parent and currentCommand.entity not in ['2', '3']
+								currentCommand = currentCommand.parent
+							if !currentCommand
+								console.warn 'no one drew this card????', command[1][0]
+							
+							console.log 'about to add draw card action', command[1][0], currentCommand
+							action = {
+								turn: currentTurnNumber
+								timestamp: batch.timestamp
+								actionType: 'card-draw'
+								type: ' draws '
+								data: @entities[command[1][0].showEntity.id]
+								owner: @entities[currentCommand.attributes.entity]
+								initialCommand: command[1][0]
+							}
+							@addAction currentTurnNumber, action
 
 				# if command[0] == 'receiveTagChange' and command[1][0].tag == 'NUM_CARDS_DRAWN_THIS_TURN' and command[1][0].value > 0
 				# 	# Don't add card draws that are at the beginning of the game
@@ -142,11 +160,13 @@ class ActionParser extends EventEmitter
 						# Mulligan
 						if command[1][0].attributes.type == '5' and currentTurnNumber == 1 and command[1][0].hideEntities
 							@turns[currentTurnNumber].playerMulligan = command[1][0].hideEntities
+
 						# Mulligan opponent
 						if command[1][0].attributes.type == '5' and currentTurnNumber == 1 and command[1][0].attributes.entity != @mainPlayerId
 							mulliganed = []
 							for tag in command[1][0].tags
 								if tag.tag == 'ZONE' and tag.value == 2
+									console.log 'adding mulligan for oppoentn', tag, command[1][0]
 									@turns[currentTurnNumber].opponentMulligan.push tag.entity
 
 
@@ -457,5 +477,12 @@ class ActionParser extends EventEmitter
 			@turns[tempTurnNumber].actions = sortedActions
 			tempTurnNumber++
 
+
+	addAction: (currentTurnNumber, action) ->
+		# Actions are registered in batches in the XML (and the game), but we need to make sure that the parent 
+		# actions happen before
+		if action.initialCommand.parent and action.initialCommand.parent.timestamp == action.timestamp
+			action.timestamp += 0.01
+		@turns[currentTurnNumber].actions.push action
 
 module.exports = ActionParser
