@@ -908,4 +908,21 @@ class ReplayPlayer extends EventEmitter
 	notifyNewLog: (log) ->
 		@emit 'new-log', log
 
+	getPlayerInfo: ->
+		playerInfo = {
+			player: {
+				'name': @player.name,
+				'class': @getClass(@entities[@player.tags.HERO_ENTITY].cardID)
+			}, 
+			opponent: {
+				'name': @opponent.name,
+				'class': @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)
+			}
+		}
+		
+		return playerInfo
+
+	getClass: (cardID) ->
+		return @cardUtils.getCard(cardID)?.playerClass?.toLowerCase()
+
 module.exports = ReplayPlayer

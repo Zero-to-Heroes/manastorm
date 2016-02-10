@@ -34,6 +34,9 @@ var joustjs = {
 		var secs = parseInt(timeComponents[0]) * 60 + parseInt(timeComponents[1]);
 		// console.log('going to timestamp', secs, timestamp)
 		window.replay.moveToTimestamp(secs);
+	},
+	getPlayerInfo: function() {
+		return window.replay.getPlayerInfo()
 	}
 
 }

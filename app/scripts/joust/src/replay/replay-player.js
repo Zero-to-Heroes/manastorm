@@ -475,6 +475,26 @@
       return this.emit('new-log', log);
     };
 
+    ReplayPlayer.prototype.getPlayerInfo = function() {
+      var playerInfo;
+      playerInfo = {
+        player: {
+          'name': this.player.name,
+          'class': this.getClass(this.entities[this.player.tags.HERO_ENTITY].cardID)
+        },
+        opponent: {
+          'name': this.opponent.name,
+          'class': this.getClass(this.entities[this.opponent.tags.HERO_ENTITY].cardID)
+        }
+      };
+      return playerInfo;
+    };
+
+    ReplayPlayer.prototype.getClass = function(cardID) {
+      var ref, ref1;
+      return (ref = this.cardUtils.getCard(cardID)) != null ? (ref1 = ref.playerClass) != null ? ref1.toLowerCase() : void 0 : void 0;
+    };
+
     return ReplayPlayer;
 
   })(EventEmitter);
