@@ -19,11 +19,13 @@
     Card.prototype.componentDidMount = function() {
       var tagEvents;
       tagEvents = 'tag-changed:ATK tag-changed:HEALTH tag-changed:DAMAGE';
-      return this.sub = subscribe(this.props.entity, tagEvents, (function(_this) {
-        return function() {
-          return _this.forceUpdate();
-        };
-      })(this));
+      if (!this.props["static"]) {
+        return this.sub = subscribe(this.props.entity, tagEvents, (function(_this) {
+          return function() {
+            return _this.forceUpdate();
+          };
+        })(this));
+      }
     };
 
     Card.prototype.render = function() {

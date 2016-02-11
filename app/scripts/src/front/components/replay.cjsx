@@ -8,6 +8,7 @@ Hand = require './ui/replay/hand'
 Hero = require './ui/replay/hero'
 Deck = require './ui/replay/deck'
 Mulligan = require './ui/replay/mulligan'
+Discover = require './ui/replay/discover'
 Board = require './ui/replay/board'
 Mana = require './ui/replay/mana'
 Health = require './ui/replay/health'
@@ -69,6 +70,7 @@ class Replay extends React.Component
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} ref="topBoard" tooltips={true}/>
 				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
+				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
 				<Mana entity={replay.opponent} />
 				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={!@showAllCards} />
@@ -80,6 +82,7 @@ class Replay extends React.Component
 				<Deck entity={replay.player} />
 				<Board entity={replay.player} ref="bottomBoard" tooltips={true}/>
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
+				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 				<Mana entity={replay.player} />
 				<Play entity={replay.player} />
 				<Hero entity={replay.player} ref="bottomHero" showConcealedInformation={true}/>

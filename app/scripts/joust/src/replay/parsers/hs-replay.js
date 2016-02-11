@@ -83,6 +83,8 @@
           }
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            this.stack[this.stack.length - 2].showEntities = this.stack[this.stack.length - 2].showEntities || [];
+            this.stack[this.stack.length - 2].showEntities.push(this.entityDefinition);
             return node.parent = this.stack[this.stack.length - 2];
           }
           break;
@@ -181,8 +183,12 @@
           this.entityDefinition.parent = this.stack[this.stack.length - 2];
           if (node.name === 'ShowEntity') {
             this.stack[this.stack.length - 2].showEntity = this.entityDefinition;
+            this.stack[this.stack.length - 2].showEntities = this.stack[this.stack.length - 2].showEntities || [];
+            this.stack[this.stack.length - 2].showEntities.push(this.entityDefinition);
           } else {
             this.stack[this.stack.length - 2].fullEntity = this.entityDefinition;
+            this.stack[this.stack.length - 2].fullEntities = this.stack[this.stack.length - 2].fullEntities || [];
+            this.stack[this.stack.length - 2].fullEntities.push(this.entityDefinition);
           }
           break;
         case 'HideEntity':
@@ -210,6 +216,7 @@
         case 'MetaData':
           this.metaData = {
             meta: metaTagNames[node.attributes.meta],
+            data: node.attributes.data,
             parent: this.stack[this.stack.length - 2]
           };
           if (!this.metaData.parent.meta) {

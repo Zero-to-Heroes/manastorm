@@ -1,0 +1,53 @@
+.discover-container {
+	position: absolute;
+	height: 200%;
+	width: 100%;
+	top: -100%;
+	background-color: rgba(255, 255, 255, 0.3);
+	z-index: 25;
+}
+
+.discover {
+	text-align: center;
+	top: 25%;
+	position: absolute;
+	width: 100%;
+	z-index: 25;
+
+	.game-card {
+		display: inline-block;
+		position: relative;
+		margin-right: 20px;
+		transition: transform 0.25s, top 0.5s;
+		width: 200px;
+		height: 310px;
+		background-size: 100% auto;
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	.card--unknown {
+		background-size: 75% auto;
+		margin-right: 0;
+	}
+
+	.discarded:after {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		content: "X";
+		font-size: 10em;
+		color: red;
+		line-height: 1.1em;
+		text-align: center;
+		opacity: 0.5;
+	}
+}
+
+.top .discover-container {
+	top: auto;
+	bottom: -100%;
+}

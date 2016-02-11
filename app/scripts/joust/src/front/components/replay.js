@@ -1,5 +1,5 @@
 (function() {
-  var Board, Button, ButtonGroup, Deck, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, Turn, TurnLog, subscribe, _, _ref,
+  var Board, Button, ButtonGroup, Deck, Discover, GameLog, HSReplayParser, Hand, Health, Hero, Mana, Mulligan, Play, PlayerName, React, ReactTooltip, Replay, ReplayPlayer, Target, Timeline, Turn, TurnLog, subscribe, _, _ref,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
@@ -24,6 +24,8 @@
   Deck = require('./ui/replay/deck');
 
   Mulligan = require('./ui/replay/mulligan');
+
+  Discover = require('./ui/replay/discover');
 
   Board = require('./ui/replay/board');
 
@@ -110,6 +112,11 @@
           "entity": replay.opponent,
           "mulligan": replay.turns[1].opponentMulligan,
           "isHidden": !this.showAllCards
+        }), React.createElement(Discover, {
+          "entity": replay.opponent,
+          "discoverController": replay.discoverController,
+          "discoverAction": replay.discoverAction,
+          "isHidden": !this.showAllCards
         }), React.createElement(Mana, {
           "entity": replay.opponent
         }), React.createElement(Play, {
@@ -136,6 +143,11 @@
         }), React.createElement(Mulligan, {
           "entity": replay.player,
           "mulligan": replay.turns[1].playerMulligan,
+          "isHidden": false
+        }), React.createElement(Discover, {
+          "entity": replay.player,
+          "discoverController": replay.discoverController,
+          "discoverAction": replay.discoverAction,
           "isHidden": false
         }), React.createElement(Mana, {
           "entity": replay.player

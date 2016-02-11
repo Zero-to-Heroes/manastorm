@@ -71,6 +71,9 @@ class HSReplayParser
 				#@entityDefinition.originalDefinition = @replay.clone(@entityDefinition)
 				if node.name == 'ShowEntity'
 					@stack[@stack.length - 2].showEntity = @entityDefinition
+					# Support for multiple ShowEntity nodes, should replace the standard definition
+					@stack[@stack.length - 2].showEntities = @stack[@stack.length - 2].showEntities || []
+					@stack[@stack.length - 2].showEntities.push @entityDefinition
 					node.parent = @stack[@stack.length - 2]
 
 			when 'Options'
@@ -148,9 +151,15 @@ class HSReplayParser
 				@entityDefinition.parent = @stack[@stack.length - 2]
 				if node.name is 'ShowEntity'
 					@stack[@stack.length - 2].showEntity = @entityDefinition
+					# Support for multiple ShowEntity nodes, should replace the standard definition
+					@stack[@stack.length - 2].showEntities = @stack[@stack.length - 2].showEntities || []
+					@stack[@stack.length - 2].showEntities.push @entityDefinition
 				# Need that to distinguish actions that create tokens
 				else 
 					@stack[@stack.length - 2].fullEntity = @entityDefinition
+					# Support for multiple ShowEntity nodes, should replace the standard definition
+					@stack[@stack.length - 2].fullEntities = @stack[@stack.length - 2].fullEntities || []
+					@stack[@stack.length - 2].fullEntities.push @entityDefinition
 
 				#if @entityDefinition.id is 72
 					#console.log 'parsing bluegill', @entityDefinition, node
@@ -184,6 +193,7 @@ class HSReplayParser
 				#console.error 'parsing MetaData'
 				@metaData = {
 					meta: metaTagNames[node.attributes.meta]
+					data: node.attributes.data
 					parent: @stack[@stack.length - 2]
 				}
 

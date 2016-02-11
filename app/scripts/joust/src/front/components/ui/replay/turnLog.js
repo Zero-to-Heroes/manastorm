@@ -1,5 +1,5 @@
 (function() {
-  var $, ActionDisplayLog, PlayerNameDisplayLog, React, ReactCSSTransitionGroup, ReactDOM, SubscriptionList, TurnDisplayLog, TurnLog, _;
+  var $, ActionDisplayLog, PlayerNameDisplayLog, React, ReactCSSTransitionGroup, ReactDOM, SpanDisplayLog, SubscriptionList, TurnDisplayLog, TurnLog, _;
 
   React = require('react');
 
@@ -61,10 +61,21 @@
     buildActionLog: function(action) {
       var card, cardLink, creator, log, newLog, owner, ownerCard, target;
       if (action.actionType === 'card-draw') {
-        console.log('adding card draw info', action);
         log = this.buildCardDrawLog(action);
       } else if (action.actionType === 'secret-revealed') {
         log = this.buildSecretRevealedLog(action);
+      } else if (action.actionType === 'played-card-from-hand') {
+        log = this.buildPlayedCardFromHandLog(action);
+      } else if (action.actionType === 'played-secret-from-hand') {
+        log = this.buildPlayedSecretFromHandLog(action);
+      } else if (action.actionType === 'power-damage') {
+        log = this.buildPowerDamageLog(action);
+      } else if (action.actionType === 'attack') {
+        log = this.buildAttackLog(action);
+      } else if (action.actionType === 'minion-death') {
+        log = this.buildMinionDeathLog(action);
+      } else if (action.actionType === 'discover') {
+        log = this.buildDiscoverLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -135,7 +146,9 @@
       } else {
         cardLink = '<span> 1 card </span>';
       }
-      drawLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+      drawLog = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement(PlayerNameDisplayLog, {
         "active": action.owner === this.replay.player,
         "name": action.owner.name
       }), React.createElement("span", null, " draws "), React.createElement("span", {
@@ -145,11 +158,134 @@
       }));
       return drawLog;
     },
+    buildPlayedCardFromHandLog: function(action) {
+      var card, cardLink, log;
+      card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement(PlayerNameDisplayLog, {
+        "active": action.owner === this.replay.player,
+        "name": action.owner.name
+      }), React.createElement("span", null, " plays "), React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }));
+      return log;
+    },
+    buildPlayedSecretFromHandLog: function(action) {
+      var card, cardLink, link, log;
+      if ((typeof cardLink !== "undefined" && cardLink !== null ? cardLink.length : void 0) > 0 && action.publicSecret) {
+        card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+        link = React.createElement("span", null, ": ");
+      } else {
+
+      }
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement(PlayerNameDisplayLog, {
+        "active": action.owner === this.replay.player,
+        "name": action.owner.name
+      }), React.createElement("span", null, " plays a "), React.createElement("span", {
+        "className": "secret-revealed"
+      }, "Secret "), link, React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }));
+      return log;
+    },
+    buildPowerDamageLog: function(action) {
+      var card, cardLink, cardLog, indent, log, target, targetLink;
+      console.log('building log for power action', action);
+      if (!action.sameOwnerAsParent) {
+        card = action.data ? action.data['cardID'] : '';
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+        cardLog = React.createElement("span", {
+          "dangerouslySetInnerHTML": {
+            __html: cardLink
+          }
+        });
+      }
+      if (action.mainAction) {
+        indent = React.createElement("span", {
+          "className": "indented-log"
+        }, "...which ");
+      }
+      target = this.replay.entities[action.target]['cardID'];
+      targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, indent, cardLog, React.createElement("span", null, " deals ", action.amount, " damage to "), React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: targetLink
+        }
+      }));
+      return log;
+    },
+    buildAttackLog: function(action) {
+      var card, cardLink, log, target, targetLink;
+      console.log('building log for attack', action);
+      card = action.data ? action.data['cardID'] : '';
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      target = this.replay.entities[action.target]['cardID'];
+      targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }), React.createElement("span", null, " attacks "), React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: targetLink
+        }
+      }));
+      return log;
+    },
+    buildMinionDeathLog: function(action) {
+      var card, cardLink, log;
+      card = this.replay.entities[action.data]['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      return log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }), React.createElement("span", null, " dies "));
+    },
+    buildDiscoverLog: function(action) {
+      var card, cardLink, choice, choiceCard, choiceCardLink, choicesCards, log, _i, _len, _ref;
+      card = action.data['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      choicesCards = [];
+      _ref = action.choices;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        choice = _ref[_i];
+        choiceCard = choice['cardID'];
+        choiceCardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(choiceCard));
+        choicesCards.push(React.createElement(SpanDisplayLog, {
+          "className": "discovered-card indented-log",
+          "newLog": choiceCardLink
+        }));
+      }
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement("span", {
+        "dangerouslySetInnerHTML": {
+          __html: cardLink
+        }
+      }), React.createElement("span", null, " discovers "), choicesCards, React.createElement("span", null));
+      return log;
+    },
     buildMulliganLog: function(turn) {
       var card, cardId, cardLink, cardLog, log, logs, mulliganed, _i, _len, _ref, _ref1, _ref2;
       log = React.createElement("p", {
         "className": "turn",
-        "key": this.logIndex++
+        "key": ++this.logIndex
       }, "Mulligan");
       this.replay.notifyNewLog(log);
       logs = [log];
@@ -162,7 +298,9 @@
           card = this.replay.cardUtils.getCard(cardId);
           console.log('card', card);
           cardLink = this.replay.buildCardLink(card);
-          cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+          cardLog = React.createElement("p", {
+            "key": ++this.logIndex
+          }, React.createElement(PlayerNameDisplayLog, {
             "active": true,
             "name": this.replay.player.name
           }), React.createElement("span", null, " mulligans "), React.createElement("span", {
@@ -174,7 +312,9 @@
         }
       }
       if (((_ref2 = turn.opponentMulligan) != null ? _ref2.length : void 0) > 0) {
-        cardLog = React.createElement("p", null, React.createElement(PlayerNameDisplayLog, {
+        cardLog = React.createElement("p", {
+          "key": ++this.logIndex
+        }, React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.replay.opponent.name
         }), " mulligans ", turn.opponentMulligan.length, " cards");
@@ -195,7 +335,8 @@
       var node;
       this.index = this.logIndex++;
       node = ReactDOM.findDOMNode(this);
-      return $(node).parent().scrollTo("max");
+      $(node).parent().parent().scrollTo("max");
+      return console.log('mounted TurnDisplayLog', node, $(node), $(node).parent());
     },
     render: function() {
       if (this.props.active) {
@@ -221,7 +362,7 @@
       var node;
       this.index = this.logIndex++;
       node = ReactDOM.findDOMNode(this);
-      return $(node).parent().scrollTo("max");
+      return $(node).parent().parent().scrollTo("max");
     },
     render: function() {
       if (this.props.active) {
@@ -246,8 +387,32 @@
       return $(node).parent().scrollTo("max");
     },
     render: function() {
+      var cls;
+      cls = this.props.className;
+      cls += " action";
       return React.createElement("p", {
-        "className": "action",
+        "className": cls,
+        "key": this.index,
+        "dangerouslySetInnerHTML": {
+          __html: this.props.newLog
+        }
+      });
+    }
+  });
+
+  SpanDisplayLog = React.createClass({
+    componentDidMount: function() {
+      var node;
+      this.index = ++this.logIndex;
+      node = ReactDOM.findDOMNode(this);
+      return $(node).parent().parent().scrollTo("max");
+    },
+    render: function() {
+      var cls;
+      cls = this.props.className;
+      cls += " action";
+      return React.createElement("span", {
+        "className": cls,
         "key": this.index,
         "dangerouslySetInnerHTML": {
           __html: this.props.newLog

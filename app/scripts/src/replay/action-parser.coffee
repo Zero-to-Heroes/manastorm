@@ -71,10 +71,17 @@ class ActionParser extends EventEmitter
 					@currentTurnNumber = @turnNumber - 1
 					if (@turns[@currentTurnNumber])
 
-						@parseMulliganCards batch, command
+						@parseMulliganCards batch, command[1][0]
+						@parseCardPlayedFromHand batch, command[1][0]
+						@parseSecretPlayedFromHand batch, command[1][0]
+						@parsePowerEffects batch, command[1][0]
+						@parseAttacks batch, command[1][0]
+						@parseDeaths batch, command[1][0]
+						@parseDiscovers batch, command[1][0]
 
-						# Played a card
-						if command[1][0].tags and command[1][0].attributes.type != '5'
+
+						# Played a card Legacy
+						if command[1][0].tags and command[1][0].attributes.type not in ['5', '7']
 
 							playedCard = -1
 
@@ -127,7 +134,8 @@ class ActionParser extends EventEmitter
 						# Card revealed
 						# TODO: Don't add this when a spell is played, since another action already handles this
 						# Also, don't reveal enchantments as "showentities"
-						if command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type != '3' and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
+						# 7 case is handled by the "playing from hand" action below
+						if command[1][0].showEntity and (command[1][0].attributes.type == '1' or (command[1][0].attributes.type not in ['3', '7'] and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)))
 
 							#console.log 'considering action for entity ' + command[1][0].showEntity.id, command[1][0].showEntity.tags, command[1][0]
 							playedCard = -1
@@ -206,7 +214,7 @@ class ActionParser extends EventEmitter
 								#console.log '\t\tadding action to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 						# Trigger with targets (or play that triggers some effects with targets, like Antique Healbot)
-						if command[1][0].tags and command[1][0].attributes.type in ['3', '5'] and command[1][0].meta?.length > 0
+						if command[1][0].tags and command[1][0].attributes.type in ['5'] and command[1][0].meta?.length > 0
 							for meta in command[1][0].meta
 								for info in meta.info
 									# Don't add targeted triggers if parent is already targeted - we would log the same thing twice
@@ -225,39 +233,26 @@ class ActionParser extends EventEmitter
 											@addAction @currentTurnNumber, action
 											#console.log 'Added action', action
 
-						# Deaths. Not really an action, but useful to see clearly what happens
-						if command[1][0].tags and command[1][0].attributes.type == '6' 
-
-							for tag in command[1][0].tags
-								# Graveyard
-								if (tag.tag == 'ZONE' && tag.value == 4)
-									action = {
-										turn: @currentTurnNumber - 1
-										# index: actionIndex++
-										timestamp: batch.timestamp
-										type: ' died '
-										owner: tag.entity
-										initialCommand: command[1][0]
-									}
-									@addAction @currentTurnNumber, action
+						
 
 						# Attacked something
-						if parseInt(command[1][0].attributes.target) > 0 and (command[1][0].attributes.type == '1' or !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
-							#console.log 'considering attack', command[1][0]
-							action = {
-								turn: @currentTurnNumber - 1
-								# index: actionIndex++
-								timestamp: batch.timestamp
-								type: ': '
-								actionType: 'attack'
-								data: @entities[command[1][0].attributes.entity]
-								owner: @turns[@currentTurnNumber].activePlayer
-								target: command[1][0].attributes.target
-								initialCommand: command[1][0]
-								debugType: 'attack with complex conditions'
-							}
-							@addAction @currentTurnNumber, action
-							#console.log '\t\tadding attack to turn', @turns[currentTurnNumber].actions[actionIndex]
+						# command[1][0].attributes.type == '1' is handled in the new version
+						# if parseInt(command[1][0].attributes.target) > 0 and (!command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0)
+						# 	#console.log 'considering attack', command[1][0]
+						# 	action = {
+						# 		turn: @currentTurnNumber - 1
+						# 		# index: actionIndex++
+						# 		timestamp: batch.timestamp
+						# 		type: ': '
+						# 		actionType: 'attack'
+						# 		data: @entities[command[1][0].attributes.entity]
+						# 		owner: @turns[@currentTurnNumber].activePlayer
+						# 		target: command[1][0].attributes.target
+						# 		initialCommand: command[1][0]
+						# 		debugType: 'attack with complex conditions'
+						# 	}
+						# 	@addAction @currentTurnNumber, action
+						# 	#console.log '\t\tadding attack to turn', @turns[currentTurnNumber].actions[actionIndex]
 
 						# Card powers. Maybe something more than just battlecries?
 						# This also includes all effects from spells, which is too verbose. Don't add the action
@@ -277,7 +272,8 @@ class ActionParser extends EventEmitter
 											dmg = tag.value
 											target = tag.entity
 
-									if dmg > 0
+									# We now handle this in a different case
+									if dmg > 0 and command[1][0].attributes.type == '5'
 										action = {
 											turn: @currentTurnNumber - 1
 											# index: actionIndex++
@@ -297,7 +293,8 @@ class ActionParser extends EventEmitter
 										@addAction @currentTurnNumber, action
 
 								# Don't include enchantments - we are already logging the fact that they are played
-								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6
+								# Don't include discover, handled elsewhere (in the new extracted methods)
+								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6 and !(command[1][0].attributes.type == '3' and command.fullEntities?.length == 3)
 
 									# Also log what creates the new entities. Can be hero power 
 									# HP are logged in a bit of a weird way, so we need to manually adjust their offset
@@ -428,6 +425,14 @@ class ActionParser extends EventEmitter
 				currentCommand = command[1][0]
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
+
+				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+				# but by the card itself. So we need to find out who that card controller is
+				ownerId = currentCommand.attributes.entity
+				if ownerId not in ['2', '3']
+					owner = @getController(@entities[ownerId].tags.CONTROLLER)
+				else
+					owner = @entities[ownerId]
 				
 				action = {
 					turn: @currentTurnNumber
@@ -435,7 +440,7 @@ class ActionParser extends EventEmitter
 					actionType: 'card-draw'
 					type: ' draws '
 					data: @entities[command[1][0].entity]
-					owner: @entities[currentCommand.attributes.entity]
+					owner: owner
 					initialCommand: command[1][0]
 				}
 				@addAction @currentTurnNumber, action
@@ -464,15 +469,169 @@ class ActionParser extends EventEmitter
 
 	parseMulliganCards: (batch, command) ->
 		# Mulligan
-		if command[1][0].attributes.type == '5' and @currentTurnNumber == 1 and command[1][0].hideEntities
-			@turns[@currentTurnNumber].playerMulligan = command[1][0].hideEntities
+		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities
+			@turns[@currentTurnNumber].playerMulligan = command.hideEntities
 
 		# Mulligan opponent
-		if command[1][0].attributes.type == '5' and @currentTurnNumber == 1 and command[1][0].attributes.entity != @mainPlayerId
+		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.attributes.entity != @mainPlayerId
 			mulliganed = []
-			for tag in command[1][0].tags
+			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value == 2
 					@turns[@currentTurnNumber].opponentMulligan.push tag.entity
 
+
+	# Not secrets
+	parseCardPlayedFromHand: (batch, command) ->
+		if command.attributes.type == '7'
+
+			# Check that the entity was in our hand before
+			entity = @entities[command.attributes.entity]
+			# console.log 'Considering play of', entity, command
+
+			playedCard = -1
+			# The case of a ShowEntity command when the card was already known - basically 
+			# when we play our own card. In that case, the tags are already known, and 
+			# tag changes are the only things we care about
+			for tag in command.tags
+				if tag.tag == 'ZONE' and tag.value == 1
+					playedCard = tag.entity
+
+			# The case of a ShowEntity (or FullEntity) when we didn't previously know the 
+			# card. In that case, a ShowEntity (or FullEntity) element is created that contains
+			# the tag with the proper zone
+			if playedCard < 0 and command.showEntity
+				# console.log '\tLooking for new card played', command.showEntity
+				if command.showEntity.tags.ZONE == 1
+					# console.log '\t\tZone tag is correct', command.showEntity.id
+					playedCard = command.showEntity.id
+
+			# Possibly check that the card was in hand before being in play?
+			if playedCard > -1
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: batch.timestamp
+					actionType: 'played-card-from-hand'
+					data: @entities[playedCard]
+					owner: @turns[@currentTurnNumber].activePlayer
+					initialCommand: command
+				}
+				# console.log '\tAnd it is a valid play', action
+				@addAction @currentTurnNumber, action
+
+	parseSecretPlayedFromHand: (batch, command) ->
+		if command.attributes.type == '7'
+
+			playedCard = -1
+			secret = false
+			for tag in command.tags
+				# Either in play or a secret
+				if tag.tag == 'ZONE' and tag.value == 7
+					playedCard = tag.entity
+				if tag.tag == 'SECRET' and tag.value == 1
+					secret = true
+					publicSecret = @turns[@currentTurnNumber].activePlayer.id == @mainPlayerId
+
+			if playedCard > -1 and secret
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: batch.timestamp
+					actionType: 'played-secret-from-hand'
+					publicSecret: publicSecret
+					# If it's a secret, we want to know who put it in play
+					data: @entities[playedCard]
+					owner: @turns[@currentTurnNumber].activePlayer
+					initialCommand: command
+				}
+				@addAction @currentTurnNumber, action
+
+
+
+	# Damage, healing and jousts
+	parsePowerEffects: (batch, command) ->
+		if command.attributes.type == '3' and command.meta?.length > 0
+			console.log '\tConsidering power of', command
+			# If the entity that triggers the power is something that just did an action, we don't log that again
+			if command.parent?.attributes?.entity == command.attributes.entity
+				sameOwnerAsParent = true
+
+			# Is the effect triggered in response to another play?
+			if command.parent
+				mainAction = command.parent
+
+			for meta in command.meta
+				for info in meta.info
+					# The power dealt some damage
+					if meta.meta == 'DAMAGE'
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: batch.timestamp
+							target: info.entity
+							amount: meta.data
+							mainAction: mainAction
+							sameOwnerAsParent: sameOwnerAsParent
+							actionType: 'power-damage'
+							data: @entities[command.attributes.entity]
+							owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+							initialCommand: command
+						}
+						@addAction @currentTurnNumber, action
+
+
+	parseAttacks: (batch, command) ->
+		if command.attributes.type == '1'
+			#console.log 'considering attack', command
+			action = {
+				turn: @currentTurnNumber - 1
+				timestamp: batch.timestamp
+				actionType: 'attack'
+				data: @entities[command.attributes.entity]
+				owner: @turns[@currentTurnNumber].activePlayer
+				target: command.attributes.target
+				initialCommand: command
+			}
+			@addAction @currentTurnNumber, action
+
+			# TODO: log the damage done
+
+	parseDeaths: (batch, command) ->
+		if command.tags and command.attributes.type == '6' 
+			for tag in command.tags
+				# Graveyard
+				if tag.tag == 'ZONE' and tag.value == 4
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: batch.timestamp
+						actionType: 'minion-death'
+						data: tag.entity
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
+
+
+	parseDiscovers: (batch, command) ->
+		# Always discover 3 cards
+		if command.attributes.type == '3' and command.fullEntities?.length == 3
+			console.log 'Considering Discover action', command
+			# Check that each of them is in the SETASIDE zone
+			isDiscover = true
+			choices = []
+			for entity in command.fullEntities
+				console.log '\tExamining discovered entity', entity
+				choices.push entity
+				if entity.tags.ZONE != 6
+					isDiscover = false
+
+			if isDiscover
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: batch.timestamp
+					actionType: 'discover'
+					data: @entities[command.attributes.entity]
+					choices: choices
+					initialCommand: command
+				}
+				command.isDiscover = true
+				console.log '\t\tadding Discover action', action
+				@addAction @currentTurnNumber, action
 
 module.exports = ActionParser

@@ -265,7 +265,8 @@
 
     ReplayPlayer.prototype.newStep = function() {
       this.targetSource = void 0;
-      return this.targetDestination = void 0;
+      this.targetDestination = void 0;
+      return this.discoverAction = void 0;
     };
 
     ReplayPlayer.prototype.getTotalLength = function() {
@@ -447,7 +448,12 @@
       }
     };
 
-    ReplayPlayer.prototype.receiveAction = function(definition) {};
+    ReplayPlayer.prototype.receiveAction = function(definition) {
+      if (definition.isDiscover) {
+        this.discoverAction = definition;
+        return this.discoverController = this.getController(this.entities[definition.attributes.entity].tags.CONTROLLER);
+      }
+    };
 
     ReplayPlayer.prototype.receiveOptions = function() {};
 
