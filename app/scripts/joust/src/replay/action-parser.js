@@ -89,7 +89,7 @@
     };
 
     ActionParser.prototype.parseActions = function() {
-      var action, armor, batch, command, dmg, entity, entityTag, excluded, i, info, j, k, l, len, len1, len2, len3, len4, len5, len6, len7, len8, len9, m, meta, n, o, p, playedCard, publicSecret, q, r, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref18, ref19, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, results, s, secret, sortedActions, t, tag, tagValue, target, tempTurnNumber;
+      var action, armor, batch, command, dmg, entity, entityTag, excluded, i, info, j, k, l, len, len1, len2, len3, len4, len5, len6, len7, len8, m, meta, n, o, p, playedCard, publicSecret, q, r, ref, ref1, ref10, ref11, ref12, ref13, ref14, ref15, ref16, ref17, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, results, s, secret, sortedActions, tag, tagValue, target, tempTurnNumber;
       this.players = [this.player, this.opponent];
       this.playerIndex = 0;
       this.turnNumber = 1;
@@ -113,6 +113,8 @@
               this.parseAttacks(batch, command[1][0]);
               this.parseDeaths(batch, command[1][0]);
               this.parseDiscovers(batch, command[1][0]);
+              this.parseSummons(batch, command[1][0]);
+              this.parseEquipEffect(batch, command[1][0]);
               if (command[1][0].tags && ((ref2 = command[1][0].attributes.type) !== '5' && ref2 !== '7')) {
                 playedCard = -1;
                 excluded = false;
@@ -278,48 +280,11 @@
                       this.addAction(this.currentTurnNumber, action);
                     }
                   }
-                  if (command[1][0].fullEntity && command[1][0].fullEntity.tags.CARDTYPE !== 6 && !(command[1][0].attributes.type === '3' && ((ref17 = command.fullEntities) != null ? ref17.length : void 0) === 3)) {
-                    if (command[1][0].parent) {
-                      ref18 = command[1][0].parent.tags;
-                      for (s = 0, len8 = ref18.length; s < len8; s++) {
-                        tag = ref18[s];
-                        if (tag.tag === 'HEROPOWER_ACTIVATIONS_THIS_TURN' && tag.value > 0) {
-                          command[1][0].indent = command[1][0].indent > 1 ? command[1][0].indent - 1 : void 0;
-                          command[1][0].fullEntity.indent = command[1][0].fullEntity.indent > 1 ? command[1][0].fullEntity.indent - 1 : void 0;
-                        }
-                      }
-                    }
-                    action = {
-                      turn: this.currentTurnNumber - 1,
-                      timestamp: batch.timestamp,
-                      prefix: '\t',
-                      type: ': ',
-                      data: this.entities[command[1][0].attributes.entity],
-                      owner: this.turns[this.currentTurnNumber].activePlayer,
-                      initialCommand: command[1][0],
-                      debugType: 'power 3 root'
-                    };
-                    this.addAction(this.currentTurnNumber, action);
-                    action = {
-                      turn: this.currentTurnNumber - 1,
-                      timestamp: batch.timestamp,
-                      prefix: '\t',
-                      creator: this.entities[command[1][0].attributes.entity],
-                      type: ': ',
-                      data: this.entities[command[1][0].fullEntity.id],
-                      owner: this.getController(command[1][0].fullEntity.tags.CONTROLLER),
-                      target: target,
-                      initialCommand: command[1][0].fullEntity,
-                      debugType: 'power 3',
-                      debug: this.entities
-                    };
-                    this.addAction(this.currentTurnNumber, action);
-                  }
                   if (command[1][0].tags) {
                     armor = 0;
-                    ref19 = command[1][0].tags;
-                    for (t = 0, len9 = ref19.length; t < len9; t++) {
-                      tag = ref19[t];
+                    ref17 = command[1][0].tags;
+                    for (s = 0, len8 = ref17.length; s < len8; s++) {
+                      tag = ref17[s];
                       if (tag.tag === 'ARMOR' && tag.value > 0) {
                         armor = tag.value;
                       }
@@ -528,7 +493,6 @@
     ActionParser.prototype.parsePowerEffects = function(batch, command) {
       var action, info, k, len, mainAction, meta, ref, ref1, ref2, ref3, results, sameOwnerAsParent;
       if (command.attributes.type === '3' && ((ref = command.meta) != null ? ref.length : void 0) > 0) {
-        console.log('\tConsidering power of', command);
         if (((ref1 = command.parent) != null ? (ref2 = ref1.attributes) != null ? ref2.entity : void 0 : void 0) === command.attributes.entity) {
           sameOwnerAsParent = true;
         }
@@ -554,6 +518,20 @@
                   mainAction: mainAction,
                   sameOwnerAsParent: sameOwnerAsParent,
                   actionType: 'power-damage',
+                  data: this.entities[command.attributes.entity],
+                  owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
+                  initialCommand: command
+                };
+                this.addAction(this.currentTurnNumber, action);
+              }
+              if (meta.meta === 'TARGET') {
+                action = {
+                  turn: this.currentTurnNumber - 1,
+                  timestamp: batch.timestamp,
+                  target: info.entity,
+                  mainAction: mainAction,
+                  sameOwnerAsParent: sameOwnerAsParent,
+                  actionType: 'power-target',
                   data: this.entities[command.attributes.entity],
                   owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
                   initialCommand: command
@@ -613,13 +591,11 @@
     ActionParser.prototype.parseDiscovers = function(batch, command) {
       var action, choices, entity, isDiscover, k, len, ref, ref1;
       if (command.attributes.type === '3' && ((ref = command.fullEntities) != null ? ref.length : void 0) === 3) {
-        console.log('Considering Discover action', command);
         isDiscover = true;
         choices = [];
         ref1 = command.fullEntities;
         for (k = 0, len = ref1.length; k < len; k++) {
           entity = ref1[k];
-          console.log('\tExamining discovered entity', entity);
           choices.push(entity);
           if (entity.tags.ZONE !== 6) {
             isDiscover = false;
@@ -635,9 +611,66 @@
             initialCommand: command
           };
           command.isDiscover = true;
-          console.log('\t\tadding Discover action', action);
           return this.addAction(this.currentTurnNumber, action);
         }
+      }
+    };
+
+    ActionParser.prototype.parseSummons = function(batch, command) {
+      var action, entity, k, len, mainAction, ref, ref1, results;
+      if (command.attributes.type === '3' && ((ref = command.fullEntities) != null ? ref.length : void 0) > 0) {
+        ref1 = command.fullEntities;
+        results = [];
+        for (k = 0, len = ref1.length; k < len; k++) {
+          entity = ref1[k];
+          if (entity.tags.ZONE === 1 && entity.tags.CARDTYPE === 4) {
+            if (command.parent) {
+              mainAction = command.parent;
+            }
+            action = {
+              turn: this.currentTurnNumber - 1,
+              timestamp: batch.timestamp,
+              actionType: 'summon-minion',
+              data: entity,
+              owner: this.getController(entity.tags.CONTROLLER),
+              mainAction: mainAction,
+              initialCommand: command
+            };
+            results.push(this.addAction(this.currentTurnNumber, action));
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
+      }
+    };
+
+    ActionParser.prototype.parseEquipEffect = function(batch, command) {
+      var action, entity, k, len, mainAction, ref, ref1, results;
+      if (command.attributes.type === '3' && ((ref = command.fullEntities) != null ? ref.length : void 0) > 0) {
+        ref1 = command.fullEntities;
+        results = [];
+        for (k = 0, len = ref1.length; k < len; k++) {
+          entity = ref1[k];
+          if (entity.tags.ZONE === 1 && entity.tags.CARDTYPE === 7) {
+            if (command.parent) {
+              mainAction = command.parent;
+            }
+            action = {
+              turn: this.currentTurnNumber - 1,
+              timestamp: batch.timestamp,
+              actionType: 'summon-weapon',
+              data: entity,
+              owner: this.getController(entity.tags.CONTROLLER),
+              mainAction: mainAction,
+              initialCommand: command
+            };
+            results.push(this.addAction(this.currentTurnNumber, action));
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
       }
     };
 

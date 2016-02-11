@@ -70,12 +70,18 @@
         log = this.buildPlayedSecretFromHandLog(action);
       } else if (action.actionType === 'power-damage') {
         log = this.buildPowerDamageLog(action);
+      } else if (action.actionType === 'power-target') {
+        log = this.buildPowerTargetLog(action);
       } else if (action.actionType === 'attack') {
         log = this.buildAttackLog(action);
       } else if (action.actionType === 'minion-death') {
         log = this.buildMinionDeathLog(action);
       } else if (action.actionType === 'discover') {
         log = this.buildDiscoverLog(action);
+      } else if (action.actionType === 'summon-minion') {
+        log = this.buildSummonMinionLog(action);
+      } else if (action.actionType === 'summon-weapon') {
+        log = this.buildSummonWeaponLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -199,7 +205,6 @@
     },
     buildPowerDamageLog: function(action) {
       var card, cardLink, cardLog, indent, log, target, targetLink;
-      console.log('building log for power action', action);
       if (!action.sameOwnerAsParent) {
         card = action.data ? action.data['cardID'] : '';
         cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
@@ -218,26 +223,46 @@
       targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
       log = React.createElement("p", {
         "key": ++this.logIndex
-      }, indent, cardLog, React.createElement("span", null, " deals ", action.amount, " damage to "), React.createElement("span", {
-        "dangerouslySetInnerHTML": {
-          __html: targetLink
-        }
+      }, indent, cardLog, React.createElement("span", null, " deals ", action.amount, " damage to "), React.createElement(SpanDisplayLog, {
+        "newLog": targetLink
+      }));
+      return log;
+    },
+    buildPowerTargetLog: function(action) {
+      var card, cardLink, cardLog, indent, log, target, targetLink;
+      if (!action.sameOwnerAsParent) {
+        card = action.data ? action.data['cardID'] : '';
+        cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+        cardLog = React.createElement("span", {
+          "dangerouslySetInnerHTML": {
+            __html: cardLink
+          }
+        });
+      }
+      if (action.mainAction) {
+        indent = React.createElement("span", {
+          "className": "indented-log"
+        }, "...and ");
+      }
+      target = this.replay.entities[action.target]['cardID'];
+      targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, indent, cardLog, React.createElement("span", null, " targets "), React.createElement(SpanDisplayLog, {
+        "newLog": targetLink
       }));
       return log;
     },
     buildAttackLog: function(action) {
       var card, cardLink, log, target, targetLink;
-      console.log('building log for attack', action);
       card = action.data ? action.data['cardID'] : '';
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       target = this.replay.entities[action.target]['cardID'];
       targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
       log = React.createElement("p", {
         "key": ++this.logIndex
-      }, React.createElement("span", {
-        "dangerouslySetInnerHTML": {
-          __html: cardLink
-        }
+      }, React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
       }), React.createElement("span", null, " attacks "), React.createElement("span", {
         "dangerouslySetInnerHTML": {
           __html: targetLink
@@ -251,10 +276,8 @@
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       return log = React.createElement("p", {
         "key": ++this.logIndex
-      }, React.createElement("span", {
-        "dangerouslySetInnerHTML": {
-          __html: cardLink
-        }
+      }, React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
       }), React.createElement("span", null, " dies "));
     },
     buildDiscoverLog: function(action) {
@@ -274,11 +297,52 @@
       }
       log = React.createElement("p", {
         "key": ++this.logIndex
-      }, React.createElement("span", {
-        "dangerouslySetInnerHTML": {
-          __html: cardLink
-        }
+      }, React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
       }), React.createElement("span", null, " discovers "), choicesCards, React.createElement("span", null));
+      return log;
+    },
+    buildSummonMinionLog: function(action) {
+      var card, cardLink, indent, log;
+      console.log('buildSummonMinionLog', action);
+      if (action.mainAction) {
+        indent = React.createElement("span", {
+          "className": "indented-log"
+        }, "...which");
+      } else {
+        indent = React.createElement(PlayerNameDisplayLog, {
+          "active": action.owner === this.replay.player,
+          "name": action.owner.name
+        });
+      }
+      card = action.data['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, indent, React.createElement("span", null, " summons "), React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
+      }));
+      return log;
+    },
+    buildSummonWeaponLog: function(action) {
+      var card, cardLink, indent, log;
+      if (action.mainAction) {
+        indent = React.createElement("span", {
+          "className": "indented-log"
+        }, "...which");
+      } else {
+        indent = React.createElement(PlayerNameDisplayLog, {
+          "active": action.owner === this.replay.player,
+          "name": action.owner.name
+        });
+      }
+      card = action.data['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, indent, React.createElement("span", null, " equips "), React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
+      }));
       return log;
     },
     buildMulliganLog: function(turn) {

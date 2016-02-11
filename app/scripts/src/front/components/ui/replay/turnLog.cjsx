@@ -60,6 +60,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'power-damage'
 			log = @buildPowerDamageLog action
 
+		else if action.actionType == 'power-target'
+			log = @buildPowerTargetLog action
+
 		else if action.actionType == 'attack'
 			log = @buildAttackLog action
 
@@ -68,6 +71,12 @@ TurnLog = React.createClass
 
 		else if action.actionType == 'discover'
 			log = @buildDiscoverLog action
+
+		else if action.actionType == 'summon-minion'
+			log = @buildSummonMinionLog action
+
+		else if action.actionType == 'summon-weapon'
+			log = @buildSummonWeaponLog action
 
 		else
 			card = if action?.data then action.data['cardID'] else ''
@@ -176,8 +185,6 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerDamageLog: (action) ->
-		console.log 'building log for power action', action
-
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -194,14 +201,34 @@ TurnLog = React.createClass
 			    {indent}
 			    {cardLog}
 			    <span> deals {action.amount} damage to </span>
-			    <span dangerouslySetInnerHTML={{__html: targetLink}}></span>
+			    <SpanDisplayLog newLog={targetLink} />
+			</p>
+
+		return log
+
+	buildPowerTargetLog: (action) ->
+		if !action.sameOwnerAsParent
+			card = if action.data then action.data['cardID'] else ''
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			indent = <span className="indented-log">...and </span>
+
+		target = @replay.entities[action.target]['cardID']
+		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+
+		log = <p key={++@logIndex}>
+			    {indent}
+			    {cardLog}
+			    <span> targets </span>
+			    <SpanDisplayLog newLog={targetLink} />
 			</p>
 
 		return log
 
 	buildAttackLog: (action) ->
-		console.log 'building log for attack', action
-
 		card = if action.data then action.data['cardID'] else ''
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
@@ -209,7 +236,7 @@ TurnLog = React.createClass
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={++@logIndex}>
-			    <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			    <SpanDisplayLog newLog={cardLink} />
 			    <span> attacks </span>
 			    <span dangerouslySetInnerHTML={{__html: targetLink}}></span>
 			</p>
@@ -221,7 +248,7 @@ TurnLog = React.createClass
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
 		log = <p key={++@logIndex}>
-			    <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			    <SpanDisplayLog newLog={cardLink} />
 			    <span> dies </span>
 			</p>
 
@@ -236,7 +263,7 @@ TurnLog = React.createClass
 			choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
 
 		log = <p key={++@logIndex}>
-			    <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			    <SpanDisplayLog newLog={cardLink} />
 			    <span> discovers </span>
 			    {choicesCards}
 			    <span></span>
@@ -244,6 +271,42 @@ TurnLog = React.createClass
 
 		return log
 
+	buildSummonMinionLog: (action) ->
+		console.log 'buildSummonMinionLog', action
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			indent = <span className="indented-log">...which</span>
+		else
+			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+
+		card = action.data['cardID']
+		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		log = <p key={++@logIndex}>
+			    {indent}		
+			    <span> summons </span> 
+			    <SpanDisplayLog newLog={cardLink} />
+			</p>
+
+		return log
+
+	buildSummonWeaponLog: (action) ->
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			indent = <span className="indented-log">...which</span>
+		else
+			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+
+		card = action.data['cardID']
+		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		log = <p key={++@logIndex}>
+			    {indent}
+			    <span> equips </span>
+			    <SpanDisplayLog newLog={cardLink} />
+			</p>
+
+		return log
 
 	# ===================
 	# Turn specific log

@@ -78,6 +78,8 @@ class ActionParser extends EventEmitter
 						@parseAttacks batch, command[1][0]
 						@parseDeaths batch, command[1][0]
 						@parseDiscovers batch, command[1][0]
+						@parseSummons batch, command[1][0]
+						@parseEquipEffect batch, command[1][0]
 
 
 						# Played a card Legacy
@@ -294,50 +296,50 @@ class ActionParser extends EventEmitter
 
 								# Don't include enchantments - we are already logging the fact that they are played
 								# Don't include discover, handled elsewhere (in the new extracted methods)
-								if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6 and !(command[1][0].attributes.type == '3' and command.fullEntities?.length == 3)
+								# if command[1][0].fullEntity and command[1][0].fullEntity.tags.CARDTYPE != 6 and !(command[1][0].attributes.type == '3' and command.fullEntities?.length == 3)
 
-									# Also log what creates the new entities. Can be hero power 
-									# HP are logged in a bit of a weird way, so we need to manually adjust their offset
-									if command[1][0].parent
-										for tag in command[1][0].parent.tags
-											if (tag.tag == 'HEROPOWER_ACTIVATIONS_THIS_TURN' && tag.value > 0)
-												command[1][0].indent = if command[1][0].indent > 1 then command[1][0].indent - 1 else undefined
-												command[1][0].fullEntity.indent = if command[1][0].fullEntity.indent > 1 then command[1][0].fullEntity.indent - 1 else undefined
+								# 	# Also log what creates the new entities. Can be hero power 
+								# 	# HP are logged in a bit of a weird way, so we need to manually adjust their offset
+								# 	if command[1][0].parent
+								# 		for tag in command[1][0].parent.tags
+								# 			if (tag.tag == 'HEROPOWER_ACTIVATIONS_THIS_TURN' && tag.value > 0)
+								# 				command[1][0].indent = if command[1][0].indent > 1 then command[1][0].indent - 1 else undefined
+								# 				command[1][0].fullEntity.indent = if command[1][0].fullEntity.indent > 1 then command[1][0].fullEntity.indent - 1 else undefined
 									
-									action = {
-										turn: @currentTurnNumber - 1
-										# index: actionIndex++
-										timestamp: batch.timestamp
-										prefix: '\t'
-										type: ': '
-										data: @entities[command[1][0].attributes.entity]
-										owner: @turns[@currentTurnNumber].activePlayer
-										initialCommand: command[1][0]
-										debugType: 'power 3 root'
-									}
-									@addAction @currentTurnNumber, action
+								# 	action = {
+								# 		turn: @currentTurnNumber - 1
+								# 		# index: actionIndex++
+								# 		timestamp: batch.timestamp
+								# 		prefix: '\t'
+								# 		type: ': '
+								# 		data: @entities[command[1][0].attributes.entity]
+								# 		owner: @turns[@currentTurnNumber].activePlayer
+								# 		initialCommand: command[1][0]
+								# 		debugType: 'power 3 root'
+								# 	}
+								# 	@addAction @currentTurnNumber, action
 
-									action = {
-										turn: @currentTurnNumber - 1
-										# index: actionIndex++
-										timestamp: batch.timestamp
-										prefix: '\t'
-										creator: @entities[command[1][0].attributes.entity]
-										type: ': '
-										# This caused invoked minions from triggers to be detected as the minion who triggered them
-										#data: @entities[command[1][0].attributes.entity]
-										data: @entities[command[1][0].fullEntity.id]
-										owner: @getController(command[1][0].fullEntity.tags.CONTROLLER) #@turns[currentTurnNumber].activePlayer
-										# Don't store the full entity, because it's possible the target 
-										# doesn't exist yet when parsing the replay
-										# (it's the case for created tokens)
-										#@entities[target]
-										target: target
-										initialCommand: command[1][0].fullEntity
-										debugType: 'power 3'
-										debug: @entities
-									}
-									@addAction @currentTurnNumber, action
+								# 	action = {
+								# 		turn: @currentTurnNumber - 1
+								# 		# index: actionIndex++
+								# 		timestamp: batch.timestamp
+								# 		prefix: '\t'
+								# 		creator: @entities[command[1][0].attributes.entity]
+								# 		type: ': '
+								# 		# This caused invoked minions from triggers to be detected as the minion who triggered them
+								# 		#data: @entities[command[1][0].attributes.entity]
+								# 		data: @entities[command[1][0].fullEntity.id]
+								# 		owner: @getController(command[1][0].fullEntity.tags.CONTROLLER) #@turns[currentTurnNumber].activePlayer
+								# 		# Don't store the full entity, because it's possible the target 
+								# 		# doesn't exist yet when parsing the replay
+								# 		# (it's the case for created tokens)
+								# 		#@entities[target]
+								# 		target: target
+								# 		initialCommand: command[1][0].fullEntity
+								# 		debugType: 'power 3'
+								# 		debug: @entities
+								# 	}
+								# 	@addAction @currentTurnNumber, action
 
 								# Armor buff
 								if command[1][0].tags
@@ -549,7 +551,6 @@ class ActionParser extends EventEmitter
 	# Damage, healing and jousts
 	parsePowerEffects: (batch, command) ->
 		if command.attributes.type == '3' and command.meta?.length > 0
-			console.log '\tConsidering power of', command
 			# If the entity that triggers the power is something that just did an action, we don't log that again
 			if command.parent?.attributes?.entity == command.attributes.entity
 				sameOwnerAsParent = true
@@ -560,6 +561,7 @@ class ActionParser extends EventEmitter
 
 			for meta in command.meta
 				for info in meta.info
+
 					# The power dealt some damage
 					if meta.meta == 'DAMAGE'
 						action = {
@@ -570,6 +572,21 @@ class ActionParser extends EventEmitter
 							mainAction: mainAction
 							sameOwnerAsParent: sameOwnerAsParent
 							actionType: 'power-damage'
+							data: @entities[command.attributes.entity]
+							owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+							initialCommand: command
+						}
+						@addAction @currentTurnNumber, action
+
+					# The power simply targets something else
+					if meta.meta == 'TARGET'
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: batch.timestamp
+							target: info.entity
+							mainAction: mainAction
+							sameOwnerAsParent: sameOwnerAsParent
+							actionType: 'power-target'
 							data: @entities[command.attributes.entity]
 							owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 							initialCommand: command
@@ -611,12 +628,10 @@ class ActionParser extends EventEmitter
 	parseDiscovers: (batch, command) ->
 		# Always discover 3 cards
 		if command.attributes.type == '3' and command.fullEntities?.length == 3
-			console.log 'Considering Discover action', command
 			# Check that each of them is in the SETASIDE zone
 			isDiscover = true
 			choices = []
 			for entity in command.fullEntities
-				console.log '\tExamining discovered entity', entity
 				choices.push entity
 				if entity.tags.ZONE != 6
 					isDiscover = false
@@ -631,7 +646,51 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				command.isDiscover = true
-				console.log '\t\tadding Discover action', action
 				@addAction @currentTurnNumber, action
+
+
+	parseSummons: (batch, command) ->
+		# A power that creates new entities - minions
+		if command.attributes.type == '3' and command.fullEntities?.length > 0
+			for entity in command.fullEntities
+				# Only care about summons here, which are entities that come in play directly
+				# And summons only concerns minions - specific handlers take care of the rest
+				if entity.tags.ZONE == 1 and entity.tags.CARDTYPE == 4
+					# Is the effect triggered in response to another play?
+					if command.parent
+						mainAction = command.parent
+
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: batch.timestamp
+						actionType: 'summon-minion'
+						data: entity
+						owner: @getController(entity.tags.CONTROLLER)
+						mainAction: mainAction
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
+
+	parseEquipEffect: (batch, command) ->
+		# A power that creates new entities - weapons
+		if command.attributes.type == '3' and command.fullEntities?.length > 0
+			for entity in command.fullEntities
+				# Only care about summons here, which are entities that come in play directly
+				# And summons only concerns minions - specific handlers take care of the rest
+				if entity.tags.ZONE == 1 and entity.tags.CARDTYPE == 7
+					# Is the effect triggered in response to another play?
+					if command.parent
+						mainAction = command.parent
+
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: batch.timestamp
+						actionType: 'summon-weapon'
+						data: entity
+						owner: @getController(entity.tags.CONTROLLER)
+						mainAction: mainAction
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
 
 module.exports = ActionParser
