@@ -32,7 +32,7 @@
       }, this.log, React.createElement("button", {
         "className": "btn btn-default",
         "onClick": this.props.onLogClick
-      }, React.createElement("span", null, "Show log")));
+      }, React.createElement("span", null, "Full log")));
     };
 
     return GameLog;

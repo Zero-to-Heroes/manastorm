@@ -37,7 +37,7 @@ TurnLog = React.createClass
 		return null unless @props.show
 
 		return 	<div className="turn-log background-white">
-					<div className="log-container">
+					<div className="log-container" id="turnLog">
 						{@logs}
 					</div>
 				</div>
@@ -54,6 +54,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'played-card-from-hand'
 			log = @buildPlayedCardFromHandLog action
 
+		else if action.actionType == 'hero-power'
+			log = @buildHeroPowerLog action
+
 		else if action.actionType == 'played-secret-from-hand'
 			log = @buildPlayedSecretFromHandLog action
 
@@ -62,6 +65,12 @@ TurnLog = React.createClass
 
 		else if action.actionType == 'power-target'
 			log = @buildPowerTargetLog action
+
+		else if action.actionType == 'trigger-fullentity'
+			log = @buildTriggerFullEntityLog action
+
+		else if action.actionType == 'summon-weapon'
+			log = @buildSummonWeaponLog action
 
 		else if action.actionType == 'attack'
 			log = @buildAttackLog action
@@ -77,6 +86,7 @@ TurnLog = React.createClass
 
 		else if action.actionType == 'summon-weapon'
 			log = @buildSummonWeaponLog action
+
 
 		else
 			card = if action?.data then action.data['cardID'] else ''
@@ -146,21 +156,40 @@ TurnLog = React.createClass
 		else
 			cardLink = '<span> 1 card </span>'
 
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			indent = <span className="indented-log">...and </span>
+		else
+			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+
+
 		drawLog = <p key={++@logIndex}>
-					<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+					{indent}
 					<span> draws </span>
-					<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+					<SpanDisplayLog newLog={cardLink} />
 				</p>
 
 		return drawLog
 
 	buildPlayedCardFromHandLog: (action) ->
-		card = if action?.data then action.data['cardID'] else ''
+		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
 		log = <p key={++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 				<span> plays </span>
+				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			</p>
+
+		return log
+
+	buildHeroPowerLog: (action) ->
+		card = action.data['cardID']
+		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		log = <p key={++@logIndex}>
+				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+				<span> uses </span>
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 			</p>
 
@@ -214,7 +243,7 @@ TurnLog = React.createClass
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			indent = <span className="indented-log">...and </span>
+			indent = <span className="indented-log">...which </span>
 
 		target = @replay.entities[action.target]['cardID']
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
@@ -224,6 +253,30 @@ TurnLog = React.createClass
 			    {cardLog}
 			    <span> targets </span>
 			    <SpanDisplayLog newLog={targetLink} />
+			</p>
+
+		return log
+
+	buildTriggerFullEntityLog: (action) ->
+		card = action.data['cardID']
+		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		console.log 'building entity creation log', action
+
+		creations = []
+		for entity in action.newEntities
+			target = entity['cardID']
+			if target
+				targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+				creationLog = <span key={++@logIndex} className="list"> 
+					<SpanDisplayLog newLog={cardLink} />
+					<span> creates </span>
+					<SpanDisplayLog newLog={targetLink} />
+				</span>
+				creations.push creationLog
+
+		log = <p key={++@logIndex}>
+			    {creations}
 			</p>
 
 		return log
@@ -397,7 +450,7 @@ SpanDisplayLog = React.createClass
 	componentDidMount: ->
 		@index = ++@logIndex
 		node = ReactDOM.findDOMNode(this)
-		$(node).parent().parent().scrollTo("max")
+		$("#turnLog").scrollTo("max")
 
 	render: ->
 		cls = @props.className

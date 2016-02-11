@@ -190,11 +190,17 @@ class HSReplayParser
 				@replay.enqueue null, 'receiveTagChange', tag
 
 			when 'MetaData'
+				if node.attributes.ts
+					ts = tsToSeconds(node.attributes.ts)
+				else
+					ts = null
+
 				#console.error 'parsing MetaData'
 				@metaData = {
 					meta: metaTagNames[node.attributes.meta]
 					data: node.attributes.data
 					parent: @stack[@stack.length - 2]
+					ts: ts
 				}
 
 				if (!@metaData.parent.meta)

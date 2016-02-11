@@ -167,7 +167,7 @@
     };
 
     HSReplayParser.prototype.actionState = function(node) {
-      var ref1, ref2, ref3, ref4, tag;
+      var ref1, ref2, ref3, ref4, tag, ts;
       switch (node.name) {
         case 'ShowEntity':
         case 'FullEntity':
@@ -214,10 +214,16 @@
           this.replay.enqueue(null, 'receiveTagChange', tag);
           break;
         case 'MetaData':
+          if (node.attributes.ts) {
+            ts = tsToSeconds(node.attributes.ts);
+          } else {
+            ts = null;
+          }
           this.metaData = {
             meta: metaTagNames[node.attributes.meta],
             data: node.attributes.data,
-            parent: this.stack[this.stack.length - 2]
+            parent: this.stack[this.stack.length - 2],
+            ts: ts
           };
           if (!this.metaData.parent.meta) {
             this.metaData.parent.meta = [];
