@@ -101,7 +101,7 @@
     };
 
     ActionParser.prototype.parseActions = function() {
-      var action, armor, batch, command, dmg, excluded, i, j, k, l, len, len1, len2, len3, len4, len5, m, n, o, p, playedCard, publicSecret, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, ref8, ref9, results, secret, sortedActions, tag, target, tempTurnNumber;
+      var action, armor, batch, command, dmg, excluded, i, j, k, l, len, len1, len2, len3, len4, m, n, o, playedCard, ref, ref1, ref2, ref3, ref4, ref5, ref6, results, secret, sortedActions, tag, target, tempTurnNumber;
       this.players = [this.player, this.opponent];
       this.playerIndex = 0;
       this.turnNumber = 1;
@@ -118,6 +118,7 @@
           if (command[0] === 'receiveAction') {
             this.currentTurnNumber = this.turnNumber - 1;
             if (this.turns[this.currentTurnNumber]) {
+              this.parseSecretRevealed(batch, command[1][0]);
               this.parseMulliganCards(batch, command[1][0]);
               this.parseCardPlayedFromHand(batch, command[1][0]);
               this.parseHeroPowerUsed(batch, command[1][0]);
@@ -128,49 +129,16 @@
               this.parseDiscovers(batch, command[1][0]);
               this.parseSummons(batch, command[1][0]);
               this.parseEquipEffect(batch, command[1][0]);
-              this.parseSecretRevealed(batch, command[1][0]);
-              this.parseTriggerEffects(batch, command[1][0]);
-              if (command[1][0].tags && ((ref2 = command[1][0].attributes.type) !== '5' && ref2 !== '7')) {
-                playedCard = -1;
-                excluded = false;
-                secret = false;
-                ref3 = command[1][0].tags;
-                for (m = 0, len2 = ref3.length; m < len2; m++) {
-                  tag = ref3[m];
-                  if (tag.tag === 'ZONE' && ((ref4 = tag.value) === 1 || ref4 === 7)) {
-                    playedCard = tag.entity;
-                  }
-                  if (tag.tag === 'SECRET' && tag.value === 1) {
-                    secret = true;
-                    publicSecret = command[1][0].attributes.type === '7' && this.turns[this.currentTurnNumber].activePlayer.id === this.mainPlayerId;
-                  }
-                  if (tag.tag === 'ATTACHED') {
-                    excluded = true;
-                  }
-                }
-                if (playedCard > -1 && !excluded) {
-                  action = {
-                    turn: this.currentTurnNumber - 1,
-                    timestamp: batch.timestamp,
-                    type: ': ',
-                    secret: secret,
-                    publicSecret: publicSecret,
-                    data: this.entities[playedCard],
-                    owner: this.turns[this.currentTurnNumber].activePlayer,
-                    initialCommand: command[1][0],
-                    debugType: 'played card'
-                  };
-                  this.addAction(this.currentTurnNumber, action);
-                }
-              }
+              this.parseTriggerFullEntityCreation(batch, command[1][0]);
+              this.parseTriggerPutSecretInPlay(batch, command[1][0]);
               if (command[1][0].tags && command[1][0].attributes.type === '5') {
                 playedCard = -1;
                 excluded = false;
                 secret = false;
-                ref5 = command[1][0].tags;
-                for (n = 0, len3 = ref5.length; n < len3; n++) {
-                  tag = ref5[n];
-                  if (tag.tag === 'ZONE' && ((ref6 = tag.value) === 1 || ref6 === 7)) {
+                ref2 = command[1][0].tags;
+                for (m = 0, len2 = ref2.length; m < len2; m++) {
+                  tag = ref2[m];
+                  if (tag.tag === 'ZONE' && ((ref3 = tag.value) === 1 || ref3 === 7)) {
                     playedCard = tag.entity;
                   }
                   if (tag.tag === 'SECRET' && tag.value === 1) {
@@ -194,14 +162,14 @@
                   this.addAction(this.currentTurnNumber, action);
                 }
               }
-              if ((ref7 = command[1][0].attributes.type) === '3' || ref7 === '5') {
+              if ((ref4 = command[1][0].attributes.type) === '3' || ref4 === '5') {
                 if (!command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0) {
                   if (command[1][0].tags) {
                     dmg = 0;
                     target = void 0;
-                    ref8 = command[1][0].tags;
-                    for (o = 0, len4 = ref8.length; o < len4; o++) {
-                      tag = ref8[o];
+                    ref5 = command[1][0].tags;
+                    for (n = 0, len3 = ref5.length; n < len3; n++) {
+                      tag = ref5[n];
                       if (tag.tag === 'DAMAGE' && tag.value > 0) {
                         dmg = tag.value;
                         target = tag.entity;
@@ -224,9 +192,9 @@
                   }
                   if (command[1][0].tags) {
                     armor = 0;
-                    ref9 = command[1][0].tags;
-                    for (p = 0, len5 = ref9.length; p < len5; p++) {
-                      tag = ref9[p];
+                    ref6 = command[1][0].tags;
+                    for (o = 0, len4 = ref6.length; o < len4; o++) {
+                      tag = ref6[o];
                       if (tag.tag === 'ARMOR' && tag.value > 0) {
                         armor = tag.value;
                       }
@@ -433,7 +401,7 @@
     };
 
     ActionParser.prototype.parseSecretPlayedFromHand = function(batch, command) {
-      var action, k, len, playedCard, publicSecret, ref, secret, tag;
+      var action, entity, k, len, owner, playedCard, ref, secret, tag;
       if (command.attributes.type === '7') {
         playedCard = -1;
         secret = false;
@@ -445,17 +413,17 @@
           }
           if (tag.tag === 'SECRET' && tag.value === 1) {
             secret = true;
-            publicSecret = this.turns[this.currentTurnNumber].activePlayer.id === this.mainPlayerId;
           }
         }
         if (playedCard > -1 && secret) {
+          entity = this.entities[playedCard];
+          owner = this.getController(entity.tags.CONTROLLER);
           action = {
             turn: this.currentTurnNumber - 1,
             timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
             actionType: 'played-secret-from-hand',
-            publicSecret: publicSecret,
-            data: this.entities[playedCard],
-            owner: this.turns[this.currentTurnNumber].activePlayer,
+            data: entity,
+            owner: owner,
             initialCommand: command
           };
           return this.addAction(this.currentTurnNumber, action);
@@ -521,20 +489,55 @@
       }
     };
 
-    ActionParser.prototype.parseTriggerEffects = function(batch, command) {
-      var action, ref, ref1;
+    ActionParser.prototype.parseTriggerPutSecretInPlay = function(batch, command) {
+      var action, entity, k, len, ref, ref1, secretsPutInPlay, tag;
+      if ((ref = command.attributes.type) === '3' || ref === '5') {
+        secretsPutInPlay = [];
+        if (command.tags) {
+          ref1 = command.tags;
+          for (k = 0, len = ref1.length; k < len; k++) {
+            tag = ref1[k];
+            if (tag.tag === 'ZONE' && tag.value === 7) {
+              entity = this.entities[tag.entity];
+              secretsPutInPlay.push(entity);
+            }
+          }
+          if (secretsPutInPlay.length > 0) {
+            action = {
+              turn: this.currentTurnNumber - 1,
+              timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
+              secrets: secretsPutInPlay,
+              mainAction: command.parent,
+              actionType: 'trigger-secret-play',
+              data: this.entities[command.attributes.entity],
+              owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
+              initialCommand: command
+            };
+            return this.addAction(this.currentTurnNumber, action);
+          }
+        }
+      }
+    };
+
+    ActionParser.prototype.parseTriggerFullEntityCreation = function(batch, command) {
+      var action, fullEntities, ref, ref1;
       if ((ref = command.attributes.type) === '5') {
         if (((ref1 = command.fullEntities) != null ? ref1.length : void 0) > 0) {
-          action = {
-            turn: this.currentTurnNumber - 1,
-            timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
-            actionType: 'trigger-fullentity',
-            data: this.entities[command.attributes.entity],
-            owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
-            newEntities: command.fullEntities,
-            initialCommand: command
-          };
-          return this.addAction(this.currentTurnNumber, action);
+          fullEntities = _.filter(command.fullEntities, function(entity) {
+            return entity.tags.ZONE === 1;
+          });
+          if ((fullEntities != null ? fullEntities.length : void 0) > 0) {
+            action = {
+              turn: this.currentTurnNumber - 1,
+              timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
+              actionType: 'trigger-fullentity',
+              data: this.entities[command.attributes.entity],
+              owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
+              newEntities: fullEntities,
+              initialCommand: command
+            };
+            return this.addAction(this.currentTurnNumber, action);
+          }
         }
       }
     };
@@ -598,10 +601,12 @@
             timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
             actionType: 'discover',
             data: this.entities[command.attributes.entity],
+            owner: this.getController(this.entities[command.attributes.entity].tags.CONTROLLER),
             choices: choices,
             initialCommand: command
           };
           command.isDiscover = true;
+          console.log('adding discover action', action);
           return this.addAction(this.currentTurnNumber, action);
         }
       }

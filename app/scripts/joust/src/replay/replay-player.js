@@ -402,7 +402,9 @@
       var tempOpponent;
       tempOpponent = this.player;
       this.player = this.opponent;
-      return this.opponent = tempOpponent;
+      this.opponent = tempOpponent;
+      this.mainPlayerId = this.player.id;
+      return console.log('switched main player, new one is', this.mainPlayerId, this.player);
     };
 
     ReplayPlayer.prototype.getController = function(controllerId) {

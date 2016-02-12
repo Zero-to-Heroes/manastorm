@@ -89,6 +89,8 @@
         log = this.buildSummonMinionLog(action);
       } else if (action.actionType === 'summon-weapon') {
         log = this.buildSummonWeaponLog(action);
+      } else if (action.actionType === 'trigger-secret-play') {
+        log = this.buildTriggerSecretPlayLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -210,10 +212,10 @@
     },
     buildPlayedSecretFromHandLog: function(action) {
       var card, cardLink, link, log;
-      if ((typeof cardLink !== "undefined" && cardLink !== null ? cardLink.length : void 0) > 0 && action.publicSecret) {
-        card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
+      if (action.owner.id === this.replay.mainPlayerId) {
+        card = action.data['cardID'];
         cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
-        link = React.createElement("span", null, ": ");
+        link = React.createElement("span", null, "- ");
       } else {
 
       }
@@ -229,6 +231,41 @@
           __html: cardLink
         }
       }));
+      return log;
+    },
+    buildTriggerSecretPlayLog: function(action) {
+      var card, cardLink, indent, log, secret, secretLog, secrets, _i, _len, _ref;
+      if (action.mainAction) {
+        indent = React.createElement("span", {
+          "className": "indented-log"
+        }, "...which puts a ", React.createElement("span", {
+          "className": "secret-revealed"
+        }, "Secret"), "in play");
+      }
+      secrets = [];
+      _ref = action.secrets;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        secret = _ref[_i];
+        card = secret['cardID'];
+        if (action.owner === this.replay.player) {
+          cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+          secretLog = React.createElement("span", {
+            "className": "list"
+          }, indent, React.createElement("span", null, ": "), React.createElement(SpanDisplayLog, {
+            "newLog": cardLink
+          }));
+          secrets.push(secretLog);
+        } else {
+          secrets.push(React.createElement("span", {
+            "className": "list"
+          }, indent, React.createElement(SpanDisplayLog, {
+            "newLog": ''
+          })));
+        }
+      }
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, secrets);
       return log;
     },
     buildPowerDamageLog: function(action) {
@@ -285,7 +322,6 @@
       var card, cardLink, creationLog, creations, entity, log, target, targetLink, _i, _len, _ref;
       card = action.data['cardID'];
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
-      console.log('building entity creation log', action);
       creations = [];
       _ref = action.newEntities;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -338,24 +374,27 @@
     },
     buildDiscoverLog: function(action) {
       var card, cardLink, choice, choiceCard, choiceCardLink, choicesCards, log, _i, _len, _ref;
+      console.log('building discover log', action, this.replay.mainPlayerId);
       card = action.data['cardID'];
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
-      choicesCards = [];
-      _ref = action.choices;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        choice = _ref[_i];
-        choiceCard = choice['cardID'];
-        choiceCardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(choiceCard));
-        choicesCards.push(React.createElement(SpanDisplayLog, {
-          "className": "discovered-card indented-log",
-          "newLog": choiceCardLink
-        }));
+      if (!action.owner || action.owner.id === this.replay.mainPlayerId) {
+        choicesCards = [];
+        _ref = action.choices;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          choice = _ref[_i];
+          choiceCard = choice['cardID'];
+          choiceCardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(choiceCard));
+          choicesCards.push(React.createElement(SpanDisplayLog, {
+            "className": "discovered-card indented-log",
+            "newLog": choiceCardLink
+          }));
+        }
       }
       log = React.createElement("p", {
         "key": ++this.logIndex
       }, React.createElement(SpanDisplayLog, {
         "newLog": cardLink
-      }), React.createElement("span", null, " discovers "), choicesCards, React.createElement("span", null));
+      }), React.createElement("span", null, " discovers "), choicesCards);
       return log;
     },
     buildSummonMinionLog: function(action) {
@@ -452,11 +491,8 @@
 
   TurnDisplayLog = React.createClass({
     componentDidMount: function() {
-      var node;
       this.index = this.logIndex++;
-      node = ReactDOM.findDOMNode(this);
-      $(node).parent().parent().scrollTo("max");
-      return console.log('mounted TurnDisplayLog', node, $(node), $(node).parent());
+      return $("#turnLog").scrollTo("max");
     },
     render: function() {
       if (this.props.active) {
@@ -479,10 +515,8 @@
 
   PlayerNameDisplayLog = React.createClass({
     componentDidMount: function() {
-      var node;
       this.index = this.logIndex++;
-      node = ReactDOM.findDOMNode(this);
-      return $(node).parent().parent().scrollTo("max");
+      return $("#turnLog").scrollTo("max");
     },
     render: function() {
       if (this.props.active) {
@@ -501,10 +535,8 @@
 
   ActionDisplayLog = React.createClass({
     componentDidMount: function() {
-      var node;
       this.index = this.logIndex++;
-      node = ReactDOM.findDOMNode(this);
-      return $(node).parent().scrollTo("max");
+      return $("#turnLog").scrollTo("max");
     },
     render: function() {
       var cls;
@@ -522,9 +554,7 @@
 
   SpanDisplayLog = React.createClass({
     componentDidMount: function() {
-      var node;
       this.index = ++this.logIndex;
-      node = ReactDOM.findDOMNode(this);
       return $("#turnLog").scrollTo("max");
     },
     render: function() {

@@ -391,6 +391,8 @@ class ReplayPlayer extends EventEmitter
 		tempOpponent = @player
 		@player = @opponent
 		@opponent = tempOpponent
+		@mainPlayerId = @player.id
+		console.log 'switched main player, new one is', @mainPlayerId, @player
 
 	getController: (controllerId) ->
 		if @player.tags.CONTROLLER == controllerId

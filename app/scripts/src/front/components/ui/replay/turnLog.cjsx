@@ -87,6 +87,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'summon-weapon'
 			log = @buildSummonWeaponLog action
 
+		else if action.actionType == 'trigger-secret-play'
+			log = @buildTriggerSecretPlayLog action
+
 
 		else
 			card = if action?.data then action.data['cardID'] else ''
@@ -196,11 +199,10 @@ TurnLog = React.createClass
 		return log
 
 	buildPlayedSecretFromHandLog: (action) ->
-
-		if cardLink?.length > 0 and action.publicSecret
-			card = if action?.data then action.data['cardID'] else ''
+		if action.owner.id == @replay.mainPlayerId
+			card = action.data['cardID']
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-			link = <span>: </span>
+			link = <span>- </span>
 		else
 
 		log = <p key={++@logIndex}>
@@ -209,6 +211,35 @@ TurnLog = React.createClass
 				<span className="secret-revealed">Secret </span>
 				{link}
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			</p>
+
+		return log
+
+	buildTriggerSecretPlayLog: (action) ->
+		if action.mainAction
+			indent = <span className="indented-log">...which puts a <span className="secret-revealed">Secret</span>in play</span>
+
+		secrets = []
+		for secret in action.secrets
+			card = secret['cardID']
+			# Secret is public
+			if action.owner == @replay.player
+				cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+				secretLog = <span className="list">
+						{indent}
+						<span>: </span>
+						<SpanDisplayLog newLog={cardLink} />
+					</span>
+				secrets.push secretLog
+			else
+				secrets.push <span className="list">
+						{indent}
+						<SpanDisplayLog newLog={''} />
+					</span>
+
+
+		log = <p key={++@logIndex}>
+				{secrets}
 			</p>
 
 		return log
@@ -261,8 +292,6 @@ TurnLog = React.createClass
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
-		console.log 'building entity creation log', action
-
 		creations = []
 		for entity in action.newEntities
 			target = entity['cardID']
@@ -306,20 +335,21 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
+		console.log 'building discover log', action, @replay.mainPlayerId
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
-		choicesCards = []
-		for choice in action.choices
-			choiceCard = choice['cardID']
-			choiceCardLink = @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
-			choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
+		if !action.owner || action.owner.id == @replay.mainPlayerId
+			choicesCards = []
+			for choice in action.choices
+				choiceCard = choice['cardID']
+				choiceCardLink = @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
+				choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
 
 		log = <p key={++@logIndex}>
 			    <SpanDisplayLog newLog={cardLink} />
 			    <span> discovers </span>
 			    {choicesCards}
-			    <span></span>
 			</p>
 
 		return log
@@ -406,9 +436,7 @@ TurnLog = React.createClass
 TurnDisplayLog = React.createClass
 	componentDidMount: ->
 		@index = @logIndex++
-		node = ReactDOM.findDOMNode(this)
-		$(node).parent().parent().scrollTo("max")
-		console.log 'mounted TurnDisplayLog', node, $(node), $(node).parent()
+		$("#turnLog").scrollTo("max")
 		
 	render: ->
 		if @props.active
@@ -425,8 +453,7 @@ TurnDisplayLog = React.createClass
 PlayerNameDisplayLog = React.createClass
 	componentDidMount: ->
 		@index = @logIndex++
-		node = ReactDOM.findDOMNode(this)
-		$(node).parent().parent().scrollTo("max")
+		$("#turnLog").scrollTo("max")
 	
 	render: ->
 		if @props.active 
@@ -438,8 +465,7 @@ PlayerNameDisplayLog = React.createClass
 ActionDisplayLog = React.createClass
 	componentDidMount: ->
 		@index = @logIndex++
-		node = ReactDOM.findDOMNode(this)
-		$(node).parent().scrollTo("max")
+		$("#turnLog").scrollTo("max")
 
 	render: ->
 		cls = @props.className
@@ -449,7 +475,6 @@ ActionDisplayLog = React.createClass
 SpanDisplayLog = React.createClass
 	componentDidMount: ->
 		@index = ++@logIndex
-		node = ReactDOM.findDOMNode(this)
 		$("#turnLog").scrollTo("max")
 
 	render: ->
