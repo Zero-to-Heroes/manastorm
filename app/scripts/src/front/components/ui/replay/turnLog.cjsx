@@ -37,6 +37,7 @@ TurnLog = React.createClass
 		return null unless @props.show
 
 		return 	<div className="turn-log background-white">
+					<div className="close" onClick={@props.onClose}></div>
 					<div className="log-container" id="turnLog">
 						{@logs}
 					</div>

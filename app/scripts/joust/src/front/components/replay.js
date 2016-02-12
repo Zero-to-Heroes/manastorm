@@ -205,7 +205,8 @@
       })), React.createElement(TurnLog, {
         "show": this.displayConf.showLog,
         "replay": replay,
-        "onTurnClick": this.onGoToTurnClick
+        "onTurnClick": this.onGoToTurnClick,
+        "onClose": this.onTurnClick
       }), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
@@ -248,7 +249,8 @@
         "onClick": this.onClickChangeSpeed.bind(this, 8)
       }, "8x")))))), React.createElement(GameLog, {
         "replay": replay,
-        "onLogClick": this.onTurnClick
+        "onLogClick": this.onTurnClick,
+        "logOpen": this.displayConf.showLog
       }));
     };
 

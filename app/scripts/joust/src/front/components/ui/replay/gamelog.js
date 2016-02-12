@@ -27,12 +27,17 @@
     };
 
     GameLog.prototype.render = function() {
+      var buttonText;
+      buttonText = React.createElement("span", null, "Full log");
+      if (this.props.logOpen) {
+        buttonText = React.createElement("span", null, "Hide log");
+      }
       return React.createElement("div", {
         "className": "game-log"
       }, this.log, React.createElement("button", {
         "className": "btn btn-default",
         "onClick": this.props.onLogClick
-      }, React.createElement("span", null, "Full log")));
+      }, buttonText));
     };
 
     return GameLog;

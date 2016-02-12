@@ -13,9 +13,13 @@ class GameLog extends React.Component
 			@forceUpdate()
 
 	render: ->
+		buttonText = <span>Full log</span>
+		if @props.logOpen
+			buttonText = <span>Hide log</span>
+
 		<div className="game-log">
 			{@log} 
-			<button className="btn btn-default" onClick={@props.onLogClick}><span>Full log</span></button>
+			<button className="btn btn-default" onClick={@props.onLogClick}>{buttonText}</button>
 		</div>
 
 

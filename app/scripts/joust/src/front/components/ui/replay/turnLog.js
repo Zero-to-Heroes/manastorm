@@ -55,6 +55,9 @@
       return React.createElement("div", {
         "className": "turn-log background-white"
       }, React.createElement("div", {
+        "className": "close",
+        "onClick": this.props.onClose
+      }), React.createElement("div", {
         "className": "log-container",
         "id": "turnLog"
       }, this.logs));

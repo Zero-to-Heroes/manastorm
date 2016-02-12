@@ -122,7 +122,7 @@ class Replay extends React.Component
 						<Target source={source} target={target} type={replay.targetType}/>
 						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick}/>
+					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
 					<form className="replay__controls padded">
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
@@ -144,7 +144,7 @@ class Replay extends React.Component
 							</div>
 						</div>
 					</form>
-					<GameLog replay={replay} onLogClick={@onTurnClick} />
+					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog}/>
 				</div>
 
 	goNextAction: (e) =>
