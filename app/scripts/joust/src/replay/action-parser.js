@@ -101,7 +101,7 @@
     };
 
     ActionParser.prototype.parseActions = function() {
-      var action, armor, batch, command, dmg, excluded, i, j, k, l, len, len1, len2, len3, len4, m, n, o, playedCard, ref, ref1, ref2, ref3, ref4, ref5, ref6, results, secret, sortedActions, tag, target, tempTurnNumber;
+      var batch, command, i, j, k, l, len, len1, ref, ref1, results, sortedActions, tempTurnNumber;
       this.players = [this.player, this.opponent];
       this.playerIndex = 0;
       this.turnNumber = 1;
@@ -131,90 +131,7 @@
               this.parseEquipEffect(batch, command[1][0]);
               this.parseTriggerFullEntityCreation(batch, command[1][0]);
               this.parseTriggerPutSecretInPlay(batch, command[1][0]);
-              if (command[1][0].tags && command[1][0].attributes.type === '5') {
-                playedCard = -1;
-                excluded = false;
-                secret = false;
-                ref2 = command[1][0].tags;
-                for (m = 0, len2 = ref2.length; m < len2; m++) {
-                  tag = ref2[m];
-                  if (tag.tag === 'ZONE' && ((ref3 = tag.value) === 1 || ref3 === 7)) {
-                    playedCard = tag.entity;
-                  }
-                  if (tag.tag === 'SECRET' && tag.value === 1) {
-                    secret = true;
-                  }
-                  if (tag.tag === 'ATTACHED') {
-                    excluded = true;
-                  }
-                }
-                if (playedCard > -1 && !excluded) {
-                  action = {
-                    turn: this.currentTurnNumber - 1,
-                    timestamp: batch.timestamp,
-                    type: ': ',
-                    secret: secret,
-                    data: this.entities[playedCard],
-                    owner: command[1][0].attributes.entity,
-                    initialCommand: command[1][0],
-                    debugType: 'played card from tigger'
-                  };
-                  this.addAction(this.currentTurnNumber, action);
-                }
-              }
-              if ((ref4 = command[1][0].attributes.type) === '3' || ref4 === '5') {
-                if (!command[1][0].parent || !command[1][0].parent.attributes.target || parseInt(command[1][0].parent.attributes.target) <= 0) {
-                  if (command[1][0].tags) {
-                    dmg = 0;
-                    target = void 0;
-                    ref5 = command[1][0].tags;
-                    for (n = 0, len3 = ref5.length; n < len3; n++) {
-                      tag = ref5[n];
-                      if (tag.tag === 'DAMAGE' && tag.value > 0) {
-                        dmg = tag.value;
-                        target = tag.entity;
-                      }
-                    }
-                    if (dmg > 0 && command[1][0].attributes.type === '5') {
-                      action = {
-                        turn: this.currentTurnNumber - 1,
-                        timestamp: batch.timestamp,
-                        prefix: '\t',
-                        type: ': ',
-                        data: this.entities[command[1][0].attributes.entity],
-                        owner: this.turns[this.currentTurnNumber].activePlayer,
-                        target: target,
-                        initialCommand: command[1][0],
-                        debugType: 'power 3 dmg'
-                      };
-                      this.addAction(this.currentTurnNumber, action);
-                    }
-                  }
-                  if (command[1][0].tags) {
-                    armor = 0;
-                    ref6 = command[1][0].tags;
-                    for (o = 0, len4 = ref6.length; o < len4; o++) {
-                      tag = ref6[o];
-                      if (tag.tag === 'ARMOR' && tag.value > 0) {
-                        armor = tag.value;
-                      }
-                    }
-                    if (armor > 0) {
-                      action = {
-                        turn: this.currentTurnNumber - 1,
-                        timestamp: batch.timestamp,
-                        prefix: '\t',
-                        type: ': ',
-                        data: this.entities[command[1][0].attributes.entity],
-                        owner: this.getController(this.entities[command[1][0].attributes.entity].tags.CONTROLLER),
-                        initialCommand: command[1][0],
-                        debugType: 'armor'
-                      };
-                      this.addAction(this.currentTurnNumber, action);
-                    }
-                  }
-                }
-              }
+              this.parseNewHeroPower(batch, command[1][0]);
             }
           }
         }
@@ -350,9 +267,6 @@
       var action, entity, k, len, playedCard, ref, tag;
       if (command.attributes.type === '7') {
         entity = this.entities[command.attributes.entity];
-        if (command.attributes.entity === '6') {
-          console.log('Play Dire Wold command', entity, command);
-        }
         playedCard = -1;
         ref = command.tags;
         for (k = 0, len = ref.length; k < len; k++) {
@@ -379,6 +293,38 @@
           };
           return this.addAction(this.currentTurnNumber, action);
         }
+      }
+    };
+
+    ActionParser.prototype.parseNewHeroPower = function(batch, command) {
+      var action, card, entity, k, len, ref, ref1, results, tag;
+      if (((ref = command.attributes.type) === '3' || ref === '5') && command.tags) {
+        ref1 = command.tags;
+        results = [];
+        for (k = 0, len = ref1.length; k < len; k++) {
+          tag = ref1[k];
+          if (tag.tag === 'ZONE' && tag.value === 1) {
+            entity = this.entities[tag.entity];
+            card = this.replay.cardUtils.getCard(entity['cardID']);
+            if (card.type === 'Hero Power') {
+              action = {
+                turn: this.currentTurnNumber - 1,
+                timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp,
+                actionType: 'new-hero-power',
+                data: entity,
+                owner: this.getController(entity.tags.CONTROLLER),
+                initialCommand: command
+              };
+              console.log('receving a new hero power', action);
+              results.push(this.addAction(this.currentTurnNumber, action));
+            } else {
+              results.push(void 0);
+            }
+          } else {
+            results.push(void 0);
+          }
+        }
+        return results;
       }
     };
 

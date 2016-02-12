@@ -91,6 +91,8 @@
         log = this.buildSummonWeaponLog(action);
       } else if (action.actionType === 'trigger-secret-play') {
         log = this.buildTriggerSecretPlayLog(action);
+      } else if (action.actionType === 'new-hero-power') {
+        log = this.buildNewHeroPowerLog(action);
       } else {
         card = (action != null ? action.data : void 0) ? action.data['cardID'] : '';
         owner = action.owner.name;
@@ -269,7 +271,7 @@
       return log;
     },
     buildPowerDamageLog: function(action) {
-      var card, cardLink, cardLog, indent, log, target, targetLink;
+      var card, cardLink, cardLog, log, target, targetLink;
       if (!action.sameOwnerAsParent) {
         card = action.data ? action.data['cardID'] : '';
         cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
@@ -280,7 +282,7 @@
         });
       }
       if (action.mainAction) {
-        indent = React.createElement("span", {
+        cardLog = React.createElement("span", {
           "className": "indented-log"
         }, "...which ");
       }
@@ -288,13 +290,13 @@
       targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
       log = React.createElement("p", {
         "key": ++this.logIndex
-      }, indent, cardLog, React.createElement("span", null, " deals ", action.amount, " damage to "), React.createElement(SpanDisplayLog, {
+      }, cardLog, React.createElement("span", null, " deals ", action.amount, " damage to "), React.createElement(SpanDisplayLog, {
         "newLog": targetLink
       }));
       return log;
     },
     buildPowerTargetLog: function(action) {
-      var card, cardLink, cardLog, indent, log, target, targetLink;
+      var card, cardLink, cardLog, log, target, targetLink;
       if (!action.sameOwnerAsParent) {
         card = action.data ? action.data['cardID'] : '';
         cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
@@ -305,7 +307,7 @@
         });
       }
       if (action.mainAction) {
-        indent = React.createElement("span", {
+        cardLog = React.createElement("span", {
           "className": "indented-log"
         }, "...which ");
       }
@@ -313,7 +315,7 @@
       targetLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(target));
       log = React.createElement("p", {
         "key": ++this.logIndex
-      }, indent, cardLog, React.createElement("span", null, " targets "), React.createElement(SpanDisplayLog, {
+      }, cardLog, React.createElement("span", null, " targets "), React.createElement(SpanDisplayLog, {
         "newLog": targetLink
       }));
       return log;
@@ -436,6 +438,22 @@
       log = React.createElement("p", {
         "key": ++this.logIndex
       }, indent, React.createElement("span", null, " equips "), React.createElement(SpanDisplayLog, {
+        "newLog": cardLink
+      }));
+      return log;
+    },
+    buildNewHeroPowerLog: function(action) {
+      var card, cardLink, log;
+      card = action.data['cardID'];
+      cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
+      log = React.createElement("p", {
+        "key": ++this.logIndex
+      }, React.createElement(PlayerNameDisplayLog, {
+        "active": action.owner === this.replay.player,
+        "name": action.owner.name
+      }), React.createElement("span", {
+        "className": "new-hero-power"
+      }, " receives a new Hero Power!! "), React.createElement(SpanDisplayLog, {
         "newLog": cardLink
       }));
       return log;

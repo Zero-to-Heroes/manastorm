@@ -97,7 +97,28 @@ class ActionParser extends EventEmitter
 						@parseEquipEffect batch, command[1][0]
 						@parseTriggerFullEntityCreation batch, command[1][0]
 						@parseTriggerPutSecretInPlay batch, command[1][0]
+						@parseNewHeroPower batch, command[1][0]
 
+						# # Armor buff
+						# if command[1][0].tags
+						# 	armor = 0
+						# 	for tag in command[1][0].tags
+						# 		if tag.tag == 'ARMOR' and tag.value > 0
+						# 			armor = tag.value
+
+						# 	if armor > 0
+						# 		action = {
+						# 			turn: @currentTurnNumber - 1
+						# 			# index: actionIndex++
+						# 			timestamp: batch.timestamp
+						# 			prefix: '\t'
+						# 			type: ': '
+						# 			data: @entities[command[1][0].attributes.entity]
+						# 			owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER)
+						# 			initialCommand: command[1][0]
+						# 			debugType: 'armor'
+						# 		}
+						# 		@addAction @currentTurnNumber, action
 
 						# Played a card Legacy
 						# if command[1][0].tags and command[1][0].attributes.type not in ['5', '7']
@@ -280,7 +301,7 @@ class ActionParser extends EventEmitter
 						# if command[1][0].attributes.type in ['3' ,'5']
 
 						# 	# If parent action has a target, do nothing
-						# 	if !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0
+							# if !command[1][0].parent or !command[1][0].parent.attributes.target or parseInt(command[1][0].parent.attributes.target) <= 0
 
 						# 		# Does it do damage?
 						# 		if command[1][0].tags
@@ -358,26 +379,6 @@ class ActionParser extends EventEmitter
 								# 	}
 								# 	@addAction @currentTurnNumber, action
 
-								# Armor buff
-								if command[1][0].tags
-									armor = 0
-									for tag in command[1][0].tags
-										if tag.tag == 'ARMOR' and tag.value > 0
-											armor = tag.value
-
-									if armor > 0
-										action = {
-											turn: @currentTurnNumber - 1
-											# index: actionIndex++
-											timestamp: batch.timestamp
-											prefix: '\t'
-											type: ': '
-											data: @entities[command[1][0].attributes.entity]
-											owner: @getController(@entities[command[1][0].attributes.entity].tags.CONTROLLER)
-											initialCommand: command[1][0]
-											debugType: 'armor'
-										}
-										@addAction @currentTurnNumber, action
 
 			#console.log @turns.length, 'game turns at position', @turns
 
@@ -521,9 +522,6 @@ class ActionParser extends EventEmitter
 			# Check that the entity was in our hand before
 			entity = @entities[command.attributes.entity]
 
-			if command.attributes.entity == '6'
-				console.log 'Play Dire Wold command', entity, command
-
 			playedCard = -1
 			# The case of a ShowEntity command when the card was already known - basically 
 			# when we play our own card. In that case, the tags are already known, and 
@@ -554,8 +552,24 @@ class ActionParser extends EventEmitter
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
 
-	
-	
+	parseNewHeroPower: (batch, command) ->
+		if command.attributes.type in ['3', '5'] and command.tags
+			for tag in command.tags
+				if tag.tag == 'ZONE' and tag.value == 1
+					entity = @entities[tag.entity]
+					card = @replay.cardUtils.getCard(entity['cardID'])
+					if card.type == 'Hero Power'
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+							actionType: 'new-hero-power'
+							data: entity
+							owner: @getController(entity.tags.CONTROLLER)
+							initialCommand: command
+						}
+						console.log 'receving a new hero power', action
+						# console.log '\tAnd it is a valid play', action
+						@addAction @currentTurnNumber, action
 
 	parseHeroPowerUsed: (batch, command) ->
 		if command.attributes.type == '7'

@@ -90,6 +90,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'trigger-secret-play'
 			log = @buildTriggerSecretPlayLog action
 
+		else if action.actionType == 'new-hero-power'
+			log = @buildNewHeroPowerLog action
+
 
 		else
 			card = if action?.data then action.data['cardID'] else ''
@@ -252,13 +255,12 @@ TurnLog = React.createClass
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			indent = <span className="indented-log">...which </span>
+			cardLog = <span className="indented-log">...which </span>
 
 		target = @replay.entities[action.target]['cardID']
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={++@logIndex}>
-			    {indent}
 			    {cardLog}
 			    <span> deals {action.amount} damage to </span>
 			    <SpanDisplayLog newLog={targetLink} />
@@ -274,13 +276,12 @@ TurnLog = React.createClass
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			indent = <span className="indented-log">...which </span>
+			cardLog = <span className="indented-log">...which </span>
 
 		target = @replay.entities[action.target]['cardID']
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={++@logIndex}>
-			    {indent}
 			    {cardLog}
 			    <span> targets </span>
 			    <SpanDisplayLog newLog={targetLink} />
@@ -386,6 +387,18 @@ TurnLog = React.createClass
 		log = <p key={++@logIndex}>
 			    {indent}
 			    <span> equips </span>
+			    <SpanDisplayLog newLog={cardLink} />
+			</p>
+
+		return log
+
+	buildNewHeroPowerLog: (action) ->
+		card = action.data['cardID']
+		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		log = <p key={++@logIndex}>
+			    <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+			    <span className="new-hero-power"> receives a new Hero Power!! </span>
 			    <SpanDisplayLog newLog={cardLink} />
 			</p>
 
