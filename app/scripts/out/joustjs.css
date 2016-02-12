@@ -2122,6 +2122,10 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.7);
   margin-top: 20px;
 }
+.hearthstone #externalPlayer .turn-log .turn-click {
+  cursor: pointer;
+  color: #fff;
+}
 .hearthstone #externalPlayer .turn-log .main-player {
   color: #0070DE;
 }

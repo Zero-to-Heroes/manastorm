@@ -124,20 +124,6 @@ TurnLog = React.createClass
 		@replay.notifyNewLog log
 		return [log]
 
-	buildTurnLog: (turn) ->
-		# console.log 'building turn log', turn
-		if turn
-			if turn.turn is 'Mulligan'
-				log = @buildMulliganLog turn
-				return log
-			else 
-				log = <p className="turn" key={@logIndex++}>
-						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
-					</p>
-
-				@replay.notifyNewLog log
-				return [log]
-
 	
 
 	# ===================
@@ -407,8 +393,22 @@ TurnLog = React.createClass
 	# ===================
 	# Turn specific log
 	# ===================
+	buildTurnLog: (turn) ->
+		# console.log 'building turn log', turn
+		if turn
+			if turn.turn is 'Mulligan'
+				log = @buildMulliganLog turn
+				return log
+			else 
+				log = <p className="turn" key={@logIndex++}>
+						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} onClick={@props.onTurnClick.bind(this, turn.turn)} />
+					</p>
+
+				@replay.notifyNewLog log
+				return [log]
+
 	buildMulliganLog: (turn) ->
-		log = <p className="turn" key={++@logIndex}>Mulligan</p>
+		log = <p className="turn turn-click" key={++@logIndex} onClick={@props.onTurnClick.bind(this, 0)}>Mulligan</p>
 
 		@replay.notifyNewLog log
 
@@ -436,12 +436,12 @@ TurnLog = React.createClass
 
 		return logs
 
-
 	# ===============
 	# Utilities
 	# ===============
 	playerName: (turn) -> 
 		return <PlayerNameDisplayLog active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
+
 
 # ===============
 # And DRY obkects
@@ -454,12 +454,12 @@ TurnDisplayLog = React.createClass
 	render: ->
 		if @props.active
 			return <span key={@index}>
-				{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}
+				<span onClick={@props.onClick} className="turn-click">{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}</span>
 				<PlayerNameDisplayLog active={true} name={@props.name} />
 			</span>
 		else
 			return <span key={@index}>
-				{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}
+				<span onClick={@props.onClick} className="turn-click">{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}</span>
 				<PlayerNameDisplayLog active={false} name={@props.name} />
 			</span>
 

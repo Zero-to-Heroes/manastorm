@@ -161,7 +161,6 @@ class ReplayPlayer extends EventEmitter
 	goPreviousTurn: ->
 		@newStep()
 
-		# else
 		targetTurn = Math.max(1, @currentTurn - 1)
 
 		@currentTurn = 0
@@ -188,6 +187,17 @@ class ReplayPlayer extends EventEmitter
 
 			@goToTimestamp targetTimestamp
 
+	goToTurn: (turn) ->
+		@newStep()
+
+		targetTurn = turn + 1
+
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@init()
+
+		while @currentTurn != targetTurn
+			@goNextAction()
 
 	# ========================
 	# Moving inside the replay (with direct timestamp manipulation)

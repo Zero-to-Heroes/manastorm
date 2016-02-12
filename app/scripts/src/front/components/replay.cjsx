@@ -122,7 +122,7 @@ class Replay extends React.Component
 						<Target source={source} target={target} type={replay.targetType}/>
 						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay}/>
+					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick}/>
 					<form className="replay__controls padded">
 						<ButtonGroup>
 							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
@@ -195,9 +195,13 @@ class Replay extends React.Component
 		@forceUpdate()
 
 	onTurnClick: (e) =>
-		console.log 'clicked on turn'
 		e.preventDefault()
 		@displayConf.showLog = !@displayConf.showLog
+		@forceUpdate()
+
+	onGoToTurnClick: (turn, e) =>
+		console.log 'clicked to go to a turn', turn
+		@state.replay.goToTurn(turn)
 		@forceUpdate()
 
 

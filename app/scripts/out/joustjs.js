@@ -47,7 +47,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  
+  console.log('in replay');
 
   React = _dereq_('react');
 
@@ -99,6 +99,7 @@
     __extends(Replay, _super);
 
     function Replay(props) {
+      this.onGoToTurnClick = __bind(this.onGoToTurnClick, this);
       this.onTurnClick = __bind(this.onTurnClick, this);
       this.onMainPlayerSwitchedChange = __bind(this.onMainPlayerSwitchedChange, this);
       this.onShowCardsChange = __bind(this.onShowCardsChange, this);
@@ -245,7 +246,8 @@
         "active": this.displayConf.showLog
       })), React.createElement(TurnLog, {
         "show": this.displayConf.showLog,
-        "replay": replay
+        "replay": replay,
+        "onTurnClick": this.onGoToTurnClick
       }), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
@@ -349,9 +351,14 @@
     };
 
     Replay.prototype.onTurnClick = function(e) {
-      
       e.preventDefault();
       this.displayConf.showLog = !this.displayConf.showLog;
+      return this.forceUpdate();
+    };
+
+    Replay.prototype.onGoToTurnClick = function(turn, e) {
+      console.log('clicked to go to a turn', turn);
+      this.state.replay.goToTurn(turn);
       return this.forceUpdate();
     };
 
@@ -1789,26 +1796,6 @@ arguments[4][4][0].apply(exports,arguments)
       this.replay.notifyNewLog(log);
       return [log];
     },
-    buildTurnLog: function(turn) {
-      var log;
-      if (turn) {
-        if (turn.turn === 'Mulligan') {
-          log = this.buildMulliganLog(turn);
-          return log;
-        } else {
-          log = React.createElement("p", {
-            "className": "turn",
-            "key": this.logIndex++
-          }, React.createElement(TurnDisplayLog, {
-            "turn": turn,
-            "active": turn.activePlayer === this.replay.player,
-            "name": turn.activePlayer.name
-          }));
-          this.replay.notifyNewLog(log);
-          return [log];
-        }
-      }
-    },
     buildSecretRevealedLog: function(action) {
       var card, cardLink, log, newLog;
       card = action.data['cardID'];
@@ -2041,7 +2028,7 @@ arguments[4][4][0].apply(exports,arguments)
     },
     buildDiscoverLog: function(action) {
       var card, cardLink, choice, choiceCard, choiceCardLink, choicesCards, log, _i, _len, _ref;
-      
+      console.log('building discover log', action, this.replay.mainPlayerId);
       card = action.data['cardID'];
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       if (!action.owner || action.owner.id === this.replay.mainPlayerId) {
@@ -2066,7 +2053,7 @@ arguments[4][4][0].apply(exports,arguments)
     },
     buildSummonMinionLog: function(action) {
       var card, cardLink, indent, log;
-      
+      console.log('buildSummonMinionLog', action);
       if (action.mainAction) {
         indent = React.createElement("span", {
           "className": "indented-log"
@@ -2123,11 +2110,33 @@ arguments[4][4][0].apply(exports,arguments)
       }));
       return log;
     },
+    buildTurnLog: function(turn) {
+      var log;
+      if (turn) {
+        if (turn.turn === 'Mulligan') {
+          log = this.buildMulliganLog(turn);
+          return log;
+        } else {
+          log = React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, React.createElement(TurnDisplayLog, {
+            "turn": turn,
+            "active": turn.activePlayer === this.replay.player,
+            "name": turn.activePlayer.name,
+            "onClick": this.props.onTurnClick.bind(this, turn.turn)
+          }));
+          this.replay.notifyNewLog(log);
+          return [log];
+        }
+      }
+    },
     buildMulliganLog: function(turn) {
       var card, cardId, cardLink, cardLog, log, logs, mulliganed, _i, _len, _ref, _ref1, _ref2;
       log = React.createElement("p", {
-        "className": "turn",
-        "key": ++this.logIndex
+        "className": "turn turn-click",
+        "key": ++this.logIndex,
+        "onClick": this.props.onTurnClick.bind(this, 0)
       }, "Mulligan");
       this.replay.notifyNewLog(log);
       logs = [log];
@@ -2136,9 +2145,9 @@ arguments[4][4][0].apply(exports,arguments)
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          
+          console.log('cardId', cardId);
           card = this.replay.cardUtils.getCard(cardId);
-          
+          console.log('card', card);
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", {
             "key": ++this.logIndex
@@ -2181,14 +2190,20 @@ arguments[4][4][0].apply(exports,arguments)
       if (this.props.active) {
         return React.createElement("span", {
           "key": this.index
-        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
+        }, React.createElement("span", {
+          "onClick": this.props.onClick,
+          "className": "turn-click"
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - '), React.createElement(PlayerNameDisplayLog, {
           "active": true,
           "name": this.props.name
         }));
       } else {
         return React.createElement("span", {
           "key": this.index
-        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
+        }, React.createElement("span", {
+          "onClick": this.props.onClick,
+          "className": "turn-click"
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - '), React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.props.name
         }));
@@ -2678,7 +2693,7 @@ arguments[4][4][0].apply(exports,arguments)
                 owner: this.getController(entity.tags.CONTROLLER),
                 initialCommand: command
               };
-              
+              console.log('receving a new hero power', action);
               results.push(this.addAction(this.currentTurnNumber, action));
             } else {
               results.push(void 0);
@@ -2915,7 +2930,7 @@ arguments[4][4][0].apply(exports,arguments)
             initialCommand: command
           };
           command.isDiscover = true;
-          
+          console.log('adding discover action', action);
           return this.addAction(this.currentTurnNumber, action);
         }
       }
@@ -3996,7 +4011,7 @@ arguments[4][4][0].apply(exports,arguments)
     }
 
     ReplayPlayer.prototype.init = function() {
-      
+      console.log('starting init');
       this.entities = {};
       this.players = [];
       this.emit('reset');
@@ -4069,14 +4084,14 @@ arguments[4][4][0].apply(exports,arguments)
 
     ReplayPlayer.prototype.goNextAction = function() {
       var targetTimestamp;
-      
+      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
       this.newStep();
       this.currentActionInTurn++;
-      
+      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
       } else if (this.turns[this.currentTurn + 1]) {
-        
+        console.log('goign to next turn');
         this.currentTurn++;
         this.currentActionInTurn = -1;
         if (!this.turns[this.currentTurn]) {
@@ -4147,7 +4162,7 @@ arguments[4][4][0].apply(exports,arguments)
       var action, target, targetTimestamp;
       this.newStep();
       if (this.currentActionInTurn >= 0) {
-        
+        console.log('going to action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
         this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
@@ -4161,6 +4176,20 @@ arguments[4][4][0].apply(exports,arguments)
       }
     };
 
+    ReplayPlayer.prototype.goToTurn = function(turn) {
+      var results, targetTurn;
+      this.newStep();
+      targetTurn = turn + 1;
+      this.currentTurn = 0;
+      this.currentActionInTurn = 0;
+      this.init();
+      results = [];
+      while (this.currentTurn !== targetTurn) {
+        results.push(this.goNextAction());
+      }
+      return results;
+    };
+
     ReplayPlayer.prototype.moveTime = function(progression) {
       var target;
       target = this.getTotalLength() * progression;
@@ -4171,15 +4200,15 @@ arguments[4][4][0].apply(exports,arguments)
       var action, i, j, k, l, ref, ref1, ref2, results, targetAction, targetTurn, turn;
       this.pause();
       timestamp += this.startTimestamp;
-      
+      console.log('moving to timestamp', timestamp);
       this.newStep();
       targetTurn = -1;
       targetAction = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        
+        console.log('looking at timestamp', turn.timestamp, turn, turn.actions[1]);
         if (turn.timestamp > timestamp) {
-          
+          console.log('breaking on turn', i, turn);
           break;
         }
         if (!turn.timestamp > timestamp && ((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[0].timestamp > timestamp) {
@@ -4190,7 +4219,7 @@ arguments[4][4][0].apply(exports,arguments)
           targetAction = -1;
           for (j = l = 0, ref2 = turn.actions.length - 1; 0 <= ref2 ? l <= ref2 : l >= ref2; j = 0 <= ref2 ? ++l : --l) {
             action = turn.actions[j];
-            
+            console.log('\tlooking at action', action);
             if (!action || !action.timestamp || (action != null ? action.timestamp : void 0) > timestamp) {
               break;
             }
@@ -4202,7 +4231,7 @@ arguments[4][4][0].apply(exports,arguments)
       this.currentActionInTurn = 0;
       this.historyPosition = 0;
       this.init();
-      
+      console.log('moveToTimestamp init done', targetTurn, targetAction);
       if (targetTurn <= 1 || targetAction < -1) {
         return;
       }
@@ -4215,7 +4244,7 @@ arguments[4][4][0].apply(exports,arguments)
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
       if (timestamp < this.currentReplayTime) {
-        
+        console.log('going back in time, resetting', timestamp, this.currentReplayTime);
         this.emit('reset');
         this.historyPosition = 0;
         this.init();
@@ -4371,7 +4400,7 @@ arguments[4][4][0].apply(exports,arguments)
       this.player = this.opponent;
       this.opponent = tempOpponent;
       this.mainPlayerId = this.player.id;
-      return 
+      return console.log('switched main player, new one is', this.mainPlayerId, this.player);
     };
 
     ReplayPlayer.prototype.getController = function(controllerId) {

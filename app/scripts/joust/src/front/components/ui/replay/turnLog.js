@@ -124,26 +124,6 @@
       this.replay.notifyNewLog(log);
       return [log];
     },
-    buildTurnLog: function(turn) {
-      var log;
-      if (turn) {
-        if (turn.turn === 'Mulligan') {
-          log = this.buildMulliganLog(turn);
-          return log;
-        } else {
-          log = React.createElement("p", {
-            "className": "turn",
-            "key": this.logIndex++
-          }, React.createElement(TurnDisplayLog, {
-            "turn": turn,
-            "active": turn.activePlayer === this.replay.player,
-            "name": turn.activePlayer.name
-          }));
-          this.replay.notifyNewLog(log);
-          return [log];
-        }
-      }
-    },
     buildSecretRevealedLog: function(action) {
       var card, cardLink, log, newLog;
       card = action.data['cardID'];
@@ -376,7 +356,7 @@
     },
     buildDiscoverLog: function(action) {
       var card, cardLink, choice, choiceCard, choiceCardLink, choicesCards, log, _i, _len, _ref;
-      
+      console.log('building discover log', action, this.replay.mainPlayerId);
       card = action.data['cardID'];
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       if (!action.owner || action.owner.id === this.replay.mainPlayerId) {
@@ -401,7 +381,7 @@
     },
     buildSummonMinionLog: function(action) {
       var card, cardLink, indent, log;
-      
+      console.log('buildSummonMinionLog', action);
       if (action.mainAction) {
         indent = React.createElement("span", {
           "className": "indented-log"
@@ -458,11 +438,33 @@
       }));
       return log;
     },
+    buildTurnLog: function(turn) {
+      var log;
+      if (turn) {
+        if (turn.turn === 'Mulligan') {
+          log = this.buildMulliganLog(turn);
+          return log;
+        } else {
+          log = React.createElement("p", {
+            "className": "turn",
+            "key": this.logIndex++
+          }, React.createElement(TurnDisplayLog, {
+            "turn": turn,
+            "active": turn.activePlayer === this.replay.player,
+            "name": turn.activePlayer.name,
+            "onClick": this.props.onTurnClick.bind(this, turn.turn)
+          }));
+          this.replay.notifyNewLog(log);
+          return [log];
+        }
+      }
+    },
     buildMulliganLog: function(turn) {
       var card, cardId, cardLink, cardLog, log, logs, mulliganed, _i, _len, _ref, _ref1, _ref2;
       log = React.createElement("p", {
-        "className": "turn",
-        "key": ++this.logIndex
+        "className": "turn turn-click",
+        "key": ++this.logIndex,
+        "onClick": this.props.onTurnClick.bind(this, 0)
       }, "Mulligan");
       this.replay.notifyNewLog(log);
       logs = [log];
@@ -471,9 +473,9 @@
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          
+          console.log('cardId', cardId);
           card = this.replay.cardUtils.getCard(cardId);
-          
+          console.log('card', card);
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", {
             "key": ++this.logIndex
@@ -516,14 +518,20 @@
       if (this.props.active) {
         return React.createElement("span", {
           "key": this.index
-        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - ', React.createElement(PlayerNameDisplayLog, {
+        }, React.createElement("span", {
+          "onClick": this.props.onClick,
+          "className": "turn-click"
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + ' - '), React.createElement(PlayerNameDisplayLog, {
           "active": true,
           "name": this.props.name
         }));
       } else {
         return React.createElement("span", {
           "key": this.index
-        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - ', React.createElement(PlayerNameDisplayLog, {
+        }, React.createElement("span", {
+          "onClick": this.props.onClick,
+          "className": "turn-click"
+        }, 'Turn ' + Math.ceil(this.props.turn.turn / 2) + 'o - '), React.createElement(PlayerNameDisplayLog, {
           "active": false,
           "name": this.props.name
         }));

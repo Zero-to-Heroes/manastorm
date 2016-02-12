@@ -5,7 +5,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     __slice = [].slice;
 
-  
+  console.log('in replay');
 
   React = require('react');
 
@@ -57,6 +57,7 @@
     __extends(Replay, _super);
 
     function Replay(props) {
+      this.onGoToTurnClick = __bind(this.onGoToTurnClick, this);
       this.onTurnClick = __bind(this.onTurnClick, this);
       this.onMainPlayerSwitchedChange = __bind(this.onMainPlayerSwitchedChange, this);
       this.onShowCardsChange = __bind(this.onShowCardsChange, this);
@@ -203,7 +204,8 @@
         "active": this.displayConf.showLog
       })), React.createElement(TurnLog, {
         "show": this.displayConf.showLog,
-        "replay": replay
+        "replay": replay,
+        "onTurnClick": this.onGoToTurnClick
       }), React.createElement("form", {
         "className": "replay__controls padded"
       }, React.createElement(ButtonGroup, null, React.createElement(Button, {
@@ -307,9 +309,14 @@
     };
 
     Replay.prototype.onTurnClick = function(e) {
-      
       e.preventDefault();
       this.displayConf.showLog = !this.displayConf.showLog;
+      return this.forceUpdate();
+    };
+
+    Replay.prototype.onGoToTurnClick = function(turn, e) {
+      console.log('clicked to go to a turn', turn);
+      this.state.replay.goToTurn(turn);
       return this.forceUpdate();
     };
 

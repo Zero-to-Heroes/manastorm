@@ -29,7 +29,7 @@
     }
 
     ReplayPlayer.prototype.init = function() {
-      
+      console.log('starting init');
       this.entities = {};
       this.players = [];
       this.emit('reset');
@@ -102,14 +102,14 @@
 
     ReplayPlayer.prototype.goNextAction = function() {
       var targetTimestamp;
-      
+      console.log('clicked goNextAction', this.currentTurn, this.currentActionInTurn);
       this.newStep();
       this.currentActionInTurn++;
-      
+      console.log('goNextAction', this.turns[this.currentTurn], this.currentActionInTurn, this.turns[this.currentTurn] ? this.turns[this.currentTurn].actions : void 0);
       if (this.turns[this.currentTurn] && this.currentActionInTurn <= this.turns[this.currentTurn].actions.length - 1) {
         return this.goToAction();
       } else if (this.turns[this.currentTurn + 1]) {
-        
+        console.log('goign to next turn');
         this.currentTurn++;
         this.currentActionInTurn = -1;
         if (!this.turns[this.currentTurn]) {
@@ -180,7 +180,7 @@
       var action, target, targetTimestamp;
       this.newStep();
       if (this.currentActionInTurn >= 0) {
-        
+        console.log('going to action', this.currentActionInTurn, this.turns[this.currentTurn].actions);
         action = this.turns[this.currentTurn].actions[this.currentActionInTurn];
         this.emit('new-action', action);
         targetTimestamp = 1000 * (action.timestamp - this.startTimestamp) + 1;
@@ -194,6 +194,20 @@
       }
     };
 
+    ReplayPlayer.prototype.goToTurn = function(turn) {
+      var results, targetTurn;
+      this.newStep();
+      targetTurn = turn + 1;
+      this.currentTurn = 0;
+      this.currentActionInTurn = 0;
+      this.init();
+      results = [];
+      while (this.currentTurn !== targetTurn) {
+        results.push(this.goNextAction());
+      }
+      return results;
+    };
+
     ReplayPlayer.prototype.moveTime = function(progression) {
       var target;
       target = this.getTotalLength() * progression;
@@ -204,15 +218,15 @@
       var action, i, j, k, l, ref, ref1, ref2, results, targetAction, targetTurn, turn;
       this.pause();
       timestamp += this.startTimestamp;
-      
+      console.log('moving to timestamp', timestamp);
       this.newStep();
       targetTurn = -1;
       targetAction = -1;
       for (i = k = 1, ref = this.turns.length; 1 <= ref ? k <= ref : k >= ref; i = 1 <= ref ? ++k : --k) {
         turn = this.turns[i];
-        
+        console.log('looking at timestamp', turn.timestamp, turn, turn.actions[1]);
         if (turn.timestamp > timestamp) {
-          
+          console.log('breaking on turn', i, turn);
           break;
         }
         if (!turn.timestamp > timestamp && ((ref1 = turn.actions) != null ? ref1.length : void 0) > 0 && turn.actions[0].timestamp > timestamp) {
@@ -223,7 +237,7 @@
           targetAction = -1;
           for (j = l = 0, ref2 = turn.actions.length - 1; 0 <= ref2 ? l <= ref2 : l >= ref2; j = 0 <= ref2 ? ++l : --l) {
             action = turn.actions[j];
-            
+            console.log('\tlooking at action', action);
             if (!action || !action.timestamp || (action != null ? action.timestamp : void 0) > timestamp) {
               break;
             }
@@ -235,7 +249,7 @@
       this.currentActionInTurn = 0;
       this.historyPosition = 0;
       this.init();
-      
+      console.log('moveToTimestamp init done', targetTurn, targetAction);
       if (targetTurn <= 1 || targetAction < -1) {
         return;
       }
@@ -248,7 +262,7 @@
 
     ReplayPlayer.prototype.goToTimestamp = function(timestamp) {
       if (timestamp < this.currentReplayTime) {
-        
+        console.log('going back in time, resetting', timestamp, this.currentReplayTime);
         this.emit('reset');
         this.historyPosition = 0;
         this.init();
@@ -404,7 +418,7 @@
       this.player = this.opponent;
       this.opponent = tempOpponent;
       this.mainPlayerId = this.player.id;
-      return 
+      return console.log('switched main player, new one is', this.mainPlayerId, this.player);
     };
 
     ReplayPlayer.prototype.getController = function(controllerId) {
