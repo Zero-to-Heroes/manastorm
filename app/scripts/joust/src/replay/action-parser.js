@@ -315,7 +315,7 @@
                 owner: this.getController(entity.tags.CONTROLLER),
                 initialCommand: command
               };
-              console.log('receving a new hero power', action);
+              
               results.push(this.addAction(this.currentTurnNumber, action));
             } else {
               results.push(void 0);
@@ -552,7 +552,7 @@
             initialCommand: command
           };
           command.isDiscover = true;
-          console.log('adding discover action', action);
+          
           return this.addAction(this.currentTurnNumber, action);
         }
       }

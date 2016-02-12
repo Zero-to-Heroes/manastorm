@@ -376,7 +376,7 @@
     },
     buildDiscoverLog: function(action) {
       var card, cardLink, choice, choiceCard, choiceCardLink, choicesCards, log, _i, _len, _ref;
-      console.log('building discover log', action, this.replay.mainPlayerId);
+      
       card = action.data['cardID'];
       cardLink = this.replay.buildCardLink(this.replay.cardUtils.getCard(card));
       if (!action.owner || action.owner.id === this.replay.mainPlayerId) {
@@ -401,7 +401,7 @@
     },
     buildSummonMinionLog: function(action) {
       var card, cardLink, indent, log;
-      console.log('buildSummonMinionLog', action);
+      
       if (action.mainAction) {
         indent = React.createElement("span", {
           "className": "indented-log"
@@ -471,9 +471,9 @@
         for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
           mulliganed = _ref1[_i];
           cardId = this.replay.entities[mulliganed].cardID;
-          console.log('cardId', cardId);
+          
           card = this.replay.cardUtils.getCard(cardId);
-          console.log('card', card);
+          
           cardLink = this.replay.buildCardLink(card);
           cardLog = React.createElement("p", {
             "key": ++this.logIndex
