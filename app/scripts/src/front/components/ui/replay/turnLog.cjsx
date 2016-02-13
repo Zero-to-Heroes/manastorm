@@ -64,6 +64,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'power-damage'
 			log = @buildPowerDamageLog action
 
+		else if action.actionType == 'power-healing'
+			log = @buildPowerHealingLog action
+
 		else if action.actionType == 'power-target'
 			log = @buildPowerTargetLog action
 
@@ -235,6 +238,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerDamageLog: (action) ->
+		console.log 'building power-damage log', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -251,6 +255,29 @@ TurnLog = React.createClass
 			    {cardLog}
 			    <span> deals {action.amount} damage to </span>
 			    <SpanDisplayLog newLog={targetLink} />
+			</p>
+
+		return log
+
+	buildPowerHealingLog: (action) ->
+		console.log 'building power-healing log', action
+		if !action.sameOwnerAsParent
+			card = if action.data then action.data['cardID'] else ''
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			cardLog = <span className="indented-log">...which </span>
+
+		target = @replay.entities[action.target]['cardID']
+		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+
+		log = <p key={++@logIndex}>
+			    {cardLog}
+			    <span> healed </span> 
+			    <SpanDisplayLog newLog={targetLink} />
+			    <span> for {action.amount} life </span>
 			</p>
 
 		return log
@@ -323,11 +350,12 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		console.log 'building discover log', action, @replay.mainPlayerId
+		console.log 'building discover log', action, @replay.mainPlayerId, action.owner.id, action.owner.id == @replay.mainPlayerId
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
-		if !action.owner || action.owner.id == @replay.mainPlayerId
+		if !action.owner or action.owner.id == parseInt(@replay.mainPlayerId)
+			console.log 'discover for main player, showing everything'
 			choicesCards = []
 			for choice in action.choices
 				choiceCard = choice['cardID']

@@ -646,7 +646,23 @@ class ActionParser extends EventEmitter
 							owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 							initialCommand: command
 						}
-						# console.log 'creating power-target', action, meta
+						@addAction @currentTurnNumber, action
+
+					# The power healed someone
+					if meta.meta == 'HEALING'
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+							target: info.entity
+							amount: meta.data
+							mainAction: mainAction
+							sameOwnerAsParent: sameOwnerAsParent
+							actionType: 'power-healing'
+							data: @entities[command.attributes.entity]
+							owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+							initialCommand: command
+						}
+						console.log 'creating power-healing', action, meta
 						@addAction @currentTurnNumber, action
 
 					# The power simply targets something else
