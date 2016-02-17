@@ -275,7 +275,7 @@ TurnLog = React.createClass
 
 		log = <p key={++@logIndex}>
 			    {cardLog}
-			    <span> healed </span> 
+			    <span> heals </span> 
 			    <SpanDisplayLog newLog={targetLink} />
 			    <span> for {action.amount} life </span>
 			</p>
