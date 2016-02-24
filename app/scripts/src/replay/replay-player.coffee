@@ -115,7 +115,7 @@ class ReplayPlayer extends EventEmitter
 
 			# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
 			# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
-			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 1
+			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
 
 			@goToTimestamp targetTimestamp
 
@@ -177,7 +177,7 @@ class ReplayPlayer extends EventEmitter
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			@emit 'new-action', action
-			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 1
+			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
 
 			if action.target
 				target = @entities[action.target]
@@ -366,9 +366,10 @@ class ReplayPlayer extends EventEmitter
 			@currentReplayTime = @getTotalLength() * 1000
 
 		elapsed = @getElapsed()
+		console.log 'elapsed', elapsed
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				#console.log 'processing', @history[@historyPosition]
+				# console.log 'processing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else

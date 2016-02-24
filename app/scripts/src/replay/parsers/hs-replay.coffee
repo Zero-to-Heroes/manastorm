@@ -19,6 +19,7 @@ class HSReplayParser
 		@stack = []
 
 	parse: (replay) ->
+		@index = 0
 		@replay = replay
 		@sax = sax.createStream(true)
 
@@ -42,6 +43,7 @@ class HSReplayParser
 				#console.log 'enqueue action from rootState', node
 				#if (node?.attributes?.entity == '70')
 					#console.log '\tDebug', node
+				node.index = @index++
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
 				@state.push('action')
 
@@ -51,6 +53,7 @@ class HSReplayParser
 					tag: tagNames[node.attributes.tag]
 					value: parseInt(node.attributes.value)
 					parent: @stack[@stack.length - 2]
+					index: @index++
 				}
 				if (!tag.parent.tags)
 					tag.parent.tags = []
@@ -62,6 +65,7 @@ class HSReplayParser
 				# console.log '\tpushing game entity to state', node
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
+				@entityDefinition.index = @index++
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
 					#console.log 'giving name to card', node.attributes.cardID, @entityDefinition.id, @entityDefinition
@@ -139,6 +143,10 @@ class HSReplayParser
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 
+				@entityDefinition.attributes = @entityDefinition.attributes or {}
+				@entityDefinition.attributes.ts = node.attributes.ts
+				@entityDefinition.index = @index++
+
 				if node.attributes.cardID
 					@entityDefinition.cardID = node.attributes.cardID
 					@replay.mainPlayer @stack[@stack.length - 2].attributes.entity
@@ -166,6 +174,7 @@ class HSReplayParser
 
 			when 'HideEntity'
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
+				@entityDefinition.index = @index++
 				@entityDefinition.parent = @stack[@stack.length - 2]
 
 				if !@entityDefinition.parent.hideEntities
@@ -179,6 +188,7 @@ class HSReplayParser
 					tag: tagNames[node.attributes.tag]
 					value: parseInt(node.attributes.value)
 					parent: @stack[@stack.length - 2]
+					index: @index++
 				}
 				if (!tag.parent.tags)
 					tag.parent.tags = []
@@ -201,6 +211,7 @@ class HSReplayParser
 					data: node.attributes.data
 					parent: @stack[@stack.length - 2]
 					ts: ts
+					index: @index++
 				}
 
 				if (!@metaData.parent.meta)
@@ -221,6 +232,7 @@ class HSReplayParser
 				#console.log '\tupdated', @stack[@stack.length - 1]
 				node.parent = @stack[@stack.length - 2]
 				node.indent = if node.parent?.indent then node.parent.indent + 1 else 1
+				node.index = @index++
 
 				#console.log 'parsing action', node
 

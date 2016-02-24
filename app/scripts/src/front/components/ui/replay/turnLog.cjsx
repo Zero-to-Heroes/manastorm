@@ -70,6 +70,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'power-target'
 			log = @buildPowerTargetLog action
 
+		else if action.actionType == 'played-card-with-target'
+			log = @buildPlayedCardWithTargetLog action
+
 		else if action.actionType == 'trigger-fullentity'
 			log = @buildTriggerFullEntityLog action
 
@@ -283,20 +286,37 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerTargetLog: (action) ->
+		console.log 'buildPowerTargetLog', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+		else 
+			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			cardLog = <span className="indented-log">...which </span>
+			indentLog = <span className="indented-log">...</span>
 
 		target = @replay.entities[action.target]['cardID']
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={++@logIndex}>
+			    {indentLog}
 			    {cardLog}
+			    <span> targets </span>
+			    <SpanDisplayLog newLog={targetLink} />
+			</p>
+
+		return log
+
+	buildPlayedCardWithTargetLog: (action) ->
+		console.log 'buildPlayedCardWithTargetLog', action
+		target = @replay.entities[action.target]['cardID']
+		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+
+		log = <p key={++@logIndex}>
+			    <span className="indented-log">...which </span>
 			    <span> targets </span>
 			    <SpanDisplayLog newLog={targetLink} />
 			</p>
