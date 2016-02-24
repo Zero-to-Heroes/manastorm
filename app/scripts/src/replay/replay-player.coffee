@@ -83,7 +83,7 @@ class ReplayPlayer extends EventEmitter
 	getCurrentTurnString: ->
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return 'Mulligan'
-		else if @turns[@currentTurn].activePlayer == @player
+		else if @getActivePlayer() == @player
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2)
 		else
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'

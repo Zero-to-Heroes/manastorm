@@ -102,6 +102,7 @@ TurnLog = React.createClass
 
 
 		else
+			console.warning 'Shouldnt happen, unsupported log action', action
 			card = if action?.data then action.data['cardID'] else ''
 
 			owner = action.owner.name 
@@ -158,12 +159,15 @@ TurnLog = React.createClass
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
 			indent = <span className="indented-log">...and </span>
-		else
-			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+			if action.owner != @replay.getActivePlayer()
+				drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 
+		else
+			drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 
 		drawLog = <p key={++@logIndex}>
 					{indent}
+					{drawer}
 					<span> draws </span>
 					<SpanDisplayLog newLog={cardLink} />
 				</p>

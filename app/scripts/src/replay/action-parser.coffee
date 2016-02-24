@@ -168,7 +168,8 @@ class ActionParser extends EventEmitter
 
 				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
 				# but by the card itself. So we need to find out who that card controller is
-				ownerId = currentCommand.attributes.entity
+				# ownerId = currentCommand.attributes.entity
+				ownerId = command[1][0].entity
 				if ownerId not in ['2', '3']
 					owner = @getController(@entities[ownerId].tags.CONTROLLER)
 				else
