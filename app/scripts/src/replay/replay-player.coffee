@@ -30,7 +30,7 @@ class ReplayPlayer extends EventEmitter
 		@lastBatch = null
 
 		@frequency = 2000
-		@currentReplayTime = 200
+		@currentReplayTime = 0
 
 		@started = false
 		@speed = 0

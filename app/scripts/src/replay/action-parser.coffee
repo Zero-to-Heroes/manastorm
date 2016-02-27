@@ -125,7 +125,6 @@ class ActionParser extends EventEmitter
 		# Add only one command for mulligan start, no need for both
 		if (command[0] == 'receiveTagChange' && command[1][0].entity == 2 && command[1][0].tag == 'MULLIGAN_STATE' && command[1][0].value == 1)
 			@turns[@turnNumber] = {
-				# historyPosition: i
 				turn: 'Mulligan'
 				playerMulligan: []
 				opponentMulligan: []
