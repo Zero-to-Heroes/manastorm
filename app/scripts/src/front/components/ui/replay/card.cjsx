@@ -61,10 +61,17 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
+		console.log @props.entity.cardID, @props.entity
 
-		console.log 'card took damage?', @props.entity.cardID, @damageTaken
+		# Can attack
+		if @props.entity.tags.EXHAUSTED == 0
+			cls += " can-attack"
+
+		# Exhausted
+		if @props.entity.tags.EXHAUSTED == 1 and @props.entity.tags.JUST_PLAYED == 1
+			exhausted = <div className="exhausted"></div>
+
 		if @props.entity.tags.DAMAGE - @damageTaken > 0
-			console.log '\tyes, card took damage', @props.entity.tags.DAMAGE - @damageTaken
 			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @damageTaken)}</span>
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
@@ -73,6 +80,7 @@ class Card extends React.Component
 			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 				{overlay}
 				{damage}
+				{exhausted}
 				{stats}
 			</div>
 
@@ -80,6 +88,7 @@ class Card extends React.Component
 			return <div className={cls} style={style}>
 				{overlay}
 				{damage}
+				{exhausted}
 				{stats}
 			</div>
 

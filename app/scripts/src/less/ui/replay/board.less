@@ -29,6 +29,17 @@
 			box-shadow: 0 0 3px 1px black;
 		}
 
+		&.can-attack::before {
+			content: "";
+		    border: 3px solid #31C331;
+		    position: absolute;
+		    top: 0;
+		    bottom: 0;
+		    left: 0;
+		    right: 0;
+		    border-radius: 50%;
+		}
+
 		.overlay {
 			opacity: 0.5;
 			border-radius: 50%;
@@ -67,6 +78,15 @@
 			left: 29px;
 		}
 
+		.exhausted {
+			background: url(images/exhausted.png) top right no-repeat;
+			width: 30px;
+			height: 30px;
+			position: absolute;
+			right: -15px;
+			top: -15px;
+		}
+
 	}
 
 }
@@ -76,5 +96,5 @@
 }
 
 .bottom .board {
-  	top: 0;
+	top: 0;
 }
