@@ -288,21 +288,47 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		turnRegex = /(t|T)\d?\d(:|\s|,|\.)/gm
-		opoonentTurnRegex = /(t|T)\d?\do(:|\s|,|\.)/gm
-		mulliganRegex = /(m|M)ulligan(:|\s)/gm
-		roundRegex = /(r|R)\d?\d(:|\s|,|\.)/gm
+		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.)/gm
+		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.)/gm
+
+		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.)/gm
+		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.)/gm
+
+		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s)/gm
 
 		that = this
 		matches = text.match(turnRegex)
 
 		if matches and matches.length > 0
 			matches.forEach (match) ->
+				match = match.trimLeft()
+				console.log '\tmatch', match
+				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+				console.log '\tinputTurnNumber', inputTurnNumber
+				# Now compute the "real" turn. This depends on whether you're the first player or not
+				if that.turns[2].activePlayer == that.player
+					turnNumber = inputTurnNumber * 2
+				else
+					turnNumber = inputTurnNumber * 2 + 1
+				turn = that.turns[turnNumber]
+				console.log '\tturn', turn
+				if turn
+					timestamp = turn.timestamp + 1
+					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
+					console.log '\tformattedTimeStamp', formattedTimeStamp
+					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
+
+		matches = text.match(opoonentTurnRegex)
+
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
 				#console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
 				#console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
-				if that.turns[2].activePlayer == that.player
+				if that.turns[2].activePlayer == that.opponent
 					turnNumber = inputTurnNumber * 2
 				else
 					turnNumber = inputTurnNumber * 2 + 1
@@ -314,13 +340,36 @@ class ReplayPlayer extends EventEmitter
 					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
 					#console.log '\tformattedTimeStamp', formattedTimeStamp
 					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-
-		matches = text.match(opoonentTurnRegex)
+		
+		matches = text.match(longTurnRegex)
 
 		if matches and matches.length > 0
 			matches.forEach (match) ->
+				match = match.trimLeft()
+				console.log '\tmatch', match, match.substring(4, match.length - 1)
+				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
+				console.log '\tinputTurnNumber', inputTurnNumber
+				# Now compute the "real" turn. This depends on whether you're the first player or not
+				if that.turns[2].activePlayer == that.player
+					turnNumber = inputTurnNumber * 2
+				else
+					turnNumber = inputTurnNumber * 2 + 1
+				turn = that.turns[turnNumber]
+				console.log '\tturn', turn
+				if turn
+					timestamp = turn.timestamp + 1
+					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
+					console.log '\tformattedTimeStamp', formattedTimeStamp
+					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
+
+		matches = text.match(longOpponentTurnRegex)
+
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
 				#console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
 				#console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
 				if that.turns[2].activePlayer == that.opponent
