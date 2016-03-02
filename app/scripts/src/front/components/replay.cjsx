@@ -37,6 +37,10 @@ class Replay extends React.Component
 			#console.log 'in players-ready' 
 			@callback
 
+		subscribe @state.replay, 'reset', =>
+			#console.log 'in players-ready' 
+			@callback
+
 		subscribe @state.replay, 'moved-timestamp', =>
 			#console.log 'in moved-timestamp'
 			setTimeout @callback, 500

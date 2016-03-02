@@ -81,4 +81,11 @@ class Entity extends EventEmitter
 				@getController()?.entityEnteredSecret(this)
 
 	getLastZone: -> @lastZone
+
+	newStep: ->
+		@emit 'new-step'
+
+	reinit: ->
+		@emit 'reset'
+		
 module.exports = Entity

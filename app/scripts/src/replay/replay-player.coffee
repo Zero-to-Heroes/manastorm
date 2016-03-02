@@ -17,6 +17,10 @@ class ReplayPlayer extends EventEmitter
 
 	init: ->
 		console.log 'starting init'
+		if @entities
+			for k,v of @entities
+				v.reinit()
+
 		@entities = {}
 		@players = []
 		@emit 'reset'
@@ -256,8 +260,6 @@ class ReplayPlayer extends EventEmitter
 
 	goToTimestamp: (timestamp) ->
 		if timestamp < @currentReplayTime
-			console.log 'going back in time, resetting', timestamp, @currentReplayTime
-			@emit 'reset'
 			@historyPosition = 0
 			@init()
 
@@ -274,6 +276,8 @@ class ReplayPlayer extends EventEmitter
 		@targetSource = undefined
 		@targetDestination = undefined
 		@discoverAction = undefined
+		for k,v of @entities
+			v.newStep()
 
 	getTotalLength: ->
 		return @history[@history.length - 1].timestamp - @startTimestamp
@@ -418,7 +422,7 @@ class ReplayPlayer extends EventEmitter
 		console.log 'elapsed', elapsed
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				# console.log 'processing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
+				console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else

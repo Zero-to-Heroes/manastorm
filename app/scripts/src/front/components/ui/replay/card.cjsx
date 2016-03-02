@@ -8,8 +8,16 @@ class Card extends React.Component
 
 		# Discover action creates a null entity here(?)
 		if !@props.static
-			@sub = subscribe @props.entity, tagEvents, =>
+			subscribe @props.entity, tagEvents, =>
 				@forceUpdate()
+
+			subscribe @props.entity, 'new-step', =>
+				@cleanTemporaryState()
+
+			subscribe @props.entity, 'reset', =>
+				@reset()
+
+		@damageTaken = 0
 
 	render: ->
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
@@ -53,19 +61,34 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
+
+		console.log 'card took damage?', @props.entity.cardID, @damageTaken
+		if @props.entity.tags.DAMAGE - @damageTaken > 0
+			console.log '\tyes, card took damage', @props.entity.tags.DAMAGE - @damageTaken
+			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @damageTaken)}</span>
+
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
 			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 				{overlay}
+				{damage}
 				{stats}
 			</div>
 
 		else
 			return <div className={cls} style={style}>
 				{overlay}
+				{damage}
 				{stats}
 			</div>
+
+	cleanTemporaryState: ->
+		@damageTaken = @props.entity.tags.DAMAGE or 0
+
+	reset: ->
+		console.log 'resetting card'
+		@damageTaken = 0
 
 
 	componentDidUpdate: ->
