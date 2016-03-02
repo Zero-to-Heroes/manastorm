@@ -41,6 +41,9 @@ class Card extends React.Component
 		if @props.entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
 
+		if @props.entity.tags.STEALTH
+			overlay = <div className="overlay stealth"></div>
+
 		if @props.stats
 			healthClass = "card__stats__health"
 			if @props.entity.tags.DAMAGE > 0
