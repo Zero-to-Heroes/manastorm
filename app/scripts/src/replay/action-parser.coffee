@@ -102,11 +102,11 @@ class ActionParser extends EventEmitter
 		# Sort the actions chronologically
 		tempTurnNumber = 1
 		while @turns[tempTurnNumber]
-			console.log 'sorting actions for turn', tempTurnNumber
+			# console.log 'sorting actions for turn', tempTurnNumber
 			sortedActions = _.sortBy @turns[tempTurnNumber].actions, 'index'
 			sortedActions = _.sortBy sortedActions, 'timestamp'
 			@turns[tempTurnNumber].actions = sortedActions
-			console.log '\tsorted', @turns[tempTurnNumber].actions
+			# console.log '\tsorted', @turns[tempTurnNumber].actions
 			tempTurnNumber++
 
 
@@ -270,18 +270,6 @@ class ActionParser extends EventEmitter
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
 
-				# And if it was a spell with a target, log that
-				# if parseInt(command.attributes.target) > 0 and (!command.meta or command.meta.length == 0)
-				# 	action = {
-				# 		turn: @currentTurnNumber - 1
-				# 		timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
-				# 		actionType: 'played-card-with-target'
-				# 		data: @entities[playedCard]
-				# 		owner: @turns[@currentTurnNumber].activePlayer
-				# 		initialCommand: command
-				# 	}
-				# 	@addAction @currentTurnNumber, action
-
 	parseNewHeroPower: (batch, command) ->
 		if command.attributes.type in ['3', '5'] and command.tags
 			for tag in command.tags
@@ -370,6 +358,7 @@ class ActionParser extends EventEmitter
 								timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
 								index: meta.index
 								target: info.entity
+								# Renaming in hsreplay 1.1
 								amount: meta.data
 								mainAction: mainAction
 								sameOwnerAsParent: sameOwnerAsParent
@@ -387,6 +376,7 @@ class ActionParser extends EventEmitter
 								timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
 								index: meta.index
 								target: info.entity
+								# Renaming in hsreplay 1.1
 								amount: meta.data
 								mainAction: mainAction
 								sameOwnerAsParent: sameOwnerAsParent
@@ -523,7 +513,7 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				command.isDiscover = true
-				console.log 'adding discover action', action
+				# console.log 'adding discover action', action
 				@addAction @currentTurnNumber, action
 
 

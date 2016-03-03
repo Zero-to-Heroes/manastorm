@@ -81,6 +81,7 @@ class HSReplayParser
 					node.parent = @stack[@stack.length - 2]
 
 			when 'Options'
+				# console.log 'pushing options', node
 				@state.push('options')
 
 			when 'ChosenEntities'
@@ -96,6 +97,24 @@ class HSReplayParser
 			when 'Choice'
 				@chosen.cards.push(node.attributes.entity)
 
+	optionsState: (node) ->
+		switch node.name
+			when 'Option'
+				option = {
+					entity: parseInt(node.attributes.entity)
+					optionIndex:  parseInt(node.attributes.index)
+					type: parseInt(node.attributes.type)
+					parent: @stack[@stack.length - 2]
+					index: @index++
+				}
+				if (!option.parent.options)
+					option.parent.options = []
+				option.parent.options.push(option)
+
+				console.log '\tparsed option', option
+
+				# @replay.enqueue null, 'receiveTagChange', tag
+
 	chosenEntitiesStateClose: (node) ->
 		switch node.name
 			when 'ChosenEntities'
@@ -106,6 +125,8 @@ class HSReplayParser
 		switch node.name
 			when 'Options'
 				@state.pop()
+				console.log 'enqueueing options node', node
+				node.debugTs = tsToSeconds(node.attributes.ts)
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveOptions', node
 
 	entityState: (node) ->
@@ -207,7 +228,7 @@ class HSReplayParser
 
 				#console.error 'parsing MetaData'
 				@metaData = {
-					meta: metaTagNames[node.attributes.meta]
+					meta: metaTagNames[node.attributes.meta || node.attributes.entity]
 					data: node.attributes.data
 					parent: @stack[@stack.length - 2]
 					ts: ts
@@ -258,7 +279,7 @@ class HSReplayParser
 			when 'Info'
 				#console.log '\t\tconsidering info node', node
 				info = {
-					entity: parseInt(node.attributes.id)
+					entity: parseInt(node.attributes.id || node.attributes.entity)
 					parent: @metaData
 				}
 

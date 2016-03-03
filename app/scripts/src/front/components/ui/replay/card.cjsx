@@ -61,11 +61,13 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
-		console.log @props.entity.cardID, @props.entity
+		# console.log @props.entity.cardID, @props.entity, @props.entity.highlighted, @props
 
 		# Can attack
-		if @props.entity.tags.EXHAUSTED == 0
-			cls += " can-attack"
+		if @props.entity.highlighted
+		# if @props.entity.tags.EXHAUSTED == 0
+			console.log '\thighlighting', @props.entity.cardID, @props.entity
+			cls += " option-on"
 
 		# Exhausted
 		if @props.entity.tags.EXHAUSTED == 1 and @props.entity.tags.JUST_PLAYED == 1
@@ -93,12 +95,18 @@ class Card extends React.Component
 			</div>
 
 	cleanTemporaryState: ->
+		# console.log 'cleaning temp state'
 		@damageTaken = @props.entity.tags.DAMAGE or 0
+		@props.entity.highlighted = false
 
 	reset: ->
 		console.log 'resetting card'
 		@damageTaken = 0
+		@props.entity.highlighted = false
 
+	# highlightOption: ->
+	# 	@props.entity.highlighted = true
+	# 	console.log 'highlighting option', @props.entity.cardID, @props.entity, @props.entity.highlighted
 
 	componentDidUpdate: ->
 		domNode = ReactDOM.findDOMNode(this)

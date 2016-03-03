@@ -290,7 +290,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerTargetLog: (action) ->
-		console.log 'buildPowerTargetLog', action
+		# console.log 'buildPowerTargetLog', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))

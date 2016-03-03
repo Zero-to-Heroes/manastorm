@@ -426,7 +426,20 @@ class ReplayPlayer extends EventEmitter
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else
+				@updateOptions()
 				break
+
+	updateOptions: ->
+		if @getActivePlayer() == @player
+			console.log 'updating options', @history.length, @historyPosition
+			currentCursor = @historyPosition
+			while currentCursor < @history.length
+				for command in @history[currentCursor].commands
+					if (command[0] == 'receiveOptions')
+						console.log 'updating options?', command
+						@history[currentCursor].execute(this)
+						return
+				currentCursor++
 		#console.log 'stopped at history', @history[@historyPosition].timestamp, elapsed
 
 	receiveGameEntity: (definition) ->
@@ -501,7 +514,15 @@ class ReplayPlayer extends EventEmitter
 			@discoverAction = definition
 			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
 
-	receiveOptions: ->
+	receiveOptions: (options) ->
+		console.log 'receiving options', options
+
+		for k,v of @entities
+			v.highlighted = false
+
+		for option in options.options
+			@entities[option.entity]?.highlighted = true
+			# @entities[option.entity]?.emit 'option-on'
 
 	receiveChoices: (choices) ->
 
