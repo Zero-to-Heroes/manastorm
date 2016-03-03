@@ -29,11 +29,15 @@ class HeroCard extends Card
 				<Secret entity={entity} key={entity.id} showSecret={show}/>
 			#console.log 'rendering secrets', @props.secrets, secrets
 
+		console.log 'rendering hero', @props.entity.cardID, @props.entity, @damageTaken
+		if @props.entity.tags.DAMAGE - @damageTaken > 0
+			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @damageTaken)}</span>
 
 		return 	<div className={cls} style={style}>
 					{secrets}
 					<Armor entity={@props.entity}/>
 					<Health entity={@props.entity}/>
+					{damage}
 				</div>
 
 module.exports = HeroCard
