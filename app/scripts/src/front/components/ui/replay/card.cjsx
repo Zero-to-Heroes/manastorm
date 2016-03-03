@@ -17,7 +17,7 @@ class Card extends React.Component
 			subscribe @props.entity, 'reset', =>
 				@reset()
 
-		@damageTaken = 0
+		# @props.entity.damageTaken = 0
 
 	render: ->
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
@@ -61,20 +61,20 @@ class Card extends React.Component
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
-		# console.log @props.entity.cardID, @props.entity, @props.entity.highlighted, @props
+
+		@props.entity.damageTaken = @props.entity.damageTaken or 0
+		console.log @props.entity.cardID, @props.entity
 
 		# Can attack
 		if @props.entity.highlighted
-		# if @props.entity.tags.EXHAUSTED == 0
-			console.log '\thighlighting', @props.entity.cardID, @props.entity
 			cls += " option-on"
 
 		# Exhausted
 		if @props.entity.tags.EXHAUSTED == 1 and @props.entity.tags.JUST_PLAYED == 1
 			exhausted = <div className="exhausted"></div>
 
-		if @props.entity.tags.DAMAGE - @damageTaken > 0
-			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @damageTaken)}</span>
+		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
+			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
@@ -96,12 +96,12 @@ class Card extends React.Component
 
 	cleanTemporaryState: ->
 		# console.log 'cleaning temp state'
-		@damageTaken = @props.entity.tags.DAMAGE or 0
+		@props.entity.damageTaken = @props.entity.tags.DAMAGE or 0
 		@props.entity.highlighted = false
 
 	reset: ->
 		console.log 'resetting card'
-		@damageTaken = 0
+		@props.entity.damageTaken = 0
 		@props.entity.highlighted = false
 
 	# highlightOption: ->

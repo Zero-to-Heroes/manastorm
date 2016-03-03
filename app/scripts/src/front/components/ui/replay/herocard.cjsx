@@ -22,7 +22,7 @@ class HeroCard extends Card
 
 		if @props.entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
-				
+
 		if @props.entity.highlighted
 			console.log '\thighlighting', @props.entity.cardID, @props.entity
 			cls += " option-on"
@@ -33,8 +33,9 @@ class HeroCard extends Card
 				<Secret entity={entity} key={entity.id} showSecret={show}/>
 			#console.log 'rendering secrets', @props.secrets, secrets
 
-		if @props.entity.tags.DAMAGE - @damageTaken > 0
-			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @damageTaken)}</span>
+		@props.entity.damageTaken = @props.entity.damageTaken or 0
+		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
+			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
 
 		return 	<div className={cls} style={style}>
 					{secrets}
