@@ -7,8 +7,6 @@ Hero = React.createClass
 	componentDidMount: ->
 
 	render: ->
-		return null unless @props.entity.tags.MULLIGAN_STATE is 4
-
 		@hero = @props.entity.getHero()
 		@heroPower = @props.entity.getHeroPower()
 		@weapon = @props.entity.getWeapon()
