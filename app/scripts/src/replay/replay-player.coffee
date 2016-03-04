@@ -19,7 +19,8 @@ class ReplayPlayer extends EventEmitter
 		console.log 'starting init'
 		if @entities
 			for k,v of @entities
-				v.reinit()
+				v.damageTaken = 0
+				v.highlighted = false
 
 		@entities = {}
 		@players = []
@@ -277,7 +278,8 @@ class ReplayPlayer extends EventEmitter
 		@targetDestination = undefined
 		@discoverAction = undefined
 		for k,v of @entities
-			v.newStep()
+			v.damageTaken = v.tags.DAMAGE or 0
+			v.highlighted = false
 
 	getTotalLength: ->
 		return @history[@history.length - 1].timestamp - @startTimestamp

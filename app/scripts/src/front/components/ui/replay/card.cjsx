@@ -11,11 +11,11 @@ class Card extends React.Component
 			subscribe @props.entity, tagEvents, =>
 				@forceUpdate()
 
-			subscribe @props.entity, 'new-step', =>
-				@cleanTemporaryState()
+			# subscribe @props.entity, 'new-step', =>
+			# 	@cleanTemporaryState()
 
-			subscribe @props.entity, 'reset', =>
-				@reset()
+			# subscribe @props.entity, 'reset', =>
+			# 	@reset()
 
 		# @props.entity.damageTaken = 0
 
@@ -94,15 +94,15 @@ class Card extends React.Component
 				{stats}
 			</div>
 
-	cleanTemporaryState: ->
-		# console.log 'cleaning temp state'
-		@props.entity.damageTaken = @props.entity.tags.DAMAGE or 0
-		@props.entity.highlighted = false
+	# cleanTemporaryState: ->
+	# 	# console.log 'cleaning temp state'
+	# 	@props.entity.damageTaken = @props.entity.tags.DAMAGE or 0
+	# 	@props.entity.highlighted = false
 
-	reset: ->
-		console.log 'resetting card'
-		@props.entity.damageTaken = 0
-		@props.entity.highlighted = false
+	# reset: ->
+	# 	console.log 'resetting card'
+	# 	@props.entity.damageTaken = 0
+	# 	@props.entity.highlighted = false
 
 	# highlightOption: ->
 	# 	@props.entity.highlighted = true

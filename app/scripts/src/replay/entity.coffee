@@ -82,10 +82,10 @@ class Entity extends EventEmitter
 
 	getLastZone: -> @lastZone
 
-	newStep: ->
-		@emit 'new-step'
+	# newStep: ->
+	# 	@emit 'new-step'
 
-	reinit: ->
-		@emit 'reset'
+	# reinit: ->
+	# 	@emit 'reset'
 		
 module.exports = Entity
