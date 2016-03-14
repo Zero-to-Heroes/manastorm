@@ -201,23 +201,26 @@ class ActionParser extends EventEmitter
 				else
 					owner = @entities[ownerId]
 
-				entity = command[1][0].showEntity || command[1][0].fullEntity
-				if entity and entity.tags.ZONE == 3
+				entities = command[1][0].showEntities || command[1][0].fullEntities
+				if entities
 					currentCommand = command[1][0]
 					while currentCommand.parent and currentCommand.entity not in ['2', '3']
 						currentCommand = currentCommand.parent
 					
-					action = {
-						turn: @currentTurnNumber
-						timestamp: batch.timestamp
-						actionType: 'card-draw'
-						type: 'from action'
-						data: @entities[entity.id]
-						mainAction: command[1][0].parent
-						owner: owner
-						initialCommand: command[1][0]
-					}
-					@addAction @currentTurnNumber, action
+					for entity in entities
+						if entity.tags.ZONE == 3
+							console.log 'adding card draw', entity, entities, command[1][0]
+							action = {
+								turn: @currentTurnNumber
+								timestamp: batch.timestamp
+								actionType: 'card-draw'
+								type: 'from action'
+								data: @entities[entity.id]
+								mainAction: command[1][0].parent
+								owner: owner
+								initialCommand: command[1][0]
+							}
+							@addAction @currentTurnNumber, action
 
 
 	parseMulliganCards: (batch, command) ->
@@ -285,7 +288,7 @@ class ActionParser extends EventEmitter
 							owner: @getController(entity.tags.CONTROLLER)
 							initialCommand: command
 						}
-						console.log 'receving a new hero power', action
+						# console.log 'receving a new hero power', action
 						# console.log '\tAnd it is a valid play', action
 						@addAction @currentTurnNumber, action
 
@@ -385,7 +388,7 @@ class ActionParser extends EventEmitter
 								owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 								initialCommand: command
 							}
-							console.log 'creating power-healing', action, meta
+							# console.log 'creating power-healing', action, meta
 							@addAction @currentTurnNumber, action
 
 						# The power simply targets something else

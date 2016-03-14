@@ -308,21 +308,21 @@ class ReplayPlayer extends EventEmitter
 		if matches and matches.length > 0
 			matches.forEach (match) ->
 				match = match.trimLeft()
-				console.log '\tmatch', match
+				# console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				console.log '\tinputTurnNumber', inputTurnNumber
+				# console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
 				if that.turns[2].activePlayer == that.player
 					turnNumber = inputTurnNumber * 2
 				else
 					turnNumber = inputTurnNumber * 2 + 1
 				turn = that.turns[turnNumber]
-				console.log '\tturn', turn
+				# console.log '\tturn', turn
 				if turn
 					timestamp = turn.timestamp + 1
-					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					# console.log '\ttimestamp', (timestamp - that.startTimestamp)
 					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					console.log '\tformattedTimeStamp', formattedTimeStamp
+					# console.log '\tformattedTimeStamp', formattedTimeStamp
 					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
 
 		matches = text.match(opoonentTurnRegex)
@@ -352,21 +352,21 @@ class ReplayPlayer extends EventEmitter
 		if matches and matches.length > 0
 			matches.forEach (match) ->
 				match = match.trimLeft()
-				console.log '\tmatch', match, match.substring(4, match.length - 1)
+				# console.log '\tmatch', match, match.substring(4, match.length - 1)
 				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				console.log '\tinputTurnNumber', inputTurnNumber
+				# console.log '\tinputTurnNumber', inputTurnNumber
 				# Now compute the "real" turn. This depends on whether you're the first player or not
 				if that.turns[2].activePlayer == that.player
 					turnNumber = inputTurnNumber * 2
 				else
 					turnNumber = inputTurnNumber * 2 + 1
 				turn = that.turns[turnNumber]
-				console.log '\tturn', turn
+				# console.log '\tturn', turn
 				if turn
 					timestamp = turn.timestamp + 1
-					console.log '\ttimestamp', (timestamp - that.startTimestamp)
+					# console.log '\ttimestamp', (timestamp - that.startTimestamp)
 					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					console.log '\tformattedTimeStamp', formattedTimeStamp
+					# console.log '\tformattedTimeStamp', formattedTimeStamp
 					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
 
 		matches = text.match(longOpponentTurnRegex)
@@ -433,12 +433,12 @@ class ReplayPlayer extends EventEmitter
 
 	updateOptions: ->
 		if @getActivePlayer() == @player
-			console.log 'updating options', @history.length, @historyPosition
+			# console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor < @history.length
 				for command in @history[currentCursor].commands
 					if (command[0] == 'receiveOptions')
-						console.log 'updating options?', command
+						# console.log 'updating options?', command
 						@history[currentCursor].execute(this)
 						return
 				currentCursor++
@@ -471,7 +471,7 @@ class ReplayPlayer extends EventEmitter
 		@player = @opponent
 		@opponent = tempOpponent
 		@mainPlayerId = @player.id
-		console.log 'switched main player, new one is', @mainPlayerId, @player
+		# console.log 'switched main player, new one is', @mainPlayerId, @player
 
 	getController: (controllerId) ->
 		if @player.tags.CONTROLLER == controllerId
@@ -517,7 +517,7 @@ class ReplayPlayer extends EventEmitter
 			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
 
 	receiveOptions: (options) ->
-		console.log 'receiving options', options
+		# console.log 'receiving options', options
 
 		for k,v of @entities
 			v.highlighted = false

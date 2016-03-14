@@ -245,7 +245,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerDamageLog: (action) ->
-		console.log 'building power-damage log', action
+		# console.log 'building power-damage log', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -267,7 +267,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerHealingLog: (action) ->
-		console.log 'building power-healing log', action
+		# console.log 'building power-healing log', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -315,7 +315,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPlayedCardWithTargetLog: (action) ->
-		console.log 'buildPlayedCardWithTargetLog', action
+		# console.log 'buildPlayedCardWithTargetLog', action
 		target = @replay.entities[action.target]['cardID']
 		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
@@ -374,12 +374,12 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		console.log 'building discover log', action, @replay.mainPlayerId, action.owner.id, action.owner.id == @replay.mainPlayerId
+		# console.log 'building discover log', action, @replay.mainPlayerId, action.owner.id, action.owner.id == @replay.mainPlayerId
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
 		if !action.owner or action.owner.id == parseInt(@replay.mainPlayerId)
-			console.log 'discover for main player, showing everything'
+			# console.log 'discover for main player, showing everything'
 			choicesCards = []
 			for choice in action.choices
 				choiceCard = choice['cardID']
@@ -395,7 +395,7 @@ TurnLog = React.createClass
 		return log
 
 	buildSummonMinionLog: (action) ->
-		console.log 'buildSummonMinionLog', action
+		# console.log 'buildSummonMinionLog', action
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
 			indent = <span className="indented-log">...which</span>
@@ -470,9 +470,9 @@ TurnLog = React.createClass
 		if turn.playerMulligan?.length > 0
 			for mulliganed in turn.playerMulligan
 				cardId = @replay.entities[mulliganed].cardID
-				console.log 'cardId', cardId
+				# console.log 'cardId', cardId
 				card = @replay.cardUtils.getCard(cardId)
-				console.log 'card', card
+				# console.log 'card', card
 				cardLink = @replay.buildCardLink(card)
 				cardLog = <p key={++@logIndex}>
 							<PlayerNameDisplayLog active={true} name={@replay.player.name} />

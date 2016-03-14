@@ -63,7 +63,7 @@ class Card extends React.Component
 
 
 		@props.entity.damageTaken = @props.entity.damageTaken or 0
-		console.log @props.entity.cardID, @props.entity
+		# console.log @props.entity.cardID, @props.entity
 
 		# Can attack
 		if @props.entity.highlighted
