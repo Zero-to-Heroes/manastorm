@@ -65,6 +65,10 @@ class ReplayPlayer extends EventEmitter
 		@emit 'game-generated', this
 		@emit 'players-ready'
 
+		# Preload the images
+		images = @buildImagesArray()
+		@preloadPictures images
+
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
@@ -559,5 +563,29 @@ class ReplayPlayer extends EventEmitter
 
 	getClass: (cardID) ->
 		return @cardUtils.getCard(cardID)?.playerClass?.toLowerCase()
+		
+		# console.log 'preloaded images'	
+
+	buildImagesArray: ->
+		images = []
+
+		ids = []
+		console.log 'building image array', @entities
+		# Entities are roughly added in the order of apparition
+		for k,v of @entities
+			console.log 'adding entity', k, v
+			ids.push v.cardID
+
+		for id in ids
+			images.push @cardUtils.buildFullCardImageUrl(@cardUtils.getCard(id))
+
+		# console.log 'image array', images
+		return images
+
+	preloadPictures: (arrayOfImages) ->
+		arrayOfImages.forEach (img) ->
+			# console.log 'preloading', img
+			(new Image()).src = img
+
 
 module.exports = ReplayPlayer
