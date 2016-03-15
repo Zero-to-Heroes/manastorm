@@ -19,6 +19,7 @@ Play = require './ui/replay/play'
 Target = require './ui/replay/target'
 Turn = require './ui/replay/turn'
 TurnLog = require './ui/replay/turnLog'
+ActiveSpell = require './ui/replay/activeSpell'
 
 ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../subscription'
@@ -76,7 +77,6 @@ class Replay extends React.Component
 				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
 				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
 				<Mana entity={replay.opponent} />
-				<Play entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={!@showAllCards} />
 				<Hero entity={replay.opponent} ref="topHero" showConcealedInformation={@showAllCards}/>
 			</div>
@@ -88,7 +88,6 @@ class Replay extends React.Component
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 				<Mana entity={replay.player} />
-				<Play entity={replay.player} />
 				<Hero entity={replay.player} ref="bottomHero" showConcealedInformation={true}/>
 				<Hand entity={replay.player} isHidden={false} />
 			</div>
@@ -100,9 +99,9 @@ class Replay extends React.Component
 		targets = []
 		if replay.targetDestination
 			console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
-			if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] 
+			if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] and this.refs['activeSpell']
 				#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
-				allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap()
+				allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap(), this.refs['activeSpell'].getCardsMap()
 				#console.log 'merged cards', allCards
 				source = @findCard allCards, replay.targetSource
 
@@ -131,6 +130,7 @@ class Replay extends React.Component
 						{top}
 						{bottom}
 						{targets}
+						<ActiveSpell ref="activeSpell" replay={replay} />
 						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>

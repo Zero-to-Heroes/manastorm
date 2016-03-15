@@ -27,6 +27,7 @@ class ActionParser extends EventEmitter
 		@entities = @replay.entities
 		@turns = @replay.turns
 		@getController = @replay.getController
+		@cardUtils = @replay.cardUtils
 
 	populateEntities: ->
 		players = [@player, @opponent]
@@ -63,6 +64,13 @@ class ActionParser extends EventEmitter
 				if command[0] == 'receiveShowEntity'
 					if command[1][0].tags.SECRET == 1
 						@entities[command[1][0].id].tags.SECRET = 1
+
+		# Sometimes card type isn't precised
+		for k,v of @entities
+			card = @cardUtils.getCard(v.cardID)
+			console.log 'getting card', v.cardID, card
+			if card?.type is 'Spell' and !v.tags.CARDTYPE
+				v.tags.CARDTYPE = 5
 
 
 	parseActions: ->
@@ -113,6 +121,7 @@ class ActionParser extends EventEmitter
 	addAction: (currentTurnNumber, action) ->
 		# Keep the initial game order
 		action.index = action.index || action.initialCommand.index
+		action.initialCommand.associatedAction = action
 		@turns[currentTurnNumber].actions.push action
 
 

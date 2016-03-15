@@ -29,6 +29,7 @@ class ReplayPlayer extends EventEmitter
 		@game = null
 		@player = null
 		@opponent = null
+		@activeSpell = null
 
 		@history = []
 		@historyPosition = 0
@@ -185,6 +186,7 @@ class ReplayPlayer extends EventEmitter
 		if @currentActionInTurn >= 0
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
+			@updateActiveSpell action
 			@emit 'new-action', action
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
 
@@ -192,6 +194,9 @@ class ReplayPlayer extends EventEmitter
 				@targetSource = action?.data.id
 				@targetDestination = action.target
 				@targetType = action.actionType
+
+			# Try and show the active spell
+
 
 			@goToTimestamp targetTimestamp
 
@@ -280,6 +285,7 @@ class ReplayPlayer extends EventEmitter
 		@targetSource = undefined
 		@targetDestination = undefined
 		@discoverAction = undefined
+		@activeSpell = undefined
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0
 			v.highlighted = false
@@ -446,6 +452,13 @@ class ReplayPlayer extends EventEmitter
 						return
 				currentCursor++
 		#console.log 'stopped at history', @history[@historyPosition].timestamp, elapsed
+
+	updateActiveSpell: (action) ->
+		realAction = action.mainAction?.associatedAction || action
+		mainEntity = action.mainAction?.associatedAction?.data || action.data
+		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType is 'played-card-from-hand'
+			console.log 'updating active spell', mainEntity
+			@activeSpell = mainEntity
 
 	receiveGameEntity: (definition) ->
 		#console.log 'receiving game entity', definition
