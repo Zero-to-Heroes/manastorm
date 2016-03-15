@@ -96,19 +96,26 @@ class Replay extends React.Component
 		else 
 			console.warn 'Missing players', replay.players
 
-		#console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
-		if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] 
-			#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
-			allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap()
-			#console.log 'merged cards', allCards
-			source = @findCard allCards, replay.targetSource
-			target = @findCard allCards, replay.targetDestination
+
+		targets = []
+		if replay.targetDestination
+			console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
+			if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] 
+				#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
+				allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap()
+				#console.log 'merged cards', allCards
+				source = @findCard allCards, replay.targetSource
+
+			for targetId in replay.targetDestination
+				target = @findCard allCards, targetId
+				targets.push <Target source={source} target={target} type={replay.targetType} key={replay.targetSource + '' + targetId}/>
 
 		# {playButton}
 		playButton = <Button glyph="play" onClick={@onClickPlay} />
 
 		if @state.replay.speed > 0
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
+
 
 		return <div className="replay">
 					<ReactTooltip />
@@ -123,7 +130,7 @@ class Replay extends React.Component
 					<div className="replay__game">
 						{top}
 						{bottom}
-						<Target source={source} target={target} type={replay.targetType}/>
+						{targets}
 						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>

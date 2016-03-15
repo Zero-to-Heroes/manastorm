@@ -209,7 +209,6 @@ class ActionParser extends EventEmitter
 					
 					for entity in entities
 						if entity.tags.ZONE == 3
-							console.log 'adding card draw', entity, entities, command[1][0]
 							action = {
 								turn: @currentTurnNumber
 								timestamp: batch.timestamp
@@ -354,58 +353,91 @@ class ActionParser extends EventEmitter
 				for meta in command.meta
 					for info in meta.info
 
+						subAction = false
 						# The power dealt some damage
 						if meta.meta == 'DAMAGE'
-							action = {
-								turn: @currentTurnNumber - 1
-								timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
-								index: meta.index
-								target: info.entity
-								# Renaming in hsreplay 1.1
-								amount: meta.data
-								mainAction: mainAction
-								sameOwnerAsParent: sameOwnerAsParent
-								actionType: 'power-damage'
-								data: @entities[command.attributes.entity]
-								owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-								initialCommand: command
-							}
-							@addAction @currentTurnNumber, action
+							if mainAction?.actions 
+								for action in mainAction.actions
+									# If the same source deals the same amount of damage, we group all of that together
+									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+										action.target.push info.entity
+										subAction = true
+							
+							if !subAction
+								action = {
+									turn: @currentTurnNumber - 1
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									index: meta.index
+									target: [info.entity]
+									# Renaming in hsreplay 1.1
+									amount: meta.data
+									mainAction: mainAction
+									sameOwnerAsParent: sameOwnerAsParent
+									actionType: 'power-damage'
+									data: @entities[command.attributes.entity]
+									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+									initialCommand: command
+								}
+								if mainAction
+									mainAction.actions = []
+									mainAction.actions.push action
+								@addAction @currentTurnNumber, action
 
 						# The power healed someone
 						if meta.meta == 'HEALING'
-							action = {
-								turn: @currentTurnNumber - 1
-								timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
-								index: meta.index
-								target: info.entity
-								# Renaming in hsreplay 1.1
-								amount: meta.data
-								mainAction: mainAction
-								sameOwnerAsParent: sameOwnerAsParent
-								actionType: 'power-healing'
-								data: @entities[command.attributes.entity]
-								owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-								initialCommand: command
-							}
-							# console.log 'creating power-healing', action, meta
-							@addAction @currentTurnNumber, action
+							if mainAction?.actions 
+								for action in mainAction.actions
+									# If the same source deals the same amount of damage, we group all of that together
+									if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+										action.target.push info.entity
+										subAction = true
+										
+							if !subAction
+								action = {
+									turn: @currentTurnNumber - 1
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									index: meta.index
+									target: [info.entity]
+									# Renaming in hsreplay 1.1
+									amount: meta.data
+									mainAction: mainAction
+									sameOwnerAsParent: sameOwnerAsParent
+									actionType: 'power-healing'
+									data: @entities[command.attributes.entity]
+									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+									initialCommand: command
+								}
+								if mainAction
+									mainAction.actions = []
+									mainAction.actions.push action
+								# console.log 'creating power-healing', action, meta
+								@addAction @currentTurnNumber, action
 
 						# The power simply targets something else
 						if meta.meta == 'TARGET'
-							action = {
-								turn: @currentTurnNumber - 1
-								timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
-								index: meta.index
-								target: info.entity
-								mainAction: mainAction
-								sameOwnerAsParent: sameOwnerAsParent
-								actionType: 'power-target'
-								data: @entities[command.attributes.entity]
-								owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-								initialCommand: command
-							}
-							@addAction @currentTurnNumber, action
+							if mainAction?.actions 
+								for action in mainAction.actions
+									# If the same source deals the same amount of damage, we group all of that together
+									if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
+										action.target.push info.entity
+										subAction = true
+							if !subAction
+								action = {
+									turn: @currentTurnNumber - 1
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									index: meta.index
+									target: [info.entity]
+									mainAction: mainAction
+									sameOwnerAsParent: sameOwnerAsParent
+									actionType: 'power-target'
+									data: @entities[command.attributes.entity]
+									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+									initialCommand: command
+								}
+								if mainAction
+									mainAction.actions = []
+									mainAction.actions.push action
+								@addAction @currentTurnNumber, action
 			
 			# Power overwhelming for instance doesn't use Meta tags
 			else if parseInt(command.attributes.target) > 0
@@ -414,7 +446,7 @@ class ActionParser extends EventEmitter
 					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
 					actionType: 'played-card-with-target'
 					data: @entities[command.attributes.entity]
-					target: command.attributes.target
+					target: [command.attributes.target]
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 					initialCommand: command
 				}
@@ -472,7 +504,7 @@ class ActionParser extends EventEmitter
 				actionType: 'attack'
 				data: @entities[command.attributes.entity]
 				owner: @turns[@currentTurnNumber].activePlayer
-				target: command.attributes.target
+				target: [command.attributes.target]
 				initialCommand: command
 			}
 			@addAction @currentTurnNumber, action
@@ -484,14 +516,20 @@ class ActionParser extends EventEmitter
 			for tag in command.tags
 				# Graveyard
 				if tag.tag == 'ZONE' and tag.value == 4
-					action = {
-						turn: @currentTurnNumber - 1
-						timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
-						actionType: 'minion-death'
-						data: tag.entity
-						initialCommand: command
-					}
-					@addAction @currentTurnNumber, action
+					# Ok, that's a death. Should we group them together?
+					actions = @turns[@currentTurnNumber].actions
+					if actions?.length > 0 and actions[actions.length - 1].actionType is 'minion-death'
+						actions[actions.length - 1].deads.push tag.entity
+					else
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+							actionType: 'minion-death'
+							data: tag.entity
+							deads: [tag.entity]
+							initialCommand: command
+						}
+						@addAction @currentTurnNumber, action
 
 
 	parseDiscovers: (batch, command) ->

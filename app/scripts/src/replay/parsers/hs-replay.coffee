@@ -111,7 +111,7 @@ class HSReplayParser
 					option.parent.options = []
 				option.parent.options.push(option)
 
-				console.log '\tparsed option', option
+				# console.log '\tparsed option', option
 
 				# @replay.enqueue null, 'receiveTagChange', tag
 
@@ -125,7 +125,7 @@ class HSReplayParser
 		switch node.name
 			when 'Options'
 				@state.pop()
-				console.log 'enqueueing options node', node
+				# console.log 'enqueueing options node', node
 				node.debugTs = tsToSeconds(node.attributes.ts)
 				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveOptions', node
 

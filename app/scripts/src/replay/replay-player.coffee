@@ -185,9 +185,8 @@ class ReplayPlayer extends EventEmitter
 			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
 
 			if action.target
-				target = @entities[action.target]
 				@targetSource = action?.data.id
-				@targetDestination = target.id
+				@targetDestination = action.target
 				@targetType = action.actionType
 
 			@goToTimestamp targetTimestamp

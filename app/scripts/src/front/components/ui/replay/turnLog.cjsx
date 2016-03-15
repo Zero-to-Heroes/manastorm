@@ -245,7 +245,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerDamageLog: (action) ->
-		# console.log 'building power-damage log', action
+		console.log 'building power-damage log', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -253,38 +253,15 @@ TurnLog = React.createClass
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			cardLog = <span className="indented-log">...which </span>
+			cls = "indented-log"
+			cardLog = <span>...which </span>
 
-		target = @replay.entities[action.target]['cardID']
-		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+		targets = @buildList action.target
 
-		log = <p key={++@logIndex}>
+		log = <p key={++@logIndex} className={cls}>
 			    {cardLog}
 			    <span> deals {action.amount} damage to </span>
-			    <SpanDisplayLog newLog={targetLink} />
-			</p>
-
-		return log
-
-	buildPowerHealingLog: (action) ->
-		# console.log 'building power-healing log', action
-		if !action.sameOwnerAsParent
-			card = if action.data then action.data['cardID'] else ''
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
-
-		# The effect occured as a response to another action, so we need to make that clear
-		if action.mainAction
-			cardLog = <span className="indented-log">...which </span>
-
-		target = @replay.entities[action.target]['cardID']
-		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
-
-		log = <p key={++@logIndex}>
-			    {cardLog}
-			    <span> heals </span> 
-			    <SpanDisplayLog newLog={targetLink} />
-			    <span> for {action.amount} life </span>
+			    {targets}
 			</p>
 
 		return log
@@ -300,19 +277,61 @@ TurnLog = React.createClass
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
-			indentLog = <span className="indented-log">...</span>
+			cls = "indented-log"
+			indentLog = <span>...</span>
 
-		target = @replay.entities[action.target]['cardID']
-		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+		targets = @buildList action.target
 
-		log = <p key={++@logIndex}>
+
+		# target = @replay.entities[action.target]['cardID']
+		# targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+
+		log = <p key={++@logIndex} className={cls}>
 			    {indentLog}
 			    {cardLog}
 			    <span> targets </span>
-			    <SpanDisplayLog newLog={targetLink} />
+			    {targets}
 			</p>
 
 		return log
+
+	buildPowerHealingLog: (action) ->
+		# console.log 'building power-healing log', action
+		if !action.sameOwnerAsParent
+			card = if action.data then action.data['cardID'] else ''
+			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.mainAction
+			cls = "indented-log"
+			cardLog = <span>...which </span>
+
+		targets = @buildList action.target
+
+		log = <p key={++@logIndex} className={cls}>
+			    {cardLog}
+			    <span> heals </span> 
+			    {targets}
+			    <span> for {action.amount} life </span>
+			</p>
+
+		return log
+
+	buildList: (actionIds) ->
+		index = 1
+		targets = []
+		for targetId in actionIds
+			target = @replay.entities[targetId]['cardID']
+			targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+			targets.push <SpanDisplayLog newLog={targetLink} />
+			if actionIds.length > 1 
+				if index == actionIds.length - 1
+					targets.push <span> and </span>
+				else if index < actionIds.length - 1
+					targets.push <span>, </span>
+			index++
+		return targets
 
 	buildPlayedCardWithTargetLog: (action) ->
 		# console.log 'buildPlayedCardWithTargetLog', action
@@ -365,12 +384,18 @@ TurnLog = React.createClass
 		return log
 
 	buildMinionDeathLog: (action) ->
-		card = @replay.entities[action.data]['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = @replay.entities[action.data]['cardID']
+		# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+
+		targets = @buildList action.deads
+		if targets.length > 1
+			dies = <span> die </span>
+		else
+			dies = <span> dies </span>
 
 		log = <p key={++@logIndex}>
-			    <SpanDisplayLog newLog={cardLink} />
-			    <span> dies </span>
+			    {targets}
+			    {dies}
 			</p>
 
 	buildDiscoverLog: (action) ->
