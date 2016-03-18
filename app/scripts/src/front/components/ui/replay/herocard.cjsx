@@ -9,7 +9,8 @@ Armor = require './armor'
 class HeroCard extends Card
 
 	render: ->
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
+		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
 		if @props.entity.cardID && !@props.isHidden
 			style =
@@ -24,7 +25,6 @@ class HeroCard extends Card
 			overlay = <div className="overlay frozen"></div>
 
 		if @props.entity.highlighted
-			console.log '\thighlighting', @props.entity.cardID, @props.entity
 			cls += " option-on"
 			
 		if @props.secrets
