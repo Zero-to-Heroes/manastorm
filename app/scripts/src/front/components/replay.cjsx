@@ -98,7 +98,7 @@ class Replay extends React.Component
 
 		targets = []
 		if replay.targetDestination
-			console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
+			# console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
 			if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] and this.refs['activeSpell']
 				#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
 				allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap(), this.refs['activeSpell'].getCardsMap()

@@ -68,7 +68,7 @@ class ActionParser extends EventEmitter
 		# Sometimes card type isn't precised
 		for k,v of @entities
 			card = @cardUtils.getCard(v.cardID)
-			console.log 'getting card', v.cardID, card
+			# console.log 'getting card', v.cardID, card
 			if card?.type is 'Spell' and !v.tags.CARDTYPE
 				v.tags.CARDTYPE = 5
 
@@ -84,7 +84,6 @@ class ActionParser extends EventEmitter
 
 				@parseMulliganTurn batch, command
 				@parseStartOfTurn batch, command
-				@parseDrawCard batch, command
 
 				# The actual actions
 				if (command[0] == 'receiveAction')
@@ -106,6 +105,10 @@ class ActionParser extends EventEmitter
 						@parseTriggerFullEntityCreation batch, command[1][0]
 						@parseTriggerPutSecretInPlay batch, command[1][0]
 						@parseNewHeroPower batch, command[1][0]
+
+				# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
+				# tap before drawing the card)
+				@parseDrawCard batch, command
 
 		# Sort the actions chronologically
 		tempTurnNumber = 1
@@ -363,6 +366,41 @@ class ActionParser extends EventEmitter
 					for info in meta.info
 
 						subAction = false
+
+						# The power simply targets something else
+						if meta.meta == 'TARGET'
+							if mainAction?.actions 
+								for action in mainAction.actions
+									# If the same source deals the same amount of damage, we group all of that together
+									if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
+										action.target.push info.entity
+										subAction = true
+
+							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+							if !mainAction and lastAction.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
+								console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
+								lastAction.target.push info.entity
+								subAction = true
+
+							if !subAction
+								action = {
+									turn: @currentTurnNumber - 1
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									index: meta.index
+									target: [info.entity]
+									mainAction: mainAction
+									sameOwnerAsParent: sameOwnerAsParent
+									actionType: 'power-target'
+									data: @entities[command.attributes.entity]
+									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+									initialCommand: command
+								}
+								if mainAction
+									mainAction.actions = []
+									mainAction.actions.push action
+								@addAction @currentTurnNumber, action
+								
 						# The power dealt some damage
 						if meta.meta == 'DAMAGE'
 							if mainAction?.actions 
@@ -371,6 +409,13 @@ class ActionParser extends EventEmitter
 									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
 										action.target.push info.entity
 										subAction = true
+
+							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+							if !mainAction and lastAction.actionType is 'power-damage' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+								console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
+								lastAction.target.push info.entity
+								subAction = true
 							
 							if !subAction
 								action = {
@@ -390,6 +435,11 @@ class ActionParser extends EventEmitter
 								if mainAction
 									mainAction.actions = []
 									mainAction.actions.push action
+
+								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
+								if lastAction?.actionType is 'power-target'
+									@turns[@currentTurnNumber].actions.pop()
+
 								@addAction @currentTurnNumber, action
 
 						# The power healed someone
@@ -401,6 +451,12 @@ class ActionParser extends EventEmitter
 										action.target.push info.entity
 										subAction = true
 										
+							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+							if !mainAction and lastAction.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+								lastAction.target.push info.entity
+								subAction = true
+
 							if !subAction
 								action = {
 									turn: @currentTurnNumber - 1
@@ -419,33 +475,12 @@ class ActionParser extends EventEmitter
 								if mainAction
 									mainAction.actions = []
 									mainAction.actions.push action
-								# console.log 'creating power-healing', action, meta
-								@addAction @currentTurnNumber, action
 
-						# The power simply targets something else
-						if meta.meta == 'TARGET'
-							if mainAction?.actions 
-								for action in mainAction.actions
-									# If the same source deals the same amount of damage, we group all of that together
-									if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
-										action.target.push info.entity
-										subAction = true
-							if !subAction
-								action = {
-									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
-									index: meta.index
-									target: [info.entity]
-									mainAction: mainAction
-									sameOwnerAsParent: sameOwnerAsParent
-									actionType: 'power-target'
-									data: @entities[command.attributes.entity]
-									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-									initialCommand: command
-								}
-								if mainAction
-									mainAction.actions = []
-									mainAction.actions.push action
+								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
+								if lastAction.actionType is 'power-target'
+									@turns[@currentTurnNumber].actions.pop()
+									
+								# console.log 'creating power-healing', action, meta
 								@addAction @currentTurnNumber, action
 			
 			# Power overwhelming for instance doesn't use Meta tags

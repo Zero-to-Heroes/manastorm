@@ -586,7 +586,7 @@ class ReplayPlayer extends EventEmitter
 		console.log 'building image array', @entities
 		# Entities are roughly added in the order of apparition
 		for k,v of @entities
-			console.log 'adding entity', k, v
+			# console.log 'adding entity', k, v
 			ids.push v.cardID
 
 		for id in ids
