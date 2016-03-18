@@ -35,8 +35,9 @@ Hand = React.createClass
 		active = _.filter @props.entity.getHand(), (entity) -> entity.tags.ZONE_POSITION > 0
 
 		hidden = @props.isHidden
+		replay = @props.replay
 		cards = active.map (entity) ->
-			<Card entity={entity} key={entity.id} isHidden={hidden} />
+			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} />
 
 		return <ReactCSSTransitionGroup component="div" className="hand"
 					transitionName="animate" transitionEnterTimeout={700}

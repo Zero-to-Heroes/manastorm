@@ -11,22 +11,27 @@ class Card extends React.Component
 			subscribe @props.entity, tagEvents, =>
 				@forceUpdate()
 
-			# subscribe @props.entity, 'new-step', =>
-			# 	@cleanTemporaryState()
-
-			# subscribe @props.entity, 'reset', =>
-			# 	@reset()
-
-		# @props.entity.damageTaken = 0
-
 	render: ->
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
+
+
 
 		if @props.entity.cardID && !@props.isHidden
 			style =
 				backgroundImage: "url(#{art})"
 			cls = "game-card"
+
+			# Cost update 
+			if @props.cost
+				costCls = "card-cost"
+				originalCard = @props.cardUtils.getCard(@props.entity.cardID)
+				originalCost = originalCard.cost
+				if @props.entity.tags.COST < originalCost
+					costCls += " lower-cost"
+				else if @props.entity.tags.COST > originalCost
+					costCls += " higher-cost"
+				cost = <div className={costCls}>{@props.entity.tags.COST}</div>
 		else
 			style = {}
 			cls = "game-card card--unknown"
@@ -76,6 +81,8 @@ class Card extends React.Component
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
 			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
 
+		
+
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
@@ -84,6 +91,7 @@ class Card extends React.Component
 				{damage}
 				{exhausted}
 				{stats}
+				{cost}
 			</div>
 
 		else
