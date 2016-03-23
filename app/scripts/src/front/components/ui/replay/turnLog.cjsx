@@ -256,15 +256,18 @@ TurnLog = React.createClass
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+		else 
+			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
 			cls = "indented-log"
-			cardLog = <span>...which </span>
+			indentLog = <span>...</span>
 
 		targets = @buildList action.target
 
 		log = <p key={++@logIndex} className={cls}>
+			    {indentLog}
 			    {cardLog}
 			    <span> deals {action.amount} damage to </span>
 			    {targets}

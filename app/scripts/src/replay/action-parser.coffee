@@ -408,9 +408,10 @@ class ActionParser extends EventEmitter
 									data: @entities[command.attributes.entity]
 									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 									initialCommand: command
+									debug_lastAction: lastAction
 								}
 								if mainAction
-									mainAction.actions = []
+									mainAction.actions = mainAction.actions or []
 									mainAction.actions.push action
 								@addAction @currentTurnNumber, action
 								
@@ -422,6 +423,8 @@ class ActionParser extends EventEmitter
 									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
 										action.target.push info.entity
 										subAction = true
+										if lastAction?.actionType is 'power-target'
+											@turns[@currentTurnNumber].actions.pop()
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
@@ -429,6 +432,8 @@ class ActionParser extends EventEmitter
 								console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
 								lastAction.target.push info.entity
 								subAction = true
+								if lastAction?.actionType is 'power-target'
+									@turns[@currentTurnNumber].actions.pop()
 							
 							if !subAction
 								action = {
@@ -446,7 +451,7 @@ class ActionParser extends EventEmitter
 									initialCommand: command
 								}
 								if mainAction
-									mainAction.actions = []
+									mainAction.actions = mainAction.actions or []
 									mainAction.actions.push action
 
 								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
@@ -486,7 +491,7 @@ class ActionParser extends EventEmitter
 									initialCommand: command
 								}
 								if mainAction
-									mainAction.actions = []
+									mainAction.actions = mainAction.actions or []
 									mainAction.actions.push action
 
 								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
