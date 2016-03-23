@@ -24,6 +24,7 @@ class Card extends React.Component
 
 			# Cost update 
 			if @props.cost
+				# console.log 'showing card cost', @props.entity.cardID, @props.entity
 				costCls = "card-cost"
 				originalCard = @props.cardUtils.getCard(@props.entity.cardID)
 				originalCost = originalCard.cost
@@ -31,7 +32,7 @@ class Card extends React.Component
 					costCls += " lower-cost"
 				else if @props.entity.tags.COST > originalCost
 					costCls += " higher-cost"
-				cost = <div className={costCls}>{@props.entity.tags.COST}</div>
+				cost = <div className={costCls}>{@props.entity.tags.COST or 0}</div>
 		else
 			style = {}
 			cls = "game-card card--unknown"
