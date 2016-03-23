@@ -363,6 +363,9 @@ class ActionParser extends EventEmitter
 					mainAction = command.parent
 
 				for meta in command.meta
+					if !meta.info
+						continue
+						
 					for info in meta.info
 
 						subAction = false
