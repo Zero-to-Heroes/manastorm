@@ -16,8 +16,9 @@ class Board extends React.Component
 	render: ->
 		cardsMap = []
 		tooltip = @props.tooltips
+		replay = @props.replay
 		cards = @props.entity.getBoard().map (entity) ->
-			cardDiv = <Card entity={entity} key={entity.id} stats={true} ref={entity.id} tooltip={tooltip}/>
+			cardDiv = <Card entity={entity} key={entity.id} stats={true} ref={entity.id} tooltip={tooltip} cardUtils={replay.cardUtils}/>
 			#console.log 'cardsMap before adding entity', cardsMap, entity, cardDiv
 			cardsMap.push entity.id
 			(cardDiv)

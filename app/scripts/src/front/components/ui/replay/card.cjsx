@@ -15,9 +15,8 @@ class Card extends React.Component
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
-
-
 		if @props.entity.cardID && !@props.isHidden
+			originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 			style =
 				backgroundImage: "url(#{art})"
 			cls = "game-card"
@@ -26,7 +25,6 @@ class Card extends React.Component
 			if @props.cost
 				# console.log 'showing card cost', @props.entity.cardID, @props.entity
 				costCls = "card-cost"
-				originalCard = @props.cardUtils.getCard(@props.entity.cardID)
 				originalCost = originalCard.cost
 				if @props.entity.tags.COST < originalCost
 					costCls += " lower-cost"
@@ -62,8 +60,17 @@ class Card extends React.Component
 			healthClass = "card__stats__health"
 			if @props.entity.tags.DAMAGE > 0
 				healthClass += " damaged"
+
+			atkCls = "card__stats__attack"
+			if originalCard
+				originalAtk = originalCard.attack
+				if @props.entity.tags.ATK > originalAtk
+					atkCls += " buff"
+				else if @props.entity.tags.ATK < originalAtk
+					atkCls += " debuff"
+
 			stats = <div className="card__stats">
-				<div className="card__stats__attack">{@props.entity.tags.ATK or 0}</div>
+				<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
 				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
