@@ -185,18 +185,23 @@ class ActionParser extends EventEmitter
 					owner = @getController(@entities[ownerId].tags.CONTROLLER)
 				else
 					owner = @entities[ownerId]
-				
-				action = {
-					turn: @currentTurnNumber
-					timestamp: batch.timestamp
-					actionType: 'card-draw'
-					type: 'from tag change'
-					data: @entities[command[1][0].entity]
-					mainAction: command[1][0].parent?.parent # It's a tag change, so we are interesting in the enclosing action
-					owner: owner
-					initialCommand: command[1][0]
-				}
-				@addAction @currentTurnNumber, action
+
+				lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+				if lastAction?.actionType is 'card-draw' and lastAction.owner.id is owner.id
+					lastAction.data.push command[1][0].entity
+				else
+					action = {
+						turn: @currentTurnNumber
+						timestamp: batch.timestamp
+						actionType: 'card-draw'
+						type: 'from tag change'
+						data: [command[1][0].entity]
+						mainAction: command[1][0].parent?.parent # It's a tag change, so we are interesting in the enclosing action
+						owner: owner
+						initialCommand: command[1][0]
+						debug_lastAction: lastAction
+					}
+					@addAction @currentTurnNumber, action
 
 		# Draw cards - 2 - The player draws a card, thus revealing a full entity
 		if command[0] == 'receiveAction'
@@ -221,17 +226,22 @@ class ActionParser extends EventEmitter
 					
 					for entity in entities
 						if entity.tags.ZONE == 3
-							action = {
-								turn: @currentTurnNumber
-								timestamp: batch.timestamp
-								actionType: 'card-draw'
-								type: 'from action'
-								data: @entities[entity.id]
-								mainAction: command[1][0].parent
-								owner: owner
-								initialCommand: command[1][0]
-							}
-							@addAction @currentTurnNumber, action
+							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+							if lastAction?.actionType is 'card-draw' and lastAction.owner.id is parseInt(owner.id)
+								lastAction.data.push entity.id
+							else
+								action = {
+									turn: @currentTurnNumber
+									timestamp: batch.timestamp
+									actionType: 'card-draw'
+									type: 'from action'
+									data: [entity.id]
+									mainAction: command[1][0].parent
+									owner: owner
+									initialCommand: command[1][0]
+									debug_lastAction: lastAction
+								}
+								@addAction @currentTurnNumber, action
 
 
 	parseMulliganCards: (batch, command) ->
