@@ -73,7 +73,8 @@ class Card extends React.Component
 
 		# Can attack
 		if @props.entity.highlighted
-			cls += " option-on"
+			highlight = <div className="option-on"></div>
+			# cls += " option-on"
 
 		# Exhausted
 		if @props.entity.tags.EXHAUSTED == 1 and @props.entity.tags.JUST_PLAYED == 1
@@ -88,6 +89,7 @@ class Card extends React.Component
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
 			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+				{highlight}
 				{overlay}
 				{damage}
 				{exhausted}
@@ -97,6 +99,7 @@ class Card extends React.Component
 
 		else
 			return <div className={cls} style={style}>
+				{highlight}
 				{overlay}
 				{damage}
 				{exhausted}

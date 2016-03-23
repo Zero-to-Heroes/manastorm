@@ -18,11 +18,29 @@
 		background-position: -32px -32px !important;
 		border: none;
 
+	    width: 70px;
+	    height: 90px;
+		border-radius: ~"75px / 100px";
+	    background-size: 235% auto !important;
+	    background-position: -47px -37px !important;
+
+	    &::before {
+	    	content: "";
+		    background: url(images/card_border.png) center center no-repeat;
+		    background-size: contain;
+		    width: 95px;
+		    height: 110px;
+		    display: block;
+		    position: absolute;
+		    top: -5px;
+		    left: -15px;
+	    }
+
 		&:last-child {
 			margin-right: 0;
 		}
 
-		&.option-on::before {
+		.option-on {
 			content: "";
 		    border: 3px solid #31C331;
 		    position: absolute;
@@ -98,9 +116,9 @@
 }
 
 .top .board {
-	top: 250px;
+	top: 225px;
 }
 
 .bottom .board {
-	top: 0;
+	top: -6px;
 }

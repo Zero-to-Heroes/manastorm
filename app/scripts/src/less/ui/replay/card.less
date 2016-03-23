@@ -27,27 +27,54 @@
 	font-size: 14px;
 }
 .card__stats__attack {
+	// position: absolute;
+	// left: -2px;
+	// bottom: 0;
+	// text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+	// height: 20px;
+	// width: 20px;
+	// background: rgb(228, 222, 76);
+	// background: url(images/attack.png) top left no-repeat;
+	// color: black;
+	// border-radius: 50%;
+	// box-shadow: 0 0 3px 1px black;
+
 	position: absolute;
-	left: -2px;
-	bottom: 0;
-	text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
-	height: 20px;
-	width: 20px;
-	background: rgb(228, 222, 76);
-	color: black;
-	border-radius: 50%;
-	box-shadow: 0 0 3px 1px black;
+    left: -15px;
+    bottom: -8px;
+    height: 44px;
+    width: 44px;
+    background: url(images/attack.png) center center no-repeat;
+    background-size: contain;
+    color: white;
+    line-height: 52px;
+    font-size: 18px;
+    text-align: center;
+    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 }
 .card__stats__health {
+	// position: absolute;
+	// right: -2px;
+	// bottom: 0;
+	// text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+	// height: 20px;
+	// width: 20px;
+	// background: rgb(172, 50, 50);
+	// border-radius: 50%;
+	// box-shadow: 0 0 3px 1px black;
+
 	position: absolute;
-	right: -2px;
-	bottom: 0;
-	text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
-	height: 20px;
-	width: 20px;
-	background: rgb(172, 50, 50);
-	border-radius: 50%;
-	box-shadow: 0 0 3px 1px black;
+    left: 40px;
+    bottom: -8px;
+    height: 44px;
+    width: 44px;
+    background: url(images/health_new.png) center center no-repeat;
+    background-size: contain;
+    color: white;
+    line-height: 52px;
+    font-size: 18px;
+    text-align: center;
+    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 
 	&.damaged {
 		color: red;
