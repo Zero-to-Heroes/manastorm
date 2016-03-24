@@ -391,7 +391,7 @@ class ActionParser extends EventEmitter
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
+							if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
 								console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
 								lastAction.target.push info.entity
 								subAction = true
@@ -428,7 +428,7 @@ class ActionParser extends EventEmitter
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction.actionType is 'power-damage' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+							if !mainAction and lastAction?.actionType is 'power-damage' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
 								console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
 								lastAction.target.push info.entity
 								subAction = true
@@ -471,7 +471,7 @@ class ActionParser extends EventEmitter
 										
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+							if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
 								lastAction.target.push info.entity
 								subAction = true
 
@@ -495,7 +495,7 @@ class ActionParser extends EventEmitter
 									mainAction.actions.push action
 
 								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
-								if lastAction.actionType is 'power-target'
+								if lastAction?.actionType is 'power-target'
 									@turns[@currentTurnNumber].actions.pop()
 									
 								# console.log 'creating power-healing', action, meta
