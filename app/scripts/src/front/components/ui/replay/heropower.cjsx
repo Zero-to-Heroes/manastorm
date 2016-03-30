@@ -20,7 +20,7 @@ class HeroPower extends Card
 			cls += " " + @props.className
 
 		if @props.entity.highlighted
-			console.log '\thighlighting', @props.entity.cardID, @props.entity
+			# console.log '\thighlighting', @props.entity.cardID, @props.entity
 			cls += " option-on"
 
 		cost = <div className="mana-cost">2</div>

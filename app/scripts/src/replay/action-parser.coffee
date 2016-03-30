@@ -97,9 +97,9 @@ class ActionParser extends EventEmitter
 						@parseHeroPowerUsed batch, command[1][0]
 						@parseSecretPlayedFromHand batch, command[1][0]
 						@parseAttacks batch, command[1][0]
+						@parseDiscovers batch, command[1][0]
 						@parsePowerEffects batch, command[1][0]
 						@parseDeaths batch, command[1][0]
-						@parseDiscovers batch, command[1][0]
 						@parseSummons batch, command[1][0]
 						@parseEquipEffect batch, command[1][0]
 						@parseTriggerFullEntityCreation batch, command[1][0]
@@ -113,12 +113,23 @@ class ActionParser extends EventEmitter
 		# Sort the actions chronologically
 		tempTurnNumber = 1
 		while @turns[tempTurnNumber]
+			# First remove actions that we don't want to consider, but that we didn't have enough information
+			# to not log first (typically the power-target that targets self on a discover action)
+			filterFunction = @filterAction
+			filteredActions = _.filter @turns[tempTurnNumber].actions, filterFunction
 			# console.log 'sorting actions for turn', tempTurnNumber
-			sortedActions = _.sortBy @turns[tempTurnNumber].actions, 'index'
+			sortedActions = _.sortBy filteredActions, 'index'
 			sortedActions = _.sortBy sortedActions, 'timestamp'
 			@turns[tempTurnNumber].actions = sortedActions
 			# console.log '\tsorted', @turns[tempTurnNumber].actions
 			tempTurnNumber++
+
+	filterAction: (action) ->
+		# console.log 'filtering action', action
+		# if action.actionType == 'power-target' and action.initialCommand?.associatedAction?.actionType == 'discover'
+		# 	console.log 'filtering out action', action
+		# 	return false
+		return true
 
 
 	addAction: (currentTurnNumber, action) ->
@@ -392,11 +403,11 @@ class ActionParser extends EventEmitter
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
 							if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
-								console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
+								# console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
 								lastAction.target.push info.entity
 								subAction = true
 
-							if !subAction
+							if !subAction and !(lastAction?.actionType is 'discover')
 								action = {
 									turn: @currentTurnNumber - 1
 									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
@@ -408,8 +419,9 @@ class ActionParser extends EventEmitter
 									data: @entities[command.attributes.entity]
 									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 									initialCommand: command
-									debug_lastAction: lastAction
+									previousAction: lastAction
 								}
+								# console.log '\tparsing target action', action, command, command.isDiscover
 								if mainAction
 									mainAction.actions = mainAction.actions or []
 									mainAction.actions.push action
@@ -606,6 +618,7 @@ class ActionParser extends EventEmitter
 					isDiscover = false
 
 			if isDiscover
+				# console.log 'parsing discover action', command
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp

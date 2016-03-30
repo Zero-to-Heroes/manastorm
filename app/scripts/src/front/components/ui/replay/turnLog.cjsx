@@ -408,7 +408,7 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		# console.log 'building discover log', action, @replay.mainPlayerId, action.owner.id, action.owner.id == @replay.mainPlayerId
+		console.log 'building discover log', action
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
@@ -417,8 +417,9 @@ TurnLog = React.createClass
 			choicesCards = []
 			for choice in action.choices
 				choiceCard = choice['cardID']
-				choiceCardLink = @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
-				choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
+				if choiceCard
+					choiceCardLink = @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
+					choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
 
 		log = <p key={++@logIndex}>
 			    <SpanDisplayLog newLog={cardLink} />
