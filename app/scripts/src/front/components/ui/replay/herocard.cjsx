@@ -4,6 +4,7 @@ Card = require './card'
 Secret = require './Secret'
 Health = require './health'
 Armor = require './armor'
+HeroAttack = require './heroAttack'
 {subscribe} = require '../../../../subscription'
 
 class HeroCard extends Card
@@ -11,6 +12,8 @@ class HeroCard extends Card
 	render: ->
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
+
+		weapon = @props.weapon
 
 		if @props.entity.cardID && !@props.isHidden
 			style =
@@ -38,6 +41,7 @@ class HeroCard extends Card
 			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
 
 		return 	<div className={cls} style={style}>
+					<HeroAttack entity={@props.entity} weapon={weapon}/>
 					{secrets}
 					<Armor entity={@props.entity}/>
 					<Health entity={@props.entity}/>
