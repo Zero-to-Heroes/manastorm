@@ -208,12 +208,17 @@ class Replay extends React.Component
 	onTurnClick: (e) =>
 		e.preventDefault()
 		@displayConf.showLog = !@displayConf.showLog
+		if @displayConf.showLog
+			replay = @state.replay
+			setTimeout () ->
+				replay.cardUtils.refreshTooltips()
 		@forceUpdate()
 
 	onGoToTurnClick: (turn, e) =>
 		console.log 'clicked to go to a turn', turn
 		@state.replay.goToTurn(turn)
 		@forceUpdate()
+		
 
 
 	findCard: (allCards, cardID) ->
