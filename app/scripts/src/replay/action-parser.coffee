@@ -106,6 +106,13 @@ class ActionParser extends EventEmitter
 						@parseTriggerPutSecretInPlay batch, command[1][0]
 						@parseNewHeroPower batch, command[1][0]
 
+
+				if (command[0] == 'receiveTagChange')
+					@currentTurnNumber = @turnNumber - 1
+					if (@turns[@currentTurnNumber])
+
+						@parseFatigueDamage batch, command[1][0]
+
 				# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
 				# tap before drawing the card)
 				@parseDrawCard batch, command
@@ -693,5 +700,19 @@ class ActionParser extends EventEmitter
 				@addAction @currentTurnNumber, action
 
 
+	parseFatigueDamage: (batch, command) ->
+		if command.tag == 'FATIGUE'
+			owner = @entities[command.entity]
+			action = {
+				turn: @currentTurnNumber
+				timestamp: batch.timestamp
+				actionType: 'fatigue-damage'
+				data: [command.entity]
+				damage: command.value
+				mainAction: command.parent?.parent # It's a tag change, so we are interesting in the enclosing action
+				owner: owner
+				initialCommand: command
+			}
+			@addAction @currentTurnNumber, action
 
 module.exports = ActionParser

@@ -100,6 +100,8 @@ TurnLog = React.createClass
 		else if action.actionType == 'new-hero-power'
 			log = @buildNewHeroPowerLog action
 
+		else if action.actionType == 'fatigue-damage'
+			log = @buildFatigueDamageLog action
 
 		else
 			console.warning 'Shouldnt happen, unsupported log action', action
@@ -475,6 +477,23 @@ TurnLog = React.createClass
 			    <span className="new-hero-power"> receives a new Hero Power!! </span>
 			    <SpanDisplayLog newLog={cardLink} />
 			</p>
+
+		return log
+
+	buildFatigueDamageLog: (action) ->
+		console.log 'logging fatigue damage', action
+		# The effect occured as a response to another action, so we need to make that clear
+		if action.owner != @replay.getActivePlayer()
+			drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+		else
+			drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+
+		fatigue = <span>  </span>
+
+		log = <p key={++@logIndex}>
+					{drawer}
+					<span> takes {action.damage} fatigue damage</span>
+				</p>
 
 		return log
 
