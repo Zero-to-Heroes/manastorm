@@ -25,7 +25,8 @@ class HeroPower extends Card
 
 		cost = <div className="mana-cost">2</div>
 
-		return 	<div className={cls} style={style}>
+		link = '<img src="' + art + '">';
+		return 	<div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 					{cost}
 				</div>
 
