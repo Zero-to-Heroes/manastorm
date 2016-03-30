@@ -12,9 +12,10 @@ Hero = React.createClass
 		@heroPower = @props.entity.getHeroPower()
 		@weapon = @props.entity.getWeapon()
 		@secrets = @props.entity.getSecrets()
+		cardUtils = @props.replay.cardUtils
 			
 		return 	<div className="hero">
-					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} className="weapon"/>
+					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} cardUtils={cardUtils} className="weapon"/>
 					<HeroCard entity={@hero} key={@hero.id} secrets={@secrets} ref={@hero.id} showSecrets={@props.showConcealedInformation} className="avatar"/>
 					<HeroPower entity={@heroPower} key={@heroPower.id} ref={@heroPower.id} className="power"/>
 				</div>

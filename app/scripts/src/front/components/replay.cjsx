@@ -78,7 +78,7 @@ class Replay extends React.Component
 				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
 				<Mana entity={replay.opponent} />
 				<Hand entity={replay.opponent} isHidden={!@showAllCards} replay={replay}/>
-				<Hero entity={replay.opponent} ref="topHero" showConcealedInformation={@showAllCards}/>
+				<Hero entity={replay.opponent} replay={replay} ref="topHero" showConcealedInformation={@showAllCards}/>
 			</div>
 
 			bottom = <div className="bottom">
@@ -88,7 +88,7 @@ class Replay extends React.Component
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 				<Mana entity={replay.player} />
-				<Hero entity={replay.player} ref="bottomHero" showConcealedInformation={true}/>
+				<Hero entity={replay.player} replay={replay} ref="bottomHero" showConcealedInformation={true}/>
 				<Hand entity={replay.player} isHidden={false} replay={replay} />
 			</div>
 

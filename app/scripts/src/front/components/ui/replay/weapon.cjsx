@@ -14,6 +14,7 @@ class Weapon extends Card
 		#console.log '\trendering weapon', @props.entity
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
+		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 
 		style =
 			background: "url(#{art}) top left no-repeat"
@@ -23,10 +24,22 @@ class Weapon extends Card
 		if @props.className
 			cls += " " + @props.className
 
+		healthClass = "card__stats__health"
+		if @props.entity.tags.DAMAGE > 0
+			healthClass += " damaged"
+
+		atkCls = "card__stats__attack"
+		if originalCard
+			originalAtk = originalCard.attack
+			if @props.entity.tags.ATK > originalAtk
+				atkCls += " buff"
+			else if @props.entity.tags.ATK < originalAtk
+				atkCls += " debuff"
+
 		stats = <div className="card__stats">
-					<div className="card__stats__attack">{@props.entity.tags.ATK or 0}</div>
-					<div className="card__stats__health">{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</div>
-				</div>
+			<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
+			<div className={healthClass}>{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</div>
+		</div>
 
 		link = '<img src="' + art + '">';
 
