@@ -116,6 +116,7 @@ class ActionParser extends EventEmitter
 				# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
 				# tap before drawing the card)
 				@parseDrawCard batch, command
+				@parseOverdraw batch, command
 
 		# Sort the actions chronologically
 		tempTurnNumber = 1
@@ -260,7 +261,47 @@ class ActionParser extends EventEmitter
 									debug_lastAction: lastAction
 								}
 								@addAction @currentTurnNumber, action
+	parseOverdraw: (batch, command) ->
 
+		currentCommand = command[1][0]
+
+		# Draw cards - 2 - The player draws a card, thus revealing a full entity
+		if command[0] == 'receiveAction'
+			while currentCommand.parent and currentCommand.entity not in ['2', '3']
+				currentCommand = currentCommand.parent
+
+			# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+			# but by the card itself. So we need to find out who that card controller is
+			ownerId = currentCommand.attributes.entity
+			if ownerId not in ['2', '3']
+				owner = @getController(@entities[ownerId].tags.CONTROLLER)
+			else
+				owner = @entities[ownerId]
+
+			entities = command[1][0].showEntities || command[1][0].fullEntities
+			if entities
+				currentCommand = command[1][0]
+				while currentCommand.parent and currentCommand.entity not in ['2', '3']
+					currentCommand = currentCommand.parent
+				
+				for entity in entities
+					# ShowEntities are revealed with a zone = GRAVEYARD
+					if entity.tags.ZONE == 4
+						lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+						if lastAction?.actionType is 'overdraw' and lastAction.owner.id is parseInt(owner.id)
+							lastAction.data.push entity.id
+						else
+							action = {
+								turn: @currentTurnNumber
+								timestamp: batch.timestamp
+								actionType: 'overdraw'
+								data: [entity.id]
+								mainAction: command[1][0].parent
+								owner: owner
+								initialCommand: command[1][0]
+								debug_lastAction: lastAction
+							}
+							@addAction @currentTurnNumber, action
 
 	parseMulliganCards: (batch, command) ->
 		# Mulligan
