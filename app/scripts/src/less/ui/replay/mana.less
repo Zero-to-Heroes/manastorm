@@ -1,18 +1,63 @@
-.mana {
-	background: url(../../image/mana.png) center center no-repeat;
-	width: 62px;
-	height: 48px;
+.mana-container {
 	position: absolute;
-	top: 150px;
-	right: 150px;
-	font-size: 20px;
-	color: white;
-	text-shadow: 0 0 10px black;
-	font-weight: bold;
-	text-align: center;
-	line-height: 48px;
+	left: ~"calc(50% + 124px)";
+	top: 168px;
+	background: url(images/mana-container-2.png) center center no-repeat;
+	background-size: contain;
+	width: 233px;
+	height: 44px;
+
+	.summary {
+		display: inline-block;
+		font-size: 14px;
+		color: white;
+		font-weight: bold;
+		text-align: center;
+		cursor: default;
+		text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+		width: 57px;
+		height: 17px;
+		margin-top: 14px;
+		vertical-align: top;
+		margin-right: -3px;
+	}
+
+	.present {
+		display: inline-block;
+	}
+
+	.future {
+		display: block;
+		padding-left: 53px;
+		height: 20px;
+	}
+
+	.mana {
+		background: url(images/mana.png) center center no-repeat;
+		background-size: contain;
+		width: 17px;
+		height: 17px;
+		position: relative;
+		display: inline-block;
+		margin-top: 14px;
+
+		&.spent {
+			background-image: url(images/mana_spent.png);
+		}
+
+		&.locked {
+			background-image: url(images/mana_locked.png);
+			margin-top: -5px;
+			padding: 0;
+		}
+
+		&.empty {
+			background: transparent;
+			margin-top: -5px;
+		}
+	}
 }
 
-.bottom .mana {
-	top: 150px;
+.top .mana-container {
+	top: 129px;
 }
