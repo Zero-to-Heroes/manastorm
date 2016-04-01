@@ -103,18 +103,18 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@currentActionInTurn++
 
-		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
 			@goToAction()
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
-			console.log 'goign to next turn'
+			# console.log 'goign to next turn'
 			@currentTurn++
 			@currentActionInTurn = -1
 
@@ -181,7 +181,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToAction: ->
-		@newStep()
+		# @newStep()
 
 		if @currentActionInTurn >= 0
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
@@ -201,7 +201,7 @@ class ReplayPlayer extends EventEmitter
 			@goToTimestamp targetTimestamp
 
 	goToTurn: (turn) ->
-		@newStep()
+		# @newStep()
 
 		targetTurn = turn + 1
 
@@ -285,7 +285,9 @@ class ReplayPlayer extends EventEmitter
 		@targetSource = undefined
 		@targetDestination = undefined
 		@discoverAction = undefined
+		@previousActiveSpell = @activeSpell
 		@activeSpell = undefined
+		console.log 'new step', @activeSpell, @previousActiveSpell
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0
 			v.highlighted = false
@@ -430,10 +432,10 @@ class ReplayPlayer extends EventEmitter
 			@currentReplayTime = @getTotalLength() * 1000
 
 		elapsed = @getElapsed()
-		console.log 'elapsed', elapsed
+		# console.log 'elapsed', elapsed
 		while @historyPosition < @history.length
 			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
+				# console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
 				@history[@historyPosition].execute(this)
 				@historyPosition++
 			else
@@ -457,8 +459,12 @@ class ReplayPlayer extends EventEmitter
 		realAction = action.mainAction?.associatedAction || action
 		mainEntity = action.mainAction?.associatedAction?.data || action.data
 		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType is 'played-card-from-hand'
-			console.log 'updating active spell', mainEntity
+			console.log '\tupdating active spell', mainEntity
 			@activeSpell = mainEntity
+		else if realAction.actionType in ['minion-death', 'secret-revealed', 'card-draw']
+			console.log '\tstill showing previous spell', @activeSpell, @previousActiveSpell
+			@activeSpell = @previousActiveSpell
+			@previousActiveSpell = undefined
 
 	receiveGameEntity: (definition) ->
 		#console.log 'receiving game entity', definition
@@ -561,6 +567,7 @@ class ReplayPlayer extends EventEmitter
 		@emit 'new-log', log
 
 	getPlayerInfo: ->
+		console.log 'getting player info', @opponent, @entities[@opponent.tags.HERO_ENTITY], @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)
 		playerInfo = {
 			player: {
 				'name': @player.name,

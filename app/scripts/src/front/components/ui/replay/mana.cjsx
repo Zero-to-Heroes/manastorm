@@ -13,7 +13,7 @@ class Mana extends React.Component
 		consumedMana = totalMana - totalAvailableMana - totalLocked
 		futureLocked = (@props.entity.tags.OVERLOAD_OWED or 0)
 
-		console.log 'rendering mana', totalMana, totalAvailableMana, totalLocked, futureLocked, @props.entity
+		# console.log 'rendering mana', totalMana, totalAvailableMana, totalLocked, futureLocked, @props.entity
 
 		availableMana = <div className="summary">{totalAvailableMana} / {totalMana}</div>
 
