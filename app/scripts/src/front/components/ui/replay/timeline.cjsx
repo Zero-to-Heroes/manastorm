@@ -11,6 +11,8 @@ class Timeline extends React.Component
 		replay = @props.replay
 		@replay = replay
 
+		return null unless replay.getTotalLength()
+
 		length = replay.getTotalLength()
 		totalSeconds = "" + Math.floor(length % 60)
 		if totalSeconds.length < 2

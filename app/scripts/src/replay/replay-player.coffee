@@ -52,18 +52,19 @@ class ReplayPlayer extends EventEmitter
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
-
-		# @goToTimestamp @currentReplayTime
-		@update()
+		console.log 'initializeGameState done'
 
 		# Parse the data to build the game structure
 		@actionParser = new ActionParser(this)
 		@actionParser.populateEntities()
+		console.log 'popuplateEntities done'
 		@actionParser.parseActions()
+		console.log 'parseActions done'
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
 			@switchMainPlayer()
+		console.log 'switchMainPlayer done'
 
 		# Notify the UI controller
 		@emit 'game-generated', this
@@ -72,10 +73,12 @@ class ReplayPlayer extends EventEmitter
 		# Preload the images
 		images = @buildImagesArray()
 		@preloadPictures images
+		console.log 'preloadPictures done'
 
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
+		console.log 'init done'
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -106,7 +109,7 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 		@currentActionInTurn++
 
@@ -134,6 +137,7 @@ class ReplayPlayer extends EventEmitter
 			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
+		console.log 'going to next turn'
 		if @turns[@currentTurn + 1]
 			turnWhenCommandIssued = @currentTurn
 
@@ -141,6 +145,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: ->
+		console.log 'going to previous action'
 		@newStep()
 
 		if @currentActionInTurn == 1
@@ -173,6 +178,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goPreviousTurn: ->
+		console.log 'going to previous turn'
 		@newStep()
 
 		targetTurn = Math.max(1, @currentTurn - 1)
@@ -185,8 +191,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToAction: ->
-		# @newStep()
-
+		console.log 'going to action', @currentActionInTurn
 		if @currentActionInTurn >= 0
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -208,15 +213,11 @@ class ReplayPlayer extends EventEmitter
 			else
 				index = @history[@history.length - 1].index
 
-			# targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
-			# @goToTimestamp targetTimestamp
 			@goToIndex index
 
 	goToTurn: (turn) ->
-		# @newStep()
 		targetTurn = parseInt(turn)
 		console.log 'going to turn', targetTurn
-		# targetTurn = turn + 1
 
 		@currentTurn = 0
 		@currentActionInTurn = 0
@@ -227,6 +228,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToIndex: (index) ->
+		console.log 'going to index', index
 		if index < @historyPosition
 			@historyPosition = 0
 			@init()
@@ -235,16 +237,6 @@ class ReplayPlayer extends EventEmitter
 		@update()
 
 		@emit 'moved-timestamp'
-
-	# goToTimestamp: (timestamp) ->
-	# 	if timestamp < @currentReplayTime
-	# 		@historyPosition = 0
-	# 		@init()
-
-	# 	@currentReplayTime = timestamp
-	# 	@update()
-
-	# 	@emit 'moved-timestamp'
 
 	# ========================
 	# Moving inside the replay (with direct timestamp manipulation)
@@ -328,9 +320,11 @@ class ReplayPlayer extends EventEmitter
 	getTotalLength: ->
 		timestamp = null
 		i = 1
-		while !timestamp
-			timestamp = @history[@history.length - i++].timestamp
-		return timestamp - @startTimestamp
+		while !timestamp and @history.length - i > 0
+			timestamp = @history[@history.length - i++]?.timestamp
+		if timestamp
+			return timestamp - @startTimestamp
+		return null
 
 	getElapsed: ->
 		# console.log 'elapsed', @currentReplayTime
@@ -351,7 +345,7 @@ class ReplayPlayer extends EventEmitter
 		# elapsed = @getElapsed()
 		# console.log 'elapsed', elapsed
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
 			@history[@historyPosition++].execute(this)
 			# if elapsed > @history[@historyPosition].timestamp - @startTimestamp
 			# 	# console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
@@ -369,6 +363,7 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor < @history.length
+				console.log 'looking at options', currentCursor, @history.length
 				if @history[currentCursor].command is 'receiveOptions'
 					# console.log 'updating options?', command
 					@history[currentCursor].execute(this)
@@ -411,9 +406,11 @@ class ReplayPlayer extends EventEmitter
 		# Find the index of the last FullEntity creation
 		index = 0
 		while @history[index].command isnt 'receiveAction'
+			console.log '\tSkipping to first action', index
 			index++
 		index++
 		while @history[index].command isnt 'receiveAction'
+			console.log '\tSkipping to secdon action', index
 			index++
 		console.log 'last index before action', index, @history[index], @history[index + 1]
 		@goToIndex @history[index].index
@@ -423,13 +420,13 @@ class ReplayPlayer extends EventEmitter
 	# Processing the different state changes
 	# ==================
 	receiveGameEntity: (definition) ->
-		# console.log 'receiving game entity', definition
+		console.log 'receiving game entity', definition
 		entity = new Entity(this)
 		@game = @entities[definition.id] = entity
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		# console.log 'receiving player', definition
+		console.log 'receiving player', definition
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
@@ -441,7 +438,7 @@ class ReplayPlayer extends EventEmitter
 			@opponent = entity
 
 	receiveEntity: (definition) ->
-		# console.log 'receiving entity', definition.id, definition
+		console.log 'receiving entity', definition.id, definition
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else
@@ -453,7 +450,7 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change) ->
-		# console.log 'receiving tag change', change
+		console.log 'receiving tag change', change
 		tags = {}
 		tags[change.tag] = change.value
 
@@ -467,20 +464,20 @@ class ReplayPlayer extends EventEmitter
 			}, this
 
 	receiveShowEntity: (definition) ->
-		# console.log 'receiving show entity', definition
+		console.log 'receiving show entity', definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition)
 		else
 			@entities[definition.id] = new Entity(definition, this)
 
 	receiveAction: (definition) ->
-		# console.log 'receiving action', definition
+		console.log 'receiving action', definition
 		if definition.isDiscover
 			@discoverAction = definition
 			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
 
 	receiveOptions: (options) ->
-		# console.log 'receiving options', options
+		console.log 'receiving options', options
 
 		for k,v of @entities
 			v.highlighted = false
