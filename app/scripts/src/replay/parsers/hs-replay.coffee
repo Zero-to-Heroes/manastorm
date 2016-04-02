@@ -34,6 +34,7 @@ class HSReplayParser
 		#console.log 'replay parsed', @replay
 
 	rootState: (node) ->
+		node.index = @index++
 		#console.log '\tparsing node', node.name, node
 		switch node.name
 			when 'Game'
@@ -43,8 +44,7 @@ class HSReplayParser
 				#console.log 'enqueue action from rootState', node
 				#if (node?.attributes?.entity == '70')
 					#console.log '\tDebug', node
-				node.index = @index++
-				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
+				@replay.enqueue  'receiveAction', node, tsToSeconds(node.attributes.ts)
 				@state.push('action')
 
 			when 'TagChange'
@@ -59,7 +59,7 @@ class HSReplayParser
 					tag.parent.tags = []
 				tag.parent.tags.push(tag)
 
-				@replay.enqueue null, 'receiveTagChange', tag
+				@replay.enqueue 'receiveTagChange', tag
 
 			when 'GameEntity', 'Player', 'FullEntity', 'ShowEntity'
 				# console.log '\tpushing game entity to state', node
@@ -90,14 +90,17 @@ class HSReplayParser
 					playerID: node.attributes.playerID
 					ts: tsToSeconds(node.attributes.ts)
 					cards: []
+					index: @index++
 				@state.push('chosenEntities')
 
 	chosenEntitiesState: (node) ->
+		node.index = @index++
 		switch node.name
 			when 'Choice'
 				@chosen.cards.push(node.attributes.entity)
 
 	optionsState: (node) ->
+		node.index = @index++
 		switch node.name
 			when 'Option'
 				option = {
@@ -111,15 +114,11 @@ class HSReplayParser
 					option.parent.options = []
 				option.parent.options.push(option)
 
-				# console.log '\tparsed option', option
-
-				# @replay.enqueue null, 'receiveTagChange', tag
-
 	chosenEntitiesStateClose: (node) ->
 		switch node.name
 			when 'ChosenEntities'
 				@state.pop()
-				@replay.enqueue @chosen.ts, 'receiveChosenEntities', @chosen
+				@replay.enqueue 'receiveChosenEntities', @chosen, @chosen.ts
 
 	optionsStateClose: (node) ->
 		switch node.name
@@ -127,9 +126,10 @@ class HSReplayParser
 				@state.pop()
 				# console.log 'enqueueing options node', node
 				node.debugTs = tsToSeconds(node.attributes.ts)
-				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveOptions', node
+				@replay.enqueue 'receiveOptions', node, tsToSeconds(node.attributes.ts)
 
 	entityState: (node) ->
+		node.index = @index++
 		switch node.name
 			when 'Tag'
 				@entityDefinition.tags[tagNames[parseInt(node.attributes.tag)]] = parseInt(node.attributes.value)
@@ -143,22 +143,23 @@ class HSReplayParser
 		switch node.name
 			when 'GameEntity'
 				@state.pop()
-				@replay.enqueue ts, 'receiveGameEntity', @entityDefinition
+				@replay.enqueue 'receiveGameEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
 			when 'Player'
 				@state.pop()
-				@replay.enqueue ts, 'receivePlayer', @entityDefinition
+				@replay.enqueue 'receivePlayer', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
 			when 'FullEntity'
 				@state.pop()
-				@replay.enqueue ts, 'receiveEntity', @entityDefinition
+				@replay.enqueue 'receiveEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
 			when 'ShowEntity'
 				@state.pop()
-				@replay.enqueue ts, 'receiveShowEntity', @entityDefinition
+				@replay.enqueue 'receiveShowEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
 
 	actionState: (node) ->
+		node.index = @index++
 		switch node.name
 			when 'ShowEntity', 'FullEntity'
 				@state.push('entity')
@@ -218,7 +219,7 @@ class HSReplayParser
 
 				#console.log '\tparsing tagchange', @stack[@stack.length - 1], @stack[@stack.length - 2]
 
-				@replay.enqueue null, 'receiveTagChange', tag
+				@replay.enqueue 'receiveTagChange', tag
 
 			when 'MetaData'
 				if node.attributes.ts
@@ -247,7 +248,6 @@ class HSReplayParser
 				console.error 'info, shouldnt happen'
 
 			when 'Action'
-				#console.log 'enqueue action from actionState', node, @stack[@stack.length - 1], @stack[@stack.length - 2]
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
@@ -258,7 +258,7 @@ class HSReplayParser
 				#console.log 'parsing action', node
 
 				@state.push('action')
-				@replay.enqueue tsToSeconds(node.attributes.ts), 'receiveAction', node
+				@replay.enqueue 'receiveAction', node, tsToSeconds(node.attributes.ts)
 
 			when 'Choices'
 				@choices =
@@ -303,7 +303,7 @@ class HSReplayParser
 		switch node.name
 			when 'Choices'
 				@state.pop()
-				@replay.enqueue @choices.ts, 'receiveChoices', @choices
+				@replay.enqueue 'receiveChoices', @choices,  @choices.ts
 
 	actionStateClose: (node) ->
 		if node.attributes.ts

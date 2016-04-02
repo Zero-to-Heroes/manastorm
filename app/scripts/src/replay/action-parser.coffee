@@ -1,6 +1,5 @@
 Entity = require './entity'
 Player = require './player'
-HistoryBatch = require './history-batch'
 _ = require 'lodash'
 EventEmitter = require 'events'
 
@@ -39,31 +38,29 @@ class ActionParser extends EventEmitter
 		currentPlayer = players[playerIndex]
 
 		# populate the entities
-		for batch, i in @history
-			for command, j in batch.commands
-				## Populate relevant data for cards
-				if (command[0] == 'receiveShowEntity')
-					if (command[1].length > 0 && command[1][0].id && @entities[command[1][0].id]) 
-						@entities[command[1][0].id].cardID = command[1][0].cardID
-				if (command[0] == 'receiveEntity')
-					if (command[1].length > 0 && command[1][0].id && !@entities[command[1][0].id]) 
-						entity = new Entity(this)
-						definition = _.cloneDeep command[1][0]
-						@entities[definition.id] = entity
-						# Entity not in the game yet
-						definition.tags.ZONE = 6
-						entity.update(definition)
+		for item in @history
+			## Populate relevant data for cards
+			if item.command == 'receiveShowEntity'
+				if item.node.id and @entities[item.node.id]
+					@entities[item.node.id].cardID = item.node.cardID
+			if item.command == 'receiveEntity'
+				if item.node.id and !@entities[item.node.id]
+					entity = new Entity(this)
+					definition = _.cloneDeep item.node
+					@entities[definition.id] = entity
+					# Entity not in the game yet
+					definition.tags.ZONE = 6
+					entity.update(definition)
 
 		# Add intrinsic information, like whether the card is a secret
-		for batch, i in @history
-			for command, j in batch.commands
-				if command[0] == 'receiveTagChange'
-					# Adding information that this entity is a secret
-					if command[1][0].tag == 'SECRET' and command[1][0].value == 1
-						@entities[command[1][0].entity].tags[command[1][0].tag] = command[1][0].value
-				if command[0] == 'receiveShowEntity'
-					if command[1][0].tags.SECRET == 1
-						@entities[command[1][0].id].tags.SECRET = 1
+		for item in @history
+			if item.command == 'receiveTagChange'
+				# Adding information that this entity is a secret
+				if item.node.tag == 'SECRET' and item.node.value == 1
+					@entities[item.node.entity].tags[item.node.tag] = item.node.value
+			if item.command == 'receiveShowEntity'
+				if item.node.tags.SECRET == 1
+					@entities[item.node.id].tags.SECRET = 1
 
 		# Sometimes card type isn't precised
 		for k,v of @entities
@@ -79,44 +76,44 @@ class ActionParser extends EventEmitter
 		@playerIndex = 0
 		@turnNumber = 1
 		@currentPlayer = @players[@playerIndex]
-		for batch, i in @history
-			for command, j in batch.commands
 
-				@parseMulliganTurn batch, command
-				@parseStartOfTurn batch, command
+		for item in @history
 
-				# The actual actions
-				if (command[0] == 'receiveAction')
-					@currentTurnNumber = @turnNumber - 1
-					if (@turns[@currentTurnNumber])
+			@parseMulliganTurn item
+			@parseStartOfTurn item
 
-						# We need to keep this one high priority, as it often has the same timestamp as its consequence
-						@parseSecretRevealed batch, command[1][0]
-						@parseMulliganCards batch, command[1][0]
-						@parseCardPlayedFromHand batch, command[1][0]
-						@parseHeroPowerUsed batch, command[1][0]
-						@parseSecretPlayedFromHand batch, command[1][0]
-						@parseAttacks batch, command[1][0]
-						@parseDiscovers batch, command[1][0]
-						@parsePowerEffects batch, command[1][0]
-						@parseDeaths batch, command[1][0]
-						@parseSummons batch, command[1][0]
-						@parseEquipEffect batch, command[1][0]
-						@parseTriggerFullEntityCreation batch, command[1][0]
-						@parseTriggerPutSecretInPlay batch, command[1][0]
-						@parseNewHeroPower batch, command[1][0]
+			# The actual actions
+			if item.command is 'receiveAction'
+				@currentTurnNumber = @turnNumber - 1
+				if (@turns[@currentTurnNumber])
+
+					# We need to keep this one high priority, as it often has the same timestamp as its consequence
+					@parseSecretRevealed item
+					@parseMulliganCards item
+					@parseCardPlayedFromHand item
+					@parseHeroPowerUsed item
+					@parseSecretPlayedFromHand item
+					@parseAttacks item
+					@parseDiscovers item
+					@parsePowerEffects item
+					@parseDeaths item
+					@parseSummons item
+					@parseEquipEffect item
+					@parseTriggerFullEntityCreation item
+					@parseTriggerPutSecretInPlay item
+					@parseNewHeroPower item
 
 
-				if (command[0] == 'receiveTagChange')
-					@currentTurnNumber = @turnNumber - 1
-					if (@turns[@currentTurnNumber])
+			if item.command is 'receiveTagChange'
+				@currentTurnNumber = @turnNumber - 1
+				if (@turns[@currentTurnNumber])
 
-						@parseFatigueDamage batch, command[1][0]
+					@parseFatigueDamage item
 
-				# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
-				# tap before drawing the card)
-				@parseDrawCard batch, command
-				@parseOverdraw batch, command
+			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
+			# tap before drawing the card)
+			@parseDrawCard item
+			@parseOverdraw item
 
 		# Sort the actions chronologically
 		tempTurnNumber = 1
@@ -127,7 +124,7 @@ class ActionParser extends EventEmitter
 			filteredActions = _.filter @turns[tempTurnNumber].actions, filterFunction
 			# console.log 'sorting actions for turn', tempTurnNumber
 			sortedActions = _.sortBy filteredActions, 'index'
-			sortedActions = _.sortBy sortedActions, 'timestamp'
+			# sortedActions = _.sortBy sortedActions, 'timestamp'
 			@turns[tempTurnNumber].actions = sortedActions
 			# console.log '\tsorted', @turns[tempTurnNumber].actions
 			tempTurnNumber++
@@ -151,46 +148,47 @@ class ActionParser extends EventEmitter
 	# =======================
 	# Specific actions
 	# =======================
-	parseMulliganTurn: (batch, command) ->
+	parseMulliganTurn: (item) ->
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
-		if (command[0] == 'receiveTagChange' && command[1][0].entity == 2 && command[1][0].tag == 'MULLIGAN_STATE' && command[1][0].value == 1)
+		if item.command is 'receiveTagChange' and item.node.entity == 2 and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
 			@turns[@turnNumber] = {
 				turn: 'Mulligan'
 				playerMulligan: []
 				opponentMulligan: []
-				timestamp: batch.timestamp
+				timestamp: item.timestamp
 				actions: []
+				index: item.index
 			}
 			@turns.length++
 			@turnNumber++
 			@currentPlayer = @players[++@playerIndex % 2]
 
-		if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].entity == 3 && command[1][0].tag == 'MULLIGAN_STATE' && command[1][0].value == 1)
+		if item.command is 'receiveTagChange' and item.node.entity == 3 and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
 			@currentPlayer = @players[++@playerIndex % 2]	
 
 
-	parseStartOfTurn: (batch, command) ->
+	parseStartOfTurn: (item) ->
 		# Start of turn
-		if (command[0] == 'receiveTagChange' && command[1].length > 0 && command[1][0].entity == 1 && command[1][0].tag == 'STEP' && command[1][0].value == 6)
+		if item.command is 'receiveTagChange' and item.node.entity == 1 and item.node.tag == 'STEP' and item.node.value == 6
 			@turns[@turnNumber] = {
 				# historyPosition: i
 				turn: @turnNumber - 1
-				timestamp: batch.timestamp
+				timestamp: item.timestamp
 				actions: []
 				activePlayer: @currentPlayer
+				index: item.index
 			}
 			@turns.length++
 			@turnNumber++
 			@currentPlayer = @players[++@playerIndex % 2]
 
 
-	parseDrawCard: (batch, command) ->
-
-		currentCommand = command[1][0]
+	parseDrawCard: (item) ->
+		currentCommand = item.node
 
 		# Draw cards - 1 - Simply a card arriving in hand
-		if command[0] == 'receiveTagChange' and command[1][0].tag == 'ZONE' and command[1][0].value == 3
+		if item.command is 'receiveTagChange' and item.node.tag == 'ZONE' and item.node.value == 3
 			# Don't add card draws that are at the beginning of the game or during Mulligan
 			if @currentTurnNumber >= 2
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
@@ -199,7 +197,7 @@ class ActionParser extends EventEmitter
 				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
 				# but by the card itself. So we need to find out who that card controller is
 				# ownerId = currentCommand.attributes.entity
-				ownerId = command[1][0].entity
+				ownerId = item.node.entity
 				if ownerId not in ['2', '3']
 					owner = @getController(@entities[ownerId].tags.CONTROLLER)
 				else
@@ -207,23 +205,23 @@ class ActionParser extends EventEmitter
 
 				lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
 				if lastAction?.actionType is 'card-draw' and lastAction.owner.id is owner.id
-					lastAction.data.push command[1][0].entity
+					lastAction.data.push item.node.entity
 				else
 					action = {
 						turn: @currentTurnNumber
-						timestamp: batch.timestamp
+						timestamp: item.timestamp
 						actionType: 'card-draw'
 						type: 'from tag change'
-						data: [command[1][0].entity]
-						mainAction: command[1][0].parent?.parent # It's a tag change, so we are interesting in the enclosing action
+						data: [item.node.entity]
+						mainAction: item.node.parent?.parent # It's a tag change, so we are interesting in the enclosing action
 						owner: owner
-						initialCommand: command[1][0]
+						initialCommand: item.node
 						debug_lastAction: lastAction
 					}
 					@addAction @currentTurnNumber, action
 
 		# Draw cards - 2 - The player draws a card, thus revealing a full entity
-		if command[0] == 'receiveAction'
+		if item.command is 'receiveAction'
 			# Don't add card draws that are at the beginning of the game or during Mulligan
 			if @currentTurnNumber >= 2
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
@@ -237,9 +235,9 @@ class ActionParser extends EventEmitter
 				else
 					owner = @entities[ownerId]
 
-				entities = command[1][0].showEntities || command[1][0].fullEntities
+				entities = item.node.showEntities || item.node.fullEntities
 				if entities
-					currentCommand = command[1][0]
+					currentCommand = item.node
 					while currentCommand.parent and currentCommand.entity not in ['2', '3']
 						currentCommand = currentCommand.parent
 					
@@ -251,22 +249,22 @@ class ActionParser extends EventEmitter
 							else
 								action = {
 									turn: @currentTurnNumber
-									timestamp: batch.timestamp
+									timestamp: item.timestamp
 									actionType: 'card-draw'
 									type: 'from action'
 									data: [entity.id]
-									mainAction: command[1][0].parent
+									mainAction: item.node.parent
 									owner: owner
-									initialCommand: command[1][0]
+									initialCommand: item.node
 									debug_lastAction: lastAction
 								}
 								@addAction @currentTurnNumber, action
-	parseOverdraw: (batch, command) ->
 
-		currentCommand = command[1][0]
+	parseOverdraw: (item) ->
+		currentCommand = item.node
 
 		# Draw cards - 2 - The player draws a card, thus revealing a full entity
-		if command[0] == 'receiveAction'
+		if item.command is 'receiveAction'
 			while currentCommand.parent and currentCommand.entity not in ['2', '3']
 				currentCommand = currentCommand.parent
 
@@ -278,9 +276,9 @@ class ActionParser extends EventEmitter
 			else
 				owner = @entities[ownerId]
 
-			entities = command[1][0].showEntities || command[1][0].fullEntities
+			entities = item.node.showEntities || item.node.fullEntities
 			if entities
-				currentCommand = command[1][0]
+				currentCommand = item.node
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 				
@@ -293,17 +291,18 @@ class ActionParser extends EventEmitter
 						else
 							action = {
 								turn: @currentTurnNumber
-								timestamp: batch.timestamp
+								timestamp: item.timestamp
 								actionType: 'overdraw'
 								data: [entity.id]
-								mainAction: command[1][0].parent
+								mainAction: item.node.parent
 								owner: owner
-								initialCommand: command[1][0]
+								initialCommand: item.node
 								debug_lastAction: lastAction
 							}
 							@addAction @currentTurnNumber, action
 
-	parseMulliganCards: (batch, command) ->
+	parseMulliganCards: (item) ->
+		command = item.node
 		# Mulligan
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities
 			@turns[@currentTurnNumber].playerMulligan = command.hideEntities
@@ -317,7 +316,8 @@ class ActionParser extends EventEmitter
 
 
 	# Not secrets
-	parseCardPlayedFromHand: (batch, command) ->
+	parseCardPlayedFromHand: (item) ->
+		command = item.node
 		if command.attributes.type == '7'
 
 			# Check that the entity was in our hand before
@@ -344,7 +344,7 @@ class ActionParser extends EventEmitter
 			if playedCard > -1
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'played-card-from-hand'
 					data: @entities[playedCard]
 					owner: @turns[@currentTurnNumber].activePlayer
@@ -353,7 +353,8 @@ class ActionParser extends EventEmitter
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
 
-	parseNewHeroPower: (batch, command) ->
+	parseNewHeroPower: (item) ->
+		command = item.node
 		if command.attributes.type in ['3', '5'] and command.tags
 			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value == 1
@@ -362,7 +363,7 @@ class ActionParser extends EventEmitter
 					if card.type == 'Hero Power'
 						action = {
 							turn: @currentTurnNumber - 1
-							timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+							timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 							actionType: 'new-hero-power'
 							data: entity
 							owner: @getController(entity.tags.CONTROLLER)
@@ -372,7 +373,8 @@ class ActionParser extends EventEmitter
 						# console.log '\tAnd it is a valid play', action
 						@addAction @currentTurnNumber, action
 
-	parseHeroPowerUsed: (batch, command) ->
+	parseHeroPowerUsed: (item) ->
+		command = item.node
 		if command.attributes.type == '7'
 
 			# Check that the entity was in our hand before
@@ -382,7 +384,7 @@ class ActionParser extends EventEmitter
 			if entity.tags.CARDTYPE == 10
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'hero-power'
 					data: entity
 					owner: @getController(entity.tags.CONTROLLER)
@@ -391,7 +393,8 @@ class ActionParser extends EventEmitter
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
 
-	parseSecretPlayedFromHand: (batch, command) ->
+	parseSecretPlayedFromHand: (item) ->
+		command = item.node
 		if command.attributes.type == '7'
 
 			playedCard = -1
@@ -408,7 +411,7 @@ class ActionParser extends EventEmitter
 				owner = @getController(entity.tags.CONTROLLER) 
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'played-secret-from-hand'
 					# If it's a secret, we want to know who put it in play
 					data: entity
@@ -420,7 +423,8 @@ class ActionParser extends EventEmitter
 
 
 	# Damage, healing and jousts
-	parsePowerEffects: (batch, command) ->
+	parsePowerEffects: (item) ->
+		command = item.node
 		if command.attributes.type in ['3', '5'] 
 
 			if command.meta?.length > 0
@@ -458,7 +462,7 @@ class ActionParser extends EventEmitter
 							if !subAction and !(lastAction?.actionType is 'discover')
 								action = {
 									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
 									index: meta.index
 									target: [info.entity]
 									mainAction: mainAction
@@ -489,7 +493,7 @@ class ActionParser extends EventEmitter
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
 							if !mainAction and lastAction?.actionType is 'power-damage' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
-								console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
+								# console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
 								lastAction.target.push info.entity
 								subAction = true
 								if lastAction?.actionType is 'power-target'
@@ -498,7 +502,7 @@ class ActionParser extends EventEmitter
 							if !subAction
 								action = {
 									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
 									index: meta.index
 									target: [info.entity]
 									# Renaming in hsreplay 1.1
@@ -538,7 +542,7 @@ class ActionParser extends EventEmitter
 							if !subAction
 								action = {
 									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || batch.timestamp
+									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
 									index: meta.index
 									target: [info.entity]
 									# Renaming in hsreplay 1.1
@@ -565,7 +569,7 @@ class ActionParser extends EventEmitter
 			else if parseInt(command.attributes.target) > 0
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'played-card-with-target'
 					data: @entities[command.attributes.entity]
 					target: [command.attributes.target]
@@ -574,7 +578,8 @@ class ActionParser extends EventEmitter
 				}
 				@addAction @currentTurnNumber, action
 
-	parseTriggerPutSecretInPlay: (batch, command) ->
+	parseTriggerPutSecretInPlay: (item) ->
+		command = item.node
 		if command.attributes.type in ['3', '5'] 
 			secretsPutInPlay = []
 			if command.tags
@@ -586,7 +591,7 @@ class ActionParser extends EventEmitter
 				if secretsPutInPlay.length > 0
 					action = {
 						turn: @currentTurnNumber - 1
-						timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 						secrets: secretsPutInPlay
 						mainAction: command.parent
 						actionType: 'trigger-secret-play'
@@ -597,7 +602,8 @@ class ActionParser extends EventEmitter
 					@addAction @currentTurnNumber, action
 
 	# The other effects, like battlecry, echoing ooze duplication, etc.
-	parseTriggerFullEntityCreation: (batch, command) ->
+	parseTriggerFullEntityCreation: (item) ->
+		command = item.node
 		if command.attributes.type in ['5'] 
 			# Trigger that creates an entity
 			if command.fullEntities?.length > 0
@@ -606,7 +612,7 @@ class ActionParser extends EventEmitter
 					for entity in fullEntities
 						action = {
 							turn: @currentTurnNumber - 1
-							timestamp: tsToSeconds(entity.attributes.ts) || tsToSeconds(command.attributes.ts) || batch.timestamp
+							timestamp: tsToSeconds(entity.attributes.ts) || tsToSeconds(command.attributes.ts) || item.timestamp
 							index: entity.index
 							actionType: 'trigger-fullentity'
 							data: @entities[command.attributes.entity]
@@ -617,12 +623,13 @@ class ActionParser extends EventEmitter
 						@addAction @currentTurnNumber, action
 
 
-	parseAttacks: (batch, command) ->
+	parseAttacks: (item) ->
+		command = item.node
 		if command.attributes.type == '1'
 			#console.log 'considering attack', command
 			action = {
 				turn: @currentTurnNumber - 1
-				timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+				timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 				actionType: 'attack'
 				data: @entities[command.attributes.entity]
 				owner: @turns[@currentTurnNumber].activePlayer
@@ -633,7 +640,8 @@ class ActionParser extends EventEmitter
 
 			# TODO: log the damage done
 
-	parseDeaths: (batch, command) ->
+	parseDeaths: (item) ->
+		command = item.node
 		if command.tags and command.attributes.type == '6' 
 			for tag in command.tags
 				# Graveyard
@@ -645,7 +653,7 @@ class ActionParser extends EventEmitter
 					else
 						action = {
 							turn: @currentTurnNumber - 1
-							timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+							timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 							actionType: 'minion-death'
 							data: tag.entity
 							deads: [tag.entity]
@@ -654,7 +662,8 @@ class ActionParser extends EventEmitter
 						@addAction @currentTurnNumber, action
 
 
-	parseDiscovers: (batch, command) ->
+	parseDiscovers: (item) ->
+		command = item.node
 		# Always discover 3 cards
 		if command.attributes.type == '3' and command.fullEntities?.length == 3
 			# Check that each of them is in the SETASIDE zone
@@ -669,7 +678,7 @@ class ActionParser extends EventEmitter
 				# console.log 'parsing discover action', command
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'discover'
 					data: @entities[command.attributes.entity]
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
@@ -681,7 +690,8 @@ class ActionParser extends EventEmitter
 				@addAction @currentTurnNumber, action
 
 
-	parseSummons: (batch, command) ->
+	parseSummons: (item) ->
+		command = item.node
 		# A power that creates new entities - minions
 		if command.attributes.type == '3' and command.fullEntities?.length > 0
 			for entity in command.fullEntities
@@ -694,7 +704,7 @@ class ActionParser extends EventEmitter
 
 					action = {
 						turn: @currentTurnNumber - 1
-						timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 						index: entity.index
 						actionType: 'summon-minion'
 						data: entity
@@ -704,7 +714,8 @@ class ActionParser extends EventEmitter
 					}
 					@addAction @currentTurnNumber, action
 
-	parseEquipEffect: (batch, command) ->
+	parseEquipEffect: (item) ->
+		command = item.node
 		# A power that creates new entities - weapons
 		if command.attributes.type == '3' and command.fullEntities?.length > 0
 			for entity in command.fullEntities
@@ -717,7 +728,7 @@ class ActionParser extends EventEmitter
 
 					action = {
 						turn: @currentTurnNumber - 1
-						timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 						index: entity.index
 						actionType: 'summon-weapon'
 						data: entity
@@ -727,13 +738,14 @@ class ActionParser extends EventEmitter
 					}
 					@addAction @currentTurnNumber, action
 
-	parseSecretRevealed: (batch, command) ->
+	parseSecretRevealed: (item) ->
+		command = item.node
 		if command.attributes.type == '5'
 			entity = @entities[command.attributes.entity]
 			if entity?.tags?.SECRET == 1
 				action = {
 					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || batch.timestamp
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'secret-revealed'
 					data: entity
 					initialCommand: command
@@ -741,12 +753,13 @@ class ActionParser extends EventEmitter
 				@addAction @currentTurnNumber, action
 
 
-	parseFatigueDamage: (batch, command) ->
+	parseFatigueDamage: (item) ->
+		command = item.node
 		if command.tag == 'FATIGUE'
 			owner = @entities[command.entity]
 			action = {
 				turn: @currentTurnNumber
-				timestamp: batch.timestamp
+				timestamp: item.timestamp
 				actionType: 'fatigue-damage'
 				data: [command.entity]
 				damage: command.value

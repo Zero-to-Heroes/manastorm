@@ -1,6 +1,7 @@
 Entity = require './entity'
 Player = require './player'
 HistoryBatch = require './history-batch'
+HistoryItem = require './history-item'
 ActionParser = require './action-parser'
 _ = require 'lodash'
 EventEmitter = require 'events'
@@ -50,7 +51,9 @@ class ReplayPlayer extends EventEmitter
 		@parser.parse(this)
 
 		# Trigger the population of all the main game entities
-		@goToTimestamp @currentReplayTime
+		@initializeGameState()
+
+		# @goToTimestamp @currentReplayTime
 		@update()
 
 		# Parse the data to build the game structure
@@ -125,9 +128,10 @@ class ReplayPlayer extends EventEmitter
 
 			# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
 			# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
-			targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
+			# targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
 
-			@goToTimestamp targetTimestamp
+			# @goToTimestamp targetTimestamp
+			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
 		if @turns[@currentTurn + 1]
@@ -188,29 +192,59 @@ class ReplayPlayer extends EventEmitter
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			@updateActiveSpell action
 			@emit 'new-action', action
-			targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
 
 			if action.target
 				@targetSource = action?.data.id
 				@targetDestination = action.target
 				@targetType = action.actionType
 
-			# Try and show the active spell
+			# Now we want to go to the action, and to show the effects of the action - ie all 
+			# that happens until the next action. Otherwise the consequence of an action would 
+			# be bundled with the next action, which is less intuitive
+			if @turns[@currentTurn].actions[@currentActionInTurn + 1] 
+				index = @turns[@currentTurn].actions[@currentActionInTurn + 1].index - 1
+			else if @turns[@currentTurn + 1]
+				index = @turns[@currentTurn + 1].index - 1
+			else
+				index = @history[@history.length - 1].index
 
-
-			@goToTimestamp targetTimestamp
+			# targetTimestamp = 1000 * (action.timestamp - @startTimestamp) + 0.0000001
+			# @goToTimestamp targetTimestamp
+			@goToIndex index
 
 	goToTurn: (turn) ->
 		# @newStep()
-
-		targetTurn = turn + 1
+		targetTurn = parseInt(turn)
+		console.log 'going to turn', targetTurn
+		# targetTurn = turn + 1
 
 		@currentTurn = 0
 		@currentActionInTurn = 0
 		@init()
 
 		while @currentTurn != targetTurn
+			console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
 			@goNextAction()
+
+	goToIndex: (index) ->
+		if index < @historyPosition
+			@historyPosition = 0
+			@init()
+
+		@targetIndex = index
+		@update()
+
+		@emit 'moved-timestamp'
+
+	# goToTimestamp: (timestamp) ->
+	# 	if timestamp < @currentReplayTime
+	# 		@historyPosition = 0
+	# 		@init()
+
+	# 	@currentReplayTime = timestamp
+	# 	@update()
+
+	# 	@emit 'moved-timestamp'
 
 	# ========================
 	# Moving inside the replay (with direct timestamp manipulation)
@@ -226,18 +260,27 @@ class ReplayPlayer extends EventEmitter
 		timestamp += @startTimestamp
 		console.log 'moving to timestamp', timestamp
 		@newStep()
+
+		lastTimestamp = 0
+		index = 0
+		while !lastTimestamp or (lastTimestamp < timestamp)
+			lastTimestamp = @history[++index].timestamp
+
+		itemIndex = @history[index].index
+		console.log 'going to itemIndex', itemIndex
+
 		targetTurn = -1
 		targetAction = -1
 
 		for i in [1..@turns.length]
 			turn = @turns[i]
-			console.log 'looking at timestamp', turn.timestamp, turn, turn.actions[1]
+			console.log 'looking at turn', turn, turn.actions[1]
 			# If the turn starts after the timestamp, this means that the action corresponding to the timestamp started in the previous turn
-			if turn.timestamp > timestamp
+			if turn.index > itemIndex
 				console.log 'breaking on turn', i, turn
 				break
 			# If the turn has no timestamp, try to default to the first action's timestamp
-			if !turn.timestamp > timestamp and turn.actions?.length > 0 and turn.actions[0].timestamp > timestamp
+			if !turn.index > itemIndex and turn.actions?.length > 0 and turn.actions[0].index > itemIndex
 				break
 			targetTurn = i
 
@@ -246,10 +289,11 @@ class ReplayPlayer extends EventEmitter
 				for j in [0..turn.actions.length - 1]
 					action = turn.actions[j]
 					console.log '\tlooking at action', action
-					if !action or !action.timestamp or action?.timestamp > timestamp
+					if !action or !action.index or action?.index > itemIndex
 						break
 						# Action -1 matches the beginning of the turn
 					targetAction = j - 1
+
 
 		# TODO: reset only if move backwards
 		@currentTurn = 0
@@ -265,17 +309,6 @@ class ReplayPlayer extends EventEmitter
 
 		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
 			@goNextAction()
-		
-
-	goToTimestamp: (timestamp) ->
-		if timestamp < @currentReplayTime
-			@historyPosition = 0
-			@init()
-
-		@currentReplayTime = timestamp
-		@update()
-
-		@emit 'moved-timestamp'
 
 
 	getActivePlayer: ->
@@ -293,165 +326,53 @@ class ReplayPlayer extends EventEmitter
 			v.highlighted = false
 
 	getTotalLength: ->
-		return @history[@history.length - 1].timestamp - @startTimestamp
+		timestamp = null
+		i = 1
+		while !timestamp
+			timestamp = @history[@history.length - i++].timestamp
+		return timestamp - @startTimestamp
 
 	getElapsed: ->
-		@currentReplayTime / 1000
+		# console.log 'elapsed', @currentReplayTime
+		@currentReplayTime
 
 	getTimestamps: ->
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
 	
 
-	# Replace the tN keywords
-	replaceKeywordsWithTimestamp: (text) ->
-		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
-		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
-
-		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?)/gm
-		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?)/gm
-
-		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?)/gm
-
-		that = this
-		matches = text.match(turnRegex)
-
-		if matches and matches.length > 0
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				# console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				# console.log '\tinputTurnNumber', inputTurnNumber
-				# Now compute the "real" turn. This depends on whether you're the first player or not
-				if that.turns[2].activePlayer == that.player
-					turnNumber = inputTurnNumber * 2
-				else
-					turnNumber = inputTurnNumber * 2 + 1
-				turn = that.turns[turnNumber]
-				# console.log '\tturn', turn
-				if turn
-					timestamp = turn.timestamp + 1
-					# console.log '\ttimestamp', (timestamp - that.startTimestamp)
-					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					# console.log '\tformattedTimeStamp', formattedTimeStamp
-					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-
-		matches = text.match(opoonentTurnRegex)
-
-		if matches and matches.length > 0
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				#console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				#console.log '\tinputTurnNumber', inputTurnNumber
-				# Now compute the "real" turn. This depends on whether you're the first player or not
-				if that.turns[2].activePlayer == that.opponent
-					turnNumber = inputTurnNumber * 2
-				else
-					turnNumber = inputTurnNumber * 2 + 1
-				turn = that.turns[turnNumber]
-				#console.log '\tturn', turn
-				if turn
-					timestamp = turn.timestamp + 1
-					#console.log '\ttimestamp', (timestamp - that.startTimestamp)
-					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					#console.log '\tformattedTimeStamp', formattedTimeStamp
-					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-		
-		matches = text.match(longTurnRegex)
-
-		if matches and matches.length > 0
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				# console.log '\tmatch', match, match.substring(4, match.length - 1)
-				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				# console.log '\tinputTurnNumber', inputTurnNumber
-				# Now compute the "real" turn. This depends on whether you're the first player or not
-				if that.turns[2].activePlayer == that.player
-					turnNumber = inputTurnNumber * 2
-				else
-					turnNumber = inputTurnNumber * 2 + 1
-				turn = that.turns[turnNumber]
-				# console.log '\tturn', turn
-				if turn
-					timestamp = turn.timestamp + 1
-					# console.log '\ttimestamp', (timestamp - that.startTimestamp)
-					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					# console.log '\tformattedTimeStamp', formattedTimeStamp
-					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-
-		matches = text.match(longOpponentTurnRegex)
-
-		if matches and matches.length > 0
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				#console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				#console.log '\tinputTurnNumber', inputTurnNumber
-				# Now compute the "real" turn. This depends on whether you're the first player or not
-				if that.turns[2].activePlayer == that.opponent
-					turnNumber = inputTurnNumber * 2
-				else
-					turnNumber = inputTurnNumber * 2 + 1
-				turn = that.turns[turnNumber]
-				#console.log '\tturn', turn
-				if turn
-					timestamp = turn.timestamp + 1
-					#console.log '\ttimestamp', (timestamp - that.startTimestamp)
-					formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-					#console.log '\tformattedTimeStamp', formattedTimeStamp
-					text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-
-		matches = text.match(mulliganRegex)
-
-		if matches and matches.length > 0
-			matches.forEach (match) ->
-				turn = that.turns[1]
-				timestamp = turn.timestamp
-				#console.log 'timestamp', timestamp, that.startTimestamp
-				formattedTimeStamp = that.formatTimeStamp (timestamp - that.startTimestamp)
-				#console.log 'formatted time stamp', formattedTimeStamp
-				text = text.replace match, '<a ng-click="goToTimestamp(\'' + formattedTimeStamp + '\')" class="ng-scope">' + match + '</a>'
-
-		#console.log 'modified text', text
-		return text
-
-	formatTimeStamp: (length) ->
-		totalSeconds = "" + Math.floor(length % 60)
-		if totalSeconds.length < 2
-			totalSeconds = "0" + totalSeconds
-		totalMinutes = Math.floor(length / 60)
-		if totalMinutes.length < 2
-			totalMinutes = "0" + totalMinutes
-
-		return totalMinutes + ':' + totalSeconds
+	
 
 	update: ->
 		#@currentReplayTime += @frequency * @speed
-		if (@currentReplayTime >= @getTotalLength() * 1000)
-			@currentReplayTime = @getTotalLength() * 1000
+		# if (@currentReplayTime >= @getTotalLength() * 1000)
+		# 	@currentReplayTime = @getTotalLength() * 1000
 
-		elapsed = @getElapsed()
+		# elapsed = @getElapsed()
 		# console.log 'elapsed', elapsed
-		while @historyPosition < @history.length
-			if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-				# console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
-				@history[@historyPosition].execute(this)
-				@historyPosition++
-			else
-				@updateOptions()
-				break
+		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
+			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			@history[@historyPosition++].execute(this)
+			# if elapsed > @history[@historyPosition].timestamp - @startTimestamp
+			# 	# console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
+			# 	@history[@historyPosition].execute(this)
+			# 	@historyPosition++
+			# else
+
+		@updateOptions()
+		if @history[@historyPosition - 1]?.timestamp
+			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
+			console.log '\tupdating timestamp', @currentReplayTime
 
 	updateOptions: ->
 		if @getActivePlayer() == @player
 			# console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor < @history.length
-				for command in @history[currentCursor].commands
-					if (command[0] == 'receiveOptions')
-						# console.log 'updating options?', command
-						@history[currentCursor].execute(this)
-						return
+				if @history[currentCursor].command is 'receiveOptions'
+					# console.log 'updating options?', command
+					@history[currentCursor].execute(this)
+					return
 				currentCursor++
 		#console.log 'stopped at history', @history[@historyPosition].timestamp, elapsed
 
@@ -465,24 +386,6 @@ class ReplayPlayer extends EventEmitter
 			console.log '\tstill showing previous spell', @activeSpell, @previousActiveSpell
 			@activeSpell = @previousActiveSpell
 			@previousActiveSpell = undefined
-
-	receiveGameEntity: (definition) ->
-		#console.log 'receiving game entity', definition
-		entity = new Entity(this)
-		@game = @entities[definition.id] = entity
-		entity.update(definition)
-
-	receivePlayer: (definition) ->
-		#console.log 'receiving player', definition
-		entity = new Player(this)
-		@entities[definition.id] = entity
-		@players.push(entity)
-		entity.update(definition)
-
-		if entity.tags.CURRENT_PLAYER
-			@player = entity
-		else
-			@opponent = entity
 
 	mainPlayer: (entityId) ->
 		if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
@@ -500,8 +403,45 @@ class ReplayPlayer extends EventEmitter
 			return @player
 		return @opponent
 
+
+	# ==================
+	# Initialization
+	# ==================
+	initializeGameState: ->
+		# Find the index of the last FullEntity creation
+		index = 0
+		while @history[index].command isnt 'receiveAction'
+			index++
+		index++
+		while @history[index].command isnt 'receiveAction'
+			index++
+		console.log 'last index before action', index, @history[index], @history[index + 1]
+		@goToIndex @history[index].index
+
+
+	# ==================
+	# Processing the different state changes
+	# ==================
+	receiveGameEntity: (definition) ->
+		# console.log 'receiving game entity', definition
+		entity = new Entity(this)
+		@game = @entities[definition.id] = entity
+		entity.update(definition)
+
+	receivePlayer: (definition) ->
+		# console.log 'receiving player', definition
+		entity = new Player(this)
+		@entities[definition.id] = entity
+		@players.push(entity)
+		entity.update(definition)
+
+		if entity.tags.CURRENT_PLAYER
+			@player = entity
+		else
+			@opponent = entity
+
 	receiveEntity: (definition) ->
-		#console.log 'receiving entity', definition.id, definition
+		# console.log 'receiving entity', definition.id, definition
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else
@@ -513,6 +453,7 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change) ->
+		# console.log 'receiving tag change', change
 		tags = {}
 		tags[change.tag] = change.value
 
@@ -526,7 +467,7 @@ class ReplayPlayer extends EventEmitter
 			}, this
 
 	receiveShowEntity: (definition) ->
-		#console.log 'receiving show entity', definition
+		# console.log 'receiving show entity', definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition)
 		else
@@ -552,14 +493,23 @@ class ReplayPlayer extends EventEmitter
 
 	receiveChosenEntities: (chosen) ->
 
-	enqueue: (timestamp, command, args...) ->
-		if not timestamp and @lastBatch
-			@lastBatch.addCommand([command, args])
-		else
-			@lastBatch = new HistoryBatch(timestamp, [command, args])
-			@history.push(@lastBatch)
-		return @lastBatch
+	enqueue: (command, node, timestamp) ->
+		item = new HistoryItem(command, node, timestamp)
+		@history.push(item)
 
+
+		# if not timestamp and @lastBatch
+		# 	@lastBatch.addCommand([command, args])
+		# else
+		# 	@lastBatch = new HistoryBatch(timestamp, [command, args])
+		# 	@history.push(@lastBatch)
+		# return @lastBatch
+
+
+
+	# ==================
+	# Communication with other entities
+	# ==================
 	forceReemit: ->
 		@emit 'new-turn', @turns[@currentTurn]
 
@@ -586,11 +536,93 @@ class ReplayPlayer extends EventEmitter
 		
 		# console.log 'preloaded images'	
 
+	# Replace the tN keywords
+	replaceKeywordsWithTimestamp: (text) ->
+		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
+		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
+
+		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?)/gm
+		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?)/gm
+
+		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?)/gm
+
+		that = this
+
+		matches = text.match(turnRegex)
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
+				# console.log '\tmatch', match
+				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+				text = that.replaceText text, inputTurnNumber, match
+				
+
+		matches = text.match(opoonentTurnRegex)
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
+				#console.log '\tmatch', match
+				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+				text = that.replaceText text, inputTurnNumber, match, true
+		
+		matches = text.match(longTurnRegex)
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
+				# console.log '\tmatch', match, match.substring(4, match.length - 1)
+				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
+				text = that.replaceText text, inputTurnNumber, match
+
+		matches = text.match(longOpponentTurnRegex)
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				match = match.trimLeft()
+				#console.log '\tmatch', match
+				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
+				text = that.replaceText text, inputTurnNumber, match, true
+
+		matches = text.match(mulliganRegex)
+		if matches and matches.length > 0
+			matches.forEach (match) ->
+				text = text.replace match, '<a ng-click="goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
+
+		#console.log 'modified text', text
+		return text
+
+	replaceText: (text, inputTurnNumber, match, opponent) ->
+		# Now compute the "real" turn. This depends on whether you're the first player or not
+		if @turns[2].activePlayer == @player
+			if opponent
+				turnNumber = inputTurnNumber * 2 + 1
+			else
+				turnNumber = inputTurnNumber * 2
+		else
+			if !opponent
+				turnNumber = inputTurnNumber * 2 + 1
+			else
+				turnNumber = inputTurnNumber * 2
+		text = text.replace match, '<a ng-click="goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
+		return text
+
+	formatTimeStamp: (length) ->
+		totalSeconds = "" + Math.floor(length % 60)
+		if totalSeconds.length < 2
+			totalSeconds = "0" + totalSeconds
+		totalMinutes = Math.floor(length / 60)
+		if totalMinutes.length < 2
+			totalMinutes = "0" + totalMinutes
+
+		return totalMinutes + ':' + totalSeconds
+
+
+	# ==================
+	# Image preloading
+	# ==================
 	buildImagesArray: ->
 		images = []
 
 		ids = []
-		console.log 'building image array', @entities
+		# console.log 'building image array', @entities
 		# Entities are roughly added in the order of apparition
 		for k,v of @entities
 			# console.log 'adding entity', k, v
