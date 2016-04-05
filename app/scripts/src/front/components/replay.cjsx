@@ -216,7 +216,8 @@ class Replay extends React.Component
 
 	onGoToTurnClick: (turn, e) =>
 		console.log 'clicked to go to a turn', turn
-		@state.replay.goToTurn(turn)
+		# Mulligan is turn 1
+		@state.replay.goToTurn(turn + 1)
 		@forceUpdate()
 		
 
