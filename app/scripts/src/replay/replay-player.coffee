@@ -407,11 +407,14 @@ class ReplayPlayer extends EventEmitter
 		index = 0
 		while @history[index].command isnt 'receiveAction'
 			# console.log '\tSkipping to first action', index
-			index++
+			index++			
+			# console.log index, @history[index], @history
 		index++
+		console.log index, @history[index], @history
 		while @history[index].command isnt 'receiveAction'
 			# console.log '\tSkipping to secdon action', index
 			index++
+			# console.log index, @history[index], @history
 		# console.log 'last index before action', index, @history[index], @history[index + 1]
 		@goToIndex @history[index].index
 
@@ -546,16 +549,17 @@ class ReplayPlayer extends EventEmitter
 		that = this
 
 		matches = text.match(turnRegex)
-		# console.log 'looking for match', text, matches
+		console.log 'looking for match', text, matches
 		if matches and matches.length > 0
 			matches = _.uniq matches
 			matches.forEach (match) ->
 				match = match.trimLeft()
-				# console.log '\tmatch', match
+				console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+				console.log '\tinputTurnNumber', inputTurnNumber
 
 				text = that.replaceText text, inputTurnNumber, match
-				# console.log '\tupdated', text
+				console.log '\tupdated', text
 				
 
 		matches = text.match(opoonentTurnRegex)
@@ -606,6 +610,12 @@ class ReplayPlayer extends EventEmitter
 				turnNumber = inputTurnNumber * 2 + 1
 			else
 				turnNumber = inputTurnNumber * 2
+
+		match = match.replace '?', ''
+		match = match.replace ' ', ''
+		match = match.replace ':', ''
+		match = match.replace ',', ''
+		match = match.replace '.', ''
 		text = text.replace new RegExp(match, 'g'), '<a ng-click="goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
 
