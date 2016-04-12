@@ -533,6 +533,9 @@ class ReplayPlayer extends EventEmitter
 
 	getClass: (cardID) ->
 		return @cardUtils.getCard(cardID)?.playerClass?.toLowerCase()
+
+	isValid: ->
+		return if !@getClass(@entities[@player.tags.HERO_ENTITY].cardID) then false else true 
 		
 		# console.log 'preloaded images'	
 

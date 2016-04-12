@@ -33,8 +33,13 @@ var joustjs = {
 		console.log('going to turn', turn)
 		window.replay.goToTurn(turn);
 	},
+	
 	getPlayerInfo: function() {
 		return window.replay.getPlayerInfo()
+	},
+
+	isValid: function() {
+		return window.replay.isValid()
 	}
 
 }
