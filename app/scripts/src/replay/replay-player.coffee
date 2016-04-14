@@ -619,7 +619,7 @@ class ReplayPlayer extends EventEmitter
 		match = match.replace ':', ''
 		match = match.replace ',', ''
 		match = match.replace '.', ''
-		text = text.replace new RegExp(match, 'g'), '<a ng-click="goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
+		text = text.replace new RegExp(match + '\\b', 'g'), '<a ng-click="goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
 
 	formatTimeStamp: (length) ->

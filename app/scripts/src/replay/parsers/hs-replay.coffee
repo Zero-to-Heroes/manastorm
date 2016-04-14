@@ -268,6 +268,7 @@ class HSReplayParser
 					playerID: node.attributes.playerID
 					source: node.attributes.source
 					ts: tsToSeconds(node.attributes.ts)
+					index: @index++
 					cards: []
 				@state.push('choices')
 
