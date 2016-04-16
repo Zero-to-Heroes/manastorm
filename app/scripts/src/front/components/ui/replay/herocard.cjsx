@@ -20,6 +20,7 @@ class HeroCard extends Card
 				background: "url(#{art}) top left no-repeat"
 				backgroundSize: '100% auto'
 			cls = "game-card"
+			avatarCls = "game-card"
 
 		if @props.className
 			cls += " " + @props.className
@@ -40,7 +41,9 @@ class HeroCard extends Card
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
 			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
 
-		return 	<div className={cls} style={style}>
+		return 	<div className={cls}>
+					<div className={avatarCls} style={style}></div>
+					<div className="frame"></div>
 					<HeroAttack entity={@props.entity} weapon={weapon}/>
 					{secrets}
 					<Armor entity={@props.entity}/>
