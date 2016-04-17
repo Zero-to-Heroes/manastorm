@@ -15,9 +15,11 @@ class Card extends React.Component
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
+		frameCls = "frame"
 		if @props.entity.cardID && !@props.isHidden
 			originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 			style =
+				# background: "transparent"
 				backgroundImage: "url(#{art})"
 			cls = "game-card"
 
@@ -33,10 +35,20 @@ class Card extends React.Component
 				cost = <div className={costCls}>{@props.entity.tags.COST or 0}</div>
 		else
 			style = {}
-			cls = "game-card card--unknown"
+			cls = "game-card"
+			frameCls += " card--unknown"
 
 		if @props.entity.tags.TAUNT
 			cls += " card--taunt"
+
+		if @props.entity.tags.DEATHRATTLE
+			effect = <div className="effect deathrattle"></div>
+		if @props.entity.tags.INSPIRE
+			effect = <div className="effect inspire"></div>
+		if @props.entity.tags.POISONOUS
+			effect = <div className="effect poisonous"></div>
+		if @props.entity.tags.TRIGGER
+			effect = <div className="effect trigger"></div>
 
 		if @props.className
 			cls += " " + @props.className
@@ -95,8 +107,10 @@ class Card extends React.Component
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
-			return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+			return <div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+				<div className={frameCls}  style={style}></div>
 				{highlight}
+				{effect}
 				{overlay}
 				{damage}
 				{exhausted}
@@ -105,8 +119,10 @@ class Card extends React.Component
 			</div>
 
 		else
-			return <div className={cls} style={style}>
+			return <div className={cls}>
+				<div className={frameCls}  style={style}></div>
 				{highlight}
+				{effect}
 				{overlay}
 				{damage}
 				{exhausted}

@@ -11,6 +11,26 @@
 		position: relative;
 		margin-right: -30px;
 		/*transition: transform 0.25s, top 0.5s;*/
+		background: transparent;
+
+		.frame {
+		    height: 100%;
+		    width: 100%;
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    background-size: contain;
+		    // background-size: 235% auto !important;
+		    // background-position: -47px -37px !important;
+			// border-radius: ~"75px / 100px";
+
+			&.card--unknown {
+				background: url(images/cardback.png) top left no-repeat;
+				background-size: contain;
+				height: 94%;
+				width: 94%;
+			}
+		}
 
 		&:last-child {
 			margin-right: 0;

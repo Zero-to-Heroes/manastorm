@@ -1,7 +1,6 @@
 .game-card {
 	width: 96px;
 	height: 143px;
-	background: url(../../image/cardback.png) top left no-repeat;
 	background-size: 96px auto;
 	display: block;
 	line-height: 95px;
@@ -9,6 +8,24 @@
 	font-size: 20px;
 	position: relative;
 	transform: translate(0);
+
+
+	.frame {
+	    height: 100%;
+	    width: 100%;
+	    position: absolute;
+	    left: 0;
+	    top: 0;
+	    background-size: contain;
+		background-repeat: no-repeat;
+
+		&.card--unknown {
+			background: url(images/cardback.png) top left no-repeat;
+			background-size: contain;
+			height: 94%;
+			width: 94%;
+		}
+	}
 }
 
 .card--unknown {
@@ -40,7 +57,7 @@
 	// box-shadow: 0 0 3px 1px black;
 
 	position: absolute;
-    left: -15px;
+    left: -20px;
     bottom: -8px;
     height: 44px;
     width: 44px;

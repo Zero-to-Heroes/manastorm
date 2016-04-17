@@ -9,20 +9,25 @@
 
 	.game-card {
 		display: inline-block;
-		margin-right: 10px;
-		transition: transform 0.25s, top 0.5s;
-		width: 64px;
-		height: 64px;
-		border-radius: 50%;
-		background-size: 200% auto !important;
-		background-position: -32px -32px !important;
+		margin-right: 20px;
+		// transition: transform 0.25s, top 0.5s;
 		border: none;
-
 	    width: 70px;
 	    height: 90px;
 		border-radius: ~"75px / 100px";
-	    background-size: 235% auto !important;
-	    background-position: -47px -37px !important;
+		background: transparent;
+
+		.frame {
+		    height: 100%;
+		    width: 100%;
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    background-size: contain;
+		    background-size: 235% auto !important;
+		    background-position: -47px -37px !important;
+			border-radius: ~"75px / 100px";
+		}
 
 	    &::before {
 	    	content: "";
@@ -109,8 +114,29 @@
 			top: -15px;
 		}
 
-	}
+		.effect {
+			background-size: contain;
+			position: absolute;
+		    width: 40px;
+		    height: 40px;
+		    background-size: contain;
+		    bottom: -12px;
+		    left: ~"calc(50% - 20px)";
 
+			&.deathrattle {
+				background-image: url(images/icon_deathrattle.png);
+			}
+			&.insptire {
+				background: url(images/icon_inspire.png);
+			}
+			&.poisonous {
+				background: url(images/icon_poisonous.png);
+			}
+			&.trigger {
+				background: url(images/icon_trigger.png);
+			}
+		}
+	}
 }
 
 .top .board {
