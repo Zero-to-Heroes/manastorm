@@ -328,7 +328,7 @@ class ActionParser extends EventEmitter
 			# when we play our own card. In that case, the tags are already known, and 
 			# tag changes are the only things we care about
 			for tag in command.tags
-				if tag.tag == 'ZONE' and tag.value == 1
+				if tag.tag == 'ZONE' and tag.value in [1, 7]
 					# Check that we are not revealing an enchantmnent
 					if @entities[tag.entity].tags.CARDTYPE != 6
 						playedCard = tag.entity
@@ -337,7 +337,7 @@ class ActionParser extends EventEmitter
 			# card. In that case, a ShowEntity (or FullEntity) element is created that contains
 			# the tag with the proper zone
 			if playedCard < 0 and command.showEntity
-				if command.showEntity.tags.ZONE == 1
+				if command.showEntity.tags.ZONE in [1, 7]
 					playedCard = command.showEntity.id
 
 			# Possibly check that the card was in hand before being in play?
