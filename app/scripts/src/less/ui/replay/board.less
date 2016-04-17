@@ -17,7 +17,7 @@
 		border-radius: ~"75px / 100px";
 		background: transparent;
 
-		.frame {
+		.art {
 		    height: 100%;
 		    width: 100%;
 		    position: absolute;
@@ -29,17 +29,37 @@
 			border-radius: ~"75px / 100px";
 		}
 
-	    &::before {
-	    	content: "";
-		    background: url(images/card_border.png) center center no-repeat;
+		.frame.minion {
+			background: url(images/card_border.png) center center no-repeat;
 		    background-size: contain;
-		    width: 95px;
-		    height: 110px;
+		    width: 120%;
+		    height: 120%;
 		    display: block;
 		    position: absolute;
-		    top: -5px;
-		    left: -15px;
+		    top: -5%;
+		    left: -15%;
+		}
+
+	    .legendary {
+	    	background: url(images/minion_legendary.png) center center no-repeat;
+		    width: 120%;
+		    height: 120%;
+		    position: absolute;
+		    top: -20%;
+		    left: -5%;
+		    background-size: contain;
+
 	    }
+
+		.frame.minion.card--taunt::before {
+		    background: url(images/minion-taunting.png) center center no-repeat;
+		    background-size: contain;
+		}
+
+		.frame.minion.card--taunt.option-on::before {
+			border-top-left-radius: 25%;
+			border-top-right-radius: 25%;
+		}
 
 		&:last-child {
 			margin-right: 0;
@@ -56,15 +76,7 @@
 		    border-radius: 50%;
 		}
 
-		&.card--taunt::before {
-		    background: url(images/minion-taunting.png) center center no-repeat;
-		    background-size: contain;
-		}
 
-		&.card--taunt.option-on::before {
-			border-top-left-radius: 25%;
-			border-top-right-radius: 25%;
-		}
 
 		.overlay {
 			opacity: 0.5;

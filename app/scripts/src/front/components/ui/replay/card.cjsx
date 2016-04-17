@@ -15,7 +15,7 @@ class Card extends React.Component
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
-		frameCls = "frame"
+		imageCls = "art"
 		if @props.entity.cardID && !@props.isHidden
 			originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 			style =
@@ -36,10 +36,16 @@ class Card extends React.Component
 		else
 			style = {}
 			cls = "game-card"
-			frameCls += " card--unknown"
+			imageCls += " card--unknown"
+
+		frameCls = "frame minion"
+		legendaryCls = ""
+
+		if originalCard?.rarity is 'Legendary'
+			legendaryCls = " legendary"
 
 		if @props.entity.tags.TAUNT
-			cls += " card--taunt"
+			frameCls += " card--taunt"
 
 		if @props.entity.tags.DEATHRATTLE
 			effect = <div className="effect deathrattle"></div>
@@ -108,7 +114,9 @@ class Card extends React.Component
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
 			return <div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
-				<div className={frameCls}  style={style}></div>
+				<div className={imageCls}  style={style}></div>
+				<div className={frameCls}></div>
+				<div className={legendaryCls}></div>
 				{highlight}
 				{effect}
 				{overlay}
@@ -120,7 +128,9 @@ class Card extends React.Component
 
 		else
 			return <div className={cls}>
-				<div className={frameCls}  style={style}></div>
+				<div className={imageCls}  style={style}></div>
+				<div className={frameCls} ></div>
+				<div className={legendaryCls}></div>
 				{highlight}
 				{effect}
 				{overlay}

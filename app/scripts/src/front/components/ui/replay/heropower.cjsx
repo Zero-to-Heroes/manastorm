@@ -32,7 +32,7 @@ class HeroPower extends Card
 		link = '<img src="' + art + '">';
 		return 	<div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 					<div className="game-card" style={style}></div>
-					<div className="frame"></div>
+					<div className="art"></div>
 					{cost}
 				</div>
 
