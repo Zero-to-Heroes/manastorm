@@ -92,7 +92,7 @@
 
 	.weapon {
 		position: absolute;
-		right: ~"calc(50% + 50px)";
+		right: ~"calc(50% + 60px)";
 		background-position: -40px -40px !important;
 		bottom: 0;
 		bottom: 20px;
@@ -103,9 +103,20 @@
 			background-image: url(images/weapon_sheathed.png)
 		}
 
+		&.unsheathed::before {
+			content: "";
+		    width: 130%;
+		    height: 130%;
+		    background-image: url(images/weapon_unsheathed.png);
+		    display: block;
+		    position: relative;
+		    background-size: contain;
+		    top: -15%;
+		    left: -15%;
+		}
+
 		.card__stats__attack {
-			background: url(images/weapon_attack.png) center center no-repeat;
-			background-size: contain;
+			background: transparent;
 			height: 30px;
 		    width: 30px;
 		    line-height: 30px;
@@ -114,8 +125,7 @@
 		}
 
 		.card__stats__health {
-			background: url(images/weapon_durability.png) center center no-repeat;
-			background-size: contain;
+			background: transparent;
 			height: 30px;
 		    width: 30px;
 		    line-height: 30px;

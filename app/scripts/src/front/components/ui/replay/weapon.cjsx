@@ -23,6 +23,7 @@ class Weapon extends Card
 			cls += " sheathed"
 			style = {}
 		else 
+			cls += " unsheathed"
 			style =
 				background: "url(#{art}) top left no-repeat"
 				backgroundSize: '100% auto'
