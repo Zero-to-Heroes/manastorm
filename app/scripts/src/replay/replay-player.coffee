@@ -359,17 +359,17 @@ class ReplayPlayer extends EventEmitter
 			# console.log '\tupdating timestamp', @currentReplayTime
 
 	updateOptions: ->
-		if @getActivePlayer() == @player
-			# console.log 'updating options', @history.length, @historyPosition
+		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
+		if !@history[@historyPosition].parent and @getActivePlayer() == @player
+			console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
-			while currentCursor < @history.length
-				# console.log 'looking at options', currentCursor, @history.length
-				if @history[currentCursor].command is 'receiveOptions'
-					# console.log 'updating options?', command
+			while currentCursor > 0
+				if @history[currentCursor]?.command is 'receiveOptions'
+					console.log 'updating options?', @history[currentCursor], @history, currentCursor
 					@history[currentCursor].execute(this)
 					return
-				currentCursor++
-		#console.log 'stopped at history', @history[@historyPosition].timestamp, elapsed
+				currentCursor--
+		console.log 'stopped at history', @history[@historyPosition].timestamp
 
 	updateActiveSpell: (action) ->
 		realAction = action.mainAction?.associatedAction || action
