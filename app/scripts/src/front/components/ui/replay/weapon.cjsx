@@ -16,10 +16,16 @@ class Weapon extends Card
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 
-		style =
-			background: "url(#{art}) top left no-repeat"
-			backgroundSize: '100% auto'
+		console.log 'rendering weapon', @props.entity
 		cls = "game-card"
+		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer().tags.PLAYER_ID
+			console.log 'shearthing', @props.replay.getActivePlayer().tags.PLAYER_ID, @props.entity
+			cls += " sheathed"
+			style = {}
+		else 
+			style =
+				background: "url(#{art}) top left no-repeat"
+				backgroundSize: '100% auto'
 
 		if @props.className
 			cls += " " + @props.className
@@ -27,6 +33,7 @@ class Weapon extends Card
 		healthClass = "card__stats__health"
 		if @props.entity.tags.DAMAGE > 0
 			healthClass += " damaged"
+
 
 		atkCls = "card__stats__attack"
 		if originalCard
