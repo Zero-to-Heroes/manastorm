@@ -99,8 +99,16 @@
 		width: 80px;
 		height: 80px;
 
-		&.sheathed {
-			background-image: url(images/weapon_sheathed.png)
+		&.sheathed::before {
+			content: "";
+		    width: 130%;
+		    height: 130%;
+			background-image: url(images/weapon_sheathed.png);
+		    display: block;
+		    position: relative;
+		    background-size: contain;
+		    top: -15%;
+		    left: -15%;
 		}
 
 		&.unsheathed::before {
