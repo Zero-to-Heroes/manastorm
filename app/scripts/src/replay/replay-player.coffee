@@ -361,15 +361,15 @@ class ReplayPlayer extends EventEmitter
 	updateOptions: ->
 		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
 		if !@history[@historyPosition].parent and @getActivePlayer() == @player
-			console.log 'updating options', @history.length, @historyPosition
+			# console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor > 0
 				if @history[currentCursor]?.command is 'receiveOptions'
-					console.log 'updating options?', @history[currentCursor], @history, currentCursor
+					# console.log 'updating options?', @history[currentCursor], @history, currentCursor
 					@history[currentCursor].execute(this)
 					return
 				currentCursor--
-		console.log 'stopped at history', @history[@historyPosition].timestamp
+		# console.log 'stopped at history', @history[@historyPosition].timestamp
 
 	updateActiveSpell: (action) ->
 		realAction = action.mainAction?.associatedAction || action
