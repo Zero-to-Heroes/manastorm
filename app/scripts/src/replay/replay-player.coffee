@@ -570,16 +570,16 @@ class ReplayPlayer extends EventEmitter
 				text = that.replaceText text, inputTurnNumber, match, true
 		
 		matches = text.match(longTurnRegex)
-		console.log 'looking for match', text, matches
+		# console.log 'looking for match', text, matches
 		if matches and matches.length > 0
 			matches = _.uniq matches
 			matches.forEach (match) ->
 				match = match.trimLeft()
-				console.log '\tmatch', match
+				# console.log '\tmatch', match
 				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				console.log '\tinputTurnNumber', inputTurnNumber
+				# console.log '\tinputTurnNumber', inputTurnNumber
 				text = that.replaceText text, inputTurnNumber, match
-				console.log '\tupdated', text
+				# console.log '\tupdated', text
 
 		matches = text.match(longOpponentTurnRegex)
 		if matches and matches.length > 0

@@ -157,7 +157,7 @@ class Card extends React.Component
 		domNode = ReactDOM.findDOMNode(this)
 		if domNode
 			#console.log 'updating card dimensions'
-			dimensions = domNode.getBoundingClientRect()
+			dimensions = @dimensions = domNode.getBoundingClientRect()
 			@centerX = dimensions.left + dimensions.width / 2
 			@centerY = dimensions.top + dimensions.height / 2
 		#console.log @centerX, @centerY, dimensions, domNode
