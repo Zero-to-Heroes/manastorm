@@ -52,8 +52,14 @@
 	    }
 
 		.frame.minion.card--taunt::before {
+			content: "";
+		    height: 100%;
+		    width: 100%;
 		    background: url(images/minion-taunting.png) center center no-repeat;
 		    background-size: contain;
+		    position: absolute;
+		    top: 0;
+		    left: 0;
 		}
 
 		.frame.minion.card--taunt.option-on::before {
