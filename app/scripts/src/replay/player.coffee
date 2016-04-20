@@ -48,18 +48,18 @@ class Player extends Entity
 			return @replay.entities[2]
 
 	entityEnteredHand: (entity) ->
-		@emit 'entity-entered-hand', {entity}
+		# @emit 'entity-entered-hand', {entity}
 
 	entityLeftDeck: (entity) ->
-		@emit 'entity-left-deck', {entity}
+		# @emit 'entity-left-deck', {entity}
 
 	entityEnteredDeck: (entity) ->
-		@emit 'entity-entered-deck', {entity}
+		# @emit 'entity-entered-deck', {entity}
 
 	entityEnteredPlay: (entity) ->
-		@emit 'entity-entered-play', {entity}
+		# @emit 'entity-entered-play', {entity}
 
 	entityEnteredSecret: (entity) ->
-		@emit 'entity-entered-secret', {entity}
+		# @emit 'entity-entered-secret', {entity}
 
 module.exports = Player

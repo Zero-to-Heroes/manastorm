@@ -3,8 +3,8 @@ React = require 'react'
 
 class Mana extends React.Component
 	componentDidMount: ->
-		subscribe @props.entity, 'tag-changed:RESOURCES tag-changed:RESOURCES_USED', =>
-			@forceUpdate()
+		# subscribe @props.entity, 'tag-changed:RESOURCES tag-changed:RESOURCES_USED', =>
+		# 	@forceUpdate()
 
 	render: ->
 		totalMana = (@props.entity.tags.RESOURCES or 0) 
@@ -20,25 +20,30 @@ class Mana extends React.Component
 		crystals = []
 		if totalAvailableMana > 0
 			for i in [1..totalAvailableMana]
-				crystal = <div className="mana"></div>
+				key = "mana" + i
+				crystal = <div className="mana" key={key}></div>
 				crystals.push crystal
 		if consumedMana > 0
 			for i in [1..consumedMana]
-				spent = <div className="mana spent"></div>
+				key = "consumed" + i
+				spent = <div className="mana spent" key={key}></div>
 				crystals.push spent
 		if totalLocked > 0
 			for i in [1..totalLocked]
-				locked = <div className="mana locked"></div>
+				key = "locked" + i
+				locked = <div className="mana locked" key={key}></div>
 				crystals.push locked
 
 		if futureLocked > 0
 			futures = []	
 			if totalMana - futureLocked > 0
 				for i in [1..totalMana - futureLocked]
-					empty = <div className="mana empty"></div>
+					key = "empty" + i
+					empty = <div className="mana empty" key={key}></div>
 					futures.push empty
 			for i in [1..futureLocked]
-				locked = <div className="mana locked future"></div>
+				key = "futureLocked" + i
+				locked = <div className="mana locked future" key={key}></div>
 				futures.push locked
 
 		return <div className="mana-container">

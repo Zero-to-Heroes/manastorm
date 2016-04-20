@@ -4,12 +4,12 @@ ReactDOM = require 'react-dom'
 
 class Card extends React.Component
 	componentDidMount: ->
-		tagEvents = 'tag-changed:ATK tag-changed:HEALTH tag-changed:DAMAGE'
+		# tagEvents = 'tag-changed:ATK tag-changed:HEALTH tag-changed:DAMAGE'
 
 		# Discover action creates a null entity here(?)
-		if !@props.static
-			subscribe @props.entity, tagEvents, =>
-				@forceUpdate()
+		# if !@props.static
+		# 	subscribe @props.entity, tagEvents, =>
+		# 		@forceUpdate()
 
 	render: ->
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''

@@ -6,8 +6,8 @@ _ = require 'lodash'
 
 class Mulligan extends React.Component
 	componentDidMount: ->
-		@sub = subscribe @props.entity, 'tag-changed:MULLIGAN_STATE', ({newValue}) =>
-			@forceUpdate()
+		# @sub = subscribe @props.entity, 'tag-changed:MULLIGAN_STATE', ({newValue}) =>
+		# 	@forceUpdate()
 
 	componentWillUnmount: ->
 		#@sub.off()
@@ -21,10 +21,8 @@ class Mulligan extends React.Component
 			#console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
 			<Card entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan.indexOf(entity.id) != -1} />
 
-		return <ReactCSSTransitionGroup component="div" className="mulligan"
-					transitionName="animate" transitionEnterTimeout={700}
-					transitionLeaveTimeout={700}>
+		return <div className="mulligan">
 				{cards}
-			</ReactCSSTransitionGroup>
+			</div>
 
 module.exports = Mulligan

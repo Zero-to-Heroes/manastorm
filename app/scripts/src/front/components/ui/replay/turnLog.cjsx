@@ -20,16 +20,16 @@ TurnLog = React.createClass
 			newLog = @buildActionLog action
 			for logLine in newLog
 				@logs.push logLine
-			@forceUpdate()
+			# @forceUpdate()
 
 		@subs.add @replay, 'new-turn', (turn) =>
 			newLog = @buildTurnLog turn
 			@logs.push newLog
-			@forceUpdate()
+			# @forceUpdate()
 
 		@subs.add @replay, 'reset',  =>
 			@logs = []
-			@forceUpdate()
+			# @forceUpdate()
 
 		@replay.forceReemit()
 
@@ -106,31 +106,31 @@ TurnLog = React.createClass
 			log = @buildFatigueDamageLog action
 
 		else
-			console.warning 'Shouldnt happen, unsupported log action', action
-			card = if action?.data then action.data['cardID'] else ''
+			# console.warning 'Shouldnt happen, unsupported log action', action
+			# card = if action?.data then action.data['cardID'] else ''
 
-			owner = action.owner.name 
-			if !owner
-				ownerCard = @replay.entities[action.owner]
-				owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-			if action.secret
-				if cardLink?.length > 0 and action.publicSecret
-					#console.log 'action', action
-					cardLink += ' -> Secret'
-				else
-					cardLink = 'Secret'
-			creator = ''
-			if action.creator
-				creator = @replay.buildCardLink(@replay.cardUtils.getCard(action.creator.cardID)) + ': '
-			newLog = owner + action.type + creator + cardLink
+			# owner = action.owner.name 
+			# if !owner
+			# 	ownerCard = @replay.entities[action.owner]
+			# 	owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
+			# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			# if action.secret
+			# 	if cardLink?.length > 0 and action.publicSecret
+			# 		#console.log 'action', action
+			# 		cardLink += ' -> Secret'
+			# 	else
+			# 		cardLink = 'Secret'
+			# creator = ''
+			# if action.creator
+			# 	creator = @replay.buildCardLink(@replay.cardUtils.getCard(action.creator.cardID)) + ': '
+			# newLog = owner + action.type + creator + cardLink
 
-			if action.target
-				target = @replay.entities[action.target]
-				newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
+			# if action.target
+			# 	target = @replay.entities[action.target]
+			# 	newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
 
-			# http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
-			log = <ActionDisplayLog newLog={newLog} />
+			# # http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
+			# log = <ActionDisplayLog newLog={newLog} />
 
 
 		@replay.notifyNewLog log
@@ -166,7 +166,7 @@ TurnLog = React.createClass
 			cardLink = <SpanDisplayLog newLog={cardLink} />
 
 		# The effect occured as a response to another action, so we need to make that clear
-		indent = <span></span>
+		indent = <span key={++@logIndex}></span>
 		if action.mainAction
 			indentText = '<span>...and </span>'
 			indent = <SpanDisplayLog className="indented-log" newLog={indentText} />
@@ -178,7 +178,7 @@ TurnLog = React.createClass
 		drawLog = <p key={++@logIndex}>
 					{indent}
 					{drawer}
-					<span> draws </span>
+					<span key={++@logIndex}> draws </span>
 					{cardLink}
 				</p>
 
@@ -209,7 +209,7 @@ TurnLog = React.createClass
 		drawLog = <p key={++@logIndex}>
 					{indent}
 					{drawer}
-					<span className="overdraw"> overdraws </span>
+					<span className="overdraw" key={++@logIndex}> overdraws </span>
 					{cardLink}
 				</p>
 
@@ -375,9 +375,9 @@ TurnLog = React.createClass
 			targets.push <SpanDisplayLog newLog={targetLink} />
 			if actionIds.length > 1 
 				if index == actionIds.length - 1
-					targets.push <span> and </span>
+					targets.push <span key={++@logIndex}> and </span>
 				else if index < actionIds.length - 1
-					targets.push <span>, </span>
+					targets.push <span key={++@logIndex}>, </span>
 			index++
 		return targets
 
@@ -592,52 +592,48 @@ TurnLog = React.createClass
 # ===============
 TurnDisplayLog = React.createClass
 	componentDidMount: ->
-		@index = @logIndex++
 		$("#turnLog").scrollTo("max")
 		
 	render: ->
 		if @props.active
-			return <span key={@index}>
-				<span onClick={@props.onClick} className="turn-click">{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}</span>
+			return <span key={++@logIndex}>
+				<span onClick={@props.onClick} className="turn-click" key={++@logIndex}>{'Turn ' + Math.ceil(@props.turn.turn / 2) + ' - '}</span>
 				<PlayerNameDisplayLog active={true} name={@props.name} />
 			</span>
 		else
-			return <span key={@index}>
-				<span onClick={@props.onClick} className="turn-click">{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}</span>
+			return <span key={++@logIndex}>
+				<span onClick={@props.onClick} className="turn-click" key={++@logIndex}>{'Turn ' + Math.ceil(@props.turn.turn / 2) + 'o - '}</span>
 				<PlayerNameDisplayLog active={false} name={@props.name} />
 			</span>
 
 PlayerNameDisplayLog = React.createClass
 	componentDidMount: ->
-		@index = @logIndex++
 		$("#turnLog").scrollTo("max")
 	
 	render: ->
 		if @props.active 
-			return <span className="main-player" key={@index}>{@props.name}</span>
+			return <span className="main-player" key={++@logIndex}>{@props.name}</span>
 		else
-			return <span className="opponent" key={@index}>{@props.name}</span>
+			return <span className="opponent" key={++@logIndex}>{@props.name}</span>
 
 
 ActionDisplayLog = React.createClass
 	componentDidMount: ->
-		@index = @logIndex++
 		$("#turnLog").scrollTo("max")
 
 	render: ->
 		cls = @props.className
 		cls += " action"
-		return <p className={cls} key={@index} dangerouslySetInnerHTML={{__html: @props.newLog}}></p>
+		return <p className={cls} key={++@logIndex} dangerouslySetInnerHTML={{__html: @props.newLog}}></p>
 
 SpanDisplayLog = React.createClass
 	componentDidMount: ->
-		@index = ++@logIndex
 		$("#turnLog").scrollTo("max")
 
 	render: ->
 		cls = @props.className
 		cls += " action"
-		return <span className={cls} key={@index} dangerouslySetInnerHTML={{__html: @props.newLog}}></span>
+		return <span className={cls} key={++@logIndex} dangerouslySetInnerHTML={{__html: @props.newLog}}></span>
 
 
 module.exports = TurnLog

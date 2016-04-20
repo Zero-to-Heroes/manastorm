@@ -7,11 +7,11 @@ class Board extends React.Component
 	componentDidMount: ->
 		@subs = new SubscriptionList
 
-		@subs.add @props.entity, 'entity-entered-play', ({entity}) =>
-			entitySub = @subs.add entity, 'left-play', =>
-				entitySub.off()
-				@forceUpdate()
-			@forceUpdate()
+		# @subs.add @props.entity, 'entity-entered-play', ({entity}) =>
+		# 	entitySub = @subs.add entity, 'left-play', =>
+		# 		entitySub.off()
+		# 		@forceUpdate()
+		# 	@forceUpdate()
 
 	render: ->
 		cardsMap = []

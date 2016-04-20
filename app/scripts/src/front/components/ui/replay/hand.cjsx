@@ -8,23 +8,23 @@ Hand = React.createClass
 	componentDidMount: ->
 		@subs = new SubscriptionList
 
-		for entity in @props.entity.getHand()
-			@subscribeToEntity(entity)
+		# for entity in @props.entity.getHand()
+		# 	@subscribeToEntity(entity)
 
-		@subs.add @props.entity, 'entity-entered-hand', ({entity}) =>
-			@subscribeToEntity(entity)
-			@forceUpdate()
+		# @subs.add @props.entity, 'entity-entered-hand', ({entity}) =>
+		# 	@subscribeToEntity(entity)
+		# 	@forceUpdate()
 
-		@subs.add @props.entity, 'tag-changed:MULLIGAN_STATE', =>
-			@forceUpdate()
+		# @subs.add @props.entity, 'tag-changed:MULLIGAN_STATE', =>
+		# 	@forceUpdate()
 
-	subscribeToEntity: (entity) ->
-		entitySubs = @subs.add new SubscriptionList
-		entitySubs.add entity, 'left-hand', =>
-			entitySubs.off()
-			@forceUpdate()
-		entitySubs.add entity, 'tag-changed:ZONE_POSITION', =>
-			@forceUpdate()
+	# subscribeToEntity: (entity) ->
+	# 	entitySubs = @subs.add new SubscriptionList
+	# 	entitySubs.add entity, 'left-hand', =>
+	# 		entitySubs.off()
+	# 		@forceUpdate()
+	# 	entitySubs.add entity, 'tag-changed:ZONE_POSITION', =>
+	# 		@forceUpdate()
 
 	componentWillUnmount: ->
 		#@subs.off()
@@ -52,11 +52,9 @@ Hand = React.createClass
 
 			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} style={style}/>
 
-		return <ReactCSSTransitionGroup component="div" className="hand"
-					transitionName="animate" transitionEnterTimeout={700}
-					transitionLeaveTimeout={700}>
+		return <div className="hand">
 				{cards}
-			</ReactCSSTransitionGroup>
+			</div>
 
 
 module.exports = Hand

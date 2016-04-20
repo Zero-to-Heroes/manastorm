@@ -2,7 +2,7 @@ React = require 'react'
 
 class Scrubber extends React.Component
 	componentDidMount: ->
-		@int = setInterval((=> @forceUpdate()), 500)
+		# @int = setInterval((=> @forceUpdate()), 500)
 
 	componentWillUnmount: ->
 		#clearInterval(@int)

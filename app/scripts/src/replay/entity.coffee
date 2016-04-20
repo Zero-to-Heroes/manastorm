@@ -37,26 +37,26 @@ class Entity extends EventEmitter
 				@tags[k] = v
 		if definition.cardID
 			@cardID = definition.cardID
-			@emit 'revealed', entity: this
+			# @emit 'revealed', entity: this
 		if definition.name
 			@name = definition.name
 
 		changed = _.pick definition.tags, (value, tag) ->
 			value isnt old[tag]
 
-		for tag, value of changed
-			if value isnt old[tag]
-				@emit "tag-changed:#{tag}",
-					entity: this
-					oldValue: old[tag]
-					newValue: value
+		# for tag, value of changed
+		# 	if value isnt old[tag]
+				# @emit "tag-changed:#{tag}",
+				# 	entity: this
+				# 	oldValue: old[tag]
+				# 	newValue: value
 
 		if changed.ZONE
 			if old.ZONE
-				@emit "left-#{zoneNames[old.ZONE].toLowerCase()}", entity: this
+				# @emit "left-#{zoneNames[old.ZONE].toLowerCase()}", entity: this
 				if old.ZONE is zones.DECK
 					@getController()?.entityLeftDeck(this)
-			@emit "entered-#{zoneNames[changed.ZONE].toLowerCase()}", entity: this
+			# @emit "entered-#{zoneNames[changed.ZONE].toLowerCase()}", entity: this
 			if changed.ZONE is zones.HAND
 				@getController()?.entityEnteredHand(this)
 			if changed.ZONE is zones.PLAY
@@ -68,16 +68,16 @@ class Entity extends EventEmitter
 
 		if changed.CONTROLLER
 			if old.ZONE is zones.HAND
-				@emit 'left-hand', entity: this
+				# @emit 'left-hand', entity: this
 				@getController()?.entityEnteredHand(this)
 			if old.ZONE is zones.PLAY
-				@emit 'left-play', entity: this
+				# @emit 'left-play', entity: this
 				@getController()?.entityEnteredPlay(this)
 			if old.ZONE is zones.DECK
-				@emit 'left-deck', entity: this
+				# @emit 'left-deck', entity: this
 				@getController()?.entityEnteredDeck(this)
 			if old.ZONE is zones.SECRET
-				@emit 'left-secret', entity: this
+				# @emit 'left-secret', entity: this
 				@getController()?.entityEnteredSecret(this)
 
 	getLastZone: -> @lastZone

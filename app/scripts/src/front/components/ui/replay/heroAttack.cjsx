@@ -7,8 +7,8 @@ class HeroAttack extends React.Component
 		hero = @props.entity
 
 		@subs = new SubscriptionList
-		@subs.add @props.entity, 'tag-changed:HERO', =>
-			@forceUpdate()
+		# @subs.add @props.entity, 'tag-changed:HERO', =>
+		# 	@forceUpdate()
 
 	render: ->
 		hero = @props.entity

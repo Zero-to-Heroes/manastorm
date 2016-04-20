@@ -86,7 +86,7 @@ Target = React.createClass
 				top -= topOffset
 			# Offset to target the center of the element
 			# console.log 'sourceDims', @props.source.dimensions
-			topOffset = (@props.source.dimensions.bottom - @props.source.dimensions.top) / 3
+			topOffset = (@props.source?.dimensions?.bottom - @props.source?.dimensions?.top) / 3
 			top += topOffset
 			height = arrowHeight - 1.5 * topOffset
 
