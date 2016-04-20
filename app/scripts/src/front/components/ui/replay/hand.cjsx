@@ -37,7 +37,20 @@ Hand = React.createClass
 		hidden = @props.isHidden
 		replay = @props.replay
 		cards = active.map (entity) ->
-			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} />
+			margin = -30
+			maxMargin = -50
+			if active.length == 8
+				margin = -40
+			else if active.length == 9
+				margin = -45
+			else if active.length == 10
+				margin = -50
+
+			style = { 
+				marginLeft: margin
+			}
+
+			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} style={style}/>
 
 		return <ReactCSSTransitionGroup component="div" className="hand"
 					transitionName="animate" transitionEnterTimeout={700}

@@ -113,8 +113,8 @@ class Card extends React.Component
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
-			return <div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
-				<div className={imageCls}  style={style}></div>
+			return <div className={cls} style={@props.style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+				<div className={imageCls} style={style}></div>
 				<div className={frameCls}></div>
 				<div className={legendaryCls}></div>
 				{highlight}
@@ -127,9 +127,9 @@ class Card extends React.Component
 			</div>
 
 		else
-			return <div className={cls}>
-				<div className={imageCls}  style={style}></div>
-				<div className={frameCls} ></div>
+			return <div className={cls} style={@props.style}>
+				<div className={imageCls} style={style}></div>
+				<div className={frameCls}></div>
 				<div className={legendaryCls}></div>
 				{highlight}
 				{effect}
