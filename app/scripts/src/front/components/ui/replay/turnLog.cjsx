@@ -240,18 +240,22 @@ TurnLog = React.createClass
 		return log
 
 	buildPlayedSecretFromHandLog: (action) ->
-		if action.owner.id == @replay.mainPlayerId
+		console.log 'logging secret played', action, @replay.mainPlayerId, @replay
+		if action.owner.id == parseInt(@replay.mainPlayerId)
 			card = action.data['cardID']
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-			link = <span>- </span>
+			link1 = <span>(</span>
+			link2 = <span>)</span>
+			console.log '\tand building card link', card
 		else
 
 		log = <p key={++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 				<span> plays a </span> 
 				<span className="secret-revealed">Secret </span>
-				{link}
+				{link1}
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+				{link2}
 			</p>
 
 		return log
