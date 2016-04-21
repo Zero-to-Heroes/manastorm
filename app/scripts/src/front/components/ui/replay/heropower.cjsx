@@ -27,7 +27,16 @@ class HeroPower extends Card
 			# console.log '\thighlighting', @props.entity.cardID, @props.entity
 			cls += " option-on"
 
-		cost = <div className="mana-cost">2</div>
+		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
+		costCls = "mana-cost"
+		originalCost = originalCard.cost
+		if @props.entity.tags.COST < originalCost
+			costCls += " lower-cost"
+		else if @props.entity.tags.COST > originalCost
+			costCls += " higher-cost"
+		cost = <div className={costCls}>{@props.entity.tags.COST or 0}</div>
+
+		# cost = <div className="mana-cost">2</div>
 
 		link = '<img src="' + art + '">';
 		return 	<div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
