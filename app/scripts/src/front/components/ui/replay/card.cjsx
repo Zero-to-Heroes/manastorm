@@ -18,8 +18,9 @@ class Card extends React.Component
 		imageCls = "art"
 		if @props.entity.cardID && !@props.isHidden
 			originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
+			# Keep both the img (for hand) and background (for the rest)
+			imgSrc = art
 			style =
-				# background: "transparent"
 				backgroundImage: "url(#{art})"
 			cls = "game-card"
 
@@ -36,6 +37,7 @@ class Card extends React.Component
 		else
 			style = {}
 			cls = "game-card"
+			imgSrc = "images/cardback.png"
 			imageCls += " card--unknown"
 
 		frameCls = "frame minion"
@@ -99,6 +101,7 @@ class Card extends React.Component
 		# Can attack
 		if @props.entity.highlighted
 			highlight = <div className="option-on"></div>
+			imageCls += " img-option-on"
 			# cls += " option-on"
 
 		# Exhausted
@@ -115,6 +118,7 @@ class Card extends React.Component
 			link = '<img src="' + art + '">';
 			return <div className={cls} style={@props.style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 				<div className={imageCls} style={style}></div>
+				<img src={imgSrc} className={imageCls}></img>
 				<div className={frameCls}></div>
 				<div className={legendaryCls}></div>
 				{highlight}
@@ -129,6 +133,7 @@ class Card extends React.Component
 		else
 			return <div className={cls} style={@props.style}>
 				<div className={imageCls} style={style}></div>
+				<img src={imgSrc} className={imageCls} style={style}></img>
 				<div className={frameCls}></div>
 				<div className={legendaryCls}></div>
 				{highlight}
