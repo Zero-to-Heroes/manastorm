@@ -20,14 +20,6 @@
 		margin-right: 0;
 		margin-left: -50px;
 
-		div.art {
-			display: none;
-		}
-
-		img {
-			display: block;
-		}
-
 		.art {
 		    height: auto;
 		    width: 100%;
@@ -47,14 +39,33 @@
 			}
 
 			&.img-option-on {
-				-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px #86F953) 
-								drop-shadow(@glowSize @glowSize 1px #86F953) 
-								drop-shadow(-@glowSize @glowSize 1px #86F953) 
-								drop-shadow(@glowSize -@glowSize 1px #86F953) 
-								drop-shadow(0px 0px 6px #659B29) 
-								drop-shadow(0px 0px 10px #659B29);
-				// -webkit-filter: drop-shadow(3px 2px 4px #31C331) drop-shadow(-4px -4px 2px #31C331);
-				// filter: drop-shadow(3px 2px 4px #31C331) drop-shadow(-4px -4px 2px #31C331);
+				-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+								drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+								drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+								drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
+								drop-shadow(0px 0px 6px @outerGlow) 
+								drop-shadow(0px 0px 10px @outerGlow);
+				filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+						drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+						drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+						drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
+						drop-shadow(0px 0px 6px @outerGlow) 
+						drop-shadow(0px 0px 10px @outerGlow);
+
+				&.combo {
+					-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow) 
+								drop-shadow(@glowSize @glowSize 1px @innerComboGlow) 
+								drop-shadow(-@glowSize @glowSize 1px @innerComboGlow) 
+								drop-shadow(@glowSize -@glowSize 1px @innerComboGlow) 
+								drop-shadow(0px 0px 6px @outerComboGlow) 
+								drop-shadow(0px 0px 10px @outerComboGlow);
+					filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow) 
+							drop-shadow(@glowSize @glowSize 1px @innerComboGlow) 
+							drop-shadow(-@glowSize @glowSize 1px @innerComboGlow) 
+							drop-shadow(@glowSize -@glowSize 1px @innerComboGlow) 
+							drop-shadow(0px 0px 6px @outerComboGlow) 
+							drop-shadow(0px 0px 10px @outerComboGlow);
+				}
 			}
 		}
 
@@ -106,8 +117,11 @@
 .bottom .hand {
 	top: auto;
 	bottom: -12px;
-}
 
-.top .hand img {
-	display: none;
+	div.art {
+		display: none;
+	}
+	img {
+		display: block;
+	}
 }

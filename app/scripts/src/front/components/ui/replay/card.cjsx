@@ -102,6 +102,13 @@ class Card extends React.Component
 		if @props.entity.highlighted
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
+
+			if @props.entity.cardID is 'EX1_134'
+				console.log 'combo SI7?', @props.controller, @props.entity
+
+			if @props.controller?.tags?.COMBO_ACTIVE == 1 and @props.entity.tags.COMBO == 1
+				imageCls += " combo"
+
 			# cls += " option-on"
 
 		# Exhausted
