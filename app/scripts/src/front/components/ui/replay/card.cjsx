@@ -65,7 +65,7 @@ class Card extends React.Component
 			cls += " discarded"
 
 		if @props.entity.tags.DIVINE_SHIELD
-			overlay = <div className="overlay divine-shield"></div>
+			divineShield = <div className="overlay divine-shield"></div>
 
 		if @props.entity.tags.SILENCED
 			overlay = <div className="overlay silenced"></div>
@@ -75,6 +75,9 @@ class Card extends React.Component
 
 		if @props.entity.tags.STEALTH
 			overlay = <div className="overlay stealth"></div>
+
+		if @props.entity.tags.WINDFURY
+			windfury = <div className="overlay windfury"></div>
 
 		if @props.stats
 			healthClass = "card__stats__health"
@@ -103,9 +106,6 @@ class Card extends React.Component
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
 
-			if @props.entity.cardID is 'EX1_134'
-				console.log 'combo SI7?', @props.controller, @props.entity
-
 			if @props.controller?.tags?.COMBO_ACTIVE == 1 and @props.entity.tags.COMBO == 1
 				imageCls += " combo"
 
@@ -130,10 +130,12 @@ class Card extends React.Component
 				<div className={legendaryCls}></div>
 				{highlight}
 				{effect}
+				{windfury}
 				{overlay}
 				{damage}
 				{exhausted}
 				{stats}
+				{divineShield}
 				{cost}
 			</div>
 
@@ -145,10 +147,12 @@ class Card extends React.Component
 				<div className={legendaryCls}></div>
 				{highlight}
 				{effect}
+				{windfury}
 				{overlay}
 				{damage}
 				{exhausted}
 				{stats}
+				{divineShield}
 			</div>
 
 	# cleanTemporaryState: ->
