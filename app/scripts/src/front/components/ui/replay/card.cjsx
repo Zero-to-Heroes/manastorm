@@ -22,7 +22,7 @@ class Card extends React.Component
 			imgSrc = art
 			style =
 				backgroundImage: "url(#{art})"
-			cls = "game-card"
+			cls = "game-card visible"
 
 			# Cost update 
 			if @props.cost
