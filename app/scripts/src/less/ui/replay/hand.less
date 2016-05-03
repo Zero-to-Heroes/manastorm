@@ -110,13 +110,36 @@
 		    	color: red;
 		    }
 		}
+
+		.card__stats {
+			.card__stats__attack {
+			    left: 0;
+			    right: auto;
+			    height: 28px;
+			    width: 28px;
+			    bottom: 5px;
+			    font-size: 16px;
+			    line-height: 32px;
+   				padding-left: 1px;
+			}
+			.card__stats__health {
+			    left: auto;
+			    right: 0px;
+			    height: 28px;
+			    width: 28px;
+			    bottom: 5px;
+			    font-size: 16px;
+			    line-height: 32px;
+			}
+		}
+		
 	}
 
 }
 
 .bottom .hand {
 	top: auto;
-	bottom: -12px;
+	bottom: -10px;
 
 	div.art {
 		display: none;
@@ -126,14 +149,23 @@
 	}
 }
 
-.top .hand .visible {
-	top: auto;
-	bottom: -12px;
-
-	div.art {
+.top .hand {
+	.card__stats {
 		display: none;
 	}
-	img {
-		display: block;
+
+	.visible {
+		top: auto;
+		bottom: -12px;
+
+		div.art {
+			display: none;
+		}
+		img {
+			display: block;
+		}
+		.card__stats {
+			display: block;
+		}
 	}
 }

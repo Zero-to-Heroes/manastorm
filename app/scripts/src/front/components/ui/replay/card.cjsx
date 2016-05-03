@@ -79,18 +79,22 @@ class Card extends React.Component
 		if @props.entity.tags.WINDFURY
 			windfury = <div className="overlay windfury"></div>
 
-		if @props.stats
-			healthClass = "card__stats__health"
-			if @props.entity.tags.DAMAGE > 0
-				healthClass += " damaged"
+		# if @props.stats
+		healthClass = "card__stats__health"
+		if @props.entity.tags.DAMAGE > 0
+			healthClass += " damaged"
 
-			atkCls = "card__stats__attack"
-			if originalCard
-				originalAtk = originalCard.attack
-				if @props.entity.tags.ATK > originalAtk
-					atkCls += " buff"
-				else if @props.entity.tags.ATK < originalAtk
-					atkCls += " debuff"
+		atkCls = "card__stats__attack"
+		if originalCard and originalCard.attack and originalCard.health
+			originalAtk = originalCard.attack
+			if @props.entity.tags.ATK > originalAtk
+				atkCls += " buff"
+			else if @props.entity.tags.ATK < originalAtk
+				atkCls += " debuff"
+
+			originalHealth = originalCard.health
+			if @props.entity.tags.HEALTH > originalAtk
+				healthClass += " buff"
 
 			stats = <div className="card__stats">
 				<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
@@ -109,6 +113,8 @@ class Card extends React.Component
 			if @props.controller?.tags?.COMBO_ACTIVE == 1 and @props.entity.tags.COMBO == 1
 				imageCls += " combo"
 
+		if @props.entity.tags.POWERED_UP == 1
+			imageCls += " img-option-on combo"
 			# cls += " option-on"
 
 		# Exhausted

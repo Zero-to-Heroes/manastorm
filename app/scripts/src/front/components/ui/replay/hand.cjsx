@@ -51,6 +51,7 @@ Hand = React.createClass
 				marginLeft: margin
 			}
 
+			console.log 'rendering card in hand', entity.cardID, entity
 			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style}/>
 
 		return <div className="hand">
