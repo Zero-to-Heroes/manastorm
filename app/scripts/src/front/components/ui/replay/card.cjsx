@@ -85,7 +85,7 @@ class Card extends React.Component
 			healthClass += " damaged"
 
 		atkCls = "card__stats__attack"
-		if originalCard and originalCard.attack and originalCard.health
+		if originalCard and (originalCard.attack or originalCard.health)
 			originalAtk = originalCard.attack
 			if @props.entity.tags.ATK > originalAtk
 				atkCls += " buff"
