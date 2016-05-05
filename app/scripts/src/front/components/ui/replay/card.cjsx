@@ -93,7 +93,7 @@ class Card extends React.Component
 				atkCls += " debuff"
 
 			originalHealth = originalCard.health
-			if @props.entity.tags.HEALTH > originalAtk
+			if @props.entity.tags.HEALTH > originalHealth
 				healthClass += " buff"
 
 			stats = <div className="card__stats">
