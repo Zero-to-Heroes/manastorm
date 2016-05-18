@@ -28,6 +28,7 @@ class HeroCard extends Card
 		if @props.entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
 
+		console.log 'rendering hero', @props.entity
 		if @props.entity.highlighted
 			cls += " option-on"
 			
@@ -44,12 +45,13 @@ class HeroCard extends Card
 		return 	<div className={cls}>
 					<div className={avatarCls} style={style}></div>
 					<div className="frame"></div>
-					<HeroAttack entity={@props.entity} weapon={weapon}/>
 					<div className="secrets">
 						{secrets}
 					</div>
-					<Armor entity={@props.entity}/>
+					{overlay}
+					<HeroAttack entity={@props.entity} weapon={weapon}/>
 					<Health entity={@props.entity}/>
+					<Armor entity={@props.entity}/>
 					{damage}
 				</div>
 

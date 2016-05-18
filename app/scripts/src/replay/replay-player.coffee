@@ -223,6 +223,7 @@ class ReplayPlayer extends EventEmitter
 		@currentActionInTurn = 0
 		@init()
 
+
 		while @currentTurn != targetTurn
 			console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
 			@goNextAction()
@@ -601,6 +602,7 @@ class ReplayPlayer extends EventEmitter
 		return text
 
 	replaceText: (text, inputTurnNumber, match, opponent) ->
+
 		# Now compute the "real" turn. This depends on whether you're the first player or not
 		if @turns[2].activePlayer == @player
 			if opponent
@@ -613,6 +615,9 @@ class ReplayPlayer extends EventEmitter
 			else
 				turnNumber = inputTurnNumber * 2
 
+		if !@turns[turnNumber]
+			return text
+			
 		match = match.replace '?', ''
 		match = match.trim()
 		match = match.replace ':', ''
