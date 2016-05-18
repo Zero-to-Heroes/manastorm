@@ -27,7 +27,7 @@ class Card extends React.Component
 			# Cost update 
 			# We don't have the data for the cards in our opponent's hand
 			if @props.cost and !@props.isInfoConcealed
-				console.log 'showing card cost', @props.entity.cardID, @props.entity, !@props.isInfoConcealed
+				# console.log 'showing card cost', @props.entity.cardID, @props.entity, !@props.isInfoConcealed
 				costCls = "card-cost"
 				originalCost = originalCard.cost
 				if @props.entity.tags.COST < originalCost
@@ -44,7 +44,7 @@ class Card extends React.Component
 		frameCls = "frame minion"
 		legendaryCls = ""
 
-		console.log 'rendering card 2', @props.entity.cardID, @props.entity, @props.isInfoConcealed
+		# console.log 'rendering card', @props.entity.cardID, @props.entity, @props.isInfoConcealed
 
 		if originalCard?.rarity is 'Legendary'
 			legendaryCls = " legendary"

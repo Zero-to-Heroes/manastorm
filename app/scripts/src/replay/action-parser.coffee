@@ -39,6 +39,8 @@ class ActionParser extends EventEmitter
 
 		# populate the entities
 		for item in @history
+			# if item.node.id == 75
+			# 	console.log 'inspecting entity 75', item
 			## Populate relevant data for cards
 			if item.command == 'receiveShowEntity'
 				if item.node.id and @entities[item.node.id]
@@ -48,6 +50,8 @@ class ActionParser extends EventEmitter
 					entity = new Entity(this)
 					definition = _.cloneDeep item.node
 					@entities[definition.id] = entity
+					# if item.node.id == 75
+					# 	console.log 'receiving entity 75', item, definition, @entities[definition.id]
 					# Entity not in the game yet
 					definition.tags.ZONE = 6
 					entity.update(definition)
@@ -68,6 +72,8 @@ class ActionParser extends EventEmitter
 			# console.log 'getting card', v.cardID, card
 			if card?.type is 'Spell' and !v.tags.CARDTYPE
 				v.tags.CARDTYPE = 5
+			if card?.type is 'Enchantment' and !v.tags.CARDTYPE
+				v.tags.CARDTYPE = 6
 
 
 	parseActions: ->
@@ -130,10 +136,6 @@ class ActionParser extends EventEmitter
 			tempTurnNumber++
 
 	filterAction: (action) ->
-		# console.log 'filtering action', action
-		# if action.actionType == 'power-target' and action.initialCommand?.associatedAction?.actionType == 'discover'
-		# 	console.log 'filtering out action', action
-		# 	return false
 		return true
 
 
@@ -669,14 +671,19 @@ class ActionParser extends EventEmitter
 	parseDiscovers: (item) ->
 		command = item.node
 		# Always discover 3 cards
-		if command.attributes.type == '3' and command.fullEntities?.length == 3
+		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
+		if command.attributes.type == '3' and command.fullEntities?.length >= 3
 			# Check that each of them is in the SETASIDE zone
 			isDiscover = true
 			choices = []
+			console.log 'discovering?', command
 			for entity in command.fullEntities
-				choices.push entity
-				if entity.tags.ZONE != 6
-					isDiscover = false
+				console.log '\tdiscovering?', entity, @entities[entity.id]
+				# Have to do this for ALitD - no Enchantments
+				if entity.tags.CARDTYPE != 6
+					choices.push entity
+					if entity.tags.ZONE != 6
+						isDiscover = false
 
 			if isDiscover
 				# console.log 'parsing discover action', command

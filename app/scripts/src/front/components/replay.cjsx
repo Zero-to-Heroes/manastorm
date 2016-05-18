@@ -44,10 +44,13 @@ class Replay extends React.Component
 
 		subscribe @state.replay, 'moved-timestamp', =>
 			#console.log 'in moved-timestamp'
-			setTimeout @callback, 500
+			setTimeout @callback, 300
 
+		console.log 'before init', @mounted
 		#console.log('sub', @sub)
 		@state.replay.init()
+		@mounted = true
+		console.log 'after init', @mounted
 		#console.log 'first init done'
 		# @state.replay.buildGameLog()
 		#console.log 'log built'
@@ -58,9 +61,16 @@ class Replay extends React.Component
 			showLog: false
 		}
 
+
+	componentDidMount: ->
+		@mounted = true
+
 	callback: =>
-		#console.log 'in callback'
-		@forceUpdate()
+		if !@mounted
+			console.log 'waiting for callback', @mounted
+			setTimeout @callback, 50
+		else
+			@forceUpdate()
 
 	render: ->
 		replay = @state.replay
