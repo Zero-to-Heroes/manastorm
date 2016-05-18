@@ -45,7 +45,9 @@ class HeroCard extends Card
 					<div className={avatarCls} style={style}></div>
 					<div className="frame"></div>
 					<HeroAttack entity={@props.entity} weapon={weapon}/>
-					{secrets}
+					<div className="secrets">
+						{secrets}
+					</div>
 					<Armor entity={@props.entity}/>
 					<Health entity={@props.entity}/>
 					{damage}
