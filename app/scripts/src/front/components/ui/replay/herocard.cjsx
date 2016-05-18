@@ -28,7 +28,7 @@ class HeroCard extends Card
 		if @props.entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
 
-		console.log 'rendering hero', @props.entity
+		# console.log 'rendering hero', @props.entity
 		if @props.entity.highlighted
 			cls += " option-on"
 			

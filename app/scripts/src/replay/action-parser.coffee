@@ -39,22 +39,24 @@ class ActionParser extends EventEmitter
 
 		# populate the entities
 		for item in @history
-			# if item.node.id == 75
-			# 	console.log 'inspecting entity 75', item
 			## Populate relevant data for cards
-			if item.command == 'receiveShowEntity'
-				if item.node.id and @entities[item.node.id]
-					@entities[item.node.id].cardID = item.node.cardID
 			if item.command == 'receiveEntity'
 				if item.node.id and !@entities[item.node.id]
 					entity = new Entity(this)
 					definition = _.cloneDeep item.node
 					@entities[definition.id] = entity
-					# if item.node.id == 75
-					# 	console.log 'receiving entity 75', item, definition, @entities[definition.id]
 					# Entity not in the game yet
 					definition.tags.ZONE = 6
 					entity.update(definition)
+			# Order is important, since a card can be first created with fullentity then info (like card id) be added with 
+			# showentity, eg rallying blade
+			if item.command == 'receiveShowEntity'
+				if item.node.id == 69
+					console.log 'showentity entity 69', item
+				if item.node.id and @entities[item.node.id]
+					@entities[item.node.id].cardID = item.node.cardID
+					if item.node.id == 69
+						console.log '\tupdated showentity entity 69', item, @entities[item.node.id]
 
 		# Add intrinsic information, like whether the card is a secret
 		for item in @history
@@ -680,13 +682,13 @@ class ActionParser extends EventEmitter
 			for entity in command.fullEntities
 				console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
-				if entity.tags.CARDTYPE != 6
+				if @entities[entity.id].tags.CARDTYPE != 6
 					choices.push entity
 					if entity.tags.ZONE != 6
 						isDiscover = false
 
-			if isDiscover
-				# console.log 'parsing discover action', command
+			if isDiscover and choices.length == 3
+				console.log 'parsing discover action', command, choices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -697,7 +699,7 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				command.isDiscover = true
-				# console.log 'adding discover action', action
+				console.log 'adding discover action', action
 				@addAction @currentTurnNumber, action
 
 
