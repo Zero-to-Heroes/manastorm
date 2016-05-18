@@ -37,6 +37,8 @@ Hand = React.createClass
 		hidden = @props.isHidden
 		replay = @props.replay
 		controller = @props.entity
+		isInfoConcealed = @props.isInfoConcealed
+
 		cards = active.map (entity) ->
 			margin = -30
 			maxMargin = -50
@@ -52,7 +54,7 @@ Hand = React.createClass
 			}
 
 			console.log 'rendering card in hand', entity.cardID, entity
-			<Card entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style}/>
+			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style}/>
 
 		return <div className="hand">
 				{cards}

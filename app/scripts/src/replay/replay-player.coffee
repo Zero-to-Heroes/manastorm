@@ -541,6 +541,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
+		# console.log 'looking at text', text
 		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
 		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
 
@@ -594,7 +595,7 @@ class ReplayPlayer extends EventEmitter
 		if matches and matches.length > 0
 			matches = _.uniq matches
 			matches.forEach (match) ->
-				text = text.replace match, '<a ng-click="goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
+				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
 
 		#console.log 'modified text', text
 		return text
@@ -617,8 +618,8 @@ class ReplayPlayer extends EventEmitter
 		match = match.replace ':', ''
 		match = match.replace ',', ''
 		match = match.replace '.', ''
-		console.log 'replacing match', match
-		text = text.replace new RegExp(match + '\\b', 'g'), '<a ng-click="goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
+		# console.log 'replacing match', match
+		text = text.replace new RegExp(match + '\\b', 'g'), '<a ng-click="mediaPlayer.goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
 
 	formatTimeStamp: (length) ->
