@@ -101,7 +101,7 @@ class Card extends React.Component
 
 			stats = <div className="card__stats">
 				<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
-				<div className={healthClass}>{@props.entity.tags.HEALTH - (@props.entity.tags.DAMAGE or 0)}</div>
+				<div className={healthClass}>{(@props.entity.tags.HEALTH or @props.entity.tags.DURABILITY) - (@props.entity.tags.DAMAGE or 0)}</div>
 			</div>
 
 
