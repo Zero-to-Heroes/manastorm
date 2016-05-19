@@ -455,6 +455,10 @@ class ActionParser extends EventEmitter
 
 						# The power simply targets something else
 						if meta.meta == 'TARGET'
+							# Prezvent a spell from targeting itself
+							if parseInt(command.attributes.entity) == info.entity and @entities[command.attributes.entity].tags.CARDTYPE == 5
+								continue
+
 							if mainAction?.actions 
 								for action in mainAction.actions
 									# If the same source deals the same amount of damage, we group all of that together
