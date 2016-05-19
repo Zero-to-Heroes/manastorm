@@ -195,25 +195,34 @@ class ReplayPlayer extends EventEmitter
 		if @currentActionInTurn >= 0
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
-			@updateActiveSpell action
-			@emit 'new-action', action
+			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
+			if action.shouldExecute
+				console.log 'shouldExecute function', action.shouldExecute, action.shouldExecute()
 
-			if action.target
-				@targetSource = action?.data.id
-				@targetDestination = action.target
-				@targetType = action.actionType
+			if action.shouldExecute and !action.shouldExecute()
+				console.log 'skipping action', action, action.shouldExecute
+				@goNextAction()
 
-			# Now we want to go to the action, and to show the effects of the action - ie all 
-			# that happens until the next action. Otherwise the consequence of an action would 
-			# be bundled with the next action, which is less intuitive
-			if @turns[@currentTurn].actions[@currentActionInTurn + 1] 
-				index = @turns[@currentTurn].actions[@currentActionInTurn + 1].index - 1
-			else if @turns[@currentTurn + 1]
-				index = @turns[@currentTurn + 1].index - 1
 			else
-				index = @history[@history.length - 1].index
+				@updateActiveSpell action
+				@emit 'new-action', action
 
-			@goToIndex index
+				if action.target
+					@targetSource = action?.data.id
+					@targetDestination = action.target
+					@targetType = action.actionType
+
+				# Now we want to go to the action, and to show the effects of the action - ie all 
+				# that happens until the next action. Otherwise the consequence of an action would 
+				# be bundled with the next action, which is less intuitive
+				if @turns[@currentTurn].actions[@currentActionInTurn + 1] 
+					index = @turns[@currentTurn].actions[@currentActionInTurn + 1].index - 1
+				else if @turns[@currentTurn + 1]
+					index = @turns[@currentTurn + 1].index - 1
+				else
+					index = @history[@history.length - 1].index
+
+				@goToIndex index
 
 	goToTurn: (turn) ->
 		targetTurn = parseInt(turn)
@@ -542,7 +551,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		# console.log 'looking at text', text
+		console.log 'looking at text', text
 		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
 		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
 
@@ -598,7 +607,7 @@ class ReplayPlayer extends EventEmitter
 			matches.forEach (match) ->
 				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
 
-		#console.log 'modified text', text
+		console.log 'modified text', text
 		return text
 
 	replaceText: (text, inputTurnNumber, match, opponent) ->
