@@ -340,9 +340,11 @@ class ActionParser extends EventEmitter
 			# The case of a ShowEntity (or FullEntity) when we didn't previously know the 
 			# card. In that case, a ShowEntity (or FullEntity) element is created that contains
 			# the tag with the proper zone
-			if playedCard < 0 and command.showEntity
-				if command.showEntity.tags.ZONE in [1]
-					playedCard = command.showEntity.id
+			# Use entities when playing Eviscerate at t6o at http://www.zerotoheroes.com/r/hearthstone/572de12ee4b0d4231295c49e/an-arena-game-going-5-0
+			if playedCard < 0 and command.showEntities
+				for showEntity in command.showEntities
+					if showEntity.tags.ZONE in [1] and showEntity.tags.CARDTYPE != 6
+						playedCard = showEntity.id
 
 			# Possibly check that the card was in hand before being in play?
 			if playedCard > -1
