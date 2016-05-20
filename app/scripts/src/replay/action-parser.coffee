@@ -491,6 +491,7 @@ class ActionParser extends EventEmitter
 									# If the same source deals the same amount of damage, we group all of that together
 									if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
 										action.target.push info.entity
+										action.index = meta.index
 										subAction = true
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
@@ -498,6 +499,7 @@ class ActionParser extends EventEmitter
 							if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
 								# console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
 								lastAction.target.push info.entity
+								lastAction.index = meta.index
 								subAction = true
 
 							# subAction = false
@@ -529,6 +531,7 @@ class ActionParser extends EventEmitter
 									# If the same source deals the same amount of damage, we group all of that together
 									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
 										action.target.push info.entity
+										action.index = meta.index
 										subAction = true
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
@@ -546,6 +549,7 @@ class ActionParser extends EventEmitter
 
 									if lastAction.amount is meta.data
 										lastAction.target.push info.entity
+										lastAction.index = meta.index
 										subAction = true
 										break
 
