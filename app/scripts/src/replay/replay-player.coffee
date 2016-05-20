@@ -196,11 +196,9 @@ class ReplayPlayer extends EventEmitter
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
-			if action.shouldExecute
-				console.log 'shouldExecute function', action.shouldExecute, action.shouldExecute()
 
 			if action.shouldExecute and !action.shouldExecute()
-				console.log 'skipping action', action, action.shouldExecute
+				console.log 'skipping action'
 				@goNextAction()
 
 			else
@@ -238,7 +236,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToIndex: (index) ->
-		# console.log 'going to index', index
+		console.log 'going to index', index
 		if index < @historyPosition
 			@historyPosition = 0
 			@init()
@@ -348,20 +346,33 @@ class ReplayPlayer extends EventEmitter
 	
 
 	update: ->
-		#@currentReplayTime += @frequency * @speed
-		# if (@currentReplayTime >= @getTotalLength() * 1000)
-		# 	@currentReplayTime = @getTotalLength() * 1000
-
-		# elapsed = @getElapsed()
-		# console.log 'elapsed', elapsed
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
-			@history[@historyPosition++].execute(this)
-			# if elapsed > @history[@historyPosition].timestamp - @startTimestamp
-			# 	# console.log '\tprocessing', elapsed, @history[@historyPosition].timestamp - @startTimestamp, @history[@historyPosition].timestamp, @startTimestamp, @history[@historyPosition]
-			# 	@history[@historyPosition].execute(this)
-			# 	@historyPosition++
-			# else
+			# if !@history[@historyPosition].executed
+			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			@history[@historyPosition].execute(this)
+			@history[@historyPosition].executed = true
+			
+			@historyPosition++
+
+		# We're doing a grouping that is not strictly chronological, so adjust for this here
+		# console.log 'checking subIndex'
+		# if @currentActionInTurn > -1
+		# 	action = @turns[@currentTurn]?.actions[@currentActionInTurn]
+		# 	if action?.subIndex
+		# 		console.log '\tprocessing out of time changes', action
+		# 		for index in action.subIndex
+		# 			console.log '\t\tconsidering index', index, @history[@historyPosition].index
+		# 			historySub = @historyPosition + 1
+		# 			while @history[historySub] and @history[historySub].index < index
+		# 				historySub++
+		# 				continue
+		# 			console.log '\t\tFinished processing non-relevant elements', index, historySub, @history[historySub]
+		# 			if @history[historySub] and @history[historySub].index is index and !@history[historySub].executed
+		# 				console.log 'executing out of chronology action', @history[historySub]
+		# 				@history[historySub].execute(this)
+		# 				@history[historySub].executed = true
+
+
 
 		@updateOptions()
 		if @history[@historyPosition - 1]?.timestamp

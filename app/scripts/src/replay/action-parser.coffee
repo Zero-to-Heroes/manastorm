@@ -132,8 +132,10 @@ class ActionParser extends EventEmitter
 			filteredActions = _.filter @turns[tempTurnNumber].actions, filterFunction
 			# console.log 'sorting actions for turn', tempTurnNumber
 			sortedActions = _.sortBy filteredActions, 'index'
-			# sortedActions = _.sortBy sortedActions, 'timestamp'
-			@turns[tempTurnNumber].actions = sortedActions
+			# Post processing
+			finalActions = @postProcess sortedActions
+
+			@turns[tempTurnNumber].actions = finalActions
 			# console.log '\tsorted', @turns[tempTurnNumber].actions
 			tempTurnNumber++
 
@@ -148,6 +150,24 @@ class ActionParser extends EventEmitter
 		@turns[currentTurnNumber].actions.push action
 
 
+	# =======================
+	# Post-processing
+	# =======================
+	postProcess: (actions) ->
+		# http://stackoverflow.com/questions/9882284/looping-through-array-and-removing-items-without-breaking-for-loop
+		for i in [actions.length - 1..1]
+			# Can happen because we clean up
+			if !actions[i]
+				continue
+			# Don't need to log both the targeting and the damage
+			if actions[i].actionType is 'power-damage' and actions[i - 1].actionType is 'power-target'
+				actions[i].index = actions[i - 1].index
+				actions[i - 1] = undefined
+
+		# Remove empty
+		finalActions = _.compact actions
+
+		return finalActions
 
 	# =======================
 	# Specific actions
@@ -480,6 +500,7 @@ class ActionParser extends EventEmitter
 								lastAction.target.push info.entity
 								subAction = true
 
+							# subAction = false
 							if !subAction and !(lastAction?.actionType is 'discover')
 								action = {
 									turn: @currentTurnNumber - 1
@@ -509,18 +530,30 @@ class ActionParser extends EventEmitter
 									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
 										action.target.push info.entity
 										subAction = true
-										if lastAction?.actionType is 'power-target'
-											@turns[@currentTurnNumber].actions.pop()
 
 							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
-							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction?.actionType is 'power-damage' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
-								# console.log 'previous action is damage, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-damage'
-								lastAction.target.push info.entity
-								subAction = true
-								if lastAction?.actionType is 'power-target'
-									@turns[@currentTurnNumber].actions.pop()
-							
+							lastActionIndex = 1
+							initialLastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+							if !mainAction 
+
+								lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+								while lastAction?.actionType is 'power-damage'
+									lastActionIndex++
+									# Make sure it's the same entity at the root of both action
+									if lastAction.data.id != parseInt(command.attributes.entity)
+										lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+										continue
+
+									if lastAction.amount is meta.data
+										lastAction.target.push info.entity
+										subAction = true
+										break
+
+									if @turns[@currentTurnNumber].actions.length - lastActionIndex < 0
+										break
+
+									lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+										
 							if !subAction
 								action = {
 									turn: @currentTurnNumber - 1
@@ -535,14 +568,11 @@ class ActionParser extends EventEmitter
 									data: @entities[command.attributes.entity]
 									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 									initialCommand: command
+									debug_initialLastAction: initialLastAction
 								}
 								if mainAction
 									mainAction.actions = mainAction.actions or []
 									mainAction.actions.push action
-
-								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
-								if lastAction?.actionType is 'power-target'
-									@turns[@currentTurnNumber].actions.pop()
 
 								@addAction @currentTurnNumber, action
 

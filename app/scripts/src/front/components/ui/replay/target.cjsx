@@ -98,7 +98,7 @@ Target = React.createClass
 			left: left
 			transform: transform
 		}
-		console.log 'applying style', style
+		# console.log 'applying style', style
 		return <div className={cls} style={style} />
 
 module.exports = Target
