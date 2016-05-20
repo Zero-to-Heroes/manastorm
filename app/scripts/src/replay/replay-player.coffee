@@ -258,7 +258,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		# console.log 'moving to timestamp', timestamp
+		console.log 'moving to timestamp', timestamp
 		@newStep()
 
 		lastTimestamp = 0
@@ -266,8 +266,12 @@ class ReplayPlayer extends EventEmitter
 		while !lastTimestamp or (lastTimestamp < timestamp)
 			lastTimestamp = @history[++index].timestamp
 
+		if timestamp >= lastTimestamp
+			@goToIndex @history[@history.length - 1].index
+			return
+
 		itemIndex = @history[index].index
-		# console.log 'going to itemIndex', itemIndex
+		console.log 'going to itemIndex', itemIndex
 
 		targetTurn = -1
 		targetAction = -1
@@ -301,7 +305,7 @@ class ReplayPlayer extends EventEmitter
 		@historyPosition = 0
 		@init()
 
-		# console.log 'moveToTimestamp init done', targetTurn, targetAction
+		console.log 'moveToTimestamp init done', targetTurn, targetAction
 
 		# Mulligan
 		if targetTurn <= 1 or targetAction < -1
@@ -348,7 +352,7 @@ class ReplayPlayer extends EventEmitter
 	update: ->
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			# if !@history[@historyPosition].executed
-			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
 			@history[@historyPosition].execute(this)
 			@history[@historyPosition].executed = true
 			

@@ -122,6 +122,7 @@ class ActionParser extends EventEmitter
 			# tap before drawing the card)
 			@parseDrawCard item
 			@parseOverdraw item
+			@parseDiscardCard item
 
 		# Sort the actions chronologically
 		tempTurnNumber = 1
@@ -290,6 +291,48 @@ class ActionParser extends EventEmitter
 									debug_lastAction: lastAction
 								}
 								@addAction @currentTurnNumber, action
+
+	parseDiscardCard: (item) ->
+		currentCommand = item.node
+
+		# Draw cards - 1 - Simply a card arriving in hand
+		# But don't log cards that come back in hand from play
+		if item.command is 'receiveTagChange' and currentCommand.tag == 'ZONE' and currentCommand.value == 4
+			# Don't add card discards that are at the beginning of the game or during Mulligan
+			if @currentTurnNumber >= 2
+				while currentCommand.parent and currentCommand.entity not in ['2', '3']
+					currentCommand = currentCommand.parent
+
+				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+				# but by the card itself. So we need to find out who that card controller is
+				# ownerId = currentCommand.attributes.entity
+				ownerId = item.node.entity
+				if ownerId not in ['2', '3']
+					owner = @getController(@entities[ownerId].tags.CONTROLLER)
+				else
+					owner = @entities[ownerId]
+
+				lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+				if lastAction?.actionType is 'card-discard' and lastAction.owner.id is owner.id
+					lastAction.data.push item.node.entity
+				else
+					action = {
+						turn: @currentTurnNumber
+						timestamp: item.timestamp
+						actionType: 'card-discard'
+						type: 'from tag change'
+						# old data attributes, could be removed now that we do a full process beforehand
+						data: [item.node.entity]
+						fullData: @entities[item.node.entity]
+						mainAction: item.node.parent?.parent # It's a tag change, so we are interesting in the enclosing action
+						owner: owner
+						initialCommand: item.node
+						debug_lastAction: lastAction
+						debug_entity: @entities[item.node.entity]
+						shouldExecute: =>
+							return action.fullData.tags.ZONE == 3
+					}
+					@addAction @currentTurnNumber, action
 
 	parseOverdraw: (item) ->
 		currentCommand = item.node

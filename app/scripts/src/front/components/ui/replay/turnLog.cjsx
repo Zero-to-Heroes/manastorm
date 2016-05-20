@@ -48,6 +48,9 @@ TurnLog = React.createClass
 		if action.actionType == 'card-draw'
 			log = @buildCardDrawLog action
 
+		if action.actionType == 'card-discard'
+			log = @buildCardDiscardLog action
+
 		else if action.actionType == 'overdraw'
 			log = @buildOverdrawLog action
 
@@ -179,6 +182,36 @@ TurnLog = React.createClass
 					{indent}
 					{drawer}
 					<span key={++@logIndex}> draws </span>
+					{cardLink}
+				</p>
+
+		return drawLog
+
+	buildCardDiscardLog: (action) ->
+		# Don't show hidden information
+		if action.owner == @replay.player
+			cardLink = @buildList action.data
+		else if action.data.length == 1
+			cardLink = '<span> ' + action.data.length + ' card </span>'
+			cardLink = <SpanDisplayLog newLog={cardLink} />
+		else
+			cardLink = '<span> ' + action.data.length + ' cards </span>'
+			cardLink = <SpanDisplayLog newLog={cardLink} />
+
+		# The effect occured as a response to another action, so we need to make that clear
+		indent = <span key={++@logIndex}></span>
+		if action.mainAction
+			indentText = '<span>...and </span>'
+			indent = <SpanDisplayLog className="indented-log" newLog={indentText} />
+			if action.owner != @replay.getActivePlayer()
+				drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+		else
+			drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+
+		drawLog = <p key={++@logIndex}>
+					{indent}
+					{drawer}
+					<span key={++@logIndex}> discards </span>
 					{cardLink}
 				</p>
 
