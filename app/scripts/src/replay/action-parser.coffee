@@ -657,9 +657,16 @@ class ActionParser extends EventEmitter
 	parseTriggerFullEntityCreation: (item) ->
 		command = item.node
 		if command.attributes.type in ['5'] 
-			# Trigger that creates an entity
+			
 			if command.fullEntities?.length > 0
-				fullEntities = _.filter(command.fullEntities, (entity) -> entity.tags.ZONE == 1 )
+				entities = command.fullEntities
+
+			else if command.showEntities?.length > 0
+				entities = command.showEntities
+
+			# Trigger that creates an entity
+			if entities?.length > 0
+				fullEntities = _.filter(entities, (entity) -> entity.tags.ZONE == 1 )
 				if fullEntities?.length > 0
 					for entity in fullEntities
 						action = {
@@ -750,26 +757,34 @@ class ActionParser extends EventEmitter
 	parseSummons: (item) ->
 		command = item.node
 		# A power that creates new entities - minions
-		if command.attributes.type == '3' and command.fullEntities?.length > 0
-			for entity in command.fullEntities
-				# Only care about summons here, which are entities that come in play directly
-				# And summons only concerns minions - specific handlers take care of the rest
-				if entity.tags.ZONE == 1 and entity.tags.CARDTYPE == 4
-					# Is the effect triggered in response to another play?
-					if command.parent
-						mainAction = command.parent
+		if command.attributes.type in ['3'] 
 
-					action = {
-						turn: @currentTurnNumber - 1
-						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
-						index: entity.index
-						actionType: 'summon-minion'
-						data: entity
-						owner: @getController(entity.tags.CONTROLLER)
-						mainAction: mainAction
-						initialCommand: command
-					}
-					@addAction @currentTurnNumber, action
+			if command.fullEntities?.length > 0
+				entities = command.fullEntities
+
+			else if command.showEntities?.length > 0
+				entities = command.showEntities
+
+			if entities
+				for entity in entities
+					# Only care about summons here, which are entities that come in play directly
+					# And summons only concerns minions - specific handlers take care of the rest
+					if entity.tags.ZONE == 1 and entity.tags.CARDTYPE == 4
+						# Is the effect triggered in response to another play?
+						if command.parent
+							mainAction = command.parent
+
+						action = {
+							turn: @currentTurnNumber - 1
+							timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+							index: entity.index
+							actionType: 'summon-minion'
+							data: entity
+							owner: @getController(entity.tags.CONTROLLER)
+							mainAction: mainAction
+							initialCommand: command
+						}
+						@addAction @currentTurnNumber, action
 
 	parseEquipEffect: (item) ->
 		command = item.node
