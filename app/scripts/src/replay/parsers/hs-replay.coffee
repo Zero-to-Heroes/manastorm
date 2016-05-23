@@ -22,6 +22,7 @@ class HSReplayParser
 		@index = 0
 		@replay = replay
 		@sax = sax.createStream(true)
+		console.log 'starting parsing'
 
 		@sax.on 'opentag', (node) => @onOpenTag(node)
 		@sax.on 'closetag', => @onCloseTag()
@@ -29,9 +30,9 @@ class HSReplayParser
 			console.error 'error while parsing xml', error
 
 		#@stream = fs.createReadStream(@path).pipe(@sax)
-		#console.log 'preparing to parse replay'
+		console.log 'preparing to parse replay'
 		@stream = new Stream(@xmlReplay).pipe(@sax)
-		#console.log 'replay parsed', @replay
+		console.log 'replay parsed', @replay
 
 	rootState: (node) ->
 		node.index = @index++
@@ -40,7 +41,7 @@ class HSReplayParser
 			when 'Game'
 				@replay.startTimestamp = tsToSeconds(node.attributes.ts)
 
-			when 'Action'
+			when 'Action', 'Block'
 				#console.log 'enqueue action from rootState', node
 				#if (node?.attributes?.entity == '70')
 					#console.log '\tDebug', node
@@ -247,7 +248,7 @@ class HSReplayParser
 			when 'Info'
 				console.error 'info, shouldnt happen'
 
-			when 'Action'
+			when 'Action', 'Block'
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
@@ -273,6 +274,9 @@ class HSReplayParser
 				@state.push('choices')
 
 		@entityDefinition.indent = if @entityDefinition.parent?.indent then @entityDefinition.parent.indent + 1 else 1
+
+	blockState: (node) ->
+		@actionState node
 
 	metaDataState: (node) ->
 		#console.log '\tin meta data state', node
@@ -312,9 +316,12 @@ class HSReplayParser
 		else
 			ts = null
 		switch node.name
-			when 'Action'
+			when 'Action', 'Block'
 				#console.log 'closing action state', node, @entityDefinition
 				node = @state.pop()
+
+	blockStateClose: (node) ->
+		return actionStateClose node
 
 	onOpenTag: (node) ->
 		#console.log 'opening tag', node
