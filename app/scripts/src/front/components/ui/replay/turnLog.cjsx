@@ -14,7 +14,9 @@ TurnLog = React.createClass
 		@replay = @props.replay
 
 		@logs = []
-		@logIndex = 0
+		@logIndex = 10000
+
+		console.log 'mounteeeeeeeeeeeeeeeeeeeeeeeeeed'
 
 		@subs.add @replay, 'new-action', (action) =>
 			newLog = @buildActionLog action
@@ -577,7 +579,7 @@ TurnLog = React.createClass
 				log = @buildMulliganLog turn
 				return log
 			else 
-				log = <p className="turn" key={@logIndex++}>
+				log = <p className="turn" key={++@logIndex}>
 						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} onClick={@props.onTurnClick.bind(this, turn.turn)} />
 					</p>
 

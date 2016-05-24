@@ -17,7 +17,7 @@ class ReplayPlayer extends EventEmitter
 		@cardUtils = window['parseCardsText']
 
 	init: ->
-		console.log 'starting init in joustjs'
+		# console.log 'starting init in joustjs'
 		if @entities
 			for k,v of @entities
 				v.damageTaken = 0
@@ -78,7 +78,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		console.log 'init done in joustjs'
+		# console.log 'init done in joustjs'
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -120,7 +120,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
-			# console.log 'goign to next turn'
+			console.log 'goign to next turn', @currentTurn + 1
 			@currentTurn++
 			@currentActionInTurn = -1
 
@@ -137,7 +137,7 @@ class ReplayPlayer extends EventEmitter
 			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
-		# console.log 'going to next turn'
+		# console.log 'going to next turn', @currentTurn + 1
 		if @turns[@currentTurn + 1]
 			turnWhenCommandIssued = @currentTurn
 
@@ -145,7 +145,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: ->
-		# console.log 'going to previous action'
+		console.log 'going to previous action'
 		@newStep()
 
 		if @currentActionInTurn == 1
@@ -174,8 +174,19 @@ class ReplayPlayer extends EventEmitter
 		if targetTurn == 0 and targetAction == 0
 			return
 
+		@seeking = true
+		console.log 'going to previous, targets', targetTurn, targetAction
 		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
+			console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
+
+			# Avoid double clicking on skipped actions
+			action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
+			if @currentTurn == targetTurn and @currentActionInTurn == targetAction - 1 and action?.shouldExecute and !action?.shouldExecute() 
+				break
+
 			@goNextAction()
+
+		@seeking = false
 
 	goPreviousTurn: ->
 		# console.log 'going to previous turn'
@@ -197,9 +208,10 @@ class ReplayPlayer extends EventEmitter
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
 
-			if action.shouldExecute and !action.shouldExecute()
-				console.log 'skipping action'
-				@goNextAction()
+			if action.shouldExecute and !action.shouldExecute() 
+				if !@seeking
+					console.log 'skipping action'
+					@goNextAction()
 
 			else
 				@updateActiveSpell action
@@ -213,7 +225,12 @@ class ReplayPlayer extends EventEmitter
 				# Now we want to go to the action, and to show the effects of the action - ie all 
 				# that happens until the next action. Otherwise the consequence of an action would 
 				# be bundled with the next action, which is less intuitive
-				if @turns[@currentTurn].actions[@currentActionInTurn + 1] 
+				nextActionIndex = 1
+				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
+				while nextAction and (!nextAction.shouldExecute or !nextAction.shouldExecute())
+					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
+
+				if nextAction
 					index = @turns[@currentTurn].actions[@currentActionInTurn + 1].index - 1
 				else if @turns[@currentTurn + 1]
 					index = @turns[@currentTurn + 1].index - 1
@@ -236,7 +253,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToIndex: (index) ->
-		console.log 'going to index', index
+		# console.log 'going to index', index
 		if index < @historyPosition
 			@historyPosition = 0
 			@init()
@@ -271,7 +288,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		itemIndex = @history[index].index
-		console.log 'going to itemIndex', itemIndex
+		# console.log 'going to itemIndex', itemIndex
 
 		targetTurn = -1
 		targetAction = -1
@@ -305,7 +322,7 @@ class ReplayPlayer extends EventEmitter
 		@historyPosition = 0
 		@init()
 
-		console.log 'moveToTimestamp init done', targetTurn, targetAction
+		# console.log 'moveToTimestamp init done', targetTurn, targetAction
 
 		# Mulligan
 		if targetTurn <= 1 or targetAction < -1
@@ -354,7 +371,6 @@ class ReplayPlayer extends EventEmitter
 			# if !@history[@historyPosition].executed
 			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
 			@history[@historyPosition].execute(this)
-			@history[@historyPosition].executed = true
 			
 			@historyPosition++
 
@@ -435,7 +451,7 @@ class ReplayPlayer extends EventEmitter
 			index++			
 			# console.log index, @history[index], @history
 		index++
-		console.log index, @history[index], @history
+		# console.log index, @history[index], @history
 		while @history[index].command isnt 'receiveAction'
 			# console.log '\tSkipping to secdon action', index
 			index++
@@ -566,7 +582,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		console.log 'looking at text', text
+		# console.log 'looking at text', text
 		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
 		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
 
@@ -622,7 +638,7 @@ class ReplayPlayer extends EventEmitter
 			matches.forEach (match) ->
 				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
 
-		console.log 'modified text', text
+		# console.log 'modified text', text
 		return text
 
 	replaceText: (text, inputTurnNumber, match, opponent) ->

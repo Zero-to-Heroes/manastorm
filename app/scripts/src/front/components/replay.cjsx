@@ -172,13 +172,17 @@ class Replay extends React.Component
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goNextAction()
+		start = new Date().getTime()
 		@forceUpdate()
+		console.log 'force update took', new Date().getTime() - start
 
 	goPreviousAction: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goPreviousAction()
+		start = new Date().getTime()
 		@forceUpdate()
+		console.log 'force update took', new Date().getTime() - start
 
 	goNextTurn: (e) =>
 		e.preventDefault()

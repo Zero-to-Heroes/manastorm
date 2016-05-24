@@ -51,12 +51,8 @@ class ActionParser extends EventEmitter
 			# Order is important, since a card can be first created with fullentity then info (like card id) be added with 
 			# showentity, eg rallying blade
 			if item.command == 'receiveShowEntity'
-				if item.node.id == 69
-					console.log 'showentity entity 69', item
 				if item.node.id and @entities[item.node.id]
 					@entities[item.node.id].cardID = item.node.cardID
-					if item.node.id == 69
-						console.log '\tupdated showentity entity 69', item, @entities[item.node.id]
 
 		# Add intrinsic information, like whether the card is a secret
 		for item in @history
@@ -247,7 +243,7 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
-							console.log action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE
+							# console.log action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE
 							return action.fullData.tags.ZONE != 1
 					}
 					@addAction @currentTurnNumber, action
@@ -479,7 +475,7 @@ class ActionParser extends EventEmitter
 				# Either in play or a secret
 				if tag.tag == 'ZONE' and tag.value == 7
 					playedCard = tag.entity
-					console.log 'is secret played action?', @entities[playedCard].cardID, command, @entities[playedCard]
+					# console.log 'is secret played action?', @entities[playedCard].cardID, command, @entities[playedCard]
 				if tag.tag == 'SECRET' and tag.value == 1
 					secret = true
 
@@ -776,9 +772,9 @@ class ActionParser extends EventEmitter
 			# Check that each of them is in the SETASIDE zone
 			isDiscover = true
 			choices = []
-			console.log 'discovering?', command
+			# console.log 'discovering?', command
 			for entity in command.fullEntities
-				console.log '\tdiscovering?', entity, @entities[entity.id]
+				# console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
 				if @entities[entity.id].tags.CARDTYPE != 6
 					choices.push entity
@@ -786,7 +782,7 @@ class ActionParser extends EventEmitter
 						isDiscover = false
 
 			if isDiscover and choices.length == 3
-				console.log 'parsing discover action', command, choices
+				# console.log 'parsing discover action', command, choices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -797,7 +793,7 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				command.isDiscover = true
-				console.log 'adding discover action', action
+				# console.log 'adding discover action', action
 				@addAction @currentTurnNumber, action
 
 
