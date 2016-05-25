@@ -227,7 +227,7 @@ class ReplayPlayer extends EventEmitter
 				# be bundled with the next action, which is less intuitive
 				nextActionIndex = 1
 				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
-				while nextAction and (!nextAction.shouldExecute or !nextAction.shouldExecute())
+				while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
 					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
 				if nextAction
@@ -369,9 +369,8 @@ class ReplayPlayer extends EventEmitter
 	update: ->
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			# if !@history[@historyPosition].executed
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
 			@history[@historyPosition].execute(this)
-			
 			@historyPosition++
 
 		# We're doing a grouping that is not strictly chronological, so adjust for this here
