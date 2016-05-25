@@ -231,7 +231,7 @@ class ReplayPlayer extends EventEmitter
 					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
 				if nextAction
-					index = @turns[@currentTurn].actions[@currentActionInTurn + 1].index - 1
+					index = nextAction.index - 1
 				else if @turns[@currentTurn + 1]
 					index = @turns[@currentTurn + 1].index - 1
 				else
@@ -288,7 +288,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		itemIndex = @history[index].index
-		# console.log 'going to itemIndex', itemIndex
+		console.log 'going to itemIndex', itemIndex
 
 		targetTurn = -1
 		targetAction = -1
@@ -322,14 +322,25 @@ class ReplayPlayer extends EventEmitter
 		@historyPosition = 0
 		@init()
 
-		# console.log 'moveToTimestamp init done', targetTurn, targetAction
+		console.log 'moveToTimestamp init done', targetTurn, targetAction
 
 		# Mulligan
 		if targetTurn <= 1 or targetAction < -1
 			return
 
+		@seeking = true
+		console.log 'going to timestamp, targets', targetTurn, targetAction
 		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
+			console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
+
+			# Avoid double clicking on skipped actions
+			action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
+			if @currentTurn == targetTurn and @currentActionInTurn == targetAction - 1 and action?.shouldExecute and !action?.shouldExecute() 
+				break
+
 			@goNextAction()
+
+		@seeking = false
 
 
 	getActivePlayer: ->
