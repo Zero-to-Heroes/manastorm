@@ -4,13 +4,9 @@ React = require 'react'
 module.exports = Application = React.createClass
 	render: ->
 		#console.log('rendering application')
-		<Window>
-			<Toolbar title="Joust" className="title-bar" />
-
-			<div className="application">
-				{@props.children}
-			</div>
-		</Window>
+		<div className="application">
+			{@props.children}
+		</div>
 
 	componentDidMount: ->
 		# Redirect straight to the replay for now

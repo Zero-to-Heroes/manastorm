@@ -13,7 +13,9 @@ Turn = React.createClass
 			cls += ' active' 
 
 		return 	<div className={cls} onClick={@props.onClick} >
-					<span>{@props.replay.getCurrentTurnString()}</span>
+					<div className="text">
+						<span>{@props.replay.getCurrentTurnString()}</span>
+					</div>
 				</div>
 
 

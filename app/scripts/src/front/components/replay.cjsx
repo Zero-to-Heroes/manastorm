@@ -1,5 +1,6 @@
-console.log('in replay')
 React = require 'react'
+ReactDOM = require 'react-dom'
+
 {ButtonGroup, Button} = require 'react-photonkit'
 ReplayPlayer = require '../../replay/replay-player'
 HSReplayParser = require '../../replay/parsers/hs-replay'
@@ -31,6 +32,8 @@ class Replay extends React.Component
 
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
 
+		@state.style = {}
+
 		@showAllCards = false
 		@mainPlayerSwitched = false
 
@@ -60,10 +63,21 @@ class Replay extends React.Component
 		@displayConf = {
 			showLog: false
 		}
+		console.log 'new version'
 
 
 	componentDidMount: ->
+		window.addEventListener 'resize', @updateDimensions
+
 		@mounted = true
+		@updateDimensions()
+
+
+	updateDimensions: =>
+		if this.refs['root']
+			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
+			console.log 'built style', @state.style
+			@forceUpdate()
 
 	callback: =>
 		if !@mounted
@@ -80,7 +94,7 @@ class Replay extends React.Component
 		if replay.players.length == 2
 			#console.log 'All players are here'
 
-			top = <div className="top">
+			top = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.opponent} />
 				<Board entity={replay.opponent} ref="topBoard" tooltips={true} replay={replay}/>
@@ -126,7 +140,8 @@ class Replay extends React.Component
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
 
-		return <div className="replay">
+		console.log 'applying style', @state.style
+		return <div className="replay" ref="root" style={@state.style}>
 					<ReactTooltip />
 					<div className="additional-controls">
 						<label>

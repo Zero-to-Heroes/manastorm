@@ -1,7 +1,7 @@
 .replay {
 	display: flex;
 	flex-direction: column;
-	box-sizing: border-box;
+	// box-sizing: border-box;
 	align-items: stretch;
 	flex-grow: 1;
 	min-height: 0;
@@ -9,17 +9,18 @@
 }
 
 .replay__game {
-	flex-grow: 1;
-	border-top: 1px solid @border-color;
-	overflow: hidden;
-	background: rgb(209, 193, 108) url(../../image/felt.png) 50% 50% repeat;
+	position: relative;
 	display: flex;
 	flex-direction: column;
+	flex-grow: 1;
+	// border-top: 1px solid @border-color;
+	overflow: hidden;
+	// background: rgb(209, 193, 108) url(../../image/felt.png) 50% 50% repeat;
 	min-height: 0;
 	min-width: 0;
 
 	border: none;
-    background: url(images/felt.png) 50% 50% #DDB570;
+    // background: url(images/felt.png) 50% 50% #DDB570;
     background-image: url(images/game-board-bg.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;
