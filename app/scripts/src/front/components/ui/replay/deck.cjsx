@@ -8,7 +8,7 @@ class Deck extends React.Component
 
 	render: ->
 		return <div className="deck">
-			{@props.entity.getDeck().length}
+			<span>{@props.entity.getDeck().length}</span>
 		</div>
 
 module.exports = Deck
