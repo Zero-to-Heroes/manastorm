@@ -10,14 +10,14 @@ class Weapon extends Card
 
 	render: ->
 		#console.log 'trying to render weapon', @props.entity
-		return null unless @props.entity?.cardID
+		return <div className="weapon-container"></div> unless @props.entity?.cardID
 		#console.log '\trendering weapon', @props.entity
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 
 		# console.log 'rendering weapon', @props.entity
-		cls = "game-card"
+		cls = "weapon-container game-card"
 		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer().tags.PLAYER_ID
 			# console.log 'shearthing', @props.replay.getActivePlayer().tags.PLAYER_ID, @props.entity
 			cls += " sheathed"

@@ -12,16 +12,13 @@ class HeroPower extends Card
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
-		cls = ""
-
-		if @props.className
-			cls += " " + @props.className
+		cls = "power"
 
 		if @props.entity.tags.EXHAUSTED
 			cls += " exhausted"
 		else 
 			style =
-				background: "url(#{art}) top left no-repeat"
+				backgroundImage: "url(#{art})"
 
 		if @props.entity.highlighted
 			# console.log '\thighlighting', @props.entity.cardID, @props.entity
@@ -39,10 +36,12 @@ class HeroPower extends Card
 		# cost = <div className="mana-cost">2</div>
 
 		link = '<img src="' + art + '">';
-		return 	<div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
-					<div className="game-card" style={style}></div>
-					<div className="art"></div>
-					{cost}
+		return 	<div className="power-container" data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+					<div className={cls}>
+						<div className="game-card" style={style}></div>
+						<div className="art"></div>
+						{cost}
+					</div>
 				</div>
 
 module.exports = HeroPower

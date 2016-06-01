@@ -1,62 +1,97 @@
 .hero {
 	text-align: center;
 	position: relative;
-	top: 30px;
+	flex: 1;
+	width: 60%;
+	margin: auto;
+	display: flex; 
+	// top: 30px;
 
 	.game-card {
 		display: inline-block;
-		margin-right: 10px;
+		// margin-right: 10px;
 		// transition: transform 0.25s, top 0.5s;
-		width: 64px;
-		height: 64px;
+		// width: 64px;
+		// height: 64px;
 		border-radius: 50%;
-		background-size: 200% auto !important;
-		background-position: -32px -30px !important;
+		background-size: 200% auto;
+		// background-position: -32px -30px !important;
 
 		&:last-child {
 			margin-right: 0;
 		}
 	}
 
+	.power-container {
+		position: relative;
+	    width: 35%;
+	    height: auto;
+	    align-self: flex-end;
+	    margin-bottom: 9%;	
+	    display: flex;
+	    align-items: flex-end;
+	    flex-direction: column;
+	}
+
 	.power {
-		position: absolute;
-		background-size: 200% auto !important;
-		background-position: -40px -40px !important;
-		left: ~"calc(50% + 50px)";
-		bottom: 15px;
-		width: 100px;
-		height: 100px;
+		position: relative;
+		width: 60%;
+		background-size: 200% auto;
+    	margin-right: 8%;
+		// background-position: -40px -40px !important;
+
+	    &::before {
+		    content: "";
+		    padding-top: 100%;
+		    position: relative;
+		    display: block; 	
+	    }	
 
 		.art {
 			background: url(images/hero_power.png) center center no-repeat;
 		    width: 100%;
-		    height: 100%;
 		    position: absolute;
 		    background-size: contain;
+		    bottom: 0;
+		    right: 0;
+
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block; 	
+		    }	
 		}
 
 		.game-card {
 		    position: absolute;
-		    top: 20px;
-		    left: 15px;
-		    background-size: 245% auto !important;
-		    background-position: -46px -45px !important;
+		    width: 90%;
+		    // background-size: 200% auto;
+		    background-position: 50% 25%;
+		    left: 5%;
+		    top: 10%;
+
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block; 	
+		    }	
 		}
 
 		.mana-cost {
 			// background: url(images/mana.png) center center no-repeat;
     		background-size: contain;
-			width: 32px;
-		    height: 32px;
 		    position: absolute;
-		    top: 0px;
-		    left: ~"calc(50% - 16px)";
-		    font-size: 24px;
+		    top: 0;
+		    left: 43%;
+		    font-size: 1.3em;
 			color: white;
-			text-shadow: 0 0 10px black;
+			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 			font-weight: bold;
 			text-align: center;
-			line-height: 32px;
+			line-height: 1.3em;
+    		width: 100%;
 
 			&.lower-cost {
 		    	color: #31C331;
@@ -86,14 +121,22 @@
 		}
 	}
 
+	.weapon-container {
+	    width: 35%;
+	    height: auto;
+	    align-self: flex-end;
+	    margin-bottom: 13%;
+
+	    &::before {
+		    content: "";
+		    padding-top: 100%;
+		    position: relative;
+		    display: block; 	
+	    }		
+	}
+
 	.weapon {
-		position: absolute;
-		right: ~"calc(50% + 70px)";
-		background-position: -40px -40px !important;
-		bottom: 0;
-		bottom: 20px;
-		width: 80px;
-		height: 80px;
+	    background-position: -40px -40px !important;
 
 		&.sheathed::before {
 			content: "";
@@ -139,29 +182,54 @@
 	}
 
 	.avatar {
-		width: 100px;
-		height: 100px;
-		background: transparent;
+    	width: 29%;
+    	height: auto;
+    	background: transparent;
+	    align-self: flex-end;
+
+	    &::before {
+		    content: "";
+		    padding-top: 100%;
+		    position: relative;
+		    display: block; 	
+	    }		
+
 
 		.game-card {
-			border-radius: 0;
-			border-top-left-radius: 60% 70%;
-			border-top-right-radius: 60% 70%;
-			background-position: -50px -50px !important;
-		    height: 100%;
+		    border-radius: 0;
+		    border-top-left-radius: 60% 70%;
+		    border-top-right-radius: 60% 70%;
+		    background-position: 45% 23% !important;
+    		background-size: 200% auto;
+		    // height: 100%;
 		    width: 100%;
+    		height: auto;
 		    position: absolute;
 		    left: 0;
+		    bottom: 0;
+
+		    &::before {
+			    content: "";
+			    padding-top: 115%;
+			    position: relative;
+			    display: block; 	
+		    }	
 		}
 
 		.frame {
-			background: url(images/hero_frame.png) center center no-repeat;
-		    height: ~"calc(100% + 20px)";
-		    width: ~"calc(100% + 40px)";
+		    background: url(images/hero_frame.png) bottom left no-repeat;
+		    width: 125%;
 		    position: absolute;
-		    left: -20px;
 		    background-size: contain;
-		    top: -10px;
+		    left: 0;
+		    bottom: -5%;
+
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block; 	
+		    }		
 		}
 
 
@@ -178,12 +246,21 @@
 		}
 
 		.health {
-			height: 42px;
-		    width: 24px;
-		    font-size: 20px;
-		    bottom: -14px;
-		    right: -6px;
-    		background: transparent;
+			// height: 42px;
+		 //    width: 24px;
+			position: absolute;
+		    font-size: 1.3em;
+			line-height: 1.3em;
+		    bottom: -5%;
+		    right: -7%;
+			color: white;
+			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+			font-weight: bold;
+			text-align: center;
+
+			&.damaged {
+				color: red;
+			}
 		}
 
 		.card__stats__attack {
