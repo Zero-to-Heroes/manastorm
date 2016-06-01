@@ -34,7 +34,7 @@ class Card extends React.Component
 					costCls += " lower-cost"
 				else if @props.entity.tags.COST > originalCost
 					costCls += " higher-cost"
-				cost = <div className={costCls}>{@props.entity.tags.COST or 0}</div>
+				cost = <div className={costCls}><span>{@props.entity.tags.COST or 0}</span></div>
 		else
 			style = {}
 			cls = "game-card"
@@ -100,8 +100,8 @@ class Card extends React.Component
 				healthClass += " buff"
 
 			stats = <div className="card__stats">
-				<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
-				<div className={healthClass}>{(@props.entity.tags.HEALTH or @props.entity.tags.DURABILITY) - (@props.entity.tags.DAMAGE or 0)}</div>
+				<div className={atkCls}><span>{@props.entity.tags.ATK or 0}</span></div>
+				<div className={healthClass}><span>{(@props.entity.tags.HEALTH or @props.entity.tags.DURABILITY) - (@props.entity.tags.DAMAGE or 0)}</span></div>
 			</div>
 
 

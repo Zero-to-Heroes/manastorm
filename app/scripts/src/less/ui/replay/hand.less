@@ -1,33 +1,32 @@
 .hand {
 	text-align: center;
-	// position: absolute;
 	height: 25%;
-
 	width: 70%;
 	text-align: right;
-    padding-right: 5px;
+
+	height: 33%;
 
 	.game-card {
 		display: inline-block;
+		width: 20%;
 		top: 0;
 		position: relative;
-		margin-right: -30px;
-		/*transition: transform 0.25s, top 0.5s;*/
 		background: transparent;
 
-		margin-right: 0;
-		margin-left: -50px;
+		&::before {
+			content: "";
+			padding-top: 148%;
+			position: relative;
+			display: block; 	
+		}	
 
 		.art {
-		    height: auto;
-		    width: 100%;
-		    position: absolute;
-		    left: 0;
-		    top: 0;
-		    background-size: contain;
-		    // background-size: 235% auto !important;
-		    // background-position: -47px -37px !important;
-			// border-radius: ~"75px / 100px";
+			height: auto;
+			width: 100%;
+			position: absolute;
+			left: 0;
+			top: 0;
+			background-size: contain;
 
 			&.card--unknown {
 				background: url(images/cardback.png) top left no-repeat;
@@ -71,63 +70,86 @@
 			margin-right: 0;
 		}
 
-		// .option-on {
-		// 	content: "";
-		// 	border: 3px solid #31C331;
-		// 	position: absolute;
-		// 	top: 13px;
-		// 	bottom: 0;
-		// 	left: 6px;
-		// 	right: 6px;
-		// }
-
 		.card-cost {
 			background: url(images/mana.png) center center no-repeat;
-    		background-size: contain;
-			width: 22px;
-		    height: 22px;
-		    position: absolute;
-		    font-size: 18px;
+			background-size: contain;
+			width: 24%;
+			// height: 22px;
+			position: absolute;
+			font-size: 1.3em;
 			color: white;
-			text-shadow: 0 0 10px black;
 			font-weight: bold;
 			text-align: center;
 			line-height: 22px;
-		    top: 18px;
-		    left: 3px;
-		    color: white;
-		    cursor: default;
+			top: 13%;
+			left: 3%;
+			color: white;
+			cursor: default;
 			// Outline text, cf http://stackoverflow.com/questions/4919076/outline-effect-to-text
-		    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 
-		    &.lower-cost {
-		    	color: #31C331;
-		    }
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block;
+			}	
 
-		    &.higher-cost {
-		    	color: red;
-		    }
+			span {
+				position: absolute;
+				top: 0;
+				display: inline-block;
+				text-align: center;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				line-height: 1.2em;
+			}
+
+			&.lower-cost {
+				color: #31C331;
+			}
+
+			&.higher-cost {
+				color: red;
+			}
 		}
 
 		.card__stats {
+
 			.card__stats__attack {
-			    left: 0;
-			    right: auto;
-			    height: 28px;
-			    width: 28px;
-			    bottom: 5px;
-			    font-size: 16px;
-			    line-height: 32px;
-   				padding-left: 1px;
+				width: 33%;
+				bottom: 1%;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.6em;
+					font-size: 1.1em;
+				}
 			}
+
 			.card__stats__health {
-			    left: auto;
-			    right: 0px;
-			    height: 28px;
-			    width: 28px;
-			    bottom: 5px;
-			    font-size: 16px;
-			    line-height: 32px;
+				width: 33%;
+				bottom: 1%;
+				left: 68%;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.4em;
+					font-size: 1.1em;
+				}
 			}
 		}
 		
@@ -137,7 +159,13 @@
 
 .bottom .hand {
 	top: auto;
-	bottom: -10px;
+	// transform: translateY(-55%);
+	// bottom: -10px;
+
+	
+	.game-card {
+		transform: translateY(-15%);
+	}
 
 	div.art {
 		display: none;
@@ -148,13 +176,17 @@
 }
 
 .top .hand {
+	// transform: translateY(-40%);
+
+	.game-card {
+		transform: translateY(-15%);
+	}
+
 	.card__stats {
 		display: none;
 	}
 
 	.visible {
-		top: auto;
-		bottom: -12px;
 
 		div.art {
 			display: none;

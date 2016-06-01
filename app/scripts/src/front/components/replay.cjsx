@@ -144,6 +144,7 @@ class Replay extends React.Component
 		if @state.replay.speed > 0
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
+		blur = ""
 		if replay.choosing()
 			blur = "blur"
 

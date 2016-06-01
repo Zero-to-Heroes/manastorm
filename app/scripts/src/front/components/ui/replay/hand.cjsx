@@ -40,17 +40,16 @@ Hand = React.createClass
 		isInfoConcealed = @props.isInfoConcealed
 
 		cards = active.map (entity) ->
-			margin = -30
-			maxMargin = -50
+			margin = -6
 			if active.length == 8
-				margin = -40
+				margin = -8
 			else if active.length == 9
-				margin = -45
+				margin = -10
 			else if active.length == 10
-				margin = -50
+				margin = -11
 
 			style = { 
-				marginLeft: margin
+				marginLeft: margin + '%'
 			}
 
 			# console.log 'rendering card in hand', entity.cardID, entity
