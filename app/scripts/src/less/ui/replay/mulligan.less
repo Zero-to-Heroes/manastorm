@@ -1,28 +1,43 @@
 .mulligan {
-	text-align: center;
-	top: 55%;
-	transform: translateY(-50%);
+	// text-align: center;
+	top: 20%;
 	position: absolute;
 	width: 100%;
 	z-index: 25;
+	display: flex;
+    justify-content: space-around;
+    width: 80%;
+    margin-left: 10%;
 
 	.game-card {
-		display: inline-block;
 		position: relative;
-		margin-right: 20px;
-		// transition: transform 0.25s, top 0.5s;
-		width: 140px;
-		height: 240px;
-		background-size: 100% auto;
+    	width: 70%;
+		// height: 240px;
+		// background-size: 100% auto;
+
+	    &::before {
+		    content: "";
+		    padding-top: 148%;
+		    position: relative;
+		    display: block; 	
+	    }	
 
 		&:last-child {
 			margin-right: 0;
 		}
 
+		.art {
+			&::before {
+			    content: "";
+			    padding-top: 148%;
+			    position: relative;
+			    display: block; 	
+		    }
+		}
+
 		.art.card--unknown {
-			margin-right: 0;
-		    height: 65%;
-		    width: inherit;
+   	 		width: 80%;
+    		margin-left: 10%;
 		}
 	}
 
@@ -33,7 +48,7 @@
 		left: 0;
 		right: 0;
 		content: "X";
-		font-size: 10em;
+		font-size: 17em;
 		color: red;
 		line-height: 1.1em;
 		text-align: center;
@@ -42,9 +57,16 @@
 }
 
 .top .mulligan .discarded:after {
-	font-size: 9em;
-	text-align: left;
-	line-height: 0.8em;
+	font-size: 12em;	
+	line-height: 1em;
+}
+
+.bottom .mulligan {
+	top: auto;
+
+	.game-card {
+		width: 30%;
+	}
 }
 
 /*.bottom .mulligan > .game-card {

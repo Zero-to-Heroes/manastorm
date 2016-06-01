@@ -94,26 +94,31 @@ class Replay extends React.Component
 		if replay.players.length == 2
 			#console.log 'All players are here'
 
-			top = <div className="top" >
+			topArea = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.opponent} />
-				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
-				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
-				<Mana entity={replay.opponent} />
 				<Hand entity={replay.opponent} isInfoConcealed={true} isHidden={!@showAllCards} replay={replay}/>
 				<Hero entity={replay.opponent} replay={replay} ref="topHero" showConcealedInformation={@showAllCards}/>
 				<Board entity={replay.opponent} ref="topBoard" tooltips={true} replay={replay}/>
+				<Mana entity={replay.opponent} />
 			</div>
 
-			bottom = <div className="bottom">
+			topOverlay = <div className="top" >
+				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
+				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
+			</div>
+
+			bottomArea = <div className="bottom"><Board entity={replay.player} ref="bottomBoard" tooltips={true} replay={replay}/>
 				<PlayerName entity={replay.player} isActive={replay.player.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.player} />
-				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
-				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
-				<Mana entity={replay.player} />
-				<Board entity={replay.player} ref="bottomBoard" tooltips={true} replay={replay}/>
 				<Hero entity={replay.player} replay={replay} ref="bottomHero" showConcealedInformation={true}/>
 				<Hand entity={replay.player} isInfoConcealed={false} isHidden={false} replay={replay} />
+				<Mana entity={replay.player} />
+			</div>
+
+			bottomOverlay = <div className="bottom">
+				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
+				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 			</div>
 
 		else 
@@ -139,6 +144,8 @@ class Replay extends React.Component
 		if @state.replay.speed > 0
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
+		if replay.choosing()
+			blur = "blur"
 
 		console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style}>
@@ -151,12 +158,18 @@ class Replay extends React.Component
 							<input type="checkbox" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} />Switch main player
 						</label>
 					</div>
-					<div className="replay__game">
-						{top}
-						{bottom}
-						{targets}
-						<ActiveSpell ref="activeSpell" replay={replay} />
-						<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
+					<div className="game">
+						<div className={"game-area " + blur}>
+							{topArea}
+							{bottomArea}
+							{targets}
+							<ActiveSpell ref="activeSpell" replay={replay} />
+							<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
+						</div>
+						<div className="overlay">
+							{topOverlay}
+							{bottomOverlay}
+						</div>
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
 					<form className="replay__controls padded">

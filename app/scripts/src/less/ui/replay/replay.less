@@ -9,24 +9,16 @@
     height: 100%;
 }
 
-.replay__game {
+.game {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
-	// border-top: 1px solid @border-color;
 	overflow: hidden;
-	// background: rgb(209, 193, 108) url(../../image/felt.png) 50% 50% repeat;
 	min-height: 0;
 	min-width: 0;
 
 	border: none;
-    // background: url(images/felt.png) 50% 50% #DDB570;
-    background-image: url(images/game-board-bg.png);
-    background-position: 50% 50%;
-    background-repeat: no-repeat;
-    background-size: contain;
-    background-color: #C3AA7D;
     height: 100%;
 }
 
@@ -41,7 +33,35 @@
 	min-width: 0;
 }
 
-.replay__game > .top {
+.game .game-area {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	width: 100%;
+	height: 100%;
+
+    background-image: url(images/game-board-bg.png);
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: #C3AA7D;
+}
+
+.game .overlay {
+	position: absolute;
+	display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+	overflow: hidden;
+	min-height: 0;
+	min-width: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+}
+
+.game .top {
 	flex-grow: 1;
 	flex-shrink: 1;
 	flex-basis: 50%;
@@ -53,7 +73,7 @@
     align-items: stretch;
 }
 
-.replay__game > .bottom {
+.game .bottom {
 	flex-grow: 1;
 	flex-shrink: 1;
 	flex-basis: 50%;
@@ -63,4 +83,9 @@
     display: flex;
     flex-direction: column;
     align-items: stretch;
+}
+
+.game .blur {
+	-webkit-filter: blur(2px);
+    filter: blur(5px);
 }

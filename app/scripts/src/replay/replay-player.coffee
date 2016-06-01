@@ -373,9 +373,6 @@ class ReplayPlayer extends EventEmitter
 	getTimestamps: ->
 		return _.map @history, (batch) => batch.timestamp - @startTimestamp
 
-	
-
-	
 
 	update: ->
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
@@ -408,6 +405,13 @@ class ReplayPlayer extends EventEmitter
 		if @history[@historyPosition - 1]?.timestamp
 			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
 			# console.log '\tupdating timestamp', @currentReplayTime
+
+	choosing: ->
+		# Blur during mulligan
+		if @turns[@currentTurn].turn is 'Mulligan'
+			return true
+
+		return false
 
 	updateOptions: ->
 		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
