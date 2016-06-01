@@ -1,5 +1,41 @@
-.game-card.active-spell {
+.active-spell-container {
 	position: absolute;
-	top: 250px;
-	left: 50px;
+	top: 0;
+	left: 0;
+	display: flex;
+	height: 100%;
+	width: 20%;
+    flex-direction: column;
+
+	.active-spell {
+		display: inline-block;
+		border: none;
+	    width: 90%;
+		background: transparent;
+		margin: auto;
+
+	    &::before {
+		    content: "";
+		    padding-top: 128%;
+		    position: relative;
+		    display: block; 	
+	    }	
+
+		.art {
+		    width: 100%;
+		    position: absolute;
+		    left: 0;
+		    top: 0;
+		    background-size: contain;
+
+			&::before {
+			    content: "";
+			    padding-top: 128%;
+			    position: relative;
+			    display: block; 	
+		    }	
+		}
+	}
+
+
 }

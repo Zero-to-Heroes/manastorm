@@ -1,42 +1,62 @@
 .board {
 	text-align: center;
 	position: relative;
-	// width: 100%;
-	// height: 78px;
 	height: 34%;
+	display: flex;
+    justify-content: center;
 
 
 	.game-card {
 		display: inline-block;
-		margin-right: 20px;
-		// transition: transform 0.25s, top 0.5s;
+		margin-right: 3%;
 		border: none;
-	    width: 70px;
-	    height: 90px;
-		border-radius: ~"75px / 100px";
+	    width: 10%;
+	    // height: 90px;
+		// border-radius: ~"75px / 100px";
 		background: transparent;
 
+	    &::before {
+		    content: "";
+		    padding-top: 128%;
+		    position: relative;
+		    display: block; 	
+	    }	
+
 		.art {
-		    height: 100%;
+		    // height: 100%;
 		    width: 100%;
 		    position: absolute;
 		    left: 0;
 		    top: 0;
 		    background-size: contain;
-		    background-size: 235% auto !important;
-		    background-position: -47px -37px !important;
+		    background-size: 235% auto;
+    		background-position: 46% 25%;
 			border-radius: ~"75px / 100px";
+
+			&::before {
+			    content: "";
+			    padding-top: 128%;
+			    position: relative;
+			    display: block; 	
+		    }	
 		}
 
 		.frame.minion {
 			background: url(images/card_border.png) center center no-repeat;
 		    background-size: contain;
 		    width: 120%;
-		    height: 120%;
+		    // height: 120%;
 		    display: block;
 		    position: absolute;
 		    top: -5%;
 		    left: -15%;
+
+			&::before {
+			    content: "";
+			    padding-top: 128%;
+			    position: relative;
+			    display: block; 	
+		    }	
 		}
 
 	    .legendary {
@@ -81,6 +101,44 @@
 		    border-radius: 50%;
 		}
 
+		.card__stats {
+
+			.card__stats__attack {
+				width: 45%;
+			    bottom: 5%;
+			    left: -6%;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.6em;
+					font-size: 1.1em;
+				}
+			}
+
+			.card__stats__health {
+				width: 45%;
+			    bottom: 5%;
+			    left: 60%;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.4em;
+					font-size: 1.1em;
+				}
+			}
+		}
 
 
 		.overlay {
@@ -175,7 +233,11 @@
 }
 
 .top .board {
+    align-items: flex-end;
+    padding-bottom: 2%;
 }
 
 .bottom .board {
+    align-items: flex-start;
+    padding-top: 1%;
 }

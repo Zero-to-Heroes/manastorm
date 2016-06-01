@@ -164,7 +164,9 @@ class Replay extends React.Component
 							{topArea}
 							{bottomArea}
 							{targets}
-							<ActiveSpell ref="activeSpell" replay={replay} />
+							<div className="active-spell-container">
+								<ActiveSpell ref="activeSpell" replay={replay} />
+							</div>
 							<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 						</div>
 						<div className="overlay">
