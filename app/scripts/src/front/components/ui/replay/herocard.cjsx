@@ -42,6 +42,7 @@ class HeroCard extends Card
 			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
 
 		return 	<div className={cls}>
+					<div className="frame frame-highlight"></div>
 					<div className={avatarCls} style={style}></div>
 					<div className="frame"></div>
 					<div className="secrets">
