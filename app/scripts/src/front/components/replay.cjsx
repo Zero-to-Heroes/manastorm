@@ -195,6 +195,7 @@ class Replay extends React.Component
 								</ul> 
 							</div>
 						</div>
+						<div id="padding"></div>
 					</form>
 					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog}/>
 				</div>

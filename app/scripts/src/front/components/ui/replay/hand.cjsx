@@ -56,7 +56,7 @@ Hand = React.createClass
 			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style}/>
 
 		return <div className="hand">
-				{cards}
+				<div>{cards}</div>
 			</div>
 
 

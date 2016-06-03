@@ -15,7 +15,7 @@ class Mana extends React.Component
 
 		# console.log 'rendering mana', totalMana, totalAvailableMana, totalLocked, futureLocked, @props.entity
 
-		availableMana = <div className="summary">{totalAvailableMana} / {totalMana}</div>
+		availableMana = <div className="summary"><span>{totalAvailableMana} / {totalMana}</span></div>
 
 		crystals = []
 		if totalAvailableMana > 0
@@ -48,8 +48,10 @@ class Mana extends React.Component
 
 		return <div className="mana-container">
 			{availableMana}
-			<div className="present">{crystals}</div>
-			<div className="future">{futures}</div>
+			<div className="crystals">
+				<div className="present">{crystals}</div>
+				<div className="future">{futures}</div>
+			</div>
 		</div>
 
 module.exports = Mana

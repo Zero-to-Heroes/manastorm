@@ -17,7 +17,7 @@ class Weapon extends Card
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 
 		# console.log 'rendering weapon', @props.entity
-		cls = "weapon-container game-card"
+		cls = "weapon"
 		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer().tags.PLAYER_ID
 			# console.log 'shearthing', @props.replay.getActivePlayer().tags.PLAYER_ID, @props.entity
 			cls += " sheathed"
@@ -25,8 +25,7 @@ class Weapon extends Card
 		else 
 			cls += " unsheathed"
 			style =
-				background: "url(#{art}) top left no-repeat"
-				backgroundSize: '100% auto'
+				backgroundImage: "url(#{art})"
 
 		if @props.className
 			cls += " " + @props.className
@@ -45,14 +44,18 @@ class Weapon extends Card
 				atkCls += " debuff"
 
 		stats = <div className="card__stats">
-			<div className={atkCls}>{@props.entity.tags.ATK or 0}</div>
-			<div className={healthClass}>{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</div>
+			<div className={atkCls}><span>{@props.entity.tags.ATK or 0}</span></div>
+			<div className={healthClass}><span>{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</span></div>
 		</div>
 
 		link = '<img src="' + art + '">';
 
-		return <div className={cls} style={style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
-				{stats}
-			</div>
+		return <div className="weapon-container" data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+					<div className={cls}>
+						<div className="game-card" style={style}></div>
+						<div className="art"></div>
+						{stats}
+					</div>
+				</div>
 
 module.exports = Weapon

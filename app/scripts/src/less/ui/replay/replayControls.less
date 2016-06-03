@@ -1,0 +1,21 @@
+.replay__controls {
+  width: 100%;
+  display: table;
+  background-color: #C3AA7D;
+}
+
+.replay__controls > div {
+	vertical-align: top;
+}
+
+.replay__controls .playback-speed {
+	display: table-cell;
+	width: 70px;
+}
+
+@media screen and (max-width: 500px) {
+	// Controls need more space on mobile
+	.replay__controls .timeline {
+		display: none;
+	}
+}

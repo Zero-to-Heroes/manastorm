@@ -3,14 +3,25 @@
 	height: 25%;
 	width: 70%;
 	text-align: right;
+	position: relative;
 
 	height: 33%;
+
+	& > div {
+	    position: absolute;
+	    bottom: 0;
+	    height: 400%;
+	    width: 100%;
+	    display: flex;
+	    align-items: flex-end;
+	    justify-content: flex-end;
+	}
 
 	.game-card {
 		display: inline-block;
 		width: 20%;
-		top: 0;
-		position: relative;
+		// top: 0;
+		// position: relative;
 		background: transparent;
 
 		&::before {
@@ -40,28 +51,28 @@
 								drop-shadow(@glowSize @glowSize 1px @innerGlow) 
 								drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
 								drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
-								drop-shadow(0px 0px 6px @outerGlow) 
-								drop-shadow(0px 0px 10px @outerGlow);
+								drop-shadow(0px 0px 0.5em @outerGlow) 
+								drop-shadow(0px 0px 0.8em @outerGlow);
 				filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
 						drop-shadow(@glowSize @glowSize 1px @innerGlow) 
 						drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
-						drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
-						drop-shadow(0px 0px 6px @outerGlow) 
-						drop-shadow(0px 0px 10px @outerGlow);
+						drop-shadow(@glowSize -@glowSize 1px @innerGlow)
+						drop-shadow(0px 0px 0.5em @outerGlow) 
+						drop-shadow(0px 0px 0.8em @outerGlow);
 
 				&.combo {
 					-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow) 
 								drop-shadow(@glowSize @glowSize 1px @innerComboGlow) 
 								drop-shadow(-@glowSize @glowSize 1px @innerComboGlow) 
 								drop-shadow(@glowSize -@glowSize 1px @innerComboGlow) 
-								drop-shadow(0px 0px 6px @outerComboGlow) 
-								drop-shadow(0px 0px 10px @outerComboGlow);
+								drop-shadow(0px 0px 0.5em @outerComboGlow) 
+								drop-shadow(0px 0px 0.8em @outerComboGlow);
 					filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow) 
 							drop-shadow(@glowSize @glowSize 1px @innerComboGlow) 
 							drop-shadow(-@glowSize @glowSize 1px @innerComboGlow) 
 							drop-shadow(@glowSize -@glowSize 1px @innerComboGlow) 
-							drop-shadow(0px 0px 6px @outerComboGlow) 
-							drop-shadow(0px 0px 10px @outerComboGlow);
+							drop-shadow(0px 0px 0.5em @outerComboGlow) 
+							drop-shadow(0px 0px 0.8em @outerComboGlow);
 				}
 			}
 		}
@@ -159,9 +170,15 @@
 .bottom .hand {
 	top: auto;
 
+	& > div {
+	    align-items: flex-start;
+	    bottom: auto;
+	    top: 0;
+	}
+
 
 	.game-card {
-		transform: translateY(-15%);
+		// transform: translateY(-15%);
 	}
 
 	div.art {
@@ -175,7 +192,7 @@
 .top .hand {
 
 	.game-card {
-		transform: translateY(-15%);
+		// transform: translateY(-15%);
 	}
 
 	.card__stats {

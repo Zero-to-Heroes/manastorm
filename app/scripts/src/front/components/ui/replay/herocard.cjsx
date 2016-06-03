@@ -39,7 +39,7 @@ class HeroCard extends Card
 
 		@props.entity.damageTaken = @props.entity.damageTaken or 0
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
-			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
+			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
 
 		return 	<div className={cls}>
 					<div className={avatarCls} style={style}></div>

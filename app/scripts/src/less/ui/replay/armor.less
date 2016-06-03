@@ -1,15 +1,32 @@
 .armor {
-	width: 26px;
-  	background: url(images/armor.png) 50% 50% no-repeat;
+	width: 33%;
+  	background: url(images/armor.png) center center no-repeat;
   	background-size: contain;
 	position: absolute;
-	font-size: 20px;
+	font-size: 1.8em;
 	color: white;
 	text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 	font-weight: bold;
-	text-align: center;
-	line-height: 36px;
+	// text-align: center;
+	// line-height: 36px;
 	top: auto;
-	bottom: 25px;
-	right: -5px;
+	bottom: 23%;
+	right: -15%;
+    display: block;
+
+	span {
+   	 	position: absolute;
+   	 	top: 0;
+   	 	bottom: 0;
+   	 	left: 0;
+   	 	right: 0;
+	}
+
+
+    &::before {
+	    content: "";
+	    padding-top: 122%;
+	    position: relative;
+	    display: block; 	
+    }	
 }

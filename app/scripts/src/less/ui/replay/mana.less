@@ -1,50 +1,67 @@
 .mana-container {
 	position: absolute;
-	left: ~"calc(50% + 124px)";
-	top: 168px;
-	background: url(images/mana-container-2.png) center center no-repeat;
+	background: rgba(0, 0, 0, 0.3) url(images/mana-container-3.png) center center no-repeat;
 	background-size: contain;
-	width: 233px;
-	height: 44px;
-
+	width: 30%;
 	left: inherit;
 	top: inherit;
-	bottom: 60px;
+	bottom: 25%;
 	right: 0;
+	display: flex;
+	border-radius: 0.5em;
+
+
+    &::before {
+	    content: "";
+	    padding-top: 13.4%;
+	    position: relative;
+	    display: block; 	
+    }	
 
 	.summary {
-		display: inline-block;
-		font-size: 14px;
+		display: flex;
+		font-size: 0.9em;
 		color: white;
 		font-weight: bold;
 		text-align: center;
 		cursor: default;
 		text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
-		width: 57px;
-		height: 17px;
-		margin-top: 14px;
-		vertical-align: top;
-		margin-right: -3px;
+		width: 25%;
+
+		& > span {
+			margin: auto;
+		}
 	}
 
-	.present {
-		display: inline-block;
-	}
+	.crystals {
+    	flex-grow: 1;
 
-	.future {
-		display: block;
-		padding-left: 53px;
-		height: 20px;
+		.present {
+			display: flex;
+			height: 100%;
+		}
+
+		.future {
+			display: flex;
+    		justify-content: flex-end;
+		}
 	}
 
 	.mana {
 		background: url(images/mana.png) center center no-repeat;
 		background-size: contain;
-		width: 17px;
-		height: 17px;
-		position: relative;
-		display: inline-block;
-		margin-top: 14px;
+		width: 10%;
+		// height: 17px;
+		// position: relative;
+		// display: inline-block;
+		// margin-top: 14px;
+
+	    &::before {
+		    content: "";
+		    padding-top: 100%;
+		    position: relative;
+		    display: block; 	
+	    }	
 
 		&.spent {
 			background-image: url(images/mana_spent.png);
@@ -64,7 +81,6 @@
 }
 
 .top .mana-container {
-	top: 129px;
-
-	top: 60px;
+	top: 25%;
+	bottom: auto;
 }

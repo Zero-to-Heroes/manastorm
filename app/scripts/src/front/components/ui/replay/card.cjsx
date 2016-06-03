@@ -125,7 +125,7 @@ class Card extends React.Component
 			exhausted = <div className="exhausted"></div>
 
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
-			damage = <span className="damage">{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span>
+			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
 
 		
 

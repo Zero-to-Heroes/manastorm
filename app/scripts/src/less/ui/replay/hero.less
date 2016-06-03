@@ -3,13 +3,13 @@
 	position: relative;
 	// flex: 1;
 	width: 50%;
-    height: 40%;
+	height: 40%;
 	margin: auto;
 	display: flex; 
 
-    height: 33%;
-    margin-top: 0;
-    margin-bottom: 0;
+	height: 33%;
+	margin-top: 0;
+	margin-bottom: 0;
 
 	.game-card {
 		display: inline-block;
@@ -23,92 +23,92 @@
 
 	.power-container {
 		position: relative;
-	    width: 35%;
-	    height: auto;
-	    align-self: flex-end;
-	    margin-bottom: 9%;	
-	    display: flex;
-	    align-items: flex-end;
-	    flex-direction: column;
+		width: 35%;
+		height: auto;
+		align-self: flex-end;
+		margin-bottom: 3%;	
+		display: flex;
+		align-items: flex-end;
+		flex-direction: column;
 	}
 
 	.power {
 		position: relative;
-		width: 60%;
+		width: 70%;
 		background-size: 200% auto;
-    	margin-right: 8%;
+		// margin-right: 8%;
 
-	    &::before {
-		    content: "";
-		    padding-top: 100%;
-		    position: relative;
-		    display: block; 	
-	    }	
+		&::before {
+			content: "";
+			padding-top: 100%;
+			position: relative;
+			display: block; 	
+		}	
 
 		.art {
 			background: url(images/hero_power.png) center center no-repeat;
-		    width: 100%;
-		    position: absolute;
-		    background-size: contain;
-		    bottom: 0;
-		    right: 0;
+			width: 100%;
+			position: absolute;
+			background-size: contain;
+			bottom: 0;
+			right: 0;
 
-		    &::before {
-			    content: "";
-			    padding-top: 100%;
-			    position: relative;
-			    display: block; 	
-		    }	
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block; 	
+			}	
 		}
 
 		.game-card {
-		    position: absolute;
-		    width: 90%;
-		    // background-size: 200% auto;
-		    background-position: 50% 25%;
-		    left: 5%;
-		    top: 10%;
+			position: absolute;
+			width: 90%;
+			// background-size: 200% auto;
+			background-position: 50% 25%;
+			left: 5%;
+			top: 10%;
 
-		    &::before {
-			    content: "";
-			    padding-top: 100%;
-			    position: relative;
-			    display: block; 	
-		    }	
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block; 	
+			}	
 		}
 
 		.mana-cost {
 			// background: url(images/mana.png) center center no-repeat;
-    		background-size: contain;
-		    position: absolute;
-		    top: 0;
-		    left: 0;
-		    font-size: 1.3em;
+			background-size: contain;
+			position: absolute;
+			top: 0;
+			left: 0;
+			font-size: 1.3em;
 			color: white;
 			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 			font-weight: bold;
 			text-align: center;
 			line-height: 1.3em;
-    		width: 100%;
+			width: 100%;
 
 			&.lower-cost {
-		    	color: #31C331;
-		    }
+				color: #31C331;
+			}
 
-		    &.higher-cost {
-		    	color: red;
-		    }
+			&.higher-cost {
+				color: red;
+			}
 		}
 
 		&.exhausted {
 			.game-card {
-			    background: url(images/hero_power_exhausted.png) center center no-repeat;
-			    background-size: 100% auto !important;
-			    background-position: center center !important;
-			    width: 100%;
-			    height: 100%;
-			    top: 0;
-			    left: 0;
+				background: url(images/hero_power_exhausted.png) center center no-repeat;
+				background-size: 100% auto !important;
+				background-position: center center !important;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
 			}
 			.mana-cost {
 				display: none;
@@ -120,134 +120,213 @@
 	}
 
 	.weapon-container {
-	    width: 35%;
-	    height: auto;
-	    align-self: flex-end;
-	    margin-bottom: 13%;
+		position: relative;
+		width: 35%;
+		height: auto;
+		align-self: flex-end;
+		margin-bottom: 0;	
+		display: flex;
+		align-items: flex-start;
+		flex-direction: column;
 
-	    &::before {
-		    content: "";
-		    padding-top: 100%;
-		    position: relative;
-		    display: block; 	
-	    }		
+		// &::before {
+		// 	content: "";
+		// 	padding-top: 100%;
+		// 	position: relative;
+		// 	display: block; 	
+		// }		
 	}
 
 	.weapon {
-	    background-position: -40px -40px !important;
+		position: relative;
+    	width: 70%;
+		background-size: 200% auto;
 
-		&.sheathed::before {
+		&::before {
 			content: "";
-		    width: 130%;
-		    height: 130%;
+			padding-top: 100%;
+			position: relative;
+			display: block; 	
+		}
+
+		.art {
+			width: 100%;
+			position: absolute;
+			background-size: contain;
+			bottom: 0;
+			right: 0;
+			background-repeat: no-repeat;
+			background-position: center center;
+
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block; 	
+			}
+		}
+
+		.game-card {
+			position: absolute;
+			width: 80%;
+			// background-size: 200% auto;
+			background-position: 50% 25%;
+			background-size: 170% auto;
+			left: 10%;
+			top: 10%;
+
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block; 	
+			}	
+		}
+
+		&.sheathed .art {
 			background-image: url(images/weapon_sheathed.png);
-		    display: block;
-		    position: relative;
-		    background-size: contain;
-		    top: -15%;
-		    left: -15%;
 		}
 
-		&.unsheathed::before {
-			content: "";
-		    width: 130%;
-		    height: 130%;
-		    background-image: url(images/weapon_unsheathed.png);
-		    display: block;
-		    position: relative;
-		    background-size: contain;
-		    top: -15%;
-		    left: -15%;
+		&.unsheathed .art {
+			background-image: url(images/weapon_unsheathed.png);
 		}
 
-		.card__stats__attack {
-			background: transparent;
-			height: 30px;
-		    width: 30px;
-		    line-height: 30px;
-		    left: -5px;
-		    bottom: 0;
-		}
+		// &.sheathed::before {
+		// 	content: "";
+		// 	width: 130%;
+		// 	height: 130%;
+		// 	background-image: url(images/weapon_sheathed.png);
+		// 	display: block;
+		// 	position: relative;
+		// 	background-size: contain;
+		// 	top: -15%;
+		// 	left: -15%;
+		// }
 
-		.card__stats__health {
-			background: transparent;
-			height: 30px;
-		    width: 30px;
-		    line-height: 30px;
-		    left: 55px;
-		    bottom: 0;
+		// &.unsheathed::before {
+		// 	content: "";
+		// 	width: 130%;
+		// 	height: 130%;
+		// 	background-image: url(images/weapon_unsheathed.png);
+		// 	display: block;
+		// 	position: relative;
+		// 	background-size: contain;
+		// 	top: -15%;
+		// 	left: -15%;
+		// }
+
+		.card__stats {
+
+			.card__stats__attack {
+				background: transparent;
+				width: 45%;
+			    bottom: 5%;
+			    left: -2%;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.6em;
+					font-size: 1.1em;
+				}
+			}
+
+			.card__stats__health {
+				width: 45%;
+			    bottom: 5%;
+			    left: 57%;
+			    background: transparent;
+
+				span {
+					position: absolute;
+					display: inline-block;
+					text-align: center;
+					top: 0;
+					bottom: 0;
+					left: 0;
+					right: 0;
+					line-height: 2.6em;
+					font-size: 1.1em;
+				}
+			}
 		}
 	}
 
 	.avatar {
-    	width: 29%;
-    	height: auto;
-    	background: transparent;
-	    align-self: flex-end;
+		width: 29%;
+		height: auto;
+		background: transparent;
+		align-self: flex-end;
+    	position: relative;
 
-	    &::before {
-		    content: "";
-		    padding-top: 100%;
-		    position: relative;
-		    display: block; 	
-	    }		
+		&::before {
+			content: "";
+			padding-top: 100%;
+			position: relative;
+			display: block; 	
+		}		
 
 
 		.game-card {
-		    border-radius: 0;
-		    border-top-left-radius: 60% 70%;
-		    border-top-right-radius: 60% 70%;
-		    background-position: 45% 23% !important;
-    		background-size: 200% auto;
-		    width: 100%;
-    		height: auto;
-		    position: absolute;
-		    left: 0;
-		    bottom: 0;
+			border-radius: 0;
+			border-top-left-radius: 60% 70%;
+			border-top-right-radius: 60% 70%;
+			background-position: 45% 23% !important;
+			background-size: 200% auto;
+			width: 100%;
+			height: auto;
+			position: absolute;
+			left: 0;
+			bottom: 0;
 
-		    &::before {
-			    content: "";
-			    padding-top: 115%;
-			    position: relative;
-			    display: block; 	
-		    }	
+			&::before {
+				content: "";
+				padding-top: 115%;
+				position: relative;
+				display: block; 	
+			}	
 		}
 
 		.frame {
-		    background: url(images/hero_frame.png) bottom left no-repeat;
-		    width: 125%;
-		    position: absolute;
-		    background-size: contain;
-		    left: 0;
-		    bottom: -5%;
+			background: url(images/hero_frame.png) bottom left no-repeat;
+			width: 125%;
+			position: absolute;
+			background-size: contain;
+			left: 0;
+			bottom: -5%;
 
-		    &::before {
-			    content: "";
-			    padding-top: 100%;
-			    position: relative;
-			    display: block; 	
-		    }		
+			&::before {
+				content: "";
+				padding-top: 100%;
+				position: relative;
+				display: block; 	
+			}		
 		}
 
 
 		&.option-on::before {
 			content: "";
-		    border: 3px solid #31C331;
-		    position: absolute;
-		    top: 0;
-		    bottom: 0;
-		    left: 0;
-		    right: 0;
+			border: 0.25em solid #31C331;
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
 			border-top-left-radius: 60% 70%;
 			border-top-right-radius: 60% 70%;
 		}
 
 		.health {
 			position: absolute;
-		    font-size: 1.3em;
-			line-height: 1.3em;
-		    bottom: -5%;
-		    right: -7%;
+			font-size: 1.3em;
+			line-height: 1.6em;
+			bottom: -5%;
+			right: -7%;
 			color: white;
 			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 			font-weight: bold;
@@ -259,7 +338,21 @@
 		}
 
 		.card__stats__attack {
-			bottom: -15px;
+		    width: 40%;
+		    bottom: -7%;
+		    left: -16%;
+
+			span {
+				position: absolute;
+				display: inline-block;
+				text-align: center;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				line-height: 3.3em;
+				font-size: 1.1em;
+			}
 		}
 	}
 
@@ -267,6 +360,7 @@
 		position: absolute;
 		width: 100%;
 		height: 100%;
+		top: 0;
 
 
 		.secret {
@@ -286,23 +380,23 @@
 			right: auto;
 
 			&:nth-of-type(1) {
-			    left: 50%;
+				left: 50%;
 			}
 			&:nth-of-type(2) {
-			    left: 17px;
-			    top: -10px;
+				left: 17px;
+				top: -10px;
 			}
 			&:nth-of-type(3) {
-			    right: -15px;
-			    top: -10px;
+				right: -15px;
+				top: -10px;
 			}
 			&:nth-of-type(4) {
-			    left: 0px;
-			    top: 20px;
+				left: 0px;
+				top: 20px;
 			}
 			&:nth-of-type(5) {
-			    right: -30px;
-			    top: 20px;
+				right: -30px;
+				top: 20px;
 			}
 		}
 	}
@@ -319,27 +413,29 @@
 
 		&.frozen {
 			background-color: #66A8CE;
-		    background: url(images/hero_frozen.png) center center no-repeat;
-		    background-size: contain;
-		    height: 160%;
-		    height: 150%;
-		    width: 160%;
-		    position: absolute;
-		    left: -35%;
-		    top: -26%;
+			background: url(images/hero_frozen.png) center center no-repeat;
+			background-size: contain;
+			height: 160%;
+			height: 150%;
+			width: 160%;
+			position: absolute;
+			left: -35%;
+			top: -26%;
 		}
 	}
 }
 
 .bottom .hero {
 
+	height: 28%;
+
 	.avatar {
-    	// margin-top: 2%;
-   	 	align-self: flex-start;
-    	padding-top: 2%;
+		// margin-top: 2%;
+		align-self: flex-start;
+		padding-top: 2%;
 	}
 
 	.power-container {
-		margin-bottom: 13%;	
+		margin-bottom: 4%;	
 	}
 }

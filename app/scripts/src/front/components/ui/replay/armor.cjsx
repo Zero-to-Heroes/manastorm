@@ -21,8 +21,6 @@ class Armor extends React.Component
 		return null unless hero and hero.tags.ARMOR > 0
 		cls = 'armor'
 
-		return <div className={cls}>
-			{hero.tags.ARMOR}
-		</div>
+		return <div className={cls}><span>{hero.tags.ARMOR}</span></div>
 
 module.exports = Armor

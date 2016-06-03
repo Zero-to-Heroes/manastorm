@@ -17,8 +17,6 @@ class HeroAttack extends React.Component
 
 		cls = 'card__stats__attack'
 
-		return <div className={cls}>
-			{hero.tags.ATK}
-		</div>
+		return <div className={cls}><span>{hero.tags.ATK}</span></div>
 
 module.exports = HeroAttack
