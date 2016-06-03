@@ -41,6 +41,8 @@ Hand = React.createClass
 
 		cards = active.map (entity) ->
 			margin = -6
+			if active.length == 7
+				margin = -7
 			if active.length == 8
 				margin = -8
 			else if active.length == 9
