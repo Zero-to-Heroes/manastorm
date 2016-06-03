@@ -410,6 +410,9 @@ class ReplayPlayer extends EventEmitter
 		# Blur during mulligan
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return true
+		# Same for discover
+		if @discoverAction
+			return true
 
 		return false
 

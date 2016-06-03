@@ -145,8 +145,10 @@ class Replay extends React.Component
 			playButton = <Button glyph="pause" onClick={@onClickPause}/>
 
 		blur = ""
+		overlayCls = "overlay"
 		if replay.choosing()
 			blur = "blur"
+			overlayCls += " silent"
 
 		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style}>
@@ -169,7 +171,7 @@ class Replay extends React.Component
 							</div>
 							<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 						</div>
-						<div className="overlay">
+						<div className={overlayCls}>
 							{topOverlay}
 							{bottomOverlay}
 						</div>
