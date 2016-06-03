@@ -148,7 +148,7 @@ class Replay extends React.Component
 		if replay.choosing()
 			blur = "blur"
 
-		console.log 'applying style', @state.style
+		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style}>
 					<ReactTooltip />
 					<div className="additional-controls">
