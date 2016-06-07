@@ -44,7 +44,7 @@ Hand = React.createClass
 			if active.length == 7
 				margin = -7
 			if active.length == 8
-				margin = -8
+				margin = -9
 			else if active.length == 9
 				margin = -10
 			else if active.length == 10
