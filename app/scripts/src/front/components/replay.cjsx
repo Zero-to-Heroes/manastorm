@@ -30,7 +30,9 @@ class Replay extends React.Component
 	constructor: (props) ->
 		super(props)
 
+		# @reloadGame props.route.replay
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
+		console.log 'replay-player created'
 
 		@state.style = {}
 
@@ -48,6 +50,13 @@ class Replay extends React.Component
 		subscribe @state.replay, 'moved-timestamp', =>
 			#console.log 'in moved-timestamp'
 			setTimeout @callback, 300
+
+		subscribe @state.replay, 'game-generated', =>
+			@gameGenerated = true
+
+		# subscribe @state.replay, 'reload-game', (newGame) =>
+		# 	console.log 'reloading', newGame
+		# 	@reloadGame newGame
 
 		console.log 'before init', @mounted
 		#console.log('sub', @sub)
@@ -88,6 +97,7 @@ class Replay extends React.Component
 
 	render: ->
 		replay = @state.replay
+		# return null unless @gameGenerated
 
 		#console.log 'rerendering replay'
 
@@ -123,6 +133,7 @@ class Replay extends React.Component
 
 		else 
 			console.warn 'Missing players', replay.players
+			return null
 
 
 		targets = []

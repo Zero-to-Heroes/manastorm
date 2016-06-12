@@ -13,11 +13,14 @@ var joustjs = {
 	init: function(config, review) {
 		var replayXml = review.replayXml;
 		joustjs.loadReplay(replayXml);
+		console.log('ext player init in joustjs.src')
 	},
 
 	loadReplay: function(replayXml) {
-		// console.log('serializing to string', replayXml)
-		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+		console.log('serializing to string', replayXml)
+		if (replayXml) {
+			var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+		}
 		//console.log('string xml', strReplayXml);
 
 		//require('coffee-react/register');
@@ -25,6 +28,12 @@ var joustjs = {
 		bundle.init(strReplayXml);
 
 		window.replay.cardUtils = window['parseCardsText']
+	},
+
+	reload: function(replayXml) {
+		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+		console.log('in reload in joustjs.src', window.replay)
+		window.replay.reload(strReplayXml)
 	},
 
 	goToTimestamp: function(turnNumber) {

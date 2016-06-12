@@ -5,6 +5,7 @@ HistoryItem = require './history-item'
 ActionParser = require './action-parser'
 _ = require 'lodash'
 EventEmitter = require 'events'
+HSReplayParser = require './parsers/hs-replay'
 
 class ReplayPlayer extends EventEmitter
 	constructor: (@parser) ->
@@ -15,6 +16,13 @@ class ReplayPlayer extends EventEmitter
 		@currentTurn = 0
 		@currentActionInTurn = 0
 		@cardUtils = window['parseCardsText']
+
+	reload: (xmlReplay) ->
+		@parser.xmlReplay = xmlReplay
+		# EventEmitter.call(this)
+		console.log 'init parser', @parser, xmlReplay
+		@init()
+
 
 	init: ->
 		# console.log 'starting init in joustjs'
@@ -47,6 +55,9 @@ class ReplayPlayer extends EventEmitter
 		}
 
 		@buildCardLink = @cardUtils.buildCardLink
+
+		if !@parser.xmlReplay
+			return
 
 		@parser.parse(this)
 
