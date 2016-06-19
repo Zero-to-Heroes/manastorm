@@ -1,5 +1,5 @@
 React = require 'react'
-{Window, Toolbar} = require 'react-photonkit'
+# {Window, Toolbar} = require 'react-photonkit'
 
 module.exports = Application = React.createClass
 	render: ->

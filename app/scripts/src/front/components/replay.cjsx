@@ -1,7 +1,7 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 
-{ButtonGroup, Button} = require 'react-photonkit'
+# {ButtonGroup, Button} = require 'react-photonkit'
 ReplayPlayer = require '../../replay/replay-player'
 HSReplayParser = require '../../replay/parsers/hs-replay'
 PlayerName = require './ui/replay/player-name'
@@ -150,10 +150,10 @@ class Replay extends React.Component
 				targets.push <Target source={source} target={target} type={replay.targetType} key={replay.targetSource + '' + targetId}/>
 
 		# {playButton}
-		playButton = <Button glyph="play" onClick={@onClickPlay} />
+		playButton = <button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay} />
 
 		if @state.replay.speed > 0
-			playButton = <Button glyph="pause" onClick={@onClickPause}/>
+			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
 
 		blur = ""
 		overlayCls = "overlay"
@@ -189,13 +189,13 @@ class Replay extends React.Component
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
 					<form className="replay__controls padded">
-						<ButtonGroup>
-							<Button glyph="fast-backward" onClick={@goPreviousTurn}/>
-							<Button glyph="to-start" onClick={@goPreviousAction}/>
+						<div className="btn-group">
+							 <button className="btn btn-default glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
+							 <button className="btn btn-default glyphicon glyphicon-step-backward" onClick={@goPreviousAction}/>
 							{playButton}
-							<Button glyph="to-end" onClick={@goNextAction}/>
-							<Button glyph="fast-forward" onClick={@goNextTurn}/>
-						</ButtonGroup>
+							 <button className="btn btn-default glyphicon glyphicon-step-forward" onClick={@goNextAction}/>
+							 <button className="btn btn-default glyphicon glyphicon-forward" onClick={@goNextTurn}/>
+						</div>
 						<Timeline replay={replay} />
 						<div className="playback-speed">
 							<div className="dropup"> 

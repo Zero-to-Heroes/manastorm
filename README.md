@@ -2,3 +2,4 @@
 	-> HACK: comment out in node_modules, no idea if there is something better to do. Filed question at https://github.com/react-photonkit/react-photonkit/issues/18
 remove fs in hs-replay
 remove photon css declaration
+	-> same file
