@@ -2,37 +2,43 @@
 	flex-grow: 1;
 	display: table-cell;
     vertical-align: middle;
+    display: flex;
+}
+
+.timeline .timeline-container {
+    display: flex;
+    width: 100%;
 }
 
 .timeline .time-display {
-	vertical-align: middle;
+	// vertical-align: middle;
 	text-align: center;
-	display: table-cell;
-	color: #2E2E2E;
+	// display: table-cell;
+	color: #68471f;
 	width: 50px;
-	padding-top: 10px;
+	// padding-top: 10px;
+	margin-top: auto;
+	margin-bottom: auto;
 }
 
 .timeline .scrub-bar {
 	cursor: pointer;
-	display: table-cell;
-}
-
-.timeline .timeline-container {
-    display: table;
-    width: 100%;
+	// display: table-cell;
+	flex-grow: 1;
+	display: flex;
 }
 
 .scrub-bar .slider {
 	vertical-align: middle;
-    margin-top: 24px;
-    margin-bottom: 14px;
-    height: 2px;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: 4px;
     cursor: pointer;
-    background-color: #000;
+    background-color: #68471f;
+    flex-grow: 1;
 }
 
 .scrub-bar .current-time {
 	background-color: #fff;
-	height: 2px;
+	height: 4px;
 }

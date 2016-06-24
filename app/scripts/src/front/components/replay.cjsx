@@ -150,10 +150,10 @@ class Replay extends React.Component
 				targets.push <Target source={source} target={target} type={replay.targetType} key={replay.targetSource + '' + targetId}/>
 
 		# {playButton}
-		playButton = <button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay} />
+		playButton = <button className="btn btn-default btn-control glyphicon glyphicon-play" onClick={@onClickPlay} />
 
 		if @state.replay.speed > 0
-			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
+			playButton = <button className="btn btn-default btn-control glyphicon glyphicon-pause" onClick={@onClickPause}/>
 
 		blur = ""
 		overlayCls = "overlay"
@@ -190,16 +190,16 @@ class Replay extends React.Component
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
 					<form className="replay__controls padded">
 						<div className="btn-group">
-							 <button className="btn btn-default glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
-							 <button className="btn btn-default glyphicon glyphicon-step-backward" onClick={@goPreviousAction}/>
+							 <button className="btn btn-default btn-control glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
+							 <button className="btn btn-default btn-control glyphicon glyphicon-step-backward" onClick={@goPreviousAction}/>
 							{playButton}
-							 <button className="btn btn-default glyphicon glyphicon-step-forward" onClick={@goNextAction}/>
-							 <button className="btn btn-default glyphicon glyphicon-forward" onClick={@goNextTurn}/>
+							 <button className="btn btn-default btn-control glyphicon glyphicon-step-forward" onClick={@goNextAction}/>
+							 <button className="btn btn-default btn-control glyphicon glyphicon-forward" onClick={@goNextTurn}/>
 						</div>
 						<Timeline replay={replay} />
 						<div className="playback-speed">
 							<div className="dropup"> 
-								<button className="btn btn-default dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
+								<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
 								<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
 									<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
 									<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
