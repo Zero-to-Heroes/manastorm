@@ -90,7 +90,7 @@ class Replay extends React.Component
 
 	callback: =>
 		if !@mounted
-			console.log 'waiting for callback', @mounted
+			# console.log 'waiting for callback', @mounted
 			setTimeout @callback, 50
 		else
 			@forceUpdate()
