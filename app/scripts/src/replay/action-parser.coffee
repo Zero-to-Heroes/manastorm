@@ -143,6 +143,7 @@ class ActionParser extends EventEmitter
 	addAction: (currentTurnNumber, action) ->
 		# Keep the initial game order
 		action.index = action.index || action.initialCommand.index
+		action.rollbackInfo = {}
 		action.initialCommand.associatedAction = action
 		@turns[currentTurnNumber].actions.push action
 

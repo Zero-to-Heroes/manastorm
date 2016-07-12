@@ -4,12 +4,42 @@ ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
 _ = require 'lodash'
 
 Target = React.createClass
-	componentDidMount: ->
-		#console.log 'target component did mount'
+
+	getInitialState: ->
+		return {hidden: "hidden"}
+
+	componentWillMount: ->
+		# console.log 'will mount', Date.now()
+		that = this
+		@retries = 40
+		setTimeout ->
+			that.show()
+		, 20
+
+	# componentWillUnmount: ->
+	# 	console.log 'will unmount'
+	# 	#console.log 'target component did mount'
+
+	# Need that for going back in the replay, as one of the cards may already be there, while the other isn't
+	show: ->
+		@retries--
+
+		that = this
+		# console.log 'showing?', @props
+		if @props.source or @props.target
+			# console.log 'really showing?'
+			if @retries > 0 and (!@props.source?.centerX or !@props.target?.centerX)
+				# console.log 'waiting to render'
+				setTimeout ->
+					that.show()
+				, 50
+			else
+				# console.log 'yes', @props
+				@setState({hidden: ""})
 
 	render: ->
-		#console.log 'trying to render target', @props
-		return null unless @props.source && @props.target
+		return null unless (@props.source and @props.target and @props.source?.centerX and @props.target?.centerX)
+		# console.log 'trying to render target', @props, Date.now()
 
 		sourceDims = @props.source.getDimensions()
 		# console.log 'sourceDims', sourceDims
@@ -52,7 +82,10 @@ Target = React.createClass
 
 		else  
 			arrowHeight = Math.sqrt(Math.pow(sourceDims.centerY - targetDims.centerY, 2) + Math.pow(sourceDims.centerX - targetDims.centerX, 2))
+			# console.log 'arrowHeight', arrowHeight
+
 			angle = Math.atan((targetDims.centerX - sourceDims.centerX) / (sourceDims.centerY - targetDims.centerY))
+			# console.log 'angle', angle
 
 			transform += 'rotate(' + angle + 'rad)'
 
@@ -60,37 +93,26 @@ Target = React.createClass
 			if sourceDims.centerY < targetDims.centerY
 				transform += 'rotate(180deg) '
 
-			# Now the angle - we want to keep it signed, which is why we don't use arrowWidth here
-			# tanAlpha = (sourceDims.centerX - targetDims.centerX) * 1.0 / arrowHeight
-			# alpha = Math.atan(tanAlpha) * 180 / Math.PI
-			# if sourceDims.centerY < targetDims.centerY
-			# 	alpha = -alpha
-
-			# console.log 'angle is', alpha
-			# transform += 'skewX(' + alpha + 'deg)'
-
-			# And readjust the origin
-			# alpha = alpha * Math.PI / 180
 			left = Math.min(sourceDims.centerX, targetDims.centerX) + (Math.max(sourceDims.centerX, targetDims.centerX) - Math.min(sourceDims.centerX, targetDims.centerX)) / 2 - containerLeft
 			# console.log 'readjusted left', left
-			# left = left + Math.tan(Math.abs(alpha)) * arrowHeight / 2
-			# console.log 'final left', left, alpha, arrowWidth, Math.cos(alpha), Math.cos(alpha) * arrowWidth / 2
-			# console.log 'final left', left, alpha, arrowHeight, Math.tan(alpha), Math.tan(alpha) * arrowHeight / 2
-			# console.log 'final top', Math.min(sourceDims.centerY, targetDims.centerY) - containerTop, containerTop
 
 			# That's the top of the arrow when not rotated
 			top = Math.min(sourceDims.centerY, targetDims.centerY) - containerTop
+			# console.log 'top', top
+
 			# Offset for rotation
 			if Math.abs(sourceDims.centerX - targetDims.centerX) > 10
 				topOffset = arrowHeight / 2 * (1 - Math.sin(angle) / Math.tan(angle))
 				top -= topOffset
+				# console.log 'offset', topOffset, top
+
 			# Offset to target the center of the element
 			# console.log 'sourceDims', @props.source.dimensions
 			topOffset = (@props.source?.dimensions?.bottom - @props.source?.dimensions?.top) / 3
 			top += topOffset
 			height = arrowHeight - 1.5 * topOffset
 
-		cls = "target " + @props.type
+		cls = "target " + @props.type + " " + @state.hidden
 
 		style = {
 			height: height

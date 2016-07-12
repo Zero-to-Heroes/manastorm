@@ -24,6 +24,10 @@ TurnLog = React.createClass
 				@logs.push logLine
 			# @forceUpdate()
 
+		@subs.add @replay, 'previous-action', (action) =>
+			popped = @logs.pop()
+			console.log 'popping last element from game log', popped
+
 		@subs.add @replay, 'new-turn', (turn) =>
 			newLog = @buildTurnLog turn
 			@logs.push newLog
