@@ -6,7 +6,7 @@ class HistoryItem
 
 	execute: (replay, action) ->
 		if @command
-			# console.log 'calling command', @command, @node, action, @timestamp
+			# console.log 'calling command', @command, @node.id, @node, action, @timestamp
 			if action
 				# console.log '\t\tcalling command', @command, @node, action, @timestamp
 				replay[@command](@node, action)

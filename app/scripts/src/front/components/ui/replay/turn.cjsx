@@ -7,6 +7,7 @@ Turn = React.createClass
 
 	render: ->
 		return null unless @props.replay
+		console.log 'rendering turn'
 
 		cls = 'current-turn'
 		if @props.active

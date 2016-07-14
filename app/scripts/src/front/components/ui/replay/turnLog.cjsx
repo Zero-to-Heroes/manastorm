@@ -42,6 +42,8 @@ TurnLog = React.createClass
 	render: ->
 		return null unless @props.show
 
+		console.log 'rendering turnLog'
+
 		return 	<div className="turn-log background-white">
 					<div className="close" onClick={@props.onClose}></div>
 					<div className="log-container" id="turnLog">

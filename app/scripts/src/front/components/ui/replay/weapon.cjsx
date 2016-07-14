@@ -38,14 +38,16 @@ class Weapon extends Card
 		atkCls = "card__stats__attack"
 		if originalCard
 			originalAtk = originalCard.attack
-			if @props.entity.tags.ATK > originalAtk
+			tagAtk = @props.entity.tags.ATK || originalAtk
+			if tagAtk > originalAtk
 				atkCls += " buff"
-			else if @props.entity.tags.ATK < originalAtk
+			else if tagAtk < originalAtk
 				atkCls += " debuff"
 
+		tagDurability = @props.entity.tags.DURABILITY || originalCard.durability
 		stats = <div className="card__stats">
-			<div className={atkCls}><span>{@props.entity.tags.ATK or 0}</span></div>
-			<div className={healthClass}><span>{@props.entity.tags.DURABILITY - (@props.entity.tags.DAMAGE or 0)}</span></div>
+			<div className={atkCls}><span>{tagAtk or 0}</span></div>
+			<div className={healthClass}><span>{tagDurability - (@props.entity.tags.DAMAGE or 0)}</span></div>
 		</div>
 
 		link = '<img src="' + art + '">';

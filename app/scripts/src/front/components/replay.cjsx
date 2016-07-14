@@ -72,7 +72,7 @@ class Replay extends React.Component
 		@displayConf = {
 			showLog: false
 		}
-		console.log 'new version'
+		# console.log 'new version'
 
 
 	componentDidMount: ->
@@ -99,10 +99,10 @@ class Replay extends React.Component
 		replay = @state.replay
 		# return null unless @gameGenerated
 
-		#console.log 'rerendering replay'
+		console.log 'rerendering replay'
 
 		if replay.players.length == 2
-			#console.log 'All players are here'
+			console.log 'All players are here'
 
 			topArea = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
@@ -130,6 +130,7 @@ class Replay extends React.Component
 				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 			</div>
+			console.log 'components are ok'
 
 		else 
 			console.warn 'Missing players', replay.players
@@ -161,7 +162,7 @@ class Replay extends React.Component
 			blur = "blur"
 			overlayCls += " silent"
 
-		# console.log 'applying style', @state.style
+		console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style}>
 					<ReactTooltip />
 					<div className="additional-controls">

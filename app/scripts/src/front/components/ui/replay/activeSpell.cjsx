@@ -5,6 +5,7 @@ ActiveSpell = React.createClass
 	componentDidMount: ->
 
 	render: ->
+		console.log 'rendering activeSpell'
 		@spell = @props.replay.activeSpell
 
 		return null unless @spell

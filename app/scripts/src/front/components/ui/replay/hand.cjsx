@@ -30,6 +30,7 @@ Hand = React.createClass
 		#@subs.off()
 
 	render: ->
+		console.log 'rendering hand'
 		return <div className="hand"></div> unless @props.entity.tags.MULLIGAN_STATE is 4
 
 		active = _.filter @props.entity.getHand(), (entity) -> entity.tags.ZONE_POSITION > 0

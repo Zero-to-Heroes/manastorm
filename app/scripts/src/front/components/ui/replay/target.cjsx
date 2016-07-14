@@ -39,7 +39,7 @@ Target = React.createClass
 
 	render: ->
 		return null unless (@props.source and @props.target and @props.source?.centerX and @props.target?.centerX)
-		# console.log 'trying to render target', @props, Date.now()
+		console.log 'trying to render target', @props, Date.now()
 
 		sourceDims = @props.source.getDimensions()
 		# console.log 'sourceDims', sourceDims

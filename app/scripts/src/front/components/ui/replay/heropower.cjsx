@@ -9,6 +9,7 @@ Armor = require './armor'
 class HeroPower extends Card
 
 	render: ->
+		console.log 'rendering HeroPower'
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
@@ -26,16 +27,19 @@ class HeroPower extends Card
 
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 		costCls = "mana-cost"
+		console.log 'getting cost from', originalCard, @props.entity
 		originalCost = originalCard.cost
-		if @props.entity.tags.COST < originalCost
+		tagCost = @props.entity.tags.COST || originalCost
+		if tagCost < originalCost
 			costCls += " lower-cost"
-		else if @props.entity.tags.COST > originalCost
+		else if tagCost > originalCost
 			costCls += " higher-cost"
-		cost = <div className={costCls}>{@props.entity.tags.COST or 0}</div>
+		cost = <div className={costCls}>{tagCost or 0}</div>
 
 		# cost = <div className="mana-cost">2</div>
 
 		link = '<img src="' + art + '">';
+		console.log '\theropower rendered'
 		return 	<div className="power-container" data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
 					<div className={cls}>
 						<div className="game-card" style={style}></div>

@@ -10,6 +10,7 @@ HeroAttack = require './heroAttack'
 class HeroCard extends Card
 
 	render: ->
+		console.log 'rendering HeroCard'
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 

@@ -12,6 +12,7 @@ class Card extends React.Component
 		# 		@forceUpdate()
 
 	render: ->
+		console.log 'rendering card'
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
@@ -29,12 +30,14 @@ class Card extends React.Component
 			if @props.cost and !@props.isInfoConcealed
 				# console.log 'showing card cost', @props.entity.cardID, @props.entity, !@props.isInfoConcealed
 				costCls = "card-cost"
+				console.log 'getting card cost from', originalCard, @props.entity
 				originalCost = originalCard.cost
-				if @props.entity.tags.COST < originalCost
+				tagCost = @props.entity.tags.COST || originalCost
+				if tagCost < originalCost
 					costCls += " lower-cost"
-				else if @props.entity.tags.COST > originalCost
+				else if tagCost > originalCost
 					costCls += " higher-cost"
-				cost = <div className={costCls}><span>{@props.entity.tags.COST or 0}</span></div>
+				cost = <div className={costCls}><span>{tagCost or 0}</span></div>
 		else
 			style = {}
 			cls = "game-card"
@@ -90,18 +93,21 @@ class Card extends React.Component
 		atkCls = "card__stats__attack"
 		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed
 			originalAtk = originalCard.attack
-			if @props.entity.tags.ATK > originalAtk
+			tagAtk = @props.entity.tags.ATK || originalAtk
+			if tagAtk > originalAtk
 				atkCls += " buff"
-			else if @props.entity.tags.ATK < originalAtk
+			else if tagAtk < originalAtk
 				atkCls += " debuff"
 
 			originalHealth = originalCard.health
-			if @props.entity.tags.HEALTH > originalHealth
+			tagHealth = @props.entity.tags.HEALTH || originalHealth
+			if tagHealth > originalHealth
 				healthClass += " buff"
 
+			tagDurability = @props.entity.tags.DURABILITY || originalCard.durability
 			stats = <div className="card__stats">
-				<div className={atkCls}><span>{@props.entity.tags.ATK or 0}</span></div>
-				<div className={healthClass}><span>{(@props.entity.tags.HEALTH or @props.entity.tags.DURABILITY) - (@props.entity.tags.DAMAGE or 0)}</span></div>
+				<div className={atkCls}><span>{tagAtk or 0}</span></div>
+				<div className={healthClass}><span>{(tagHealth or tagDurability) - (@props.entity.tags.DAMAGE or 0)}</span></div>
 			</div>
 
 
@@ -127,7 +133,7 @@ class Card extends React.Component
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
 
-		
+		console.log '\tcard rendered'
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden

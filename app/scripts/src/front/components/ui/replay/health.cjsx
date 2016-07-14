@@ -17,6 +17,7 @@ class Health extends React.Component
 		#@subs.off()
 
 	render: ->
+		console.log 'rendering health'
 		hero = @props.entity
 		return null unless hero
 		cls = 'health'

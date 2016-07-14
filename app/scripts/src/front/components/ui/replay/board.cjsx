@@ -14,6 +14,7 @@ class Board extends React.Component
 		# 	@forceUpdate()
 
 	render: ->
+		console.log 'rendering board'
 		cardsMap = []
 		tooltip = @props.tooltips
 		replay = @props.replay

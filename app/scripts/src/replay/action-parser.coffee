@@ -385,7 +385,7 @@ class ActionParser extends EventEmitter
 		# Mulligan opponent
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.attributes.entity != @mainPlayerId and command.tags
 			mulliganed = []
-			console.log 'debug opponent mulligan', command, command.tags
+			# console.log 'debug opponent mulligan', command, command.tags
 			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value == 2
 					@turns[@currentTurnNumber].opponentMulligan.push tag.entity

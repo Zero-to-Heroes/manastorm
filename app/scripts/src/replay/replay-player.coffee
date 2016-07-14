@@ -438,7 +438,7 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			# if !@history[@historyPosition].executed
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[@currentTurn]
 				action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -569,7 +569,7 @@ class ReplayPlayer extends EventEmitter
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
-		console.log 'receiving player', entity
+		# console.log 'receiving player', entity
 
 		if entity.tags.CURRENT_PLAYER
 			@player = entity
@@ -589,8 +589,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		if change.tag is 'MULLIGAN_STATE'
-			console.log 'receiving tag change', change, @entities[change.entity]
+		# if change.tag is 'MULLIGAN_STATE'
+		# 	console.log 'receiving tag change', change, @entities[change.entity]
 
 		tags = {}
 		tags[change.tag] = change.value
@@ -604,11 +604,11 @@ class ReplayPlayer extends EventEmitter
 				tags: tags
 			}, this
 
-		if change.tag is 'MULLIGAN_STATE'
-			console.log '\tprocessed tag change', change, @entities[change.entity]
+		# if change.tag is 'MULLIGAN_STATE'
+		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		# console.log 'receiving show entity', definition
+		console.log 'receiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
