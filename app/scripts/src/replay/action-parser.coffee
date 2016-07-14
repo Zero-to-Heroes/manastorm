@@ -191,6 +191,7 @@ class ActionParser extends EventEmitter
 			@currentPlayer = @players[++@playerIndex % 2]	
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
+				@currentPlayer = @players[++@playerIndex % 2]
 
 
 	parseStartOfTurn: (item) ->
