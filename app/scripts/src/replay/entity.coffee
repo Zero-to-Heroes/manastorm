@@ -24,6 +24,7 @@ class Entity extends EventEmitter
 
 	update: (definition, action) ->
 		old = _.assign {}, @tags
+		# console.log 'updating entity', this, definition, action
 
 		if definition.tags.ZONE
 			@lastZone = old.ZONE

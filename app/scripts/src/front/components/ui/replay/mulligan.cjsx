@@ -13,9 +13,10 @@ class Mulligan extends React.Component
 		#@sub.off()
 
 	render: ->
+		# console.log 'rendering mulligan?', @props.entity, @props.entity.getHand(), @props.mulligan
 		return null unless @props.entity.tags.MULLIGAN_STATE < 4
 
-		#console.log 'rendering mulligan', @props.entity, @props.entity.getHand(), @props.mulligan
+		# console.log '\tyes'
 		hidden = @props.isHidden
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
 			#console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan

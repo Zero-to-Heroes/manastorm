@@ -89,7 +89,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		# console.log 'init done in joustjs'
+		console.log 'init done in joustjs'
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -145,6 +145,7 @@ class ReplayPlayer extends EventEmitter
 			# targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
 
 			# @goToTimestamp targetTimestamp
+			console.log 'going to turn', @turns[@currentTurn]
 			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
@@ -260,7 +261,7 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn
+		console.log 'going to action', @currentActionInTurn
 		if @currentActionInTurn >= 0
 			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -300,7 +301,7 @@ class ReplayPlayer extends EventEmitter
 
 	goToTurn: (turn) ->
 		targetTurn = parseInt(turn)
-		# console.log 'going to turn', targetTurn
+		console.log 'going to turn', targetTurn
 
 		@currentTurn = 0
 		@currentActionInTurn = 0
@@ -434,7 +435,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	update: ->
-		console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
+		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			# if !@history[@historyPosition].executed
 			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
@@ -450,6 +451,8 @@ class ReplayPlayer extends EventEmitter
 		if @history[@historyPosition - 1]?.timestamp
 			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
 			# console.log '\tupdating timestamp', @currentReplayTime
+
+		# console.log 'update finished'
 
 	rollbackAction: (action) ->
 		# console.log 'going backwards', action
@@ -482,6 +485,7 @@ class ReplayPlayer extends EventEmitter
 		return false
 
 	updateOptions: ->
+		# console.log 'updating options'
 		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
 		if !@history[@historyPosition]?.parent and @getActivePlayer() == @player
 			# console.log 'updating options', @history.length, @historyPosition
@@ -525,6 +529,7 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'switched main player, new one is', @mainPlayerId, @player
 
 	getController: (controllerId) ->
+		# console.log 'getting controller', @player, @opponent, this
 		if @player.tags.CONTROLLER == controllerId
 			return @player
 		return @opponent
@@ -560,11 +565,11 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		# console.log 'receiving player', definition
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
+		console.log 'receiving player', entity
 
 		if entity.tags.CURRENT_PLAYER
 			@player = entity
@@ -584,7 +589,9 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		# console.log 'receiving tag change', change
+		if change.tag is 'MULLIGAN_STATE'
+			console.log 'receiving tag change', change, @entities[change.entity]
+
 		tags = {}
 		tags[change.tag] = change.value
 
@@ -597,6 +604,9 @@ class ReplayPlayer extends EventEmitter
 				tags: tags
 			}, this
 
+		if change.tag is 'MULLIGAN_STATE'
+			console.log '\tprocessed tag change', change, @entities[change.entity]
+
 	receiveShowEntity: (definition, action) ->
 		# console.log 'receiving show entity', definition
 		if @entities[definition.id]
@@ -604,11 +614,26 @@ class ReplayPlayer extends EventEmitter
 		else
 			@entities[definition.id] = new Entity(definition, this)
 
+		# Since patch 5.2.0.13619, the first showEntity always comes from the current player
+		# Case of newer replay
+		if @player is null or @opponent is null
+			entity = @entities[definition.id]
+			# console.log 'setting player', definition, @entities[definition.id]
+			for player in @players
+				if player.tags.CONTROLLER is entity.tags.CONTROLLER
+					@player = player
+					# console.log '\tsetting player', @player
+				else 
+					@opponent = player
+					# console.log '\tsetting opponent', @opponent
+			console.log 'set player and opponent', @player, @opponent
+
 	receiveAction: (definition) ->
 		# console.log 'receiving action', definition
 		if definition.isDiscover
 			@discoverAction = definition
 			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
+		# console.log 'received action"'
 
 	receiveOptions: (options) ->
 		# console.log 'receiving options', options

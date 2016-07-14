@@ -60,6 +60,7 @@ class ActionParser extends EventEmitter
 				# Adding information that this entity is a secret
 				if item.node.tag == 'SECRET' and item.node.value == 1
 					@entities[item.node.entity].tags[item.node.tag] = item.node.value
+				# Since patch 5.2.0.13619, the CURRENT_PLAYER is sent afterwards as a tag change
 			if item.command == 'receiveShowEntity'
 				if item.node.tags.SECRET == 1
 					@entities[item.node.id].tags.SECRET = 1
@@ -188,6 +189,8 @@ class ActionParser extends EventEmitter
 
 		if item.command is 'receiveTagChange' and item.node.entity == 3 and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
 			@currentPlayer = @players[++@playerIndex % 2]	
+			if @turns[1]
+				@turns[1].index = Math.max @turns[1].index, item.index
 
 
 	parseStartOfTurn: (item) ->
