@@ -174,24 +174,22 @@ class ActionParser extends EventEmitter
 	parseMulliganTurn: (item) ->
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
-		if item.command is 'receiveTagChange' and item.node.entity == 2 and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
-			@turns[@turnNumber] = {
-				turn: 'Mulligan'
-				playerMulligan: []
-				opponentMulligan: []
-				timestamp: item.timestamp
-				actions: []
-				index: item.index
-			}
-			@turns.length++
-			@turnNumber++
-			@currentPlayer = @players[++@playerIndex % 2]
-
-		if item.command is 'receiveTagChange' and item.node.entity == 3 and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
-			@currentPlayer = @players[++@playerIndex % 2]	
+		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
-				@currentPlayer = @players[++@playerIndex % 2]
+				# @currentPlayer = @players[++@playerIndex % 2]
+			else 
+				@turns[@turnNumber] = {
+					turn: 'Mulligan'
+					playerMulligan: []
+					opponentMulligan: []
+					timestamp: item.timestamp
+					actions: []
+					index: item.index
+				}
+				@turns.length++
+				@turnNumber++
+				# @currentPlayer = @players[++@playerIndex % 2]
 
 
 	parseStartOfTurn: (item) ->
@@ -394,8 +392,7 @@ class ActionParser extends EventEmitter
 	# Not secrets
 	parseCardPlayedFromHand: (item) ->
 		command = item.node
-		if command.attributes.type == '7'
-
+		if command.attributes.type == '7' and command.tags
 			# Check that the entity was in our hand before
 			entity = @entities[command.attributes.entity]
 
@@ -473,7 +470,7 @@ class ActionParser extends EventEmitter
 
 	parseSecretPlayedFromHand: (item) ->
 		command = item.node
-		if command.attributes.type == '7'
+		if command.attributes.type == '7' and command.tags
 
 			playedCard = -1
 			secret = false

@@ -30,7 +30,6 @@ Hand = React.createClass
 		#@subs.off()
 
 	render: ->
-		console.log 'rendering hand'
 		return <div className="hand"></div> unless @props.entity.tags.MULLIGAN_STATE is 4
 
 		active = _.filter @props.entity.getHand(), (entity) -> entity.tags.ZONE_POSITION > 0
@@ -40,6 +39,7 @@ Hand = React.createClass
 		controller = @props.entity
 		isInfoConcealed = @props.isInfoConcealed
 
+		console.log 'rendering hand for', @props.entity
 		cards = active.map (entity) ->
 			margin = -6
 			if active.length == 7
@@ -55,7 +55,7 @@ Hand = React.createClass
 				marginLeft: margin + '%'
 			}
 
-			# console.log 'rendering card in hand', entity.cardID, entity
+			console.log 'rendering card in hand', entity.cardID, entity
 			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style}/>
 
 		return <div className="hand">

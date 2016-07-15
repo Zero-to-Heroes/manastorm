@@ -63,14 +63,14 @@ class ReplayPlayer extends EventEmitter
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
-		# console.log 'initializeGameState done'
+		console.log 'initializeGameState done'
 
 		# Parse the data to build the game structure
 		@actionParser = new ActionParser(this)
 		@actionParser.populateEntities()
-		# console.log 'popuplateEntities done'
+		console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		# console.log 'parseActions done'
+		console.log 'parseActions done'
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
@@ -89,7 +89,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		console.log 'init done in joustjs'
+		console.log 'init done in joustjs', @turns
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -437,14 +437,16 @@ class ReplayPlayer extends EventEmitter
 	update: ->
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
+			# console.log '\tgo'
 			# if !@history[@historyPosition].executed
-			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition]
+			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[@currentTurn]
 				action = @turns[@currentTurn].actions[@currentActionInTurn]
 
 			@history[@historyPosition].execute(this, action)
 			@historyPosition++
+			# console.log '\t\tprocessed'
 
 
 		@updateOptions()
@@ -541,18 +543,27 @@ class ReplayPlayer extends EventEmitter
 	initializeGameState: ->
 		# Find the index of the last FullEntity creation
 		index = 0
-		while @history[index].command isnt 'receiveAction'
-			# console.log '\tSkipping to first action', index
-			index++			
-			# console.log index, @history[index], @history
-		index++
-		# console.log index, @history[index], @history
-		while @history[index].command isnt 'receiveAction'
-			# console.log '\tSkipping to secdon action', index
+		# Go to first mulligan
+		while @history[index]
+			if @history[index].command is 'receiveAction'
+				lastAction = @history[index]
+			if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE'
+				break
 			index++
-			# console.log index, @history[index], @history
-		# console.log 'last index before action', index, @history[index], @history[index + 1]
-		@goToIndex @history[index].index
+
+		# while @history[index].command isnt 'receiveAction'
+		# 	# console.log '\tSkipping to first action', index
+		# 	index++			
+		# 	# console.log index, @history[index], @history
+		# index++
+		# # console.log index, @history[index], @history
+		# while @history[index].command isnt 'receiveAction'
+		# 	# console.log '\tSkipping to secdon action', index
+		# 	index++
+		# 	# console.log index, @history[index], @history
+		console.log 'last index before action', index, @history[index], @history[index + 1]
+		# @goToIndex @history[index].index
+		@goToIndex lastAction.index
 
 
 	# ==================
@@ -590,7 +601,7 @@ class ReplayPlayer extends EventEmitter
 
 	receiveTagChange: (change, action) ->
 		# if change.tag is 'MULLIGAN_STATE'
-		# 	console.log 'receiving tag change', change, @entities[change.entity]
+		# console.log '\t\treceiving tag change', change, @entities[change.entity]
 
 		tags = {}
 		tags[change.tag] = change.value
@@ -608,40 +619,42 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		console.log 'receiving show entity', definition.id, definition
+		console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
 			@entities[definition.id] = new Entity(definition, this)
 
-		# Since patch 5.2.0.13619, the first showEntity always comes from the current player
+		# Since patch 5.2.0.13619, the first showEntity with a cardID (and that is not an enchantment, cf tavern
+		# brawl conditions) always comes from the current player
 		# Case of newer replay
-		if @player is null or @opponent is null
+		if (@player is null or @opponent is null) and definition.cardID and definition.tags?.CARDTYPE != 6
 			entity = @entities[definition.id]
-			# console.log 'setting player', definition, @entities[definition.id]
+			console.log 'setting player', entity
 			for player in @players
 				if player.tags.CONTROLLER is entity.tags.CONTROLLER
 					@player = player
-					# console.log '\tsetting player', @player
+					console.log '\tsetting player', @player
 				else 
 					@opponent = player
-					# console.log '\tsetting opponent', @opponent
+					console.log '\tsetting opponent', @opponent
 			console.log 'set player and opponent', @player, @opponent
 
 	receiveAction: (definition) ->
-		# console.log 'receiving action', definition
+		# console.log '\t\treceiving action', definition
 		if definition.isDiscover
 			@discoverAction = definition
 			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
 		# console.log 'received action"'
 
 	receiveOptions: (options) ->
-		# console.log 'receiving options', options
+		console.log '\t\treceiving options', options
 
 		for k,v of @entities
 			v.highlighted = false
 
 		for option in options.options
+			console.log 'highlighting', @entities[option.entity]
 			@entities[option.entity]?.highlighted = true
 			# @entities[option.entity]?.emit 'option-on'
 

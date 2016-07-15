@@ -61,6 +61,7 @@ class Replay extends React.Component
 		console.log 'before init', @mounted
 		#console.log('sub', @sub)
 		@state.replay.init()
+
 		@mounted = true
 		console.log 'after init', @mounted
 		#console.log 'first init done'
@@ -86,14 +87,17 @@ class Replay extends React.Component
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
 			console.log 'built style', @state.style
-			@forceUpdate()
+			@callback()
 
 	callback: =>
 		if !@mounted
 			# console.log 'waiting for callback', @mounted
 			setTimeout @callback, 50
 		else
-			@forceUpdate()
+			try
+				@forceUpdate()
+			catch e
+				console.error 'issue in forceUpdate', e
 
 	render: ->
 		replay = @state.replay
@@ -102,6 +106,7 @@ class Replay extends React.Component
 		console.log 'rerendering replay'
 
 		if replay.players.length == 2
+			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
 			console.log 'All players are here'
 
 			topArea = <div className="top" >
@@ -114,7 +119,7 @@ class Replay extends React.Component
 			</div>
 
 			topOverlay = <div className="top" >
-				<Mulligan entity={replay.opponent} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
+				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
 				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
 			</div>
 
@@ -127,7 +132,7 @@ class Replay extends React.Component
 			</div>
 
 			bottomOverlay = <div className="bottom">
-				<Mulligan entity={replay.player} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
+				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 			</div>
 			console.log 'components are ok'
@@ -215,11 +220,12 @@ class Replay extends React.Component
 				</div>
 
 	goNextAction: (e) =>
+		# nononono.sendexception
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goNextAction()
 		start = new Date().getTime()
-		@forceUpdate()
+		@callback()
 		console.log 'force update took', new Date().getTime() - start
 
 	goPreviousAction: (e) =>
@@ -227,43 +233,43 @@ class Replay extends React.Component
 		@state.replay.pause()
 		@state.replay.goPreviousAction()
 		start = new Date().getTime()
-		@forceUpdate()
+		@callback()
 		console.log 'force update took', new Date().getTime() - start
 
 	goNextTurn: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goNextTurn()
-		@forceUpdate()
+		@callback()
 
 	goPreviousTurn: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goPreviousTurn()
-		@forceUpdate()
+		@callback()
 
 	onClickPlay: (e) =>
 		e.preventDefault()
 		@state.replay.autoPlay()
-		@forceUpdate()
+		@callback()
 
 	onClickPause: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
-		@forceUpdate()
+		@callback()
 
 	onClickChangeSpeed: (speed) ->
 		@state.replay.changeSpeed speed
-		@forceUpdate()
+		@callback()
 
 	onShowCardsChange: =>
 		@showAllCards = !@showAllCards
-		@forceUpdate()
+		@callback()
 
 	onMainPlayerSwitchedChange: =>
 		@mainPlayerSwitched = !@mainPlayerSwitched
 		@state.replay.switchMainPlayer()
-		@forceUpdate()
+		@callback()
 
 	onTurnClick: (e) =>
 		e.preventDefault()
@@ -272,13 +278,13 @@ class Replay extends React.Component
 			replay = @state.replay
 			setTimeout () ->
 				replay.cardUtils.refreshTooltips()
-		@forceUpdate()
+		@callback()
 
 	onGoToTurnClick: (turn, e) =>
 		console.log 'clicked to go to a turn', turn
 		# Mulligan is turn 1
 		@state.replay.goToTurn(turn + 1)
-		@forceUpdate()
+		@callback()
 		
 
 

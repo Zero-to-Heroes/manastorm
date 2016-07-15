@@ -12,7 +12,7 @@ class Card extends React.Component
 		# 		@forceUpdate()
 
 	render: ->
-		console.log 'rendering card'
+		# console.log 'rendering card'
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
@@ -133,7 +133,7 @@ class Card extends React.Component
 		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
 
-		console.log '\tcard rendered'
+		# console.log '\tcard rendered'
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if @props.entity.cardID && !@props.isHidden
