@@ -1,13 +1,13 @@
 .replay__controls {
-  	width: 100%;
-  	// display: table;
-  	background-color: #C3AA7D;
-    padding-top: 4%;
-    padding-bottom: 3%;
-    padding-left: 2%;
-    padding-right: 8px;
-    display: flex;
-    flex-wrap: wrap;
+	width: 100%;
+	// display: table;
+	background-color: #C3AA7D;
+	padding-top: 4%;
+	padding-bottom: 3%;
+	padding-left: 2%;
+	padding-right: 8px;
+	display: flex;
+	flex-wrap: wrap;
 }
 
 .replay__controls button {
@@ -21,12 +21,24 @@
 .replay__controls .playback-speed {
 	display: table-cell;
 	width: 70px;
-    text-align: right;
+	text-align: right;
 }
 
+@media screen and (max-width: 600px) {
+	.replay__controls {
+		// height: 100px;
+		padding-bottom: 100px;
+	}
+}
 @media screen and (max-width: 500px) {
 	// Controls need more space on mobile
 	.replay__controls .timeline {
 		display: none;
+	}
+}
+@media screen and (max-width: 400px) {
+	// Controls need more space on mobile
+	.replay__controls {
+		padding-right: 0;
 	}
 }

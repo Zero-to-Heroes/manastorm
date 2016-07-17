@@ -9,7 +9,7 @@ class Player extends Entity
 	getHand: ->
 		hand = _.filter @replay.entities, (entity) =>
 			entity.tags.ZONE is zones.HAND and entity.tags.CONTROLLER is @tags.CONTROLLER
-
+ 
 		return _.sortBy hand, (entity) -> entity.tags.ZONE_POSITION
 
 	getDeck: ->
