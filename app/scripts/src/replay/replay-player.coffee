@@ -97,14 +97,14 @@ class ReplayPlayer extends EventEmitter
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	pause: ->
-		console.log 'pausing'
+		# console.log 'pausing'
 		if @speed > 0
 			@previousSpeed = @speed
 		@speed = 0
 		clearInterval(@interval)
 
 	changeSpeed: (speed) ->
-		console.log 'changing speed'
+		# console.log 'changing speed'
 		@speed = speed
 		clearInterval(@interval)
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
@@ -116,6 +116,7 @@ class ReplayPlayer extends EventEmitter
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2)
 		else
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
+
 
 
 	# ========================
@@ -142,12 +143,6 @@ class ReplayPlayer extends EventEmitter
 
 			@emit 'new-turn', @turns[@currentTurn]
 
-			# Sometimes the first action in a turn isn't a card draw, but start-of-turn effects, so we can't easily skip 
-			# the draw card action (and also, it makes things a bit clearer when the player doesn't do anything on their turn)
-			# targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
-
-			# @goToTimestamp targetTimestamp
-			# console.log 'going to turn', @turns[@currentTurn]
 			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
@@ -218,49 +213,41 @@ class ReplayPlayer extends EventEmitter
 			if !lastIteration
 				@goPreviousAction true
 
-			# if changeTurn
-			# 	@emit 'previous-action', rollbackAction
-
 			# hack to handle better all targeting, active spell and so on
 			# ultimately all the info should be contained in the action itself and we only read from it
 			if lastIteration
-				# @emit 'previous-action', rollbackAction
 				@goNextAction()
 
-		# @currentTurn = 0
-		# @currentActionInTurn = -1
-		# @init()
-
-		# # Mulligan
-		# if targetTurn == 0 and targetAction == 0
-		# 	return
-
-		# @seeking = true
-		# console.log 'going to previous, targets', targetTurn, targetAction
-		# while @currentTurn != targetTurn or @currentActionInTurn != targetAction
-		# 	console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
-
-		# 	# Avoid double clicking on skipped actions
-		# 	action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
-		# 	if @currentTurn == targetTurn and @currentActionInTurn == targetAction - 1 and action?.shouldExecute and !action?.shouldExecute() 
-		# 		break
-
-		# 	@goNextAction()
-
-		# @seeking = false
 
 	goPreviousTurn: ->
 		# console.log 'going to previous turn'
-		@newStep()
+		if @turns[@currentTurn - 1]
+			# console.log 'previous turn exists'
+			turnWhenCommandIssued = @currentTurn
 
-		targetTurn = Math.max(1, @currentTurn - 1)
+			while @currentTurn >= turnWhenCommandIssued - 1
+				# console.log 'going to previous action', @currentTurn, turnWhenCommandIssued
+				@goPreviousAction()
 
-		@currentTurn = 0
-		@currentActionInTurn = 0
-		@init()
-
-		while @currentTurn != targetTurn
 			@goNextAction()
+
+		else
+			@currentTurn = 0
+			@currentActionInTurn = 0
+			@init()
+			return
+
+		# console.log 'going to previous turn'
+		# @newStep()
+
+		# targetTurn = Math.max(1, @currentTurn - 1)
+
+		# @currentTurn = 0
+		# @currentActionInTurn = 0
+		# @init()
+
+		# while @currentTurn != targetTurn
+		# 	@goNextAction()
 
 	goToAction: ->
 		# console.log 'going to action', @currentActionInTurn
@@ -305,14 +292,26 @@ class ReplayPlayer extends EventEmitter
 		targetTurn = parseInt(turn)
 		console.log 'going to turn', targetTurn
 
-		@currentTurn = 0
-		@currentActionInTurn = 0
-		@init()
+		if targetTurn > @currentTurn
+			while targetTurn > @currentTurn
+				@goNextTurn()
+
+		else if targetTurn < @currentTurn
+			while targetTurn < @currentTurn
+				@goPreviousTurn()
+
+		else 
+			while @currentActionInTurn >= 0
+				@goPreviousAction()
+
+		# @currentTurn = 0
+		# @currentActionInTurn = 0
+		# @init()
 
 
-		while @currentTurn != targetTurn
-			# console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
-			@goNextAction()
+		# while @currentTurn != targetTurn
+		# 	# console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
+		# 	@goNextAction()
 
 	goToIndex: (index) ->
 		# console.log 'going to index', index
@@ -340,69 +339,99 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'moving to timestamp', timestamp
 		@newStep()
 
-		lastTimestamp = 0
-		index = 0
-		while !lastTimestamp or (lastTimestamp < timestamp)
-			lastTimestamp = @history[++index].timestamp
+		# lastTimestamp = 0
+		# index = 0
+		# while !lastTimestamp or (lastTimestamp < timestamp)
+		# 	lastTimestamp = @history[++index].timestamp
 
-		if timestamp >= lastTimestamp
-			@goToIndex @history[@history.length - 1].index
-			return
-
-		itemIndex = @history[index].index
-		# console.log 'going to itemIndex', itemIndex
-
-		targetTurn = -1
-		targetAction = -1
-
-		for i in [1..@turns.length]
-			turn = @turns[i]
-			# console.log 'looking at turn', turn, turn.actions[1]
-			# If the turn starts after the timestamp, this means that the action corresponding to the timestamp started in the previous turn
-			if turn.index > itemIndex
-				# console.log 'breaking on turn', i, turn
-				break
-			# If the turn has no timestamp, try to default to the first action's timestamp
-			if !turn.index > itemIndex and turn.actions?.length > 0 and turn.actions[0].index > itemIndex
-				break
-			targetTurn = i
-
-			if turn.actions.length > 0
-				targetAction = -1
-				for j in [0..turn.actions.length - 1]
-					action = turn.actions[j]
-					# console.log '\tlooking at action', action
-					if !action or !action.index or action?.index > itemIndex
-						break
-						# Action -1 matches the beginning of the turn
-					targetAction = j - 1
-
-
-		# TODO: reset only if move backwards
-		@currentTurn = 0
-		@currentActionInTurn = 0
-		@historyPosition = 0
-		@init()
-
-		console.log 'moveToTimestamp init done', targetTurn, targetAction
-
-		# Mulligan
-		if targetTurn <= 1 or targetAction < -1
-			return
-
+		# Going forward
 		@seeking = true
-		# console.log 'going to timestamp, targets', targetTurn, targetAction
-		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
-			# console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
-
-			# Avoid double clicking on skipped actions
-			action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
-			if @currentTurn == targetTurn and @currentActionInTurn == targetAction - 1 and action?.shouldExecute and !action?.shouldExecute() 
-				break
-
-			@goNextAction()
-
+		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
+		if timestamp > @getCurrentTimestamp()
+			# console.log '\tforward'
+			while !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
+				@goNextAction()
+		else if timestamp < @getCurrentTimestamp()
+			# console.log '\tbackward'
+			while !@getCurrentTimestamp() or timestamp < @getCurrentTimestamp()
+				@goPreviousAction()
 		@seeking = false
+
+
+	getCurrentTimestamp: ->
+		if !@turns[@currentTurn].actions[@currentActionInTurn] or !@turns[@currentTurn].actions[@currentActionInTurn].timestamp
+			timestamp = @turns[@currentTurn].timestamp
+			index = Math.max @currentActionInTurn, 0
+			while !timestamp and index < 200 # preventing infinite loops
+				timestamp = @turns[@currentTurn].actions[index++]?.timestamp
+		else
+			timestamp = @turns[@currentTurn].actions[@currentActionInTurn].timestamp
+		# console.log '\t\tgetting current timestamp', timestamp
+		# if !timestamp
+		# 	console.warn '\t\tcould not get timestamp', @turns[@currentTurn], @currentTurn, @currentActionInTurn, @turns, index
+		return timestamp
+
+
+		# if timestamp >= lastTimestamp
+		# 	@goToIndex @history[@history.length - 1].index
+		# 	return
+
+
+
+		# itemIndex = @history[index].index
+		# # console.log 'going to itemIndex', itemIndex
+
+		# targetTurn = -1
+		# targetAction = -1
+
+		# for i in [1..@turns.length]
+		# 	turn = @turns[i]
+		# 	# console.log 'looking at turn', turn, turn.actions[1]
+		# 	# If the turn starts after the timestamp, this means that the action corresponding to the timestamp started in the previous turn
+		# 	if turn.index > itemIndex
+		# 		# console.log 'breaking on turn', i, turn
+		# 		break
+		# 	# If the turn has no timestamp, try to default to the first action's timestamp
+		# 	if !turn.index > itemIndex and turn.actions?.length > 0 and turn.actions[0].index > itemIndex
+		# 		break
+		# 	targetTurn = i
+
+		# 	if turn.actions.length > 0
+		# 		targetAction = -1
+		# 		for j in [0..turn.actions.length - 1]
+		# 			action = turn.actions[j]
+		# 			# console.log '\tlooking at action', action
+		# 			if !action or !action.index or action?.index > itemIndex
+		# 				break
+		# 				# Action -1 matches the beginning of the turn
+		# 			targetAction = j - 1
+
+
+		# # TODO: reset only if move backwards
+		# @currentTurn = 0
+		# @currentActionInTurn = 0
+		# @historyPosition = 0
+		# @init()
+
+		# console.log 'moveToTimestamp init done', targetTurn, targetAction
+
+		# # Mulligan
+		# if targetTurn <= 1 or targetAction < -1
+		# 	return
+
+		# @seeking = true
+		# # console.log 'going to timestamp, targets', targetTurn, targetAction
+		# while @currentTurn != targetTurn or @currentActionInTurn != targetAction
+		# 	# console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
+
+		# 	# Avoid double clicking on skipped actions
+		# 	action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
+		# 	if @currentTurn == targetTurn and @currentActionInTurn == targetAction - 1 and action?.shouldExecute and !action?.shouldExecute() 
+		# 		break
+
+		# 	@goNextAction()
+
+		# @seeking = false
 
 
 	getActivePlayer: ->
