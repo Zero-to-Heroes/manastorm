@@ -16,7 +16,7 @@ TurnLog = React.createClass
 		@logs = []
 		@logIndex = 10000
 
-		console.log 'mounteeeeeeeeeeeeeeeeeeeeeeeeeed'
+		# console.log 'mounteeeeeeeeeeeeeeeeeeeeeeeeeed'
 
 		@subs.add @replay, 'new-action', (action) =>
 			newLog = @buildActionLog action
@@ -26,7 +26,7 @@ TurnLog = React.createClass
 
 		@subs.add @replay, 'previous-action', (action) =>
 			popped = @logs.pop()
-			console.log 'popping last element from game log', popped
+			# console.log 'popping last element from game log', popped
 
 		@subs.add @replay, 'new-turn', (turn) =>
 			newLog = @buildTurnLog turn
@@ -42,7 +42,7 @@ TurnLog = React.createClass
 	render: ->
 		return null unless @props.show
 
-		console.log 'rendering turnLog'
+		# console.log 'rendering turnLog'
 
 		return 	<div className="turn-log background-white">
 					<div className="close" onClick={@props.onClose}></div>
@@ -281,13 +281,13 @@ TurnLog = React.createClass
 		return log
 
 	buildPlayedSecretFromHandLog: (action) ->
-		console.log 'logging secret played', action, @replay.mainPlayerId, @replay
+		# console.log 'logging secret played', action, @replay.mainPlayerId, @replay
 		if action.owner.id == parseInt(@replay.mainPlayerId)
 			card = action.data['cardID']
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 			link1 = <span>(</span>
 			link2 = <span>)</span>
-			console.log '\tand building card link', card
+			# console.log '\tand building card link', card
 		else
 
 		log = <p key={++@logIndex}>
@@ -331,7 +331,7 @@ TurnLog = React.createClass
 		return log
 
 	buildPowerDamageLog: (action) ->
-		console.log 'building power-damage log', action
+		# console.log 'building power-damage log', action
 		if !action.sameOwnerAsParent
 			card = if action.data then action.data['cardID'] else ''
 			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
@@ -488,7 +488,7 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		console.log 'building discover log', action
+		# console.log 'building discover log', action
 		card = action.data['cardID']
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
@@ -559,7 +559,7 @@ TurnLog = React.createClass
 		return log
 
 	buildFatigueDamageLog: (action) ->
-		console.log 'logging fatigue damage', action
+		# console.log 'logging fatigue damage', action
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.owner != @replay.getActivePlayer()
 			drawer = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />

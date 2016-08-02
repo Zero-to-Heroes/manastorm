@@ -37,10 +37,11 @@ var joustjs = {
 	},
 
 	goToTimestamp: function(turnNumber) {
-		var regex = /\d?\d/;
-		var turn = turnNumber.match(regex)[0];
-		console.log('going to turn', turn)
-		window.replay.goToTurn(turn);
+		var regex = /\d?\d/
+		var turn = turnNumber.match(regex)[0]
+		// console.log('going to turn', turn)
+		window.replay.pause()
+		window.replay.goToTurn(turn)
 	},
 	
 	getPlayerInfo: function() {

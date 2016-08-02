@@ -7,7 +7,7 @@ class Deck extends React.Component
 		# 	@forceUpdate()
 
 	render: ->
-		console.log 'rendering deck'
+		# console.log 'rendering deck'
 		return <div className="deck">
 			<span>{@props.entity.getDeck().length}</span>
 		</div>

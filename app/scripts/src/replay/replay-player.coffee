@@ -20,7 +20,7 @@ class ReplayPlayer extends EventEmitter
 	reload: (xmlReplay) ->
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
-		console.log 'init parser', @parser, xmlReplay
+		# console.log 'init parser', @parser, xmlReplay
 		@init()
 
 
@@ -63,14 +63,14 @@ class ReplayPlayer extends EventEmitter
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
-		console.log 'initializeGameState done'
+		# console.log 'initializeGameState done'
 
 		# Parse the data to build the game structure
 		@actionParser = new ActionParser(this)
 		@actionParser.populateEntities()
-		console.log 'popuplateEntities done'
+		# console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		console.log 'parseActions done'
+		# console.log 'parseActions done'
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
@@ -89,7 +89,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		console.log 'init done in joustjs', @turns
+		# console.log 'init done in joustjs', @turns
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
@@ -97,12 +97,14 @@ class ReplayPlayer extends EventEmitter
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	pause: ->
+		console.log 'pausing'
 		if @speed > 0
 			@previousSpeed = @speed
 		@speed = 0
 		clearInterval(@interval)
 
 	changeSpeed: (speed) ->
+		console.log 'changing speed'
 		@speed = speed
 		clearInterval(@interval)
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
@@ -131,7 +133,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
-			console.log 'goign to next turn', @currentTurn + 1
+			# console.log 'goign to next turn', @currentTurn + 1
 			@currentTurn++
 			@currentActionInTurn = -1
 
@@ -145,7 +147,7 @@ class ReplayPlayer extends EventEmitter
 			# targetTimestamp = 1000 * (@turns[@currentTurn].timestamp - @startTimestamp) + 0.0000001
 
 			# @goToTimestamp targetTimestamp
-			console.log 'going to turn', @turns[@currentTurn]
+			# console.log 'going to turn', @turns[@currentTurn]
 			@goToIndex @turns[@currentTurn].index
 
 	goNextTurn: ->
@@ -157,7 +159,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -184,7 +186,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		else if @currentActionInTurn < 0
-			console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
+			# console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
@@ -196,14 +198,14 @@ class ReplayPlayer extends EventEmitter
 
 
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			console.log 'skipping back', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log 'skipping back', rollbackAction, @currentTurn, @currentActionInTurn
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 		
 		else
-			console.log 'rolling back action', @turns, @currentTurn, @currentActionInTurn, rollbackAction
+			# console.log 'rolling back action', @turns, @currentTurn, @currentActionInTurn, rollbackAction
 			@rollbackAction rollbackAction
 			@emit 'previous-action', rollbackAction
 
@@ -261,15 +263,15 @@ class ReplayPlayer extends EventEmitter
 			@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn
+		# console.log 'going to action', @currentActionInTurn
 		if @currentActionInTurn >= 0
-			console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
+			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
 
 			if action.shouldExecute and !action.shouldExecute() 
 				if !@seeking
-					console.log 'skipping action'
+					# console.log 'skipping action'
 					@goNextAction()
 
 			else
@@ -309,7 +311,7 @@ class ReplayPlayer extends EventEmitter
 
 
 		while @currentTurn != targetTurn
-			console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
+			# console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
 			@goNextAction()
 
 	goToIndex: (index) ->
@@ -335,7 +337,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		console.log 'moving to timestamp', timestamp
+		# console.log 'moving to timestamp', timestamp
 		@newStep()
 
 		lastTimestamp = 0
@@ -348,7 +350,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		itemIndex = @history[index].index
-		console.log 'going to itemIndex', itemIndex
+		# console.log 'going to itemIndex', itemIndex
 
 		targetTurn = -1
 		targetAction = -1
@@ -389,9 +391,9 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		@seeking = true
-		console.log 'going to timestamp, targets', targetTurn, targetAction
+		# console.log 'going to timestamp, targets', targetTurn, targetAction
 		while @currentTurn != targetTurn or @currentActionInTurn != targetAction
-			console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
+			# console.log '\tmoving to next action', @currentTurn, @currentActionInTurn, targetAction
 
 			# Avoid double clicking on skipped actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn + 1]
@@ -561,7 +563,7 @@ class ReplayPlayer extends EventEmitter
 		# 	# console.log '\tSkipping to secdon action', index
 		# 	index++
 		# 	# console.log index, @history[index], @history
-		console.log 'last index before action', index, @history[index], @history[index + 1]
+		# console.log 'last index before action', index, @history[index], @history[index + 1]
 		# @goToIndex @history[index].index
 		@goToIndex lastAction.index
 
@@ -619,7 +621,7 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		console.log '\t\treceiving show entity', definition.id, definition
+		# console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
@@ -630,15 +632,15 @@ class ReplayPlayer extends EventEmitter
 		# Case of newer replay
 		if (@player is null or @opponent is null) and definition.cardID and definition.tags?.CARDTYPE != 6
 			entity = @entities[definition.id]
-			console.log 'setting player', entity
+			# console.log 'setting player', entity
 			for player in @players
 				if player.tags.CONTROLLER is entity.tags.CONTROLLER
 					@player = player
-					console.log '\tsetting player', @player
+					# console.log '\tsetting player', @player
 				else 
 					@opponent = player
-					console.log '\tsetting opponent', @opponent
-			console.log 'set player and opponent', @player, @opponent
+					# console.log '\tsetting opponent', @opponent
+			# console.log 'set player and opponent', @player, @opponent
 
 	receiveAction: (definition) ->
 		# console.log '\t\treceiving action', definition
@@ -648,13 +650,13 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'received action"'
 
 	receiveOptions: (options) ->
-		console.log '\t\treceiving options', options
+		# console.log '\t\treceiving options', options
 
 		for k,v of @entities
 			v.highlighted = false
 
 		for option in options.options
-			console.log 'highlighting', @entities[option.entity]
+			# console.log 'highlighting', @entities[option.entity]
 			@entities[option.entity]?.highlighted = true
 			# @entities[option.entity]?.emit 'option-on'
 
@@ -710,7 +712,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		console.log 'looking at text', text
+		# console.log 'looking at text', text
 		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
 		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
 
@@ -725,7 +727,7 @@ class ReplayPlayer extends EventEmitter
 		if matches and matches.length > 0
 			matches = _.uniq matches
 			matches.forEach (match) ->
-				console.log 'matching own turn', match
+				# console.log 'matching own turn', match
 				match = match.trimLeft()
 				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
 				text = that.replaceText text, inputTurnNumber, match

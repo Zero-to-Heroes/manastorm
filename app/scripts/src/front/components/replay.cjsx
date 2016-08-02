@@ -32,7 +32,7 @@ class Replay extends React.Component
 
 		# @reloadGame props.route.replay
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
-		console.log 'replay-player created'
+		# console.log 'replay-player created'
 
 		@state.style = {}
 
@@ -58,12 +58,12 @@ class Replay extends React.Component
 		# 	console.log 'reloading', newGame
 		# 	@reloadGame newGame
 
-		console.log 'before init', @mounted
+		# console.log 'before init', @mounted
 		#console.log('sub', @sub)
 		@state.replay.init()
 
 		@mounted = true
-		console.log 'after init', @mounted
+		# console.log 'after init', @mounted
 		#console.log 'first init done'
 		# @state.replay.buildGameLog()
 		#console.log 'log built'
@@ -86,7 +86,7 @@ class Replay extends React.Component
 	updateDimensions: =>
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-			console.log 'built style', @state.style
+			# console.log 'built style', @state.style
 			@callback()
 
 	callback: =>
@@ -103,11 +103,11 @@ class Replay extends React.Component
 		replay = @state.replay
 		# return null unless @gameGenerated
 
-		console.log 'rerendering replay'
+		# console.log 'rerendering replay'
 
 		if replay.players.length == 2
 			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
-			console.log 'All players are here'
+			# console.log 'All players are here'
 
 			topArea = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
@@ -135,7 +135,7 @@ class Replay extends React.Component
 				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 			</div>
-			console.log 'components are ok'
+			# console.log 'components are ok'
 
 		else 
 			console.warn 'Missing players', replay.players
@@ -167,7 +167,7 @@ class Replay extends React.Component
 			blur = "blur"
 			overlayCls += " silent"
 
-		console.log 'applying style', @state.style
+		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style}>
 					<ReactTooltip />
 					<div className="additional-controls">
@@ -224,17 +224,17 @@ class Replay extends React.Component
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goNextAction()
-		start = new Date().getTime()
+		# start = new Date().getTime()
 		@callback()
-		console.log 'force update took', new Date().getTime() - start
+		# console.log 'force update took', new Date().getTime() - start
 
 	goPreviousAction: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goPreviousAction()
-		start = new Date().getTime()
+		# start = new Date().getTime()
 		@callback()
-		console.log 'force update took', new Date().getTime() - start
+		# console.log 'force update took', new Date().getTime() - start
 
 	goNextTurn: (e) =>
 		e.preventDefault()

@@ -13,7 +13,7 @@ class GameLog extends React.Component
 			# @forceUpdate()
 
 	render: ->
-		console.log 'rendering gamelog'
+		# console.log 'rendering gamelog'
 		buttonText = <span>Full log</span>
 		if @props.logOpen
 			buttonText = <span>Hide log</span>

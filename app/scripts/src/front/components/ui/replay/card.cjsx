@@ -30,7 +30,7 @@ class Card extends React.Component
 			if @props.cost and !@props.isInfoConcealed
 				# console.log 'showing card cost', @props.entity.cardID, @props.entity, !@props.isInfoConcealed
 				costCls = "card-cost"
-				console.log 'getting card cost from', originalCard, @props.entity
+				# console.log 'getting card cost from', originalCard, @props.entity
 				originalCost = originalCard.cost
 				tagCost = @props.entity.tags.COST || originalCost
 				if tagCost < originalCost

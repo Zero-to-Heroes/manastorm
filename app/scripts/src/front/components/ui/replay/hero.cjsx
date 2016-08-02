@@ -8,7 +8,7 @@ Hero = React.createClass
 	componentDidMount: ->
 
 	render: ->
-		console.log 'rendering hero'
+		# console.log 'rendering hero'
 		@hero = @props.entity.getHero()
 		@heroPower = @props.entity.getHeroPower()
 		@weapon = @props.entity.getWeapon()

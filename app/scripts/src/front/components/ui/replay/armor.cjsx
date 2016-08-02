@@ -17,7 +17,7 @@ class Armor extends React.Component
 		#@subs.off()
 
 	render: ->
-		console.log 'rendering Armor'
+		# console.log 'rendering Armor'
 		hero = @props.entity
 		return null unless hero and hero.tags.ARMOR > 0
 		cls = 'armor'

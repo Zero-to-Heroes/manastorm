@@ -7,7 +7,7 @@ class Mana extends React.Component
 		# 	@forceUpdate()
 
 	render: ->
-		console.log 'rendering mana'
+		# console.log 'rendering mana'
 		totalMana = (@props.entity.tags.RESOURCES or 0) 
 		totalAvailableMana = totalMana - (@props.entity.tags.RESOURCES_USED or 0)
 		totalLocked = (@props.entity.tags.OVERLOAD_LOCKED or 0)

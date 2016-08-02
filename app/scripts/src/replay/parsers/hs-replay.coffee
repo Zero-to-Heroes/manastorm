@@ -23,7 +23,7 @@ class HSReplayParser
 			@index = 0
 			@replay = replay
 			@sax = sax.createStream(true)
-			console.log 'starting parsing'
+			# console.log 'starting parsing'
 
 			@sax.on 'opentag', (node) => @onOpenTag(node)
 			@sax.on 'closetag', => @onCloseTag()
@@ -31,9 +31,9 @@ class HSReplayParser
 				console.error 'error while parsing xml', error
 
 			#@stream = fs.createReadStream(@path).pipe(@sax)
-			console.log 'preparing to parse replay'
+			# console.log 'preparing to parse replay'
 			@stream = new Stream(@xmlReplay).pipe(@sax)
-			console.log 'replay parsed'
+			# console.log 'replay parsed'
 
 	rootState: (node) ->
 		node.index = @index++
