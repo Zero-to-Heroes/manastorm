@@ -80,11 +80,12 @@ class ActionParser extends EventEmitter
 		@players = [@player, @opponent]
 		@playerIndex = 0
 		@turnNumber = 1
-		@currentPlayer = @players[@playerIndex]
+		# @currentPlayer = @players[@playerIndex]
 
 		for item in @history
 
 			@parseMulliganTurn item
+			@parseChangeActivePlayer item
 			@parseStartOfTurn item
 
 			# The actual actions
@@ -189,12 +190,31 @@ class ActionParser extends EventEmitter
 				}
 				@turns.length++
 				@turnNumber++
+				# if item.node.entity == 3
+				# 	@playerIndex = 1
+				# 	@currentPlayer = @players[@playerIndex]
 				# @currentPlayer = @players[++@playerIndex % 2]
 
+	parseChangeActivePlayer: (item) ->
+		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
+			previousPlayer = @currentPlayer
+			console.log 'previous player', previousPlayer, @turns[@turnNumber - 1], @turns[@turnNumber - 1]?.activePlayer
+			@currentPlayer = _.find @players, (o) ->
+				return o.id == item.node.entity
+
+			# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't 
+			# become active player next turn
+			if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
+				@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
+					return o.id != item.node.entity
+				console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
+
+			console.log 'switching active player', item, @currentPlayer, @players
 
 	parseStartOfTurn: (item) ->
 		# Start of turn
 		if item.command is 'receiveTagChange' and item.node.entity == 1 and item.node.tag == 'STEP' and item.node.value == 6
+			console.log 'parsing start of turn', item, @currentPlayer
 			@turns[@turnNumber] = {
 				# historyPosition: i
 				turn: @turnNumber - 1
@@ -205,7 +225,7 @@ class ActionParser extends EventEmitter
 			}
 			@turns.length++
 			@turnNumber++
-			@currentPlayer = @players[++@playerIndex % 2]
+			# @currentPlayer = @players[++@playerIndex % 2]
 
 
 	parseDrawCard: (item) ->
