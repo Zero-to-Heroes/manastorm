@@ -222,20 +222,21 @@ class ReplayPlayer extends EventEmitter
 	goPreviousTurn: ->
 		# console.log 'going to previous turn'
 		if @turns[@currentTurn - 1]
-			# console.log 'previous turn exists'
+			console.log 'previous turn exists', @turns[@currentTurn - 1], @turns, @currentTurn
 			turnWhenCommandIssued = @currentTurn
 
-			while @currentTurn >= turnWhenCommandIssued - 1
-				# console.log 'going to previous action', @currentTurn, turnWhenCommandIssued
+			if turnWhenCommandIssued == 2
+				console.log 'going to previous action'
 				@goPreviousAction()
+			else
+				while @currentTurn >= turnWhenCommandIssued - 1
+					# console.log 'going to previous action', @currentTurn, turnWhenCommandIssued
+					@goPreviousAction()
 
-			@goNextAction()
+				@goNextAction()
 
-		else
-			@currentTurn = 0
-			@currentActionInTurn = 0
-			@init()
-			return
+		# else
+		# 	@goPreviousAction()
 
 		# console.log 'going to previous turn'
 		# @newStep()
