@@ -154,7 +154,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: (lastIteration) ->
-		# console.log 'going to previous action', @currentTurn, @currentActionInTurn
+		console.log 'going to previous action', @currentTurn, @currentActionInTurn
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -337,7 +337,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		# console.log 'moving to timestamp', timestamp
+		console.log 'moving to timestamp', timestamp
 		@newStep()
 
 		# lastTimestamp = 0
@@ -349,12 +349,14 @@ class ReplayPlayer extends EventEmitter
 		@seeking = true
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
 		if timestamp > @getCurrentTimestamp()
-			# console.log '\tforward'
+			console.log '\tforward'
 			while !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
 				@goNextAction()
 		else if timestamp < @getCurrentTimestamp()
-			# console.log '\tbackward'
-			while !@getCurrentTimestamp() or timestamp < @getCurrentTimestamp()
+			console.log '\tbackward'
+			# Stop at mulligan
+			while @currentTurn > 1 and (!@getCurrentTimestamp() or timestamp < @getCurrentTimestamp())
+				console.log 'going to previous action', @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 				@goPreviousAction()
 		@seeking = false
 

@@ -198,7 +198,7 @@ class ActionParser extends EventEmitter
 	parseChangeActivePlayer: (item) ->
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
 			previousPlayer = @currentPlayer
-			console.log 'previous player', previousPlayer, @turns[@turnNumber - 1], @turns[@turnNumber - 1]?.activePlayer
+			# console.log 'previous player', previousPlayer, @turns[@turnNumber - 1], @turns[@turnNumber - 1]?.activePlayer
 			@currentPlayer = _.find @players, (o) ->
 				return o.id == item.node.entity
 
@@ -207,14 +207,14 @@ class ActionParser extends EventEmitter
 			if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
 				@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
 					return o.id != item.node.entity
-				console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
+				# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
 
-			console.log 'switching active player', item, @currentPlayer, @players
+			# console.log 'switching active player', item, @currentPlayer, @players
 
 	parseStartOfTurn: (item) ->
 		# Start of turn
 		if item.command is 'receiveTagChange' and item.node.entity == 1 and item.node.tag == 'STEP' and item.node.value == 6
-			console.log 'parsing start of turn', item, @currentPlayer
+			# console.log 'parsing start of turn', item, @currentPlayer
 			@turns[@turnNumber] = {
 				# historyPosition: i
 				turn: @turnNumber - 1
