@@ -37,19 +37,22 @@ class HSReplayParser
 
 	rootState: (node) ->
 		node.index = @index++
-		#console.log '\tparsing node', node.name, node
-		switch node.name
-			when 'Game'
+		# console.log '\tparsing node', node.name, node
+		switch node.name.toLowerCase()
+			when 'Game'.toLowerCase()
+				# console.log '\tparsing node', node
 				@replay.startTimestamp = tsToSeconds(node.attributes.ts)
 
-			when 'Action', 'Block'
+			when 'Action'.toLowerCase(), 'Block'.toLowerCase()
+				# console.log '\tparsing node', node
 				#console.log 'enqueue action from rootState', node
 				#if (node?.attributes?.entity == '70')
 					#console.log '\tDebug', node
 				@replay.enqueue  'receiveAction', node, tsToSeconds(node.attributes.ts)
 				@state.push('action')
 
-			when 'TagChange'
+			when 'TagChange'.toLowerCase()
+				# console.log '\tparsing node', node
 				tag = {
 					entity: parseInt(node.attributes.entity)
 					tag: tagNames[node.attributes.tag]
@@ -63,7 +66,7 @@ class HSReplayParser
 
 				@replay.enqueue 'receiveTagChange', tag
 
-			when 'GameEntity', 'Player', 'FullEntity', 'ShowEntity'
+			when 'GameEntity'.toLowerCase(), 'Player'.toLowerCase(), 'FullEntity'.toLowerCase(), 'ShowEntity'.toLowerCase()
 				# console.log '\tpushing game entity to state', node
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
@@ -75,21 +78,21 @@ class HSReplayParser
 					@entityDefinition.name = node.attributes.name
 
 				#@entityDefinition.originalDefinition = @replay.clone(@entityDefinition)
-				if node.name == 'ShowEntity'
+				if node.name.toLowerCase() == 'ShowEntity'.toLowerCase()
 					@stack[@stack.length - 2].showEntity = @entityDefinition
 					# Support for multiple ShowEntity nodes, should replace the standard definition
 					@stack[@stack.length - 2].showEntities = @stack[@stack.length - 2].showEntities || []
 					@stack[@stack.length - 2].showEntities.push @entityDefinition
 					node.parent = @stack[@stack.length - 2]
 
-			when 'Options'
+			when 'Options'.toLowerCase()
 				# console.log 'pushing options', node
 				@state.push('options')
 
-			when 'ChosenEntities'
+			when 'ChosenEntities'.toLowerCase()
 				@chosen =
 					entity: node.attributes.entity
-					playerID: node.attributes.playerID
+					playerID: node.attributes.playerID || node.attributes.playerid
 					ts: tsToSeconds(node.attributes.ts)
 					cards: []
 					index: @index++
@@ -97,14 +100,14 @@ class HSReplayParser
 
 	chosenEntitiesState: (node) ->
 		node.index = @index++
-		switch node.name
-			when 'Choice'
+		switch node.name.toLowerCase()
+			when 'Choice'.toLowerCase()
 				@chosen.cards.push(node.attributes.entity)
 
 	optionsState: (node) ->
 		node.index = @index++
-		switch node.name
-			when 'Option'
+		switch node.name.toLowerCase()
+			when 'Option'.toLowerCase()
 				option = {
 					entity: parseInt(node.attributes.entity)
 					optionIndex:  parseInt(node.attributes.index)
@@ -117,14 +120,14 @@ class HSReplayParser
 				option.parent.options.push(option)
 
 	chosenEntitiesStateClose: (node) ->
-		switch node.name
-			when 'ChosenEntities'
+		switch node.name.toLowerCase()
+			when 'ChosenEntities'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receiveChosenEntities', @chosen, @chosen.ts
 
 	optionsStateClose: (node) ->
-		switch node.name
-			when 'Options'
+		switch node.name.toLowerCase()
+			when 'Options'.toLowerCase()
 				@state.pop()
 				# console.log 'enqueueing options node', node
 				node.debugTs = tsToSeconds(node.attributes.ts)
@@ -132,8 +135,8 @@ class HSReplayParser
 
 	entityState: (node) ->
 		node.index = @index++
-		switch node.name
-			when 'Tag'
+		switch node.name.toLowerCase()
+			when 'Tag'.toLowerCase()
 				@entityDefinition.tags[tagNames[parseInt(node.attributes.tag)]] = parseInt(node.attributes.value)
 
 	entityStateClose: (node) ->
@@ -142,28 +145,28 @@ class HSReplayParser
 		else
 			ts = null
 
-		switch node.name
-			when 'GameEntity'
+		switch node.name.toLowerCase()
+			when 'GameEntity'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receiveGameEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
-			when 'Player'
+			when 'Player'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receivePlayer', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
-			when 'FullEntity'
+			when 'FullEntity'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receiveEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
-			when 'ShowEntity'
+			when 'ShowEntity'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receiveShowEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
 
 	actionState: (node) ->
 		node.index = @index++
-		switch node.name
-			when 'ShowEntity', 'FullEntity'
+		switch node.name.toLowerCase()
+			when 'ShowEntity'.toLowerCase(), 'FullEntity'.toLowerCase()
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 
@@ -181,7 +184,7 @@ class HSReplayParser
 				#@entityDefinition.originalDefinition = @replay.clone(@entityDefinition)
 
 				@entityDefinition.parent = @stack[@stack.length - 2]
-				if node.name is 'ShowEntity'
+				if node.name.toLowerCase() is 'ShowEntity'.toLowerCase()
 					@stack[@stack.length - 2].showEntity = @entityDefinition
 					# Support for multiple ShowEntity nodes, should replace the standard definition
 					@stack[@stack.length - 2].showEntities = @stack[@stack.length - 2].showEntities || []
@@ -196,7 +199,7 @@ class HSReplayParser
 				#if @entityDefinition.id is 72
 					#console.log 'parsing bluegill', @entityDefinition, node
 
-			when 'HideEntity'
+			when 'HideEntity'.toLowerCase()
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 				@entityDefinition.index = @index++
 				@entityDefinition.parent = @stack[@stack.length - 2]
@@ -206,7 +209,7 @@ class HSReplayParser
 				@entityDefinition.parent.hideEntities.push(@entityDefinition.id)
 
 
-			when 'TagChange'
+			when 'TagChange'.toLowerCase()
 				tag = {
 					entity: parseInt(node.attributes.entity)
 					tag: tagNames[node.attributes.tag]
@@ -223,7 +226,7 @@ class HSReplayParser
 
 				@replay.enqueue 'receiveTagChange', tag
 
-			when 'MetaData'
+			when 'MetaData'.toLowerCase()
 				if node.attributes.ts
 					ts = tsToSeconds(node.attributes.ts)
 				else
@@ -246,10 +249,10 @@ class HSReplayParser
 				#console.log '\tmetadata', @metaData
 				@state.push('metaData')
 
-			when 'Info'
+			when 'Info'.toLowerCase()
 				console.error 'info, shouldnt happen'
 
-			when 'Action', 'Block'
+			when 'Action'.toLowerCase(), 'Block'.toLowerCase()
 				#@stack[@stack.length - 1].parent = @stack[@stack.length - 2]
 				#node.parent = @stack[@stack.length - 2]
 				#console.log '\tupdated', @stack[@stack.length - 1]
@@ -262,7 +265,7 @@ class HSReplayParser
 				@state.push('action')
 				@replay.enqueue 'receiveAction', node, tsToSeconds(node.attributes.ts)
 
-			when 'Choices'
+			when 'Choices'.toLowerCase()
 				@choices =
 					entity: parseInt(node.attributes.entity)
 					max: node.attributes.max
@@ -281,8 +284,8 @@ class HSReplayParser
 
 	metaDataState: (node) ->
 		#console.log '\tin meta data state', node
-		switch node.name
-			when 'Info'
+		switch node.name.toLowerCase()
+			when 'Info'.toLowerCase()
 				#console.log '\t\tconsidering info node', node
 				info = {
 					entity: parseInt(node.attributes.id || node.attributes.entity)
@@ -296,18 +299,18 @@ class HSReplayParser
 				#console.log '\t\tinfo', info
 
 	metaDataStateClose: (node) ->
-		switch node.name
-			when 'MetaData'
+		switch node.name.toLowerCase()
+			when 'MetaData'.toLowerCase()
 				@state.pop()
 
 	choicesState: (node) ->
-		switch node.name
-			when 'Choice'
+		switch node.name.toLowerCase()
+			when 'Choice'.toLowerCase()
 				@choices.cards.push(node.attributes.entity)
 
 	choicesStateClose: (node) ->
-		switch node.name
-			when 'Choices'
+		switch node.name.toLowerCase()
+			when 'Choices'.toLowerCase()
 				@state.pop()
 				@replay.enqueue 'receiveChoices', @choices,  @choices.ts
 
@@ -316,8 +319,8 @@ class HSReplayParser
 			ts = tsToSeconds(node.attributes.ts)
 		else
 			ts = null
-		switch node.name
-			when 'Action', 'Block'
+		switch node.name.toLowerCase()
+			when 'Action'.toLowerCase(), 'Block'.toLowerCase()
 				#console.log 'closing action state', node, @entityDefinition
 				node = @state.pop()
 
