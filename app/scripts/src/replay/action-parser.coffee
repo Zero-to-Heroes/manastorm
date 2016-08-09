@@ -164,6 +164,11 @@ class ActionParser extends EventEmitter
 				actions[i].index = actions[i - 1].index
 				actions[i - 1] = undefined
 
+			if !actions[i].owner
+				# console.log 'adding owner', actions[i], @turns[actions[i].turn], @turns
+				# Because turn 1 is Mulligan
+				actions[i].owner = @turns[actions[i].turn + 1].activePlayer
+
 		# Remove empty
 		finalActions = _.compact actions
 
