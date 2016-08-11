@@ -258,7 +258,7 @@ TurnLog = React.createClass
 
 	buildPlayedCardFromHandLog: (action) ->
 		card = action.data['cardID']
-		console.log 'buildPlayedCardFromHandLog', action, card
+		# console.log 'buildPlayedCardFromHandLog', action, card
 		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 
 		log = <p key={++@logIndex}>

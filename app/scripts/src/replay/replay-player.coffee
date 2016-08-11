@@ -123,13 +123,19 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
+
+		## last acation in the game
+		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
+			console.log 'doing nothing, end of the game', @currentTurn, @turns.length, @currentActionInTurn, @turns[@currentTurn].actions.length - 1
+			return
+
 		@currentActionInTurn++
 
 		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
-		if (@turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1) 
+		if @turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1
 			@goToAction()
 
 		# Going to the next turn
@@ -154,7 +160,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn
+		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @turns
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -251,7 +257,7 @@ class ReplayPlayer extends EventEmitter
 		# 	@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn
+		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
