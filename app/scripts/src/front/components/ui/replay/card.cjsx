@@ -156,13 +156,35 @@ class Card extends React.Component
 					</div>
 				</div>
 
-			enchantmentClass = "status-effects"
+			enchantmentClass = "enchantments"
+		
+		# The keywords
+		keywords = []
+		for k,v of entity.tags
+			key = 'GLOBAL_KEYWORD_' + k
+			console.log 
+			if v isnt 0 and cardUtils?.keywords[key]
+				name = cardUtils?.localizeKeyword(key)
+				text = cardUtils?.localizeKeyword(key + '_TEXT')
+				statusElement = 
+					<div className="status">
+						<h3>{name}</h3>
+						<span>{text}</span>
+					</div>
+				keywords.push statusElement
+
+
 		# Build the card link on hover. It includes the card image + the status alterations			
 		cardTooltip = 
 			<div className="card-container">
-				<img src={art} />
-				<div className={enchantmentClass}>
-					{enchantments}
+				<div className="game-info">
+					<img src={art} />
+					<div className={enchantmentClass}>
+						{enchantments}
+					</div>
+				</div>
+				<div className='statuses'>
+					{keywords}
 				</div>
 			</div>
 
