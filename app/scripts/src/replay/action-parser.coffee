@@ -181,6 +181,7 @@ class ActionParser extends EventEmitter
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
+			console.log 'parsing mulligan', item
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
 				# @currentPlayer = @players[++@playerIndex % 2]
@@ -228,6 +229,7 @@ class ActionParser extends EventEmitter
 				activePlayer: @currentPlayer
 				index: item.index
 			}
+			console.log 'parsing start of turn', item, @turns[@turnNumber], @turns
 			@turns.length++
 			@turnNumber++
 			# @currentPlayer = @players[++@playerIndex % 2]
