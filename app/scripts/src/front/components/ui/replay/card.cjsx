@@ -130,7 +130,8 @@ class Card extends React.Component
 		if entity.tags.DAMAGE - entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
-		if entity.getEnchantments()?.length > 0
+		# console.log 'entity in card', entity, entity.getEnchantments
+		if entity.getEnchantments?()?.length > 0
 			# console.log '\tcard rendered', entity.cardID, entity
 			# console.log 'enchantments', entity.getEnchantments()
 
