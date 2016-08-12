@@ -131,12 +131,12 @@ class Card extends React.Component
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
 		if entity.getEnchantments()?.length > 0
-			console.log '\tcard rendered', entity.cardID, entity
-			console.log 'enchantments', entity.getEnchantments()
+			# console.log '\tcard rendered', entity.cardID, entity
+			# console.log 'enchantments', entity.getEnchantments()
 
 			enchantments = entity.getEnchantments().map (enchant) ->
 				enchantor = entity.replay.entities[enchant.tags.CREATOR]
-				console.log 'enchantor', enchantor, entity.replay.entities, enchant.tags.CREATOR, enchant
+				# console.log 'enchantor', enchantor, entity.replay.entities, enchant.tags.CREATOR, enchant
 				enchantCard = cardUtils?.getCard(enchant.cardID)
 
 				if enchantor
@@ -164,7 +164,7 @@ class Card extends React.Component
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if entity.cardID && !@props.isHidden
-			link = '<img src="' + art + '">';
+			# link = '<img src="' + art + '">';
 			return <div className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls}></img>

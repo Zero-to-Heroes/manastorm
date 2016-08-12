@@ -129,7 +129,7 @@ class ReplayPlayer extends EventEmitter
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
 			# console.log 'doing nothing, end of the game', @currentTurn, @turns.length, @currentActionInTurn, @turns[@currentTurn].actions.length - 1
-			return
+			return null
 
 		@currentActionInTurn++
 
@@ -150,6 +150,8 @@ class ReplayPlayer extends EventEmitter
 			@emit 'new-turn', @turns[@currentTurn]
 
 			@goToIndex @turns[@currentTurn].index
+
+		return true
 
 	goNextTurn: ->
 		# console.log 'going to next turn', @currentTurn + 1
@@ -356,8 +358,9 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
 		if timestamp > @getCurrentTimestamp()
 			console.log '\tforward'
-			while !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
-				@goNextAction()
+			hasMoved = true
+			while hasMoved and (!@getCurrentTimestamp() or timestamp > @getCurrentTimestamp())
+				hasMoved = @goNextAction()
 		else if timestamp < @getCurrentTimestamp()
 			console.log '\tbackward'
 			# Stop at mulligan
