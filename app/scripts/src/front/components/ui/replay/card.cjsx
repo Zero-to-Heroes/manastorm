@@ -29,7 +29,10 @@ class Card extends React.Component
 				costCls = "card-cost"
 				# console.log 'getting card cost from', originalCard, entity
 				originalCost = originalCard.cost
-				tagCost = entity.tags.COST || originalCost
+				if entity.tags.COST is 0
+					tagCost = 0
+				else
+					tagCost = entity.tags.COST || originalCost
 				if tagCost < originalCost
 					costCls += " lower-cost"
 				else if tagCost > originalCost
@@ -44,7 +47,7 @@ class Card extends React.Component
 		frameCls = "frame minion"
 		legendaryCls = ""
 
-		# console.log 'rendering card', entity.cardID, entity, @props.isInfoConcealed
+		console.log 'rendering card', entity.cardID, @props.cost, entity.tags.COST, @props.isHidden, entity, @props.isInfoConcealed
 
 		if originalCard?.rarity is 'Legendary'
 			legendaryCls = " legendary"
