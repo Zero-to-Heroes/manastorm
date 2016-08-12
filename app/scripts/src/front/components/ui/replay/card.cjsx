@@ -1,24 +1,21 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
+ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../../../subscription'
 
 class Card extends React.Component
-	componentDidMount: ->
-		# tagEvents = 'tag-changed:ATK tag-changed:HEALTH tag-changed:DAMAGE'
-
-		# Discover action creates a null entity here(?)
-		# if !@props.static
-		# 	subscribe @props.entity, tagEvents, =>
-		# 		@forceUpdate()
 
 	render: ->
 		# console.log 'rendering card'
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
+		cardUtils = @props.cardUtils
+		entity = @props.entity
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{entity.cardID}.png"
+
 
 		imageCls = "art"
-		if @props.entity.cardID && !@props.isHidden
-			originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
+		if entity.cardID && !@props.isHidden
+			originalCard = cardUtils?.getCard(entity.cardID)
 			# Keep both the img (for hand) and background (for the rest)
 			imgSrc = art
 			style =
@@ -28,11 +25,11 @@ class Card extends React.Component
 			# Cost update 
 			# We don't have the data for the cards in our opponent's hand
 			if @props.cost and !@props.isInfoConcealed
-				# console.log 'showing card cost', @props.entity.cardID, @props.entity, !@props.isInfoConcealed
+				# console.log 'showing card cost', entity.cardID, entity, !@props.isInfoConcealed
 				costCls = "card-cost"
-				# console.log 'getting card cost from', originalCard, @props.entity
+				# console.log 'getting card cost from', originalCard, entity
 				originalCost = originalCard.cost
-				tagCost = @props.entity.tags.COST || originalCost
+				tagCost = entity.tags.COST || originalCost
 				if tagCost < originalCost
 					costCls += " lower-cost"
 				else if tagCost > originalCost
@@ -47,21 +44,21 @@ class Card extends React.Component
 		frameCls = "frame minion"
 		legendaryCls = ""
 
-		# console.log 'rendering card', @props.entity.cardID, @props.entity, @props.isInfoConcealed
+		# console.log 'rendering card', entity.cardID, entity, @props.isInfoConcealed
 
 		if originalCard?.rarity is 'Legendary'
 			legendaryCls = " legendary"
 
-		if @props.entity.tags.TAUNT
+		if entity.tags.TAUNT
 			frameCls += " card--taunt"
 
-		if @props.entity.tags.DEATHRATTLE
+		if entity.tags.DEATHRATTLE
 			effect = <div className="effect deathrattle"></div>
-		if @props.entity.tags.INSPIRE
+		if entity.tags.INSPIRE
 			effect = <div className="effect inspire"></div>
-		if @props.entity.tags.POISONOUS
+		if entity.tags.POISONOUS
 			effect = <div className="effect poisonous"></div>
-		if @props.entity.tags.TRIGGER
+		if entity.tags.TRIGGER
 			effect = <div className="effect trigger"></div>
 
 		if @props.className
@@ -70,75 +67,105 @@ class Card extends React.Component
 		if @props.isDiscarded
 			cls += " discarded"
 
-		if @props.entity.tags.DIVINE_SHIELD
+		if entity.tags.DIVINE_SHIELD
 			divineShield = <div className="overlay divine-shield"></div>
 
-		if @props.entity.tags.SILENCED
+		if entity.tags.SILENCED
 			overlay = <div className="overlay silenced"></div>
 
-		if @props.entity.tags.FROZEN
+		if entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
 
-		if @props.entity.tags.STEALTH
+		if entity.tags.STEALTH
 			overlay = <div className="overlay stealth"></div>
 
-		if @props.entity.tags.WINDFURY
+		if entity.tags.WINDFURY
 			windfury = <div className="overlay windfury"></div>
 
 		# if @props.stats
 		healthClass = "card__stats__health"
-		if @props.entity.tags.DAMAGE > 0
+		if entity.tags.DAMAGE > 0
 			healthClass += " damaged"
 
 		atkCls = "card__stats__attack"
 		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed
 			originalAtk = originalCard.attack
-			tagAtk = @props.entity.tags.ATK || originalAtk
+			tagAtk = entity.tags.ATK || originalAtk
 			if tagAtk > originalAtk
 				atkCls += " buff"
 			else if tagAtk < originalAtk
 				atkCls += " debuff"
 
 			originalHealth = originalCard.health
-			tagHealth = @props.entity.tags.HEALTH || originalHealth
+			tagHealth = entity.tags.HEALTH || originalHealth
 			if tagHealth > originalHealth
 				healthClass += " buff"
 
-			tagDurability = @props.entity.tags.DURABILITY || originalCard.durability
+			tagDurability = entity.tags.DURABILITY || originalCard.durability
 			stats = <div className="card__stats">
 				<div className={atkCls}><span>{tagAtk or 0}</span></div>
-				<div className={healthClass}><span>{(tagHealth or tagDurability) - (@props.entity.tags.DAMAGE or 0)}</span></div>
+				<div className={healthClass}><span>{(tagHealth or tagDurability) - (entity.tags.DAMAGE or 0)}</span></div>
 			</div>
 
 
-		@props.entity.damageTaken = @props.entity.damageTaken or 0
-		# console.log @props.entity.cardID, @props.entity
+		entity.damageTaken = entity.damageTaken or 0
+		# console.log entity.cardID, entity
 
 		# Can attack
-		if @props.entity.highlighted
+		if entity.highlighted
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
 
-			if @props.controller?.tags?.COMBO_ACTIVE == 1 and @props.entity.tags.COMBO == 1
+			if @props.controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
 				imageCls += " combo"
 
-		if @props.entity.tags.POWERED_UP == 1
+		if entity.tags.POWERED_UP == 1
 			imageCls += " img-option-on combo"
 			# cls += " option-on"
 
 		# Exhausted
-		if @props.entity.tags.EXHAUSTED == 1 and @props.entity.tags.JUST_PLAYED == 1
+		if entity.tags.EXHAUSTED == 1 and entity.tags.JUST_PLAYED == 1
 			exhausted = <div className="exhausted"></div>
 
-		if @props.entity.tags.DAMAGE - @props.entity.damageTaken > 0
-			damage = <span className="damage"><span>{-(@props.entity.tags.DAMAGE - @props.entity.damageTaken)}</span></span>
+		if entity.tags.DAMAGE - entity.damageTaken > 0
+			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
-		# console.log '\tcard rendered'
+		if entity.getEnchantments()?.length > 0
+			console.log '\tcard rendered', entity.cardID, entity
+			console.log 'enchantments', entity.getEnchantments()
+
+			enchantments = entity.getEnchantments().map (enchant) ->
+				enchantor = entity.replay.entities[enchant.tags.CREATOR]
+				console.log 'enchantor', enchantor, entity.replay.entities, enchant.tags.CREATOR, enchant
+				enchantCard = cardUtils?.getCard(enchant.cardID)
+
+				if enchantor
+					enchantImage = 
+						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
+					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
+
+				<div className="enchantment">
+					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>
+					<div className="info-container">
+						<div className="icon" style={enchantImage}></div>
+						<span className="text" dangerouslySetInnerHTML={{__html: cardUtils?.localizeText(enchantCard)}}></span>
+					</div>
+				</div>
+
+			enchantmentClass = "status-effects"
+		# Build the card link on hover. It includes the card image + the status alterations			
+		cardTooltip = 
+			<div className="card-container">
+				<img src={art} />
+				<div className={enchantmentClass}>
+					{enchantments}
+				</div>
+			</div>
 
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
-		if @props.entity.cardID && !@props.isHidden
+		if entity.cardID && !@props.isHidden
 			link = '<img src="' + art + '">';
-			return <div className={cls} style={@props.style} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+			return <div className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls}></img>
 				<div className={frameCls}></div>
@@ -152,6 +179,9 @@ class Card extends React.Component
 				{stats}
 				{divineShield}
 				{cost}
+				<ReactTooltip id={"" + entity.id} >
+				    {cardTooltip}
+				</ReactTooltip>
 			</div>
 
 		else
@@ -172,17 +202,17 @@ class Card extends React.Component
 
 	# cleanTemporaryState: ->
 	# 	# console.log 'cleaning temp state'
-	# 	@props.entity.damageTaken = @props.entity.tags.DAMAGE or 0
-	# 	@props.entity.highlighted = false
+	# 	entity.damageTaken = entity.tags.DAMAGE or 0
+	# 	entity.highlighted = false
 
 	# reset: ->
 	# 	console.log 'resetting card'
-	# 	@props.entity.damageTaken = 0
-	# 	@props.entity.highlighted = false
+	# 	entity.damageTaken = 0
+	# 	entity.highlighted = false
 
 	# highlightOption: ->
-	# 	@props.entity.highlighted = true
-	# 	console.log 'highlighting option', @props.entity.cardID, @props.entity, @props.entity.highlighted
+	# 	entity.highlighted = true
+	# 	console.log 'highlighting option', entity.cardID, entity, entity.highlighted
 
 	componentDidUpdate: ->
 		domNode = ReactDOM.findDOMNode(this)

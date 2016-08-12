@@ -22,6 +22,12 @@ class Entity extends EventEmitter
 			return @replay.opponent
 		return null
 
+	getEnchantments: ->
+		enchantments = _.filter @replay.entities, (entity) =>
+			entity.tags.ZONE is zones.PLAY and entity.tags.ATTACHED is @tags.ENTITY_ID
+
+		return enchantments
+
 	update: (definition, action) ->
 		old = _.assign {}, @tags
 		# console.log 'updating entity', this, definition, action

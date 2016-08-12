@@ -123,12 +123,12 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
+		# console.log 'clicked goNextAction', @currentTurn, @currentActionInTurn
 		@newStep()
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
-			console.log 'doing nothing, end of the game', @currentTurn, @turns.length, @currentActionInTurn, @turns[@currentTurn].actions.length - 1
+			# console.log 'doing nothing, end of the game', @currentTurn, @turns.length, @currentActionInTurn, @turns[@currentTurn].actions.length - 1
 			return
 
 		@currentActionInTurn++
@@ -160,7 +160,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @turns
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @turns
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -228,11 +228,11 @@ class ReplayPlayer extends EventEmitter
 	goPreviousTurn: ->
 		# console.log 'going to previous turn'
 		if @turns[@currentTurn - 1]
-			console.log 'previous turn exists', @turns[@currentTurn - 1], @turns, @currentTurn
+			# console.log 'previous turn exists', @turns[@currentTurn - 1], @turns, @currentTurn
 			turnWhenCommandIssued = @currentTurn
 
 			if turnWhenCommandIssued == 2
-				console.log 'going to previous action'
+				# console.log 'going to previous action'
 				@goPreviousAction()
 			else
 				while @currentTurn >= turnWhenCommandIssued - 1
@@ -257,7 +257,7 @@ class ReplayPlayer extends EventEmitter
 		# 	@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -297,7 +297,7 @@ class ReplayPlayer extends EventEmitter
 
 	goToTurn: (turn) ->
 		targetTurn = parseInt(turn)
-		console.log 'going to turn', targetTurn
+		# console.log 'going to turn', targetTurn
 
 		if targetTurn > @currentTurn
 			while targetTurn > @currentTurn
@@ -640,8 +640,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		# if change.tag is 'MULLIGAN_STATE'
-		# console.log '\t\treceiving tag change', change, @entities[change.entity]
+		if change.tag is 'ATTACHED'
+			console.log '\t\treceiving tag change', change, @entities[change.entity], @entities[change.value]
 
 		tags = {}
 		tags[change.tag] = change.value
