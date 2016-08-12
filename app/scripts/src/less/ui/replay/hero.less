@@ -349,6 +349,7 @@
 			text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
 			font-weight: bold;
 			text-align: center;
+    		width: 20%;
 
 			&.damaged {
 				color: red;
@@ -434,22 +435,38 @@
 		opacity: 0.5;
 		border-radius: 50%;
 		border-radius: 50%;
-		position: relative;
-		left: -5%;
-		top: -5%;
-		width: 110%;
-		height: 110%;
+
+		position: absolute;
+		background-size: contain;
 
 		&.frozen {
-			background-color: #66A8CE;
+			// background-color: #66A8CE;
 			background: url(images/hero_frozen.png) center center no-repeat;
-			background-size: contain;
-			height: 160%;
 			height: 150%;
 			width: 160%;
-			position: absolute;
 			left: -35%;
 			top: -26%;
+		}
+		&.heavily-armored {
+			// background-color: #66A8CE;
+			background: url(images/hero_heavily_armored.png) center center no-repeat;
+			opacity: 1;
+		    width: 145%;
+		    height: 145%;
+		    top: -25%;
+		    left: -21%;
+		    background-size: contain;
+		}
+		&.immune {
+			// background-color: #66A8CE;
+			background: url(images/hero_immune.png) center center no-repeat;
+			opacity: 1;
+		    width: 145%;
+		    height: 145%;
+		    top: -25%;
+		    left: -21%;
+		    background-size: contain;
+
 		}
 	}
 }
