@@ -643,8 +643,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		if change.tag is 'ATTACHED'
-			console.log '\t\treceiving tag change', change, @entities[change.entity], @entities[change.value]
+		# if change.tag is 'ATTACHED'
+		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], @entities[change.value]
 
 		tags = {}
 		tags[change.tag] = change.value

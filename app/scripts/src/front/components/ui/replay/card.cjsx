@@ -47,7 +47,7 @@ class Card extends React.Component
 		frameCls = "frame minion"
 		legendaryCls = ""
 
-		console.log 'rendering card', entity.cardID, @props.cost, entity.tags.COST, @props.isHidden, entity, @props.isInfoConcealed
+		# console.log 'rendering card', entity.cardID, @props.cost, entity.tags.COST, @props.isHidden, entity, @props.isInfoConcealed
 
 		if originalCard?.rarity is 'Legendary'
 			legendaryCls = " legendary"

@@ -117,6 +117,21 @@
 				display: none;
 			}
 		}
+
+		&.option-on {
+			-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+							drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+							drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+							drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
+							drop-shadow(0px 0px 0.5em @outerGlow) 
+							drop-shadow(0px 0px 0.8em @outerGlow);
+			filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+					drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+					drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+					drop-shadow(@glowSize -@glowSize 1px @innerGlow)
+					drop-shadow(0px 0px 0.5em @outerGlow) 
+					drop-shadow(0px 0px 0.8em @outerGlow);
+		}
 	}
 
 	.weapon-container {
