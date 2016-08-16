@@ -382,6 +382,7 @@ class ReplayPlayer extends EventEmitter
 				console.log 'going to previous action', @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 				@goPreviousAction()
 		@seeking = false
+		@emit 'moved-timestamp'
 
 
 	getCurrentTimestamp: ->
