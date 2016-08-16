@@ -729,13 +729,13 @@ class ReplayPlayer extends EventEmitter
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
 		# console.log 'looking at text', text
-		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?)/gm
-		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?)/gm
+		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?|$)/gm
+		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?|$)/gm
 
-		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?)/gm
-		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?)/gm
+		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?|$)/gm
+		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?|$)/gm
 
-		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?)/gm
+		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?|$)/gm
 
 		that = this
 
