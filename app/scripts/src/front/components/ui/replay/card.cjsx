@@ -184,6 +184,7 @@ class Card extends React.Component
 					</div>
 				</div>
 				<div className='statuses'>
+					<div className="filler"></div>
 					{keywords}
 				</div>
 			</div>

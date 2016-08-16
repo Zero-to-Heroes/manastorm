@@ -7,8 +7,18 @@
 	top: inherit;
 	bottom: 25%;
 	right: 0;
-	display: flex;
+	display: block;
 	border-radius: 0.5em;
+
+	// Needed because FF and Chrome have some different implementations
+	// http://stackoverflow.com/questions/33502702/flex-elements-ignore-percent-padding-in-firefox
+	.browser-compatibility {
+	    display: flex;
+	    width: 100%;
+	    height: 100%;
+	    position: absolute;
+	    top: 0;	
+	}
 
 
     &::before {
@@ -65,13 +75,13 @@
 
 		&.locked {
 			background-image: url(images/mana_locked.png);
-			margin-top: -5px;
+			margin-top: -1%;
 			padding: 0;
 		}
 
 		&.empty {
 			background: transparent;
-			margin-top: -5px;
+			margin-top: -1%;
 		}
 	}
 }

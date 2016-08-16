@@ -48,10 +48,12 @@ class Mana extends React.Component
 				futures.push locked
 
 		return <div className="mana-container">
-			{availableMana}
-			<div className="crystals">
-				<div className="present">{crystals}</div>
-				<div className="future">{futures}</div>
+			<div className="browser-compatibility">
+				{availableMana}
+				<div className="crystals">
+					<div className="present">{crystals}</div>
+					<div className="future">{futures}</div>
+				</div>
 			</div>
 		</div>
 

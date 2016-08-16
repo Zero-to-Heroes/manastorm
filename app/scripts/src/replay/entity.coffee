@@ -57,8 +57,18 @@ class Entity extends EventEmitter
 		if definition.name
 			@name = definition.name
 
-		changed = _.pick definition.tags, (value, tag) ->
-			value isnt old[tag]
+
+		# if action
+		# 	changed = _.pick definition.tags, (value, tag) ->
+		# 		value isnt old[tag]
+
+		# 	console.log 'changed', changed
+		# 	for k, v of action.rollbackInfo[@id]
+		# 		if !changed[k]
+		# 			console.log 'cancelling change', k, v, action.rollbackInfo[@id]
+		# 			delete action.rollbackInfo[@id][k]
+		# 			console.log '\tnew', action.rollbackInfo[@id]
+
 
 		# for tag, value of changed
 		# 	if value isnt old[tag]

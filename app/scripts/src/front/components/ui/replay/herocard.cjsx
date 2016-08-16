@@ -18,7 +18,7 @@ class HeroCard extends Card
 
 		weapon = @props.weapon
 
-		console.log 'rendering hero', entity.cardID, entity
+		# console.log 'rendering hero', entity.cardID, entity
 
 		if entity.cardID && !@props.isHidden
 			style =

@@ -169,6 +169,9 @@ class ActionParser extends EventEmitter
 				# Because turn 1 is Mulligan
 				actions[i].owner = @turns[actions[i].turn + 1].activePlayer
 
+			# action.tagChanges = {}
+			# action.tagRollback = {}
+
 		# Remove empty
 		finalActions = _.compact actions
 
