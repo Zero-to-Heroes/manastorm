@@ -41,7 +41,7 @@ class Card extends React.Component
 		else
 			style = {}
 			cls = "game-card"
-			imgSrc = "images/cardback.png"
+			# imgSrc = "images/cardback.png"
 			imageCls += " card--unknown"
 
 		frameCls = "frame minion"
