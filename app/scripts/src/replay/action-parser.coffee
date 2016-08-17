@@ -112,9 +112,9 @@ class ActionParser extends EventEmitter
 
 			if item.command is 'receiveTagChange'
 				@currentTurnNumber = @turnNumber - 1
-				if (@turns[@currentTurnNumber])
-
+				if @turns[@currentTurnNumber]
 					@parseFatigueDamage item
+					@parseEndGame item
 
 			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
 			# tap before drawing the card)
@@ -167,7 +167,7 @@ class ActionParser extends EventEmitter
 			if !actions[i].owner
 				# console.log 'adding owner', actions[i], @turns[actions[i].turn], @turns
 				# Because turn 1 is Mulligan
-				actions[i].owner = @turns[actions[i].turn + 1].activePlayer
+				actions[i].owner = @turns[actions[i].turn + 1]?.activePlayer
 
 			# action.tagChanges = {}
 			# action.tagRollback = {}
@@ -916,5 +916,25 @@ class ActionParser extends EventEmitter
 				initialCommand: command
 			}
 			@addAction @currentTurnNumber, action
+
+
+	parseEndGame: (item) ->
+		command = item.node
+		if command.tag == 'PLAYSTATE' and command.value in [4, 5]
+			console.log 'parsing end game', item
+			lastAction = _.last @turns[@currentTurnNumber]?.actions
+			if lastAction?.actionType is 'end-game'
+				lastAction.index = command.index
+				lastAction.timestamp = item.timestamp
+			else
+				action = {
+					turn: @currentTurnNumber
+					timestamp: item.timestamp
+					index: command.index
+					actionType: 'end-game'
+					mainAction: command.parent?.parent # It's a tag change, so we are interesting in the enclosing action
+					initialCommand: command
+				}
+				@addAction @currentTurnNumber, action
 
 module.exports = ActionParser

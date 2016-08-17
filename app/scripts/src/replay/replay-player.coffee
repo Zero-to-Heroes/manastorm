@@ -127,7 +127,7 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		console.log 'goNextAction', @currentTurn, @currentActionInTurn, @historyPosition
+		# console.log 'goNextAction', @currentTurn, @currentActionInTurn, @historyPosition
 		@newStep()
 
 		## last acation in the game
@@ -144,7 +144,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
-			console.log 'goign to next turn', @currentTurn + 1
+			# console.log 'goign to next turn', @currentTurn + 1
 			@currentTurn++
 			@currentActionInTurn = -1
 
@@ -166,14 +166,14 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
 		@previousActiveSpell = undefined
 
 		if @currentActionInTurn == -1 and @currentTurn > 2
-			console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
+			# console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
 			rollbackAction = @turns[@currentTurn - 1].actions[@turns[@currentTurn - 1].actions.length - 1]
 
 		else 
@@ -204,16 +204,16 @@ class ReplayPlayer extends EventEmitter
 			targetAction = @currentActionInTurn - 1
 
 
-		console.log 'rollbackAction', rollbackAction
+		# console.log 'rollbackAction', rollbackAction
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 
 		else
-			console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
 			@emit 'previous-action', rollbackAction
 
@@ -286,6 +286,7 @@ class ReplayPlayer extends EventEmitter
 
 			else
 				@updateActiveSpell action
+				@updateEndGame action
 				@emit 'new-action', action
 
 				if action.target
@@ -442,7 +443,11 @@ class ReplayPlayer extends EventEmitter
 				action = @turns[@currentTurn].actions[@currentActionInTurn]
 
 			@history[@historyPosition].execute(this, action)
-			@historyPosition++
+
+			if @history[@historyPosition + 1]
+				@historyPosition++
+			else 
+				break
 			# console.log '\t\tprocessed'
 
 
@@ -479,8 +484,12 @@ class ReplayPlayer extends EventEmitter
 		# Blur during mulligan
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return true
+			
 		# Same for discover
 		if @discoverAction
+			return true
+
+		if @isEndGame
 			return true
 
 		return false
@@ -516,8 +525,12 @@ class ReplayPlayer extends EventEmitter
 			@activeSpell = @previousActiveSpell
 			@previousActiveSpell = undefined
 
-		# @activeSpell = @activeSpell || action.activeSpell
 
+	updateEndGame: (action) ->
+		if action.actionType is 'end-game'
+			@isEndGame = true
+		else 
+			@isEndGame = false
 		# action.activeSpell = @activeSpell
 
 	mainPlayer: (entityId) ->

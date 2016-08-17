@@ -50,6 +50,10 @@ class Entity extends EventEmitter
 					action.rollbackInfo[@id][k] = action.rollbackInfo[@id][k] || @tags[k]
 				@tags[k] = v
 
+			# Keep track of concedes
+			if definition.tags.PLAYSTATE is 8
+				@tags['CONCEDED'] = 1
+
 		# console.log 'update first pass done'
 		if definition.cardID
 			@cardID = definition.cardID
@@ -57,54 +61,6 @@ class Entity extends EventEmitter
 		if definition.name
 			@name = definition.name
 
-
-		# if action
-		# 	changed = _.pick definition.tags, (value, tag) ->
-		# 		value isnt old[tag]
-
-		# 	console.log 'changed', changed
-		# 	for k, v of action.rollbackInfo[@id]
-		# 		if !changed[k]
-		# 			console.log 'cancelling change', k, v, action.rollbackInfo[@id]
-		# 			delete action.rollbackInfo[@id][k]
-		# 			console.log '\tnew', action.rollbackInfo[@id]
-
-
-		# for tag, value of changed
-		# 	if value isnt old[tag]
-				# @emit "tag-changed:#{tag}",
-				# 	entity: this
-				# 	oldValue: old[tag]
-				# 	newValue: value
-
-		# if changed.ZONE
-		# 	if old.ZONE
-		# 		# @emit "left-#{zoneNames[old.ZONE].toLowerCase()}", entity: this
-		# 		if old.ZONE is zones.DECK
-		# 			@getController()?.entityLeftDeck(this)
-		# 	# @emit "entered-#{zoneNames[changed.ZONE].toLowerCase()}", entity: this
-		# 	if changed.ZONE is zones.HAND
-		# 		@getController()?.entityEnteredHand(this)
-		# 	if changed.ZONE is zones.PLAY
-		# 		@getController()?.entityEnteredPlay(this)
-		# 	if changed.ZONE is zones.DECK
-		# 		@getController()?.entityEnteredDeck(this)
-		# 	if changed.ZONE is zones.SECRET
-		# 		@getController()?.entityEnteredSecret(this)
-
-		# if changed.CONTROLLER
-		# 	if old.ZONE is zones.HAND
-		# 		# @emit 'left-hand', entity: this
-		# 		@getController()?.entityEnteredHand(this)
-		# 	if old.ZONE is zones.PLAY
-		# 		# @emit 'left-play', entity: this
-		# 		@getController()?.entityEnteredPlay(this)
-		# 	if old.ZONE is zones.DECK
-		# 		# @emit 'left-deck', entity: this
-		# 		@getController()?.entityEnteredDeck(this)
-		# 	if old.ZONE is zones.SECRET
-		# 		# @emit 'left-secret', entity: this
-		# 		@getController()?.entityEnteredSecret(this)
 
 	getLastZone: -> @lastZone
 

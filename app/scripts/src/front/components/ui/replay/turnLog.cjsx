@@ -116,32 +116,8 @@ TurnLog = React.createClass
 		else if action.actionType == 'fatigue-damage'
 			log = @buildFatigueDamageLog action
 
-		else
-			# console.warning 'Shouldnt happen, unsupported log action', action
-			# card = if action?.data then action.data['cardID'] else ''
-
-			# owner = action.owner.name 
-			# if !owner
-			# 	ownerCard = @replay.entities[action.owner]
-			# 	owner = @replay.buildCardLink(@replay.cardUtils.getCard(ownerCard.cardID))
-			# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-			# if action.secret
-			# 	if cardLink?.length > 0 and action.publicSecret
-			# 		#console.log 'action', action
-			# 		cardLink += ' -> Secret'
-			# 	else
-			# 		cardLink = 'Secret'
-			# creator = ''
-			# if action.creator
-			# 	creator = @replay.buildCardLink(@replay.cardUtils.getCard(action.creator.cardID)) + ': '
-			# newLog = owner + action.type + creator + cardLink
-
-			# if action.target
-			# 	target = @replay.entities[action.target]
-			# 	newLog += ' -> ' + @replay.buildCardLink(@replay.cardUtils.getCard(target.cardID))
-
-			# # http://stackoverflow.com/questions/30495062/how-can-i-scroll-a-div-to-be-visible-in-reactjs
-			# log = <ActionDisplayLog newLog={newLog} />
+		else if action.actionType == 'end-game'
+			log = @buildEndGameLog action
 
 
 		@replay.notifyNewLog log
@@ -621,6 +597,11 @@ TurnLog = React.createClass
 			logs.push cardLog
 
 		return logs
+
+	buildEndGameLog: (action) ->
+		console.log 'logging end game', action
+		log = <p className="turn end-game" key={++@logIndex}>End game</p>
+		return log
 
 	# ===============
 	# Utilities

@@ -10,6 +10,7 @@ Hero = require './ui/replay/hero'
 Deck = require './ui/replay/deck'
 Mulligan = require './ui/replay/mulligan'
 Discover = require './ui/replay/discover'
+EndGame = require './ui/replay/endgame'
 Board = require './ui/replay/board'
 Mana = require './ui/replay/mana'
 Health = require './ui/replay/health'
@@ -121,6 +122,7 @@ class Replay extends React.Component
 			topOverlay = <div className="top" >
 				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
 				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
+				<EndGame entity={replay.opponent} isEnd={replay.isEndGame} />
 			</div>
 
 			bottomArea = <div className="bottom"><Board entity={replay.player} ref="bottomBoard" tooltips={true} replay={replay}/>
@@ -134,6 +136,7 @@ class Replay extends React.Component
 			bottomOverlay = <div className="bottom">
 				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
+				<EndGame entity={replay.player} isEnd={replay.isEndGame} />
 			</div>
 			# console.log 'components are ok'
 
