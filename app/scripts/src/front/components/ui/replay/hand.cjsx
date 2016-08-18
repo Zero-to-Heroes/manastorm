@@ -5,29 +5,6 @@ ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
 _ = require 'lodash'
 
 Hand = React.createClass
-	componentDidMount: ->
-		@subs = new SubscriptionList
-
-		# for entity in @props.entity.getHand()
-		# 	@subscribeToEntity(entity)
-
-		# @subs.add @props.entity, 'entity-entered-hand', ({entity}) =>
-		# 	@subscribeToEntity(entity)
-		# 	@forceUpdate()
-
-		# @subs.add @props.entity, 'tag-changed:MULLIGAN_STATE', =>
-		# 	@forceUpdate()
-
-	# subscribeToEntity: (entity) ->
-	# 	entitySubs = @subs.add new SubscriptionList
-	# 	entitySubs.add entity, 'left-hand', =>
-	# 		entitySubs.off()
-	# 		@forceUpdate()
-	# 	entitySubs.add entity, 'tag-changed:ZONE_POSITION', =>
-	# 		@forceUpdate()
-
-	componentWillUnmount: ->
-		#@subs.off()
 
 	render: ->
 		return <div className="hand"></div> unless @props.entity.tags.MULLIGAN_STATE is 4

@@ -1,14 +1,9 @@
 React = require 'react'
-SubscriptionList = require '../../../../subscription-list'
-{subscribe} = require '../../../../subscription'
 
 class HeroAttack extends React.Component
 	componentDidMount: ->
 		hero = @props.entity
 
-		@subs = new SubscriptionList
-		# @subs.add @props.entity, 'tag-changed:HERO', =>
-		# 	@forceUpdate()
 
 	render: ->
 		hero = @props.entity

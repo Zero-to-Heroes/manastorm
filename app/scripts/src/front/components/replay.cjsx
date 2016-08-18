@@ -41,18 +41,22 @@ class Replay extends React.Component
 
 		@showAllCards = false
 		@mainPlayerSwitched = false
+		@dirty = false
 
 		subscribe @state.replay, 'players-ready', =>
-			#console.log 'in players-ready' 
-			@callback
+			console.log 'in players-ready'
+			@callProtectedCallback()
 
-		subscribe @state.replay, 'reset', =>
-			#console.log 'in players-ready' 
-			@callback
+		# subscribe @state.replay, 'reset', =>
+		# 	console.log 'in reset' 
+		# 	@callback
 
 		subscribe @state.replay, 'moved-timestamp', =>
-			#console.log 'in moved-timestamp'
-			setTimeout @callback, 300
+			console.log 'in moved-timestamp'
+			@callProtectedCallback()
+			# if !@dirty
+			# 	@dirty = true 
+			# 	setTimeout @callback, 300
 
 		subscribe @state.replay, 'game-generated', =>
 			@gameGenerated = true
@@ -85,12 +89,16 @@ class Replay extends React.Component
 		@mounted = true
 		@updateDimensions()
 
+	callProtectedCallback: ->
+		if !@dirty
+			@dirty = true 
+			@callback()
 
 	updateDimensions: =>
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-			# console.log 'built style', @state.style
-			@callback()
+			console.log 'updated dimensions'
+			@callProtectedCallback()
 
 	callback: =>
 		if !@mounted
@@ -98,7 +106,12 @@ class Replay extends React.Component
 			setTimeout @callback, 50
 		else
 			try
+				console.log 'forcing update'
 				@forceUpdate()
+				that = this
+				setTimeout () ->
+					that.dirty = false
+				, 50
 			catch e
 				console.error 'issue in forceUpdate', e
 
@@ -106,7 +119,7 @@ class Replay extends React.Component
 		replay = @state.replay
 		# return null unless @gameGenerated
 
-		# console.log 'rerendering replay'
+		console.log 'rerendering replay'
 
 		if replay.players.length == 2
 			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
@@ -236,7 +249,7 @@ class Replay extends React.Component
 		@state.replay.pause()
 		@state.replay.goNextAction()
 		# start = new Date().getTime()
-		@callback()
+		@callProtectedCallback()
 		# console.log 'force update took', new Date().getTime() - start
 
 	goPreviousAction: (e) =>
@@ -244,43 +257,43 @@ class Replay extends React.Component
 		@state.replay.pause()
 		@state.replay.goPreviousAction()
 		# start = new Date().getTime()
-		@callback()
+		@callProtectedCallback()
 		# console.log 'force update took', new Date().getTime() - start
 
 	goNextTurn: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goNextTurn()
-		@callback()
+		@callProtectedCallback()
 
 	goPreviousTurn: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
 		@state.replay.goPreviousTurn()
-		@callback()
+		@callProtectedCallback()
 
 	onClickPlay: (e) =>
 		e.preventDefault()
 		@state.replay.autoPlay()
-		@callback()
+		@callProtectedCallback()
 
 	onClickPause: (e) =>
 		e.preventDefault()
 		@state.replay.pause()
-		@callback()
+		@callProtectedCallback()
 
 	onClickChangeSpeed: (speed) ->
 		@state.replay.changeSpeed speed
-		@callback()
+		@callProtectedCallback()
 
 	onShowCardsChange: =>
 		@showAllCards = !@showAllCards
-		@callback()
+		@callProtectedCallback()
 
 	onMainPlayerSwitchedChange: =>
 		@mainPlayerSwitched = !@mainPlayerSwitched
 		@state.replay.switchMainPlayer()
-		@callback()
+		@callProtectedCallback()
 
 	onTurnClick: (e) =>
 		e.preventDefault()
@@ -289,13 +302,13 @@ class Replay extends React.Component
 			replay = @state.replay
 			setTimeout () ->
 				replay.cardUtils.refreshTooltips()
-		@callback()
+		@callProtectedCallback()
 
 	onGoToTurnClick: (turn, e) =>
-		console.log 'clicked to go to a turn', turn
+		# console.log 'clicked to go to a turn', turn
 		# Mulligan is turn 1
 		@state.replay.goToTurn(turn + 1)
-		@callback()
+		@callProtectedCallback()
 		
 
 

@@ -10,7 +10,6 @@ class GameLog extends React.Component
 
 		@subs.add @replay, 'new-log', (log) =>
 			@log = log
-			# @forceUpdate()
 
 	render: ->
 		# console.log 'rendering gamelog'

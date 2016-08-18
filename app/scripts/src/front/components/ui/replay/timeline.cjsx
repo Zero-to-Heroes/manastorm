@@ -1,11 +1,6 @@
 React = require 'react'
 
 class Timeline extends React.Component
-	componentDidMount: ->
-		# @int = setInterval((=> @forceUpdate()), 500)
-
-	componentWillUnmount: ->
-		#clearInterval(@int)
 
 	render: ->
 		replay = @props.replay

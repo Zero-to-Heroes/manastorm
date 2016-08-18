@@ -21,7 +21,7 @@ class SecretRevealed extends React.Component
 			when 5
 				secretClass += "paladin"
 
-		console.log 'rendering secret', @props.entity
+		# console.log 'rendering secret', @props.entity
 
 		return 	<div className={secretClass}>
 					<Card entity={entity} key={'secret' + entity.id} ref={'secret' + entity.id} cardUtils={cardUtils}/>

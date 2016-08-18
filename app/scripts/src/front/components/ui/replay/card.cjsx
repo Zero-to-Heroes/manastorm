@@ -158,7 +158,7 @@ class Card extends React.Component
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
-			return <div className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
+			return <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 				<div className={frameHighlight}></div>
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls}></img>
@@ -179,7 +179,7 @@ class Card extends React.Component
 			</div>
 
 		else
-			return <div className={cls} style={@props.style}>
+			return <div key={'card' + entity.id} className={cls} style={@props.style}>
 				<div className={frameHighlight}></div>
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls} style={style}></img>
@@ -241,7 +241,7 @@ class Card extends React.Component
 						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
 					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
 
-				<div className="enchantment">
+				<div className="enchantment" key={'enchantment' + entity.id + enchant.cardID}>
 					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>
 					<div className="info-container">
 						<div className="icon" style={enchantImage}></div>
@@ -271,7 +271,7 @@ class Card extends React.Component
 				text = cardUtils?.localizeKeyword(key + '_TEXT')
 				# console.log '\t\texists', name, text
 				statusElement = 
-					<div className="status">
+					<div className="status" key={'status' + entity.id + key}>
 						<h3>{name}</h3>
 						<span>{text}</span>
 					</div>

@@ -1,11 +1,6 @@
 React = require 'react'
 
 class Scrubber extends React.Component
-	componentDidMount: ->
-		# @int = setInterval((=> @forceUpdate()), 500)
-
-	componentWillUnmount: ->
-		#clearInterval(@int)
 
 	render: ->
 		return null unless @props.replay.started

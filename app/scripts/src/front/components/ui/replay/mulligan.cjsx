@@ -1,16 +1,8 @@
 React = require 'react'
 Card = require './card'
-ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
 _ = require 'lodash'
-{subscribe} = require '../../../../subscription'
 
 class Mulligan extends React.Component
-	componentDidMount: ->
-		# @sub = subscribe @props.entity, 'tag-changed:MULLIGAN_STATE', ({newValue}) =>
-		# 	@forceUpdate()
-
-	componentWillUnmount: ->
-		#@sub.off()
 
 	render: ->
 		# console.log 'rendering mulligan?', @props.entity, @props.entity.getHand(), @props.mulligan

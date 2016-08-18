@@ -1,17 +1,9 @@
 React = require 'react'
 Card = require './card'
 _ = require 'lodash'
-SubscriptionList = require '../../../../subscription-list'
 
 class Board extends React.Component
-	componentDidMount: ->
-		@subs = new SubscriptionList
 
-		# @subs.add @props.entity, 'entity-entered-play', ({entity}) =>
-		# 	entitySub = @subs.add entity, 'left-play', =>
-		# 		entitySub.off()
-		# 		@forceUpdate()
-		# 	@forceUpdate()
 
 	render: ->
 		# console.log 'rendering board'

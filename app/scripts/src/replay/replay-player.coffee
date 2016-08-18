@@ -80,7 +80,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Notify the UI controller
 		@emit 'game-generated', this
-		@emit 'players-ready'
+		# @emit 'players-ready'
 
 		# Preload the images
 		images = @buildImagesArray()
@@ -237,7 +237,7 @@ class ReplayPlayer extends EventEmitter
 					# console.log 'position back to start of turn'
 					while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 						@historyPosition--
-					console.log '\tdone'
+					# console.log '\tdone'
 				@goNextAction()
 
 
@@ -281,7 +281,7 @@ class ReplayPlayer extends EventEmitter
 
 			if action.shouldExecute and !action.shouldExecute() 
 				if !@seeking
-					console.log 'skipping action'
+					# console.log 'skipping action'
 					@goNextAction()
 
 			else
