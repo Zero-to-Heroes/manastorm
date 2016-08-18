@@ -921,7 +921,7 @@ class ActionParser extends EventEmitter
 	parseEndGame: (item) ->
 		command = item.node
 		if command.tag == 'PLAYSTATE' and command.value in [4, 5]
-			console.log 'parsing end game', item
+			# console.log 'parsing end game', item
 			lastAction = _.last @turns[@currentTurnNumber]?.actions
 			if lastAction?.actionType is 'end-game'
 				lastAction.index = command.index

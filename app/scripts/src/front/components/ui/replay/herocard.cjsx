@@ -5,6 +5,7 @@ Secret = require './Secret'
 Health = require './health'
 Armor = require './armor'
 HeroAttack = require './heroAttack'
+ReactTooltip = require 'react-tooltip'
 {subscribe} = require '../../../../subscription'
 
 class HeroCard extends Card
@@ -51,7 +52,18 @@ class HeroCard extends Card
 		if entity.tags.DAMAGE - entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
-		return 	<div className={cls}>
+		# console.log 'build statuses', entity.cardID, entity
+		statuses = @buildStatuses entity
+
+		cardTooltip = 
+			<div className="card-container">
+				<div className='statuses'>
+					<div className="filler"></div>
+					{statuses}
+				</div>
+			</div>
+
+		return 	<div className={cls} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 					<div className="frame frame-highlight"></div>
 					<div className={avatarCls} style={style}></div>
 					<div className="frame"></div>
@@ -63,6 +75,9 @@ class HeroCard extends Card
 					<Health entity={entity}/>
 					<Armor entity={entity}/>
 					{damage}
+					<ReactTooltip id={"" + entity.id} >
+					    {cardTooltip}
+					</ReactTooltip>
 				</div>
 
 module.exports = HeroCard

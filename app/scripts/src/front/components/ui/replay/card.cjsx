@@ -134,45 +134,8 @@ class Card extends React.Component
 		if entity.tags.DAMAGE - entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
-		# console.log 'entity in card', entity, entity.getEnchantments
-		if entity.getEnchantments?()?.length > 0
-			# console.log '\tcard rendered', entity.cardID, entity
-			# console.log 'enchantments', entity.getEnchantments()
-
-			enchantments = entity.getEnchantments().map (enchant) ->
-				enchantor = entity.replay.entities[enchant.tags.CREATOR]
-				# console.log 'enchantor', enchantor, entity.replay.entities, enchant.tags.CREATOR, enchant
-				enchantCard = cardUtils?.getCard(enchant.cardID)
-
-				if enchantor
-					enchantImage = 
-						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
-					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
-
-				<div className="enchantment">
-					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>
-					<div className="info-container">
-						<div className="icon" style={enchantImage}></div>
-						<span className="text" dangerouslySetInnerHTML={{__html: cardUtils?.localizeText(enchantCard)}}></span>
-					</div>
-				</div>
-
-			enchantmentClass = "enchantments"
-		
-		# The keywords
-		keywords = []
-		for k,v of entity.tags
-			key = 'GLOBAL_KEYWORD_' + k
-			console.log 
-			if v isnt 0 and cardUtils?.keywords[key]
-				name = cardUtils?.localizeKeyword(key)
-				text = cardUtils?.localizeKeyword(key + '_TEXT')
-				statusElement = 
-					<div className="status">
-						<h3>{name}</h3>
-						<span>{text}</span>
-					</div>
-				keywords.push statusElement
+		enchantments = @buildEnchantments entity
+		statuses = @buildStatuses entity
 
 
 		# Build the card link on hover. It includes the card image + the status alterations			
@@ -180,13 +143,13 @@ class Card extends React.Component
 			<div className="card-container">
 				<div className="game-info">
 					<img src={art} />
-					<div className={enchantmentClass}>
+					<div className="enchantments">
 						{enchantments}
 					</div>
 				</div>
 				<div className='statuses'>
 					<div className="filler"></div>
-					{keywords}
+					{statuses}
 				</div>
 			</div>
 
@@ -258,5 +221,63 @@ class Card extends React.Component
 	getDimensions: ->
 		#console.log 'getting dimensions for card', @centerX, @centerY
 		return {@centerX, @centerY}
+
+	buildEnchantments: (entity) ->
+		cardUtils = @props.cardUtils
+		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
+
+		# console.log 'entity in card', entity, entity.getEnchantments
+		if entity.getEnchantments?()?.length > 0
+			# console.log '\tcard rendered', entity.cardID, entity
+			# console.log 'enchantments', entity.getEnchantments()
+
+			enchantments = entity.getEnchantments().map (enchant) ->
+				enchantor = entity.replay.entities[enchant.tags.CREATOR]
+				# console.log 'enchantor', enchantor, entity.replay.entities, enchant.tags.CREATOR, enchant
+				enchantCard = cardUtils?.getCard(enchant.cardID)
+
+				if enchantor
+					enchantImage = 
+						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
+					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
+
+				<div className="enchantment">
+					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>
+					<div className="info-container">
+						<div className="icon" style={enchantImage}></div>
+						<span className="text" dangerouslySetInnerHTML={{__html: cardUtils?.localizeText(enchantCard)}}></span>
+					</div>
+				</div>
+
+			# enchantmentClass = "enchantments"
+
+		return enchantments
+
+	buildStatuses: (entity) ->
+		cardUtils = @props.cardUtils
+		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
+
+		# The keywords
+		keywords = []
+
+		# console.log 'build statuses', entity.cardID, entity, cardUtils?.keywords
+
+		for k,v of entity.tags
+			key = 'GLOBAL_KEYWORD_' + k
+			# console.log '\t' + key, v
+			if v isnt 0 and cardUtils?.keywords[key]
+				# console.log '\t\texists'
+				name = cardUtils?.localizeKeyword(key)
+				text = cardUtils?.localizeKeyword(key + '_TEXT')
+				# console.log '\t\texists', name, text
+				statusElement = 
+					<div className="status">
+						<h3>{name}</h3>
+						<span>{text}</span>
+					</div>
+				# console.log '\t\tbuild', statusElement
+				keywords.push statusElement
+
+		return keywords
 
 module.exports = Card

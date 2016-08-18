@@ -234,7 +234,7 @@ class ReplayPlayer extends EventEmitter
 			if lastIteration			
 				# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
 				if @currentActionInTurn is -1
-					console.log 'position back to start of turn'
+					# console.log 'position back to start of turn'
 					while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 						@historyPosition--
 					console.log '\tdone'
@@ -273,7 +273,7 @@ class ReplayPlayer extends EventEmitter
 		# 	@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -361,7 +361,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp()
+		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp()
 		@newStep()
 
 		# lastTimestamp = 0
@@ -373,16 +373,16 @@ class ReplayPlayer extends EventEmitter
 		@seeking = true
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
 		if !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
-			console.log '\tforward'
+			# console.log '\tforward'
 			hasMoved = true
 			while hasMoved and (!@getCurrentTimestamp() or timestamp > @getCurrentTimestamp())
 				hasMoved = @goNextAction()
-				console.log 'going to next action', hasMoved, @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
+				# console.log 'going to next action', hasMoved, @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 		else if timestamp < @getCurrentTimestamp()
-			console.log '\tbackward'
+			# console.log '\tbackward'
 			# Stop at mulligan
 			while @currentTurn > 1 and (!@getCurrentTimestamp() or timestamp < @getCurrentTimestamp())
-				console.log 'going to previous action', @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
+				# console.log 'going to previous action', @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 				@goPreviousAction()
 		@seeking = false
 		@emit 'moved-timestamp'
@@ -397,8 +397,8 @@ class ReplayPlayer extends EventEmitter
 		else
 			timestamp = @turns[@currentTurn].actions[@currentActionInTurn].timestamp
 		# console.log '\t\tgetting current timestamp', timestamp
-		if !timestamp
-			console.warn '\t\tcould not get timestamp', @turns[@currentTurn], @currentTurn, @currentActionInTurn, @turns, index
+		# if !timestamp
+		# 	console.warn '\t\tcould not get timestamp', @turns[@currentTurn], @currentTurn, @currentActionInTurn, @turns, index
 		return timestamp
 
 
@@ -438,7 +438,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	update: ->
-		console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
+		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			# console.log '\tgo'
 			# if !@history[@historyPosition].executed
@@ -627,8 +627,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		if change.tag is 'RESOURCES'
-			console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		# if change.tag is 'RESOURCES'
+		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value
