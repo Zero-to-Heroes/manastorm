@@ -6,7 +6,7 @@ _ = require 'lodash'
 class EndGame extends React.Component
 
 	render: ->
-		console.log 'rendering endgame?', @props.entity
+		# console.log 'rendering endgame?', @props.entity
 		# WON, LOST, CONCEDED
 		return null unless @props.isEnd
 

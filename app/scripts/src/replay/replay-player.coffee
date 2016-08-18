@@ -360,7 +360,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		console.log 'moving to timestamp', timestamp
+		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp()
 		@newStep()
 
 		# lastTimestamp = 0
@@ -371,11 +371,12 @@ class ReplayPlayer extends EventEmitter
 		# Going forward
 		@seeking = true
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
-		if timestamp > @getCurrentTimestamp()
+		if !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
 			console.log '\tforward'
 			hasMoved = true
 			while hasMoved and (!@getCurrentTimestamp() or timestamp > @getCurrentTimestamp())
 				hasMoved = @goNextAction()
+				console.log 'going to next action', hasMoved, @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 		else if timestamp < @getCurrentTimestamp()
 			console.log '\tbackward'
 			# Stop at mulligan
@@ -395,8 +396,8 @@ class ReplayPlayer extends EventEmitter
 		else
 			timestamp = @turns[@currentTurn].actions[@currentActionInTurn].timestamp
 		# console.log '\t\tgetting current timestamp', timestamp
-		# if !timestamp
-		# 	console.warn '\t\tcould not get timestamp', @turns[@currentTurn], @currentTurn, @currentActionInTurn, @turns, index
+		if !timestamp
+			console.warn '\t\tcould not get timestamp', @turns[@currentTurn], @currentTurn, @currentActionInTurn, @turns, index
 		return timestamp
 
 
