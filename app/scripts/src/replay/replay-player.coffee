@@ -405,6 +405,9 @@ class ReplayPlayer extends EventEmitter
 	getActivePlayer: ->
 		return @turns[@currentTurn]?.activePlayer || {}
 
+	getCurrentAction: ->
+		return @turns[@currentTurn].actions[@currentActionInTurn]
+
 	newStep: ->
 		@targetSource = undefined
 		@targetDestination = undefined
@@ -494,6 +497,9 @@ class ReplayPlayer extends EventEmitter
 			return true
 
 		return false
+
+	isFatigue: ->
+		return @turns[@currentTurn].actions[@currentActionInTurn]?.actionType is 'fatigue-damage'
 
 
 	updateOptions: (action) ->

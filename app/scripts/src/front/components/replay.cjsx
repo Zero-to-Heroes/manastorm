@@ -11,6 +11,7 @@ Deck = require './ui/replay/deck'
 Mulligan = require './ui/replay/mulligan'
 Discover = require './ui/replay/discover'
 EndGame = require './ui/replay/endgame'
+Fatigue = require './ui/replay/fatigue'
 Board = require './ui/replay/board'
 Mana = require './ui/replay/mana'
 Health = require './ui/replay/health'
@@ -138,6 +139,10 @@ class Replay extends React.Component
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 				<EndGame entity={replay.player} isEnd={replay.isEndGame} />
 			</div>
+
+			commonOverlay = <div className="common">
+				<Fatigue entity={replay.getActivePlayer()} isFatigue={replay.isFatigue()} action={replay.getCurrentAction()} />
+			</div>
 			# console.log 'components are ok'
 
 		else 
@@ -166,7 +171,7 @@ class Replay extends React.Component
 
 		blur = ""
 		overlayCls = "overlay"
-		if replay.choosing()
+		if replay.choosing() or replay.isFatigue()
 			blur = "blur"
 			overlayCls += " silent"
 
@@ -194,6 +199,7 @@ class Replay extends React.Component
 						<div className={overlayCls}>
 							{topOverlay}
 							{bottomOverlay}
+							{commonOverlay}
 						</div>
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>

@@ -1,0 +1,35 @@
+.overlay .common {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+
+	.fatigue {
+		width: 35%;
+		margin: auto;
+		background: url(images/fatigue.png) center center no-repeat;
+		background-size: contain;
+		position: relative;
+
+		&:before {
+			content: "";
+			padding-top: 159%;
+			position: relative;
+			display: block; 	
+		}
+
+		.text {
+		    color: black;
+		    position: absolute;
+		    top: 65%;
+		    width: 100%;
+		    text-align: center;
+		    display: block;
+		    font-weight: bold;
+		    padding-left: 25%;
+		    padding-right: 25%;
+		}
+	}
+}
