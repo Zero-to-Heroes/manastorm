@@ -79,24 +79,51 @@
 		    left: 0;
 		}
 
-		.frame.minion.card--taunt.option-on::before {
-			border-top-left-radius: 25%;
-			border-top-right-radius: 25%;
-		}
+		// .frame.minion.card--taunt.option-on::before {
+		// 	border-top-left-radius: 25%;
+		// 	border-top-right-radius: 25%;
+		// }
 
 		&:last-child {
 			margin-right: 0;
 		}
 
-		.option-on {
-			content: "";
-		    border: 0.25em solid @innerGlow; //#31C331;
-		    position: absolute;
-		    top: 0;
-		    bottom: 0;
-		    left: 0;
-		    right: 0;
-		    border-radius: 50%;
+		// .option-on {
+		// 	content: "";
+		//     border: 0.25em solid @innerGlow; //#31C331;
+		//     position: absolute;
+		//     top: 0;
+		//     bottom: 0;
+		//     left: 0;
+		//     right: 0;
+		//     border-radius: 50%;
+		// }
+
+		&.option-on .frame-highlight {
+			background-image: url(images/card_border_noshadow.png);
+		    top: -5%;
+		    left: -15%;
+			-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+							drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+							drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+							drop-shadow(@glowSize -@glowSize 1px @innerGlow) 
+							drop-shadow(0px 0px 0.5em @outerGlow) 
+							drop-shadow(0px 0px 0.8em @outerGlow);
+			filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
+					drop-shadow(@glowSize @glowSize 1px @innerGlow) 
+					drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
+					drop-shadow(@glowSize -@glowSize 1px @innerGlow)
+					drop-shadow(0px 0px 0.5em @outerGlow) 
+					drop-shadow(0px 0px 0.8em @outerGlow);
+
+			&.legendary {
+				background-image: url(images/card_border_noshadow_legendary.png);
+			    width: 157%;
+			    top: -20%;
+			    left: -26%;
+			    height: 142%;
+			}
+
 		}
 
 		.card__stats {

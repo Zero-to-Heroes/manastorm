@@ -116,14 +116,15 @@ class Card extends React.Component
 
 		# Can attack
 		if entity.highlighted
+			cls += " option-on"
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
 
 			if @props.controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
 				imageCls += " combo"
 
-		if entity.tags.POWERED_UP == 1
-			imageCls += " img-option-on combo"
+			if entity.tags.POWERED_UP == 1
+				imageCls += " img-option-on combo"
 			# cls += " option-on"
 
 		# Exhausted
@@ -189,10 +190,13 @@ class Card extends React.Component
 				</div>
 			</div>
 
+		frameHighlight = frameCls + " frame-highlight" + legendaryCls
+
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
 			return <div className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
+				<div className={frameHighlight}></div>
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls}></img>
 				<div className={frameCls}></div>
@@ -213,6 +217,7 @@ class Card extends React.Component
 
 		else
 			return <div className={cls} style={@props.style}>
+				<div className={frameHighlight}></div>
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls} style={style}></img>
 				<div className={frameCls}></div>
