@@ -287,6 +287,7 @@ class ReplayPlayer extends EventEmitter
 			else
 				@updateActiveSpell action
 				@updateEndGame action
+				@updateSecret action
 				@emit 'new-action', action
 
 				if action.target
@@ -532,6 +533,11 @@ class ReplayPlayer extends EventEmitter
 			@activeSpell = @previousActiveSpell
 			@previousActiveSpell = undefined
 
+	updateSecret: (action) ->
+		if action.actionType is 'secret-revealed'
+			@revealedSecret = action.data
+		else 
+			@revealedSecret = false
 
 	updateEndGame: (action) ->
 		if action.actionType is 'end-game'
