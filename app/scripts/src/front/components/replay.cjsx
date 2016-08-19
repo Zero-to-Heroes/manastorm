@@ -107,9 +107,9 @@ class Replay extends React.Component
 		else
 			try
 				console.log 'forcing update'
-				@forceUpdate()
 				that = this
 				setTimeout () ->
+					that.forceUpdate()
 					that.dirty = false
 				, 50
 			catch e
