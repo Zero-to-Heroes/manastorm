@@ -138,12 +138,13 @@ class Card extends React.Component
 		statuses = @buildStatuses entity
 
 
-		# Build the card link on hover. It includes the card image + the status alterations			
+		# Build the card link on hover. It includes the card image + the status alterations		
+		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
 		cardTooltip = 
 			<div className="card-container">
 				<div className="game-info">
 					<img src={art} />
-					<div className="enchantments">
+					<div className={enchantmentClass}>
 						{enchantments}
 					</div>
 				</div>
