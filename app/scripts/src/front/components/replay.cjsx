@@ -208,7 +208,6 @@ class Replay extends React.Component
 						<div className={"game-area " + blur}>
 							{topArea}
 							{bottomArea}
-							{targets}
 							{targetManager}
 							<div className="active-spell-container">
 								<ActiveSpell ref="activeSpell" replay={replay} />

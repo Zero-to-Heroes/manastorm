@@ -416,7 +416,7 @@ class ReplayPlayer extends EventEmitter
 		@discoverAction = undefined
 		@previousActiveSpell = @activeSpell
 		@activeSpell = undefined
-		# console.log 'new step', @activeSpell, @previousActiveSpell
+		console.log 'new step', @activeSpell, @previousActiveSpell
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0
 			v.highlighted = false
@@ -525,7 +525,7 @@ class ReplayPlayer extends EventEmitter
 		realAction = action.mainAction?.associatedAction || action
 		mainEntity = action.mainAction?.associatedAction?.data || action.data
 		# console.log 'updating active spell', action, realAction, mainEntity
-		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType is 'played-card-from-hand'
+		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType in ['played-card-from-hand', 'played-card-with-target']
 			# console.log '\tupdating active spell', mainEntity
 			@activeSpell = mainEntity
 
