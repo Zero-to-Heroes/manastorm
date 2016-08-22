@@ -50,6 +50,7 @@ class Weapon extends Card
 			<div className={healthClass}><span>{tagDurability - (@props.entity.tags.DAMAGE or 0)}</span></div>
 		</div>
 
+		@updateDimensions()
 		link = '<img src="' + art + '">';
 
 		return <div className="weapon-container" data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">

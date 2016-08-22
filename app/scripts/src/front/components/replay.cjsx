@@ -21,6 +21,7 @@ Timeline = require './ui/replay/timeline'
 GameLog = require './ui/replay/gamelog'
 Play = require './ui/replay/play'
 Target = require './ui/replay/target'
+TargetManager = require './ui/replay/targetManager'
 Turn = require './ui/replay/turn'
 TurnLog = require './ui/replay/turnLog'
 ActiveSpell = require './ui/replay/activeSpell'
@@ -94,6 +95,7 @@ class Replay extends React.Component
 			@dirty = true 
 			@callback()
 
+
 	updateDimensions: =>
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
@@ -166,19 +168,20 @@ class Replay extends React.Component
 
 
 		targets = []
-		if replay.targetDestination
+		if replay.targetDestination and replay.targetSource
+			targetManager = <TargetManager replay={replay} components={this} />
 			# console.log 'retrieving source and targets from', replay.targetSource, replay.targetDestination
-			if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] and this.refs['activeSpell']
-				#console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
-				allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap(), this.refs['activeSpell'].getCardsMap()
-				#console.log 'merged cards', allCards
-				source = @findCard allCards, replay.targetSource
+			# if this.refs['topBoard'] and this.refs['bottomBoard'] and this.refs['topHero'] and this.refs['bottomHero'] and this.refs['activeSpell']
+			# 	# console.log 'topBoard cards', this.refs['topBoard'].getCardsMap
+			# 	allCards = @merge this.refs['topBoard'].getCardsMap(), this.refs['bottomBoard'].getCardsMap(), this.refs['topHero'].getCardsMap(), this.refs['bottomHero'].getCardsMap(), this.refs['activeSpell'].getCardsMap()
+			# 	console.log 'merged cards', allCards
+			# 	source = @findCard allCards, replay.targetSource
 
-			for targetId in replay.targetDestination
-				target = @findCard allCards, targetId
-				targets.push <Target source={source} target={target} type={replay.targetType} key={replay.targetSource + '' + targetId}/>
+			# for targetId in replay.targetDestination
+			# 	target = @findCard allCards, targetId
+			# 	console.log 'adding target', target, source
+			# 	targets.push <Target source={source} target={target} type={replay.targetType} key={'target' + replay.targetSource + '' + targetId}/>
 
-		# {playButton}
 		playButton = <button className="btn btn-default btn-control glyphicon glyphicon-play" onClick={@onClickPlay} />
 
 		if @state.replay.speed > 0
@@ -206,6 +209,7 @@ class Replay extends React.Component
 							{topArea}
 							{bottomArea}
 							{targets}
+							{targetManager}
 							<div className="active-spell-container">
 								<ActiveSpell ref="activeSpell" replay={replay} />
 							</div>

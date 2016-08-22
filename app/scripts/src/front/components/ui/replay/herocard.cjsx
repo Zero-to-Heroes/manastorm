@@ -62,6 +62,8 @@ class HeroCard extends Card
 					{statuses}
 				</div>
 			</div>
+			
+		@updateDimensions()
 
 		return 	<div className={cls} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 					<div className="frame frame-highlight"></div>

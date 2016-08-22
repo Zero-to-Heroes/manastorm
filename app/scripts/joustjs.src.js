@@ -13,11 +13,11 @@ var joustjs = {
 	init: function(config, review) {
 		var replayXml = review.replayXml;
 		joustjs.loadReplay(replayXml);
-		console.log('ext player init in joustjs.src')
+		// console.log('ext player init in joustjs.src')
 	},
 
 	loadReplay: function(replayXml) {
-		console.log('serializing to string', replayXml)
+		// console.log('serializing to string', replayXml)
 		if (replayXml) {
 			var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
 		}
@@ -32,7 +32,7 @@ var joustjs = {
 
 	reload: function(replayXml) {
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
-		console.log('in reload in joustjs.src', window.replay)
+		// console.log('in reload in joustjs.src', window.replay)
 		window.replay.reload(strReplayXml)
 	},
 

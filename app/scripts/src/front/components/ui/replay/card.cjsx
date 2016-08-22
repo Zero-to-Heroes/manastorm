@@ -156,6 +156,8 @@ class Card extends React.Component
 
 		frameHighlight = frameCls + " frame-highlight" + legendaryCls
 
+		@updateDimensions()
+
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
@@ -196,27 +198,16 @@ class Card extends React.Component
 				{divineShield}
 			</div>
 
-	# cleanTemporaryState: ->
-	# 	# console.log 'cleaning temp state'
-	# 	entity.damageTaken = entity.tags.DAMAGE or 0
-	# 	entity.highlighted = false
-
-	# reset: ->
-	# 	console.log 'resetting card'
-	# 	entity.damageTaken = 0
-	# 	entity.highlighted = false
-
-	# highlightOption: ->
-	# 	entity.highlighted = true
-	# 	console.log 'highlighting option', entity.cardID, entity, entity.highlighted
-
-	componentDidUpdate: ->
-		domNode = ReactDOM.findDOMNode(this)
-		if domNode
-			#console.log 'updating card dimensions'
-			dimensions = @dimensions = domNode.getBoundingClientRect()
-			@centerX = dimensions.left + dimensions.width / 2
-			@centerY = dimensions.top + dimensions.height / 2
+	updateDimensions: ->
+		setTimeout () =>
+			domNode = ReactDOM.findDOMNode(this)
+			if domNode
+				dimensions = @dimensions = domNode.getBoundingClientRect()
+				@centerX = dimensions.left + dimensions.width / 2
+				@centerY = dimensions.top + dimensions.height / 2
+				# if @props.entity?.id is 14
+				# 	console.log 'updating card dimensions', @props.entity?.cardID, @props.entity?.id, dimensions, @centerX, @centerY, @props.entity
+		, 0
 		#console.log @centerX, @centerY, dimensions, domNode
 
 	getDimensions: ->

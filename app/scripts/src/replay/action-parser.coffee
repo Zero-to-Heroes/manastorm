@@ -447,14 +447,17 @@ class ActionParser extends EventEmitter
 
 			# Possibly check that the card was in hand before being in play?
 			if playedCard > -1
+				# target = if command.attributes.target is '0' then null else command.attributes.target
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'played-card-from-hand'
 					data: @entities[playedCard]
+					# target: [command.attributes.target]
 					owner: @turns[@currentTurnNumber].activePlayer
 					initialCommand: command
 				}
+				
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
 
@@ -536,162 +539,23 @@ class ActionParser extends EventEmitter
 		command = item.node
 		if command.attributes.type in ['3', '5'] 
 
+			if command.attributes.entity is '14' and command.attributes.target is '69'
+				console.log 'considering power trigger', item
+
 			if command.meta?.length > 0
-				# If the entity that triggers the power is something that just did an action, we don't log that again
-				sameOwnerAsParent = (command.parent?.attributes?.entity == command.attributes.entity)
-
-				# Is the effect triggered in response to another play?
-				if command.parent
-					mainAction = command.parent
-
-				for meta in command.meta
-					if !meta.info
+				for meta in command.meta 
+					if !meta.info and !meta.meta
 						continue
+
+					# The HSReplay version
+					if !meta.info and meta.meta
+						@addMeta command, meta, meta
 						
-					for info in meta.info
+					if meta.info
+						for info in meta.info
+							@addMeta command, meta, info
 
-						subAction = false
-
-						# The power simply targets something else
-						if meta.meta == 'TARGET'
-							# Prezvent a spell from targeting itself
-							if parseInt(command.attributes.entity) == info.entity and @entities[command.attributes.entity].tags.CARDTYPE == 5
-								continue
-
-							if mainAction?.actions 
-								for action in mainAction.actions
-									# If the same source deals the same amount of damage, we group all of that together
-									if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
-										action.target.push info.entity
-										action.index = meta.index
-										subAction = true
-
-							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
-							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
-								# console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
-								lastAction.target.push info.entity
-								lastAction.index = meta.index
-								subAction = true
-
-							# subAction = false
-							if !subAction and !(lastAction?.actionType is 'discover')
-								action = {
-									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
-									index: meta.index
-									target: [info.entity]
-									mainAction: mainAction
-									sameOwnerAsParent: sameOwnerAsParent
-									actionType: 'power-target'
-									data: @entities[command.attributes.entity]
-									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-									initialCommand: command
-									previousAction: lastAction
-									debug_target: @entities[info.entity]
-								}
-								# console.log '\tparsing target action', action, command, command.isDiscover
-								if mainAction
-									mainAction.actions = mainAction.actions or []
-									mainAction.actions.push action
-								@addAction @currentTurnNumber, action
-								
-						# The power dealt some damage
-						if meta.meta == 'DAMAGE'
-							if mainAction?.actions 
-								for action in mainAction.actions
-									# If the same source deals the same amount of damage, we group all of that together
-									if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
-										action.target.push info.entity
-										action.index = meta.index
-										subAction = true
-
-							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
-							lastActionIndex = 1
-							initialLastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-							if !mainAction 
-
-								lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-								while lastAction?.actionType is 'power-damage'
-									lastActionIndex++
-									# Make sure it's the same entity at the root of both action
-									if lastAction.data.id != parseInt(command.attributes.entity)
-										lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-										continue
-
-									if lastAction.amount is meta.data
-										lastAction.target.push info.entity
-										lastAction.index = meta.index
-										subAction = true
-										break
-
-									if @turns[@currentTurnNumber].actions.length - lastActionIndex < 0
-										break
-
-									lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-										
-							if !subAction
-								action = {
-									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
-									index: meta.index
-									target: [info.entity]
-									# Renaming in hsreplay 1.1
-									amount: meta.data
-									mainAction: mainAction
-									sameOwnerAsParent: sameOwnerAsParent
-									actionType: 'power-damage'
-									data: @entities[command.attributes.entity]
-									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-									initialCommand: command
-									debug_initialLastAction: initialLastAction
-								}
-								if mainAction
-									mainAction.actions = mainAction.actions or []
-									mainAction.actions.push action
-
-								@addAction @currentTurnNumber, action
-
-						# The power healed someone
-						if meta.meta == 'HEALING'
-							if mainAction?.actions 
-								for action in mainAction.actions
-									# If the same source deals the same amount of damage, we group all of that together
-									if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
-										action.target.push info.entity
-										subAction = true
-										
-							# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
-							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-							if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
-								lastAction.target.push info.entity
-								subAction = true
-
-							if !subAction
-								action = {
-									turn: @currentTurnNumber - 1
-									timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
-									index: meta.index
-									target: [info.entity]
-									# Renaming in hsreplay 1.1
-									amount: meta.data
-									mainAction: mainAction
-									sameOwnerAsParent: sameOwnerAsParent
-									actionType: 'power-healing'
-									data: @entities[command.attributes.entity]
-									owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-									initialCommand: command
-								}
-								if mainAction
-									mainAction.actions = mainAction.actions or []
-									mainAction.actions.push action
-
-								# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
-								if lastAction?.actionType is 'power-target'
-									@turns[@currentTurnNumber].actions.pop()
-									
-								# console.log 'creating power-healing', action, meta
-								@addAction @currentTurnNumber, action
+						
 			
 			# Power overwhelming for instance doesn't use Meta tags
 			else if parseInt(command.attributes.target) > 0
@@ -704,6 +568,167 @@ class ActionParser extends EventEmitter
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 					initialCommand: command
 				}
+				@addAction @currentTurnNumber, action
+
+	addMeta: (command, meta, info) ->
+
+		# If the entity that triggers the power is something that just did an action, we don't log that again
+		sameOwnerAsParent = (command.parent?.attributes?.entity == command.attributes.entity)
+
+		# Is the effect triggered in response to another play?
+		if command.parent
+			mainAction = command.parent
+
+		subAction = false
+		target = info.entity
+		if !target and command.attributes.target isnt '0'
+			target = command.attributes.target
+
+		if !target
+			return
+
+		# The power simply targets something else
+		if meta.meta == 'TARGET'
+
+			# Prezvent a spell from targeting itself
+			if parseInt(command.attributes.entity) == info.entity and @entities[command.attributes.entity].tags.CARDTYPE == 5
+				return
+
+			if mainAction?.actions 
+				for action in mainAction.actions
+
+					# If the same source deals the same amount of damage, we group all of that together
+					if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
+
+						# If no info node (hsreplay), then default to action target
+						action.target.push target
+						action.index = meta.index
+						subAction = true
+
+			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+			lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+			if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
+				# console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
+				lastAction.target.push target
+				lastAction.index = meta.index
+				subAction = true
+
+			# subAction = false
+			if !subAction and !(lastAction?.actionType is 'discover')
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
+					index: meta.index
+					target: [target]
+					mainAction: mainAction
+					sameOwnerAsParent: sameOwnerAsParent
+					actionType: 'power-target'
+					data: @entities[command.attributes.entity]
+					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+					initialCommand: command
+					previousAction: lastAction
+				}
+				# console.log '\tparsing target action', action, command, command.isDiscover
+				if mainAction
+					mainAction.actions = mainAction.actions or []
+					mainAction.actions.push action
+				@addAction @currentTurnNumber, action
+				
+		# The power dealt some damage
+		if meta.meta == 'DAMAGE'
+			if mainAction?.actions 
+				for action in mainAction.actions
+					# If the same source deals the same amount of damage, we group all of that together
+					if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+						action.target.push target
+						action.index = meta.index
+						subAction = true
+
+			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+			lastActionIndex = 1
+			initialLastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+			if !mainAction 
+
+				lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+				while lastAction?.actionType is 'power-damage'
+					lastActionIndex++
+					# Make sure it's the same entity at the root of both action
+					if lastAction.data.id != parseInt(command.attributes.entity)
+						lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+						continue
+
+					if lastAction.amount is meta.data
+						lastAction.target.push target
+						lastAction.index = meta.index
+						subAction = true
+						break
+
+					if @turns[@currentTurnNumber].actions.length - lastActionIndex < 0
+						break
+
+					lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
+						
+			if !subAction
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
+					index: meta.index
+					target: [target]
+					# Renaming in hsreplay 1.1
+					amount: meta.data
+					mainAction: mainAction
+					sameOwnerAsParent: sameOwnerAsParent
+					actionType: 'power-damage'
+					data: @entities[command.attributes.entity]
+					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+					initialCommand: command
+					debug_initialLastAction: initialLastAction
+				}
+				if mainAction
+					mainAction.actions = mainAction.actions or []
+					mainAction.actions.push action
+
+				@addAction @currentTurnNumber, action
+
+		# The power healed someone
+		if meta.meta == 'HEALING'
+			if mainAction?.actions 
+				for action in mainAction.actions
+					# If the same source deals the same amount of damage, we group all of that together
+					if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+						action.target.push target
+						subAction = true
+						
+			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
+			lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+			if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+				lastAction.target.push target
+				subAction = true
+
+			if !subAction
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
+					index: meta.index
+					target: [target]
+					# Renaming in hsreplay 1.1
+					amount: meta.data
+					mainAction: mainAction
+					sameOwnerAsParent: sameOwnerAsParent
+					actionType: 'power-healing'
+					data: @entities[command.attributes.entity]
+					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+					initialCommand: command
+				}
+				if mainAction
+					mainAction.actions = mainAction.actions or []
+					mainAction.actions.push action
+
+				# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
+				if lastAction?.actionType is 'power-target'
+					@turns[@currentTurnNumber].actions.pop()
+					
+				# console.log 'creating power-healing', action, meta
 				@addAction @currentTurnNumber, action
 
 	parseTriggerPutSecretInPlay: (item) ->

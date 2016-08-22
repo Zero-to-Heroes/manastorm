@@ -37,6 +37,7 @@ class HeroPower extends Card
 		cost = <div className={costCls}>{tagCost or 0}</div>
 
 		# cost = <div className="mana-cost">2</div>
+		@updateDimensions()
 
 		link = '<img src="' + art + '">';
 		# console.log '\theropower rendered'

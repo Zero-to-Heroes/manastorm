@@ -5,39 +5,41 @@ _ = require 'lodash'
 
 Target = React.createClass
 
-	getInitialState: ->
-		return {hidden: "hidden"}
+	# getInitialState: ->
+	# 	return {hidden: "hidden"}
 
-	componentWillMount: ->
-		# console.log 'will mount', Date.now()
-		that = this
-		@retries = 40
-		setTimeout ->
-			that.show()
-		, 20
+	# componentWillMount: ->
+	# 	console.log 'will mount', Date.now()
+	# 	@setState({hidden: ""})
+		# that = this
+		# @retries = 40
+		# setTimeout ->
+		# 	that.show()
+		# , 20
 
 	# componentWillUnmount: ->
 	# 	console.log 'will unmount'
 	# 	#console.log 'target component did mount'
 
 	# Need that for going back in the replay, as one of the cards may already be there, while the other isn't
-	show: ->
-		@retries--
+	# show: ->
+	# 	@retries--
 
-		that = this
-		# console.log 'showing?', @props
-		if @props.source or @props.target
-			# console.log 'really showing?'
-			if @retries > 0 and (!@props.source?.centerX or !@props.target?.centerX)
-				# console.log 'waiting to render'
-				setTimeout ->
-					that.show()
-				, 50
-			else
-				# console.log 'yes', @props
-				@setState({hidden: ""})
+	# 	that = this
+	# 	# console.log 'showing?', @props
+	# 	if @props.source or @props.target
+	# 		# console.log 'really showing?'
+	# 		if @retries > 0 and (!@props.source?.centerX or !@props.target?.centerX)
+	# 			# console.log 'waiting to render'
+	# 			setTimeout ->
+	# 				that.show()
+	# 			, 50
+	# 		else
+	# 			console.log 'yes', @props
+	# 			@setState({hidden: ""})
 
 	render: ->
+		# console.log 'rendering target?', @props.source, @props.target, @props.source?.getDimensions(), @props.source?.centerX, @props.target?.centerX
 		return null unless (@props.source and @props.target and @props.source?.centerX and @props.target?.centerX)
 		# console.log 'trying to render target', @props, Date.now()
 
@@ -112,7 +114,7 @@ Target = React.createClass
 			top += topOffset
 			height = arrowHeight - 1.5 * topOffset
 
-		cls = "target " + @props.type + " " + @state.hidden
+		cls = "target " + @props.type
 
 		style = {
 			height: height

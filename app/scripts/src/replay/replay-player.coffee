@@ -285,6 +285,7 @@ class ReplayPlayer extends EventEmitter
 					@goNextAction()
 
 			else
+				console.log 'will execute action', action
 				@updateActiveSpell action
 				@updateEndGame action
 				@updateSecret action
@@ -293,7 +294,7 @@ class ReplayPlayer extends EventEmitter
 				if action.target
 					@targetSource = action?.data.id
 					@targetDestination = action.target
-					# console.log 'setting target destination', @targetDestination, action
+					# console.log 'setting target destination', @targetDestination, @targetSource, action
 					@targetType = action.actionType
 
 				# Now we want to go to the action, and to show the effects of the action - ie all 
