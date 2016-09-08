@@ -11,6 +11,7 @@ HSReplayParser = require './parsers/hs-replay'
 class ReplayPlayer extends EventEmitter
 	constructor: (@parser) ->
 		EventEmitter.call(this)
+		@emitter = new EventEmitter
 
 		window.replay = this
 
@@ -121,6 +122,14 @@ class ReplayPlayer extends EventEmitter
 		else
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
+	getCurrentTurn: ->
+		if @turns[@currentTurn].turn is 'Mulligan'
+			return 'mulligan'
+		else if @getActivePlayer() == @player
+			return 't' + Math.ceil(@turns[@currentTurn].turn / 2)
+		else
+			return 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
+
 
 
 	# ========================
@@ -151,7 +160,10 @@ class ReplayPlayer extends EventEmitter
 			if !@turns[@currentTurn]
 				return
 
+			console.log 'emitting new turn event',  @turns[@currentTurn]
 			@emit 'new-turn', @turns[@currentTurn]
+			@notifyChangedTurn @turns[@currentTurn]
+			@emitter.emit 'new-turn', @turns[@currentTurn]
 
 			@goToIndex @turns[@currentTurn].index
 
@@ -197,6 +209,9 @@ class ReplayPlayer extends EventEmitter
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
+			console.log 'emitting new turn event',  @turns[targetTurn]
+			@notifyChangedTurn @turns[@currentTurn]
+			@emit 'new-turn', @turns[targetTurn]
 			# @emit 'previous-action', rollbackAction
 
 		else
@@ -315,8 +330,26 @@ class ReplayPlayer extends EventEmitter
 				@goToIndex index
 
 	goToTurn: (turn) ->
-		targetTurn = parseInt(turn)
-		# console.log 'going to turn', targetTurn
+		console.log 'going to turn in replay-player', turn, turn.substring(0, turn.length - 1)
+
+		if turn is 'mulligan' or turn is 0 or turn is '0'
+			gameTurn = 1
+
+		else if @turns[2].activePlayer == @player
+			if turn.indexOf('o') != -1
+				gameTurn = turn.substring(0, turn.length - 1) * 2 + 1
+			else
+				gameTurn = turn.substring(0, turn.length) * 2
+		else
+			if turn.indexOf('o') == -1
+				gameTurn = turn.substring(0, turn.length) * 2 + 1
+			else
+				gameTurn = turn.substring(0, turn.length - 1) * 2
+
+		console.log 'gameTurn', gameTurn
+
+		targetTurn = parseInt(gameTurn)
+		console.log 'going to turn', targetTurn
 
 		if targetTurn > @currentTurn
 			while targetTurn > @currentTurn
@@ -416,7 +449,7 @@ class ReplayPlayer extends EventEmitter
 		@discoverAction = undefined
 		@previousActiveSpell = @activeSpell
 		@activeSpell = undefined
-		console.log 'new step', @activeSpell, @previousActiveSpell
+		# console.log 'new step', @activeSpell, @previousActiveSpell
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0
 			v.highlighted = false
@@ -731,6 +764,24 @@ class ReplayPlayer extends EventEmitter
 	notifyNewLog: (log) ->
 		@emit 'new-log', log
 
+	notifyChangedTurn: ->
+		inputTurnNumber = @turns[@currentTurn].turn
+		if inputTurnNumber in ['Mulligan', 'mulligan']
+			turnNumber = 'mulligan'
+
+		else if @turns[2].activePlayer == @player
+			if inputTurnNumber % 2 == 0
+				turnNumber = 't' + inputTurnNumber / 2 + 'o'
+			else
+				turnNumber = 't' + (inputTurnNumber + 1) / 2
+		else
+			if inputTurnNumber % 2 != 0
+				turnNumber = 't' + (inputTurnNumber + 1) / 2 + 'o'
+			else
+				turnNumber = 't' + inputTurnNumber / 2
+
+		@onTurnChanged? turnNumber
+
 	getPlayerInfo: ->
 		# console.log 'getting player info', @opponent, @entities[@opponent.tags.HERO_ENTITY], @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)
 		playerInfo = {
@@ -811,7 +862,7 @@ class ReplayPlayer extends EventEmitter
 		if matches and matches.length > 0
 			matches = _.uniq matches
 			matches.forEach (match) ->
-				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'1\')" class="ng-scope">' + match + '</a>'
+				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'mulligan\')" class="ng-scope">' + match + '</a>'
 
 		# console.log 'modified text', text
 		return text
@@ -832,6 +883,11 @@ class ReplayPlayer extends EventEmitter
 
 		if !@turns[turnNumber]
 			return text
+
+		inputTurnNumber = 't' + inputTurnNumber
+
+		if opponent
+			inputTurnNumber += 'o'
 			
 		match = match.replace '?', ''
 		match = match.trim()
@@ -839,7 +895,7 @@ class ReplayPlayer extends EventEmitter
 		match = match.replace ',', ''
 		match = match.replace '.', ''
 		# console.log 'replacing match', match
-		text = text.replace new RegExp('\\b' + match + '\\b', 'g'), '<a ng-click="mediaPlayer.goToTimestamp(\'' + turnNumber + '\')" class="ng-scope">' + match + '</a>'
+		text = text.replace new RegExp('\\b' + match + '\\b', 'g'), '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
 
 	formatTimeStamp: (length) ->
