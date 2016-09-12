@@ -824,7 +824,7 @@ class ReplayPlayer extends EventEmitter
 			text = that.replaceText text, inputTurnNumber, match, opponent
 			# console.log 'new text', text
 			# Approximate length of the new chain
-			turnRegex.lastIndex += 70
+			turnRegex.lastIndex += 60
 			match = turnRegex.exec(text)
 	
 
