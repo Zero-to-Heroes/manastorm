@@ -803,56 +803,71 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		# console.log 'looking at text', text
-		turnRegex = /(\s|^)(t|T)\d?\d(:|\s|,|\.|\?|$)/gm
-		opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?|$)/gm
+		console.log 'looking at text', text
+		# https://regex101.com/r/yD6dG8/1
+		turnRegex = /(?:\s|^)(?:t(?:urn )?|T(?:urn )?)(\d?\do?)(?:|\s|,|\.|\?|$)/gm
+		# opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?|$)/gm
 
-		longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?|$)/gm
-		longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?|$)/gm
+		# longTurnRegex = /(\s|^)(turn|Turn)\s?\d?\d(:|\s|,|\.|\?|$)/gm
+		# longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?|$)/gm
 
 		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?|$)/gm
 
 		that = this
 
-		matches = text.match(turnRegex)
-		if matches and matches.length > 0
-			matches = _.uniq matches
-			matches.forEach (match) ->
-				# console.log 'matching own turn', match
-				match = match.trimLeft()
-				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				text = that.replaceText text, inputTurnNumber, match
+		match = turnRegex.exec(text)
+		while match
+			# console.log '\tmatched!!!', match[1], match
+			# console.log 'replaced substring', text.substring(match.index, match.index + match[0].length)
+			opponent = match[1].indexOf('o') != -1
+			inputTurnNumber = parseInt(match[1])
+			text = that.replaceText text, inputTurnNumber, match, opponent
+			# console.log 'new text', text
+			# Approximate length of the new chain
+			turnRegex.lastIndex += 70
+			match = turnRegex.exec(text)
+	
+
+		# if matches and matches.length > 0
+		# 	matches = _.uniq matches
+		# 	matches.forEach (match) ->
+		# 		console.log 'matching own turn', match
+		# 		match = match.trimLeft()
+		# 		inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+		# 		console.log 'inputTurnNumber', inputTurnNumber, match.substring( 1, match.length - 1)
+		# 		text = that.replaceText text, inputTurnNumber, match
+		# 		console.log 'end text', text
 				
 
-		matches = text.match(opoonentTurnRegex)
-		if matches and matches.length > 0
-			matches = _.uniq matches
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				#console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-				text = that.replaceText text, inputTurnNumber, match, true
+		# matches = text.match(opoonentTurnRegex)
+		# if matches and matches.length > 0
+		# 	matches = _.uniq matches
+		# 	matches.forEach (match) ->
+		# 		match = match.trimLeft()
+		# 		#console.log '\tmatch', match
+		# 		inputTurnNumber = parseInt(match.substring 1, match.length - 1)
+		# 		text = that.replaceText text, inputTurnNumber, match, true
 		
-		matches = text.match(longTurnRegex)
-		# console.log 'looking for match', text, matches
-		if matches and matches.length > 0
-			matches = _.uniq matches
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				# console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				# console.log '\tinputTurnNumber', inputTurnNumber
-				text = that.replaceText text, inputTurnNumber, match
-				# console.log '\tupdated', text
+		# matches = text.match(longTurnRegex)
+		# # console.log 'looking for match', text, matches
+		# if matches and matches.length > 0
+		# 	matches = _.uniq matches
+		# 	matches.forEach (match) ->
+		# 		match = match.trimLeft()
+		# 		# console.log '\tmatch', match
+		# 		inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
+		# 		# console.log '\tinputTurnNumber', inputTurnNumber
+		# 		text = that.replaceText text, inputTurnNumber, match
+		# 		# console.log '\tupdated', text
 
-		matches = text.match(longOpponentTurnRegex)
-		if matches and matches.length > 0
-			matches = _.uniq matches
-			matches.forEach (match) ->
-				match = match.trimLeft()
-				#console.log '\tmatch', match
-				inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-				text = that.replaceText text, inputTurnNumber, match, true
+		# matches = text.match(longOpponentTurnRegex)
+		# if matches and matches.length > 0
+		# 	matches = _.uniq matches
+		# 	matches.forEach (match) ->
+		# 		match = match.trimLeft()
+		# 		#console.log '\tmatch', match
+		# 		inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
+		# 		text = that.replaceText text, inputTurnNumber, match, true
 
 		matches = text.match(mulliganRegex)
 		if matches and matches.length > 0
@@ -860,7 +875,7 @@ class ReplayPlayer extends EventEmitter
 			matches.forEach (match) ->
 				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'mulligan\')" class="ng-scope">' + match + '</a>'
 
-		# console.log 'modified text', text
+		console.log 'modified text', text
 		return text
 
 	replaceText: (text, inputTurnNumber, match, opponent) ->
@@ -878,20 +893,19 @@ class ReplayPlayer extends EventEmitter
 				turnNumber = inputTurnNumber * 2
 
 		if !@turns[turnNumber]
+			console.warn 'turn doesnt exist', turnNumber
 			return text
 
 		inputTurnNumber = 't' + inputTurnNumber
 
 		if opponent
 			inputTurnNumber += 'o'
+
+		replaceString = '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match[0] + '</a>'
+		text = text.substring(0, match.index + match[1].length - 1) + replaceString + text.substring(match.index + match[0].length)
 			
-		match = match.replace '?', ''
-		match = match.trim()
-		match = match.replace ':', ''
-		match = match.replace ',', ''
-		match = match.replace '.', ''
 		# console.log 'replacing match', match
-		text = text.replace new RegExp('\\b' + match + '\\b', 'g'), '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match + '</a>'
+		# text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
 
 	formatTimeStamp: (length) ->
