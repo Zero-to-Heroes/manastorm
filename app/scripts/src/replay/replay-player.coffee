@@ -328,8 +328,26 @@ class ReplayPlayer extends EventEmitter
 					index = @history[@history.length - 1].index
 
 				@goToIndex index
+				
 
-	goToTurn: (turn) ->
+	goToTurn: (gameTurn) ->
+		targetTurn = parseInt(gameTurn)
+		console.log 'going to turn', targetTurn
+
+		if targetTurn > @currentTurn
+			while targetTurn > @currentTurn
+				@goNextTurn()
+
+		else if targetTurn < @currentTurn
+			while targetTurn < @currentTurn
+				@goPreviousTurn()
+
+		else 
+			while @currentActionInTurn >= 0
+				@goPreviousAction()
+
+
+	goToFriendlyTurn: (turn) ->
 		console.log 'going to turn in replay-player', turn, turn.substring(0, turn.length - 1)
 
 		if turn is 'mulligan' or turn is 0 or turn is '0'
@@ -348,29 +366,7 @@ class ReplayPlayer extends EventEmitter
 
 		console.log 'gameTurn', gameTurn
 
-		targetTurn = parseInt(gameTurn)
-		console.log 'going to turn', targetTurn
-
-		if targetTurn > @currentTurn
-			while targetTurn > @currentTurn
-				@goNextTurn()
-
-		else if targetTurn < @currentTurn
-			while targetTurn < @currentTurn
-				@goPreviousTurn()
-
-		else 
-			while @currentActionInTurn >= 0
-				@goPreviousAction()
-
-		# @currentTurn = 0
-		# @currentActionInTurn = 0
-		# @init()
-
-
-		# while @currentTurn != targetTurn
-		# 	# console.log '\tand going to next action', @currentTurn, targetTurn, @currentActionInTurn
-		# 	@goNextAction()
+		@goToTurn gameTurn
 
 	goToIndex: (index) ->
 		# console.log 'going to index', index

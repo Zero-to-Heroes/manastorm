@@ -43,14 +43,14 @@ var joustjs = {
 		var turn = match[1]
 		// console.log('going to turn', turn, match)
 		window.replay.pause()
-		window.replay.goToTurn(turn)
+		window.replay.goToFriendlyTurn(turn)
 	},
 
 	onTurnChanged: function(callback) {
 		// console.log('registering event listener in joustjs src')
 		window.replay.onTurnChanged = function(turn) {
 			// var turnNumber = turn.turn == 'Mulligan' ? 0 : turn.turn
-			console.log('on turn changed in joustjs.src', turn)
+			// console.log('on turn changed in joustjs.src', turn)
 			callback(turn)
 		}
 	},
