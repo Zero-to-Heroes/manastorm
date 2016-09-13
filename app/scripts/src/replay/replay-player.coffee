@@ -803,7 +803,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
-		console.log 'looking at text', text
+		# console.log 'looking at text', text
 		# https://regex101.com/r/yD6dG8/1
 		turnRegex = /(?:\s|^)(?:t(?:urn )?|T(?:urn )?)(\d?\do?)(?:|\s|,|\.|\?|$)/gm
 		# opoonentTurnRegex = /(\s|^)(t|T)\d?\do(:|\s|,|\.|\?|$)/gm
@@ -821,10 +821,9 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'replaced substring', text.substring(match.index, match.index + match[0].length)
 			opponent = match[1].indexOf('o') != -1
 			inputTurnNumber = parseInt(match[1])
-			text = that.replaceText text, inputTurnNumber, match, opponent
+			text = that.replaceText text, inputTurnNumber, match, opponent, turnRegex
 			# console.log 'new text', text
 			# Approximate length of the new chain
-			turnRegex.lastIndex += 70
 			match = turnRegex.exec(text)
 	
 
@@ -875,10 +874,10 @@ class ReplayPlayer extends EventEmitter
 			matches.forEach (match) ->
 				text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'mulligan\')" class="ng-scope">' + match + '</a>'
 
-		console.log 'modified text', text
+		# console.log 'modified text', text
 		return text
 
-	replaceText: (text, inputTurnNumber, match, opponent) ->
+	replaceText: (text, inputTurnNumber, match, opponent, turnRegex) ->
 
 		# Now compute the "real" turn. This depends on whether you're the first player or not
 		if @turns[2].activePlayer == @player
@@ -902,8 +901,9 @@ class ReplayPlayer extends EventEmitter
 			inputTurnNumber += 'o'
 
 		replaceString = '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match[0] + '</a>'
-		text = text.substring(0, match.index + match[1].length - 1) + replaceString + text.substring(match.index + match[0].length)
+		text = text.substring(0, match.index) + replaceString + text.substring(match.index + match[0].length)
 			
+		turnRegex.lastIndex += replaceString.length
 		# console.log 'replacing match', match
 		# text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match + '</a>'
 		return text
