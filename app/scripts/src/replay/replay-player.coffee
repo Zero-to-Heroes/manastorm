@@ -230,6 +230,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
+			@notifyChangedTurn @turns[@currentTurn]
 			@emit 'previous-action', rollbackAction
 
 			# previousAction = @turns[targetTurn].actions[targetAction]
