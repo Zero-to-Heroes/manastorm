@@ -398,7 +398,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp()
+		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
 		@newStep()
 
 		# lastTimestamp = 0
@@ -421,16 +421,28 @@ class ReplayPlayer extends EventEmitter
 			while @currentTurn > 1 and (!@getCurrentTimestamp() or timestamp < @getCurrentTimestamp())
 				# console.log 'going to previous action', @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
 				@goPreviousAction()
+
 		@seeking = false
 		@emit 'moved-timestamp'
 
 
 	getCurrentTimestamp: ->
-		if !@turns[@currentTurn].actions[@currentActionInTurn] or !@turns[@currentTurn].actions[@currentActionInTurn].timestamp
+		if @isEndGame
+			timestamp = @turns[@currentTurn].timestamp
+			index =  @currentActionInTurn
+			index = Math.max index, 0
+			while !timestamp and index > 0 # preventing infinite loops
+				timestamp = @turns[@currentTurn].actions[index--]?.timestamp
+
+		else if @turns[@currentTurn] is 'Mulligan'
+			timestamp = 0
+
+		else if !@turns[@currentTurn].actions[@currentActionInTurn] or !@turns[@currentTurn].actions[@currentActionInTurn].timestamp
 			timestamp = @turns[@currentTurn].timestamp
 			index = Math.max @currentActionInTurn, 0
-			while !timestamp and index < 200 # preventing infinite loops
+			while !timestamp and index < 30 # preventing infinite loops
 				timestamp = @turns[@currentTurn].actions[index++]?.timestamp
+
 		else
 			timestamp = @turns[@currentTurn].actions[@currentActionInTurn].timestamp
 		# console.log '\t\tgetting current timestamp', timestamp
