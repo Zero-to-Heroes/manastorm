@@ -53,7 +53,7 @@ class Replay extends React.Component
 		# 	@callback
 
 		subscribe @state.replay, 'moved-timestamp', =>
-			console.log 'in moved-timestamp'
+			# console.log 'in moved-timestamp'
 			@callProtectedCallback()
 			# if !@dirty
 			# 	@dirty = true 

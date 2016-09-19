@@ -117,14 +117,19 @@ class ReplayPlayer extends EventEmitter
 	getCurrentTurnString: ->
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return 'Mulligan'
+		else if @isEndGame
+			return 'End game'
 		else if @getActivePlayer() == @player
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2)
 		else
 			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
 	getCurrentTurn: ->
+		# console.log 'getting current turn', @turns[@currentTurn]
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return 'mulligan'
+		else if @isEndGame
+			return 'endgame'
 		else if @getActivePlayer() == @player
 			return 't' + Math.ceil(@turns[@currentTurn].turn / 2)
 		else
@@ -160,9 +165,9 @@ class ReplayPlayer extends EventEmitter
 			if !@turns[@currentTurn]
 				return
 
-			console.log 'emitting new turn event',  @turns[@currentTurn]
+			# console.log 'emitting new turn event',  @turns[@currentTurn]
 			@emit 'new-turn', @turns[@currentTurn]
-			@notifyChangedTurn @turns[@currentTurn]
+			@notifyChangedTurn @turns[@currentTurn].turn
 			@emitter.emit 'new-turn', @turns[@currentTurn]
 
 			@goToIndex @turns[@currentTurn].index
@@ -176,6 +181,17 @@ class ReplayPlayer extends EventEmitter
 
 			while turnWhenCommandIssued == @currentTurn
 				@goNextAction()
+		else
+			@goToEndGame()
+
+
+	goToEndGame: ->
+		console.log 'in goToEndGame'
+		while !@isEndGame
+			@goNextAction()
+
+		@notifyChangedTurn 'endgame'
+
 
 	goPreviousAction: (lastIteration) ->
 		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
@@ -209,8 +225,8 @@ class ReplayPlayer extends EventEmitter
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
-			console.log 'emitting new turn event',  @turns[targetTurn]
-			@notifyChangedTurn @turns[@currentTurn]
+			# console.log 'emitting new turn event',  @turns[targetTurn]
+			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'new-turn', @turns[targetTurn]
 			# @emit 'previous-action', rollbackAction
 
@@ -230,7 +246,7 @@ class ReplayPlayer extends EventEmitter
 		else
 			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
-			@notifyChangedTurn @turns[@currentTurn]
+			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'previous-action', rollbackAction
 
 			# previousAction = @turns[targetTurn].actions[targetAction]
@@ -273,21 +289,6 @@ class ReplayPlayer extends EventEmitter
 
 				@goNextAction()
 
-		# else
-		# 	@goPreviousAction()
-
-		# console.log 'going to previous turn'
-		# @newStep()
-
-		# targetTurn = Math.max(1, @currentTurn - 1)
-
-		# @currentTurn = 0
-		# @currentActionInTurn = 0
-		# @init()
-
-		# while @currentTurn != targetTurn
-		# 	@goNextAction()
-
 	goToAction: ->
 		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
@@ -301,7 +302,7 @@ class ReplayPlayer extends EventEmitter
 					@goNextAction()
 
 			else
-				console.log 'will execute action', action
+				# console.log 'will execute action', action
 				@updateActiveSpell action
 				@updateEndGame action
 				@updateSecret action
@@ -349,10 +350,15 @@ class ReplayPlayer extends EventEmitter
 
 
 	goToFriendlyTurn: (turn) ->
-		console.log 'going to turn in replay-player', turn, turn.substring(0, turn.length - 1)
+		console.log 'going to turn in replay-player', turn
 
 		if turn is 'mulligan' or turn is 0 or turn is '0'
 			gameTurn = 1
+
+		else if turn is 'endgame'
+			console.log 'going to endgame'
+			@goToEndGame()
+			return
 
 		else if @turns[2].activePlayer == @player
 			if turn.indexOf('o') != -1
@@ -471,8 +477,6 @@ class ReplayPlayer extends EventEmitter
 	update: ->
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			# console.log '\tgo'
-			# if !@history[@historyPosition].executed
 			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[@currentTurn]
@@ -508,13 +512,6 @@ class ReplayPlayer extends EventEmitter
 		if @history[@historyPosition - 1]?.timestamp
 			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
 			# console.log '\tupdating timestamp', @currentReplayTime
-
-		# console.log 'rolled back', @historyPosition, @history[@historyPosition]
-	# addBackInTimeInfo: (action, historyElement) ->
-	# 	# Will be an object containing, for each entity whose tag has changed, and the initial value of that tag at the beginning 
-	# 	# of the action
-	# 	action.backInfo = action.backInfo || {}
-	# 	historyElement.executeBackInTime(this, action)
 
 	choosing: ->
 		# Blur during mulligan
@@ -573,6 +570,8 @@ class ReplayPlayer extends EventEmitter
 	updateEndGame: (action) ->
 		if action.actionType is 'end-game'
 			@isEndGame = true
+			console.log 'notifying endgame'
+			@notifyChangedTurn 'endgame'
 		else 
 			@isEndGame = false
 		# action.activeSpell = @activeSpell
@@ -676,24 +675,6 @@ class ReplayPlayer extends EventEmitter
 		# if change.tag is 'MULLIGAN_STATE'
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
-	# updateActionsInfo: ->
-	# 	while @history[@historyPosition]
-	# 		action = getAction @historyPosition
-
-	# 		if @history[@historyPosition].command is 'receiveTagChange'
-	# 			@attachTagChanges action, @history[@historyPosition]
-	# 			@history[@historyPosition].execute(this, action)
-
-	# 		@historyPosition++
-
-	# attachTagChanges: (action, tagChange) ->
-	# 	action.tagChanges[change.entity] = action.tagChanges[change.entity] || {}
-	# 	action.tagRollback[change.entity] = action.tagRollback[change.entity] || {}
-
-	# 	action.tagRollback[change.entity][change.tag] = 
-
-	# 	action.tagChanges[change.entity]
-
 	receiveShowEntity: (definition, action) ->
 		# console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
@@ -743,13 +724,6 @@ class ReplayPlayer extends EventEmitter
 		@history.push(item)
 
 
-		# if not timestamp and @lastBatch
-		# 	@lastBatch.addCommand([command, args])
-		# else
-		# 	@lastBatch = new HistoryBatch(timestamp, [command, args])
-		# 	@history.push(@lastBatch)
-		# return @lastBatch
-
 
 
 	# ==================
@@ -761,10 +735,12 @@ class ReplayPlayer extends EventEmitter
 	notifyNewLog: (log) ->
 		@emit 'new-log', log
 
-	notifyChangedTurn: ->
-		inputTurnNumber = @turns[@currentTurn].turn
+	notifyChangedTurn: (inputTurnNumber) ->
 		if inputTurnNumber in ['Mulligan', 'mulligan']
 			turnNumber = 'mulligan'
+
+		else if inputTurnNumber is 'endgame'
+			turnNumber = 'endgame'
 
 		else if @turns[2].activePlayer == @player
 			if inputTurnNumber % 2 == 0
@@ -813,6 +789,7 @@ class ReplayPlayer extends EventEmitter
 		# longOpponentTurnRegex = /(\s|^)(turn|Turn)\s?\d?\do(:|\s|,|\.|\?|$)/gm
 
 		mulliganRegex = /(\s|^)(m|M)ulligan(:|\s|\?|$)/gm
+		endgameRegex = /(?:\s|^)((?:e|E)nd(?: )?game)(?::|\s|\?|$)/gm
 
 		that = this
 
@@ -826,48 +803,14 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'new text', text
 			# Approximate length of the new chain
 			match = turnRegex.exec(text)
-	
 
-		# if matches and matches.length > 0
-		# 	matches = _.uniq matches
-		# 	matches.forEach (match) ->
-		# 		console.log 'matching own turn', match
-		# 		match = match.trimLeft()
-		# 		inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-		# 		console.log 'inputTurnNumber', inputTurnNumber, match.substring( 1, match.length - 1)
-		# 		text = that.replaceText text, inputTurnNumber, match
-		# 		console.log 'end text', text
-				
+		match = endgameRegex.exec(text)
+		while match
+			replaceString = '<a ng-click="mediaPlayer.goToTimestamp(\'endgame\')" class="ng-scope">' + match[0] + '</a>'
+			text = text.substring(0, match.index) + replaceString + text.substring(match.index + match[0].length)
+			turnRegex.lastIndex += replaceString.length
+			match = turnRegex.exec(text)
 
-		# matches = text.match(opoonentTurnRegex)
-		# if matches and matches.length > 0
-		# 	matches = _.uniq matches
-		# 	matches.forEach (match) ->
-		# 		match = match.trimLeft()
-		# 		#console.log '\tmatch', match
-		# 		inputTurnNumber = parseInt(match.substring 1, match.length - 1)
-		# 		text = that.replaceText text, inputTurnNumber, match, true
-		
-		# matches = text.match(longTurnRegex)
-		# # console.log 'looking for match', text, matches
-		# if matches and matches.length > 0
-		# 	matches = _.uniq matches
-		# 	matches.forEach (match) ->
-		# 		match = match.trimLeft()
-		# 		# console.log '\tmatch', match
-		# 		inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-		# 		# console.log '\tinputTurnNumber', inputTurnNumber
-		# 		text = that.replaceText text, inputTurnNumber, match
-		# 		# console.log '\tupdated', text
-
-		# matches = text.match(longOpponentTurnRegex)
-		# if matches and matches.length > 0
-		# 	matches = _.uniq matches
-		# 	matches.forEach (match) ->
-		# 		match = match.trimLeft()
-		# 		#console.log '\tmatch', match
-		# 		inputTurnNumber = parseInt(match.substring(4, match.length - 1).trim())
-		# 		text = that.replaceText text, inputTurnNumber, match, true
 
 		matches = text.match(mulliganRegex)
 		if matches and matches.length > 0

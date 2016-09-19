@@ -38,7 +38,7 @@ var joustjs = {
 
 	goToTimestamp: function(turnNumber) {
 		// console.log('called goToTimestamp in joustjs', turnNumber)
-		var regex = /(?:t?)(\d?\d?\do?|mulligan)/
+		var regex = /(?:t?)(\d?\d?\do?|mulligan|endgame)/
 		var match = turnNumber.match(regex)
 		var turn = match[1]
 		// console.log('going to turn', turn, match)
@@ -56,7 +56,9 @@ var joustjs = {
 	},
 
 	getCurrentTimestamp: function() {
-		return window.replay.getCurrentTurn().toLowerCase()
+		var turn = window.replay.getCurrentTurn().toLowerCase()
+		// console.log('getting current timestamp', turn)
+		return turn
 	},
 	
 	getPlayerInfo: function() {
