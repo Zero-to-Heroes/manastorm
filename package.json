@@ -9,8 +9,10 @@
     "browserify": "^12.0.1",
     "browserify-derequire": "^0.9.4",
     "event-kit": "^1.4.1",
+    "grunt-contrib-connect": "^1.0.2",
     "grunt-contrib-copy": "^0.8.2",
     "grunt-contrib-less": "^1.1.0",
+    "grunt-contrib-watch": "^1.0.0",
     "grunt-remove-logging": "^0.2.0",
     "history": "^1.13.1",
     "jquery": "^2.1.4",
@@ -23,6 +25,7 @@
     "react-split-pane": "^0.1.19",
     "react-tooltip": "^1.0.4",
     "sax": "^1.1.4",
+    "serve-static": "^1.11.1",
     "string-stream": "0.0.7"
   },
   "devDependencies": {

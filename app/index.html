@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Manastorm - Hearthstone Replay Viewer</title>
+		<meta name="description" content="A Hearthstone replay viewer focused on game analysis" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="robots" content="index,follow" />
+		<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		<link rel="stylesheet" href="standalone.css">
+		<link rel="stylesheet" href="dependencies/hearthstone.css">
+		<link rel="stylesheet" href="scripts/out/joustjs.css">
+
+        <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+
+	</head>
+	<body class="hearthstone">
+		<noscript>Please enable JavaScript to view this web page.</noscript>
+		<div class="joustjs main-container">
+			<div class="external-player-container">
+				<div id="dummy"></div>
+				<div id="externalPlayer" class="external-player">
+					Waiting waiting
+				</div>
+			</div>
+		</div>
+
+		<!-- Adding the dependencies manually, as they are only for scaffolding and I want to keep things simple here -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
+
+		<script src="dependencies/parseCardsText.js"></script>	
+		<script src="scripts/out/joustjs.js"></script>	
+
+		<script>
+			console.log('ok', joustjs)
+			$.ajax({
+				url: 'replay.xml',
+				dataType: 'xml',
+				success: function(response) {
+					joustjs.loadReplay(response)
+				}
+			})
+			// 
+		</script>
+	</body>
+</html>

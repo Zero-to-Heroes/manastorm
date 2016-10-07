@@ -15,6 +15,8 @@ module.exports = function (grunt) {
 	// Time how long tasks take. Can help when optimizing build times
 	require('time-grunt')(grunt);
 
+	var serveStatic = require('serve-static')
+
 	// Configurable paths for the application
 	var appConfig = {
 		app: 'app',
@@ -100,15 +102,49 @@ module.exports = function (grunt) {
 			main: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/dist/*',
-				dest: 'G:\\Source\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
 				flatten: true
 			},
 			dev: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/*',
-				dest: 'G:\\Source\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
 				flatten: true
 			}
+		},
+
+		watch: {
+		  	js: {
+				files: ['<%= yeoman.app %>/**/*.js'],
+				options: {
+			  		livereload: '<%= connect.options.livereload %>'
+				}
+		  	},
+		  	livereload: {
+				options: {
+			  		livereload: '<%= connect.options.livereload %>'
+				},
+				files: [
+			  		'<%= yeoman.app %>/**/*.html'
+				]
+		  	}
+		},
+
+		// The actual grunt server settings
+		connect: {
+		  	options: {
+				port: 9001,
+				base: '<%= yeoman.app %>',
+				// Change this to '0.0.0.0' to access the server from outside.
+				hostname: '0.0.0.0',
+				livereload: 35729
+		  	},
+		  	livereload: {
+				options: {
+				  	open: true,
+					base: '<%= yeoman.app %>'
+				}
+		  	}
 		}
 	});
 
@@ -124,11 +160,22 @@ module.exports = function (grunt) {
 		'copy:main'
 	]);
 
-	grunt.registerTask('dev', [
+
+	grunt.registerTask('build-dev', [
 		'less',
 		'coffee',
 		'cjsx',
-		'browserify',
+		'browserify'
+	]);
+
+	grunt.registerTask('dev', [
+		'build-dev',
 		'copy:dev'
+	]);
+
+	grunt.registerTask('serve', [
+		// 'build-dev',
+		'connect:livereload',
+		'watch'
 	]);
 };
