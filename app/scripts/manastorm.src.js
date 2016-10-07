@@ -1,4 +1,4 @@
-var joustjs = {
+var manastorm = {
 
 	execute: function(review, text) {
 		if (!text) return '';
@@ -12,8 +12,7 @@ var joustjs = {
 
 	init: function(config, review) {
 		var replayXml = review.replayXml;
-		joustjs.loadReplay(replayXml);
-		// console.log('ext player init in joustjs.src')
+		manastorm.loadReplay(replayXml);
 	},
 
 	loadReplay: function(replayXml) {
@@ -24,7 +23,7 @@ var joustjs = {
 		//console.log('string xml', strReplayXml);
 
 		//require('coffee-react/register');
-		var bundle = require('./joust/src/front/bundle.js');
+		var bundle = require('./js/src/front/bundle.js');
 		bundle.init(strReplayXml);
 
 		window.replay.cardUtils = window['parseCardsText']
@@ -32,12 +31,10 @@ var joustjs = {
 
 	reload: function(replayXml) {
 		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
-		// console.log('in reload in joustjs.src', window.replay)
 		window.replay.reload(strReplayXml)
 	},
 
 	goToTimestamp: function(turnNumber) {
-		// console.log('called goToTimestamp in joustjs', turnNumber)
 		var regex = /(?:t?)(\d?\d?\do?|mulligan|endgame)/
 		var match = turnNumber.match(regex)
 		var turn = match[1]
@@ -47,17 +44,13 @@ var joustjs = {
 	},
 
 	onTurnChanged: function(callback) {
-		// console.log('registering event listener in joustjs src')
 		window.replay.onTurnChanged = function(turn) {
-			// var turnNumber = turn.turn == 'Mulligan' ? 0 : turn.turn
-			// console.log('on turn changed in joustjs.src', turn)
 			callback(turn)
 		}
 	},
 
 	getCurrentTimestamp: function() {
 		var turn = window.replay.getCurrentTurn().toLowerCase()
-		// console.log('getting current timestamp', turn)
 		return turn
 	},
 	
@@ -71,4 +64,4 @@ var joustjs = {
 
 }
 
-module.exports = joustjs;
+module.exports = manastorm;

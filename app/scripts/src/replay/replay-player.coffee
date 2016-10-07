@@ -27,7 +27,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	init: ->
-		# console.log 'starting init in joustjs'
+		# console.log 'starting init in manastorm'
 		if @entities
 			for k,v of @entities
 				v.damageTaken = 0
@@ -93,7 +93,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		# console.log 'init done in joustjs', @turns
+		# console.log 'init done in manastorm', @turns
 
 
 	autoPlay: ->

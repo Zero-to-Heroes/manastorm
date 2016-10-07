@@ -34,7 +34,7 @@ module.exports = function (grunt) {
 				expand: true,
 				cwd: '<%= yeoman.app %>/scripts',
 				src: ['**/*.coffee'],
-				dest: '<%= yeoman.app %>/scripts/joust',
+				dest: '<%= yeoman.app %>/scripts/js',
 				ext: '.js'
 			}
 		},
@@ -44,14 +44,14 @@ module.exports = function (grunt) {
 				expand: true,
 				cwd: '<%= yeoman.app %>/scripts',
 				src: ['**/*.cjsx'],
-				dest: '<%= yeoman.app %>/scripts/joust',
+				dest: '<%= yeoman.app %>/scripts/js',
 				ext: '.js'
 			}
 		},
 
 		removelogging: {
 			dist: {
-				src: "<%= yeoman.app %>/scripts/joust/**/*.js",
+				src: "<%= yeoman.app %>/scripts/js/**/*.js",
 				options: {
 					methods: ['log', 'debug']
 				}
@@ -61,19 +61,19 @@ module.exports = function (grunt) {
 		browserify: {
 			options: {
 				browserifyOptions: {
-					standalone: 'joustjs'
+					standalone: 'manastorm'
 				},
 				plugin: [
 					[ "browserify-derequire" ]
 				]
 			},
-			'<%= yeoman.app %>/scripts/out/joustjs.js': ['<%= yeoman.app %>/scripts/joustjs.src.js', '<%= yeoman.app %>/scripts/joust/**/*.js']
+			'<%= yeoman.app %>/scripts/out/manastorm.js': ['<%= yeoman.app %>/scripts/manastorm.src.js', '<%= yeoman.app %>/scripts/js/**/*.js']
 		},
 
 		less: {
 			development: {
 				files: {
-					"<%= yeoman.app %>/scripts/out/joustjs.css": '<%= yeoman.app %>/scripts/src/less/styles.less'
+					"<%= yeoman.app %>/scripts/out/manastorm.css": '<%= yeoman.app %>/scripts/src/less/styles.less'
 				}
 			}
 		},
@@ -81,7 +81,7 @@ module.exports = function (grunt) {
 		uglify: {
 			dist: {
 				files: {
-					'<%= yeoman.app %>/scripts/out/dist/joustjs.js': ['<%= yeoman.app %>/scripts/out/joustjs.js']
+					'<%= yeoman.app %>/scripts/out/dist/manastorm.js': ['<%= yeoman.app %>/scripts/out/manastorm.js']
 				}
 			}
 		},
@@ -93,22 +93,28 @@ module.exports = function (grunt) {
 			},
 			dist: {
 				files: {
-					'<%= yeoman.app %>/scripts/out/dist/joustjs.css': ['<%= yeoman.app %>/scripts/out/joustjs.css']
+					'<%= yeoman.app %>/scripts/out/dist/manastorm.css': ['<%= yeoman.app %>/scripts/out/manastorm.css']
 				}
 			}
 		},
 
 		copy: {
+			static: {
+				expand: true,
+				cwd: '<%= yeoman.app %>/scripts/static/',
+				src: '**/*',
+				dest: '<%= yeoman.app %>/scripts/out'
+			},
 			main: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/dist/*',
-				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\manastorm/',
 				flatten: true
 			},
 			dev: {
 				expand: true,
 				src: '<%= yeoman.app %>/scripts/out/*',
-				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\joustjs/',
+				dest: 'D:\\Dev\\Projects\\coaching\\yo\\app\\plugins\\manastorm/',
 				flatten: true
 			}
 		},
@@ -165,7 +171,8 @@ module.exports = function (grunt) {
 		'less',
 		'coffee',
 		'cjsx',
-		'browserify'
+		'browserify',
+		'copy:static'
 	]);
 
 	grunt.registerTask('dev', [
@@ -174,7 +181,7 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('serve', [
-		// 'build-dev',
+		'build-dev',
 		'connect:livereload',
 		'watch'
 	]);

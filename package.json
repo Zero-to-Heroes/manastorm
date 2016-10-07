@@ -1,9 +1,9 @@
 {
-  "name": "joust-js",
-  "version": "0.0.0",
+  "name": "manastorm",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sebastientromp/simple-rankings.git"
+    "url": "https://github.com/Zero-to-Heroes/manastorm"
   },
   "dependencies": {
     "browserify": "^12.0.1",

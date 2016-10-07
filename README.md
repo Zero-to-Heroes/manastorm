@@ -1,5 +1,9 @@
->> Error: Cannot find module '!!./../../../css-loader/index.js!./photon.min.css' from 'D:\Dev\Projects\joust-js\node_modules\react-photonkit\dist'
-	-> HACK: comment out in node_modules, no idea if there is something better to do. Filed question at https://github.com/react-photonkit/react-photonkit/issues/18
-remove fs in hs-replay
-remove photon css declaration
-	-> same file
+Manastorm is a javascript replay viewer for Hearthstone, focused on step-by-step play. It is built using coffeescript and reactjs.
+
+#Getting started
+
+* Download and install [NodeJS](https://nodejs.org/en/download/) (we'll need node package manager)
+* In a command prompt/bash, run `npm install npm -g` then `npm install`
+* Then install grunt-cli using `npm install -g grunt-cli`
+* You can then run manastorm using `grunt serve`. It will by default load the replay from the replay.xml file at the root
+    * If you want to load a game from [Zero to Heroes](http://www.zerotoheroes.com), the easiest way is to open the developer tools, monitor the Network activity and look for a request with a guid name, like 5b4711c3-e8be-4a1e-abb8-10aaadddb061. This is the XML of the game being loaded, so just copy-paste the contents into your local file.
