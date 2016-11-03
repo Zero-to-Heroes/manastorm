@@ -549,11 +549,11 @@ class ActionParser extends EventEmitter
 
 					# The HSReplay version
 					if !meta.info and meta.meta
-						@addMeta command, meta, meta
+						@addMeta item, meta, meta
 						
 					if meta.info
 						for info in meta.info
-							@addMeta command, meta, info
+							@addMeta item, meta, info
 
 						
 			
@@ -570,8 +570,9 @@ class ActionParser extends EventEmitter
 				}
 				@addAction @currentTurnNumber, action
 
-	addMeta: (command, meta, info) ->
+	addMeta: (item, meta, info) ->
 
+		command = item.node
 		# If the entity that triggers the power is something that just did an action, we don't log that again
 		sameOwnerAsParent = (command.parent?.attributes?.entity == command.attributes.entity)
 
