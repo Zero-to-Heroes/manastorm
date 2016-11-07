@@ -127,41 +127,11 @@ module.exports = function (grunt) {
 				filter: 'isFile',
 				dest: '<%= yeoman.release %>'
 			}
-
-
-			// releaseDev: {
-			// 	static: {
-			// 		expand: true,
-			// 		cwd: '<%= yeoman.app %>/scripts/static/',
-			// 		src: '**/*',
-			// 		dest: '<%= yeoman.release %>'
-			// 	},
-			// 	dev: {
-			// 		expand: true,
-			// 		cwd: '<%= yeoman.app %>/scripts/out/',
-			// 		src: '**/*',
-			// 		dest: '<%= yeoman.release %>'
-			// 	}
-			// },
-			// release: {
-			// 	static: {
-			// 		expand: true,
-			// 		cwd: '<%= yeoman.app %>/scripts/static/',
-			// 		src: '**/*',
-			// 		dest: '<%= yeoman.release %>'
-			// 	},
-			// 	main: {
-			// 		expand: true,
-			// 		cwd: '<%= yeoman.app %>/scripts/out/dist/',
-			// 		src: '*',
-			// 		dest: '<%= yeoman.release %>'
-			// 	}
-			// }
 		},
 
 		watch: {
 		  	js: {
-				files: ['<%= yeoman.app %>/**/*.js'],
+				files: ['<%= yeoman.app %>/**/manastorm.js'],
 				options: {
 			  		livereload: '<%= connect.options.livereload %>'
 				}
@@ -183,7 +153,7 @@ module.exports = function (grunt) {
 				base: '<%= yeoman.app %>',
 				// Change this to '0.0.0.0' to access the server from outside.
 				hostname: '0.0.0.0',
-				livereload: 35729
+				livereload: 35732
 		  	},
 		  	livereload: {
 				options: {

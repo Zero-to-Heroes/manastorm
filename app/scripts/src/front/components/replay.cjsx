@@ -62,6 +62,8 @@ class Replay extends React.Component
 		subscribe @state.replay, 'game-generated', =>
 			@gameGenerated = true
 
+		@bindKeypressHandlers()
+
 		# subscribe @state.replay, 'reload-game', (newGame) =>
 		# 	console.log 'reloading', newGame
 		# 	@reloadGame newGame
@@ -83,6 +85,11 @@ class Replay extends React.Component
 		}
 		# console.log 'new version'
 
+
+	bindKeypressHandlers: =>
+		window.addEventListener 'keydown', (e) =>
+			if @mousingover
+				@handleKeyDown e
 
 	componentDidMount: ->
 		window.addEventListener 'resize', @updateDimensions
@@ -194,7 +201,7 @@ class Replay extends React.Component
 			overlayCls += " silent"
 
 		# console.log 'applying style', @state.style
-		return <div className="replay" ref="root" style={@state.style}>
+		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 					<ReactTooltip />
 					<div className="additional-controls">
 						<label>
@@ -245,6 +252,27 @@ class Replay extends React.Component
 					</form>
 					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog}/>
 				</div>
+
+
+	handleKeyDown: (e) =>
+		# console.log 'keydown', e
+		switch e.code
+			when 'ArrowRight'
+				@goNextAction e
+			when 'ArrowLeft'
+				@goPreviousAction e
+			when 'ArrowUp'
+				@goNextTurn e
+			when 'ArrowDown'
+				@goPreviousTurn e
+
+	onMouseEnter: (e) =>
+		# console.log 'mouse entered', e
+		@mousingover = true
+
+	onMouseLeave: (e) =>
+		# console.log 'mouse left', e
+		@mousingover = false
 
 	goNextAction: (e) =>
 		# nononono.sendexception
