@@ -885,11 +885,13 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'building image array', @entities
 		# Entities are roughly added in the order of apparition
 		for k,v of @entities
-			# console.log 'adding entity', k, v
 			ids.push v.cardID
 
 		for id in ids
-			images.push @cardUtils.buildFullCardImageUrl(@cardUtils.getCard(id))
+			card = @cardUtils.getCard(id)
+			# console.log 'preloading', id, card
+			if card and card.type != 'Enchantment'
+				images.push @cardUtils.buildFullCardImageUrl(card)
 
 		# console.log 'image array', images
 		return images

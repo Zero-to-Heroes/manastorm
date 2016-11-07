@@ -29,11 +29,6 @@ var manastorm = {
 		window.replay.cardUtils = window['parseCardsText']
 	},
 
-	reload: function(replayXml) {
-		var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
-		window.replay.reload(strReplayXml)
-	},
-
 	goToTimestamp: function(turnNumber) {
 		var regex = /(?:t?)(\d?\d?\do?|mulligan|endgame)/
 		var match = turnNumber.match(regex)
