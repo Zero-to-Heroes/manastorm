@@ -39,9 +39,9 @@ Target = React.createClass
 	# 			@setState({hidden: ""})
 
 	render: ->
-		console.log 'rendering target?', @props.source, @props.target, @props.source?.getDimensions(), @props.source?.centerX, @props.target?.centerX
+		# console.log 'rendering target?', @props.source, @props.target, @props.source?.getDimensions(), @props.source?.centerX, @props.target?.centerX
 		return null unless (@props.source and @props.target and @props.source?.centerX and @props.target?.centerX)
-		console.log 'trying to render target', @props, Date.now()
+		# console.log 'trying to render target', @props, Date.now()
 
 		sourceDims = @props.source.getDimensions()
 		# console.log 'sourceDims', sourceDims

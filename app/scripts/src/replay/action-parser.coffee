@@ -73,6 +73,9 @@ class ActionParser extends EventEmitter
 				v.tags.CARDTYPE = 5
 			if card?.type is 'Enchantment' and !v.tags.CARDTYPE
 				v.tags.CARDTYPE = 6
+			# Init 0 damage to make rollbacking easier
+			if card?.type is 'Minion'
+				v.tags.DAMAGE = 0
 
 
 	parseActions: ->

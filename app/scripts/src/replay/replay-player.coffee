@@ -186,7 +186,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	goToEndGame: ->
-		console.log 'in goToEndGame'
+		# console.log 'in goToEndGame'
 		while !@isEndGame
 			@goNextAction()
 
@@ -194,14 +194,14 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
 		@previousActiveSpell = undefined
 
 		if @currentActionInTurn == -1 and @currentTurn > 2
-			console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
+			# console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
 			rollbackAction = @turns[@currentTurn - 1].actions[@turns[@currentTurn - 1].actions.length - 1]
 
 		else 
@@ -221,11 +221,11 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		else if @currentActionInTurn < 0
-			console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
+			# console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
-			console.log 'emitting new turn event',  @turns[targetTurn]
+			# console.log 'emitting new turn event',  @turns[targetTurn]
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'new-turn', @turns[targetTurn]
 			@emit 'previous-action', rollbackAction
@@ -235,16 +235,16 @@ class ReplayPlayer extends EventEmitter
 			targetAction = @currentActionInTurn - 1
 
 
-		console.log 'rollbackAction', rollbackAction
+		# console.log 'rollbackAction', rollbackAction
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 
 		else
-			console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'previous-action', rollbackAction
@@ -266,10 +266,10 @@ class ReplayPlayer extends EventEmitter
 			if lastIteration			
 				# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
 				if @currentActionInTurn is -1
-					console.log 'position back to start of turn'
+					# console.log 'position back to start of turn'
 					while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 						@historyPosition--
-					console.log '\tdone'
+					# console.log '\tdone'
 				@goNextAction()
 
 
@@ -290,7 +290,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -517,7 +517,7 @@ class ReplayPlayer extends EventEmitter
 			@historyPosition--
 
 		for k, v of action.rollbackInfo
-			# console.log '\trolling entity', k, v, @entities[k], action, @historyPosition
+			console.log '\trolling entity', k, v, @entities[k], action, @historyPosition
 			@entities[k].update tags: v
 
 		@updateOptions()
@@ -544,18 +544,18 @@ class ReplayPlayer extends EventEmitter
 
 
 	updateOptions: (action) ->
-		# console.log 'updating options'
+		console.log 'updating options'
 		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
 		if !@history[@historyPosition]?.parent and @getActivePlayer() == @player
-			# console.log 'updating options', @history.length, @historyPosition
+			console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor > 0
 				if @history[currentCursor]?.command is 'receiveOptions'
-					# console.log 'updating options?', @history[currentCursor], @history, currentCursor
+					console.log 'updating options?', @history[currentCursor], @history, currentCursor
 					@history[currentCursor].execute(this, action)
 					return
 				currentCursor--
-		# console.log 'stopped at history', @history[@historyPosition].timestamp
+		console.log 'stopped at history', @history[@historyPosition].timestamp
 
 	updateActiveSpell: (action) ->
 		if !action
@@ -657,7 +657,7 @@ class ReplayPlayer extends EventEmitter
 			@opponent = entity
 
 	receiveEntity: (definition, action) ->
-		# console.log 'receiving entity', definition.id, definition
+		# console.log 'receiving entity', definition.id, definition, @entities[definition.id]
 		if @entities[definition.id]
 			entity = @entities[definition.id]
 		else
@@ -670,7 +670,7 @@ class ReplayPlayer extends EventEmitter
 
 	receiveTagChange: (change, action) ->
 		# if change.tag is 'RESOURCES'
-		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		# console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value
