@@ -194,14 +194,14 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
+		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
 		@previousActiveSpell = undefined
 
 		if @currentActionInTurn == -1 and @currentTurn > 2
-			# console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
+			console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
 			rollbackAction = @turns[@currentTurn - 1].actions[@turns[@currentTurn - 1].actions.length - 1]
 
 		else 
@@ -221,30 +221,30 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		else if @currentActionInTurn < 0
-			# console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
+			console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
-			# console.log 'emitting new turn event',  @turns[targetTurn]
+			console.log 'emitting new turn event',  @turns[targetTurn]
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'new-turn', @turns[targetTurn]
-			# @emit 'previous-action', rollbackAction
+			@emit 'previous-action', rollbackAction
 
 		else
 			targetTurn = @currentTurn
 			targetAction = @currentActionInTurn - 1
 
 
-		# console.log 'rollbackAction', rollbackAction
+		console.log 'rollbackAction', rollbackAction
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
+			console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 
 		else
-			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+			console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'previous-action', rollbackAction
@@ -266,10 +266,10 @@ class ReplayPlayer extends EventEmitter
 			if lastIteration			
 				# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
 				if @currentActionInTurn is -1
-					# console.log 'position back to start of turn'
+					console.log 'position back to start of turn'
 					while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 						@historyPosition--
-					# console.log '\tdone'
+					console.log '\tdone'
 				@goNextAction()
 
 

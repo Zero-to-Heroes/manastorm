@@ -106,7 +106,7 @@ class Replay extends React.Component
 	updateDimensions: =>
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-			console.log 'updated dimensions'
+			# console.log 'updated dimensions'
 			@callProtectedCallback()
 
 	callback: =>
@@ -115,7 +115,7 @@ class Replay extends React.Component
 			setTimeout @callback, 50
 		else
 			try
-				console.log 'forcing update'
+				# console.log 'forcing update'
 				that = this
 				setTimeout () ->
 					that.forceUpdate()
@@ -128,7 +128,7 @@ class Replay extends React.Component
 		replay = @state.replay
 		# return null unless @gameGenerated
 
-		console.log 'rerendering replay'
+		# console.log 'rerendering replay'
 
 		if replay.players.length == 2
 			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
