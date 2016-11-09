@@ -60,6 +60,9 @@ class ActionParser extends EventEmitter
 				# Adding information that this entity is a secret
 				if item.node.tag == 'SECRET' and item.node.value == 1
 					@entities[item.node.entity].tags[item.node.tag] = item.node.value
+				# Add parent tag, needed for discover
+				if item.node.tag == 'PARENT_CARD'
+					@entities[item.node.entity].tags[item.node.tag] = item.node.value
 				# Since patch 5.2.0.13619, the CURRENT_PLAYER is sent afterwards as a tag change
 			if item.command == 'receiveShowEntity'
 				if item.node.tags.SECRET == 1
@@ -134,8 +137,10 @@ class ActionParser extends EventEmitter
 			filteredActions = _.filter @turns[tempTurnNumber].actions, filterFunction
 			# console.log 'sorting actions for turn', tempTurnNumber
 			sortedActions = _.sortBy filteredActions, 'index'
+			# console.log 'sorted actions', sortedActions
 			# Post processing
 			finalActions = @postProcess sortedActions
+			# console.log 'final actions', finalActions
 
 			@turns[tempTurnNumber].actions = finalActions
 			# console.log '\tsorted', @turns[tempTurnNumber].actions
@@ -172,9 +177,6 @@ class ActionParser extends EventEmitter
 				# Because turn 1 is Mulligan
 				actions[i].owner = @turns[actions[i].turn + 1]?.activePlayer
 
-			# action.tagChanges = {}
-			# action.tagRollback = {}
-
 		# Remove empty
 		finalActions = _.compact actions
 
@@ -187,7 +189,7 @@ class ActionParser extends EventEmitter
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
-			console.log 'parsing mulligan', item
+			# console.log 'parsing mulligan', item
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
 			else 
@@ -407,13 +409,13 @@ class ActionParser extends EventEmitter
 		# Mulligan
 		# Prince Malchezaar has the same signature, but with a different entity ID
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities and command.attributes.entity in ['2', '3']
-			console.log 'parsing mulligan cards hideEntities', command
+			# console.log 'parsing mulligan cards hideEntities', command
 			@turns[@currentTurnNumber].playerMulligan = command.hideEntities
 
 		# Mulligan opponent
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.attributes.entity != @mainPlayerId and command.tags
 			mulliganed = []
-			console.log 'debug opponent mulligan', command, command.tags
+			# console.log 'debug opponent mulligan', command, command.tags
 			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value == 2
 					@turns[@currentTurnNumber].opponentMulligan.push tag.entity
@@ -828,20 +830,22 @@ class ActionParser extends EventEmitter
 		# Always discover 3 cards
 		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
 		if command.attributes.type == '3' and command.fullEntities?.length >= 3
+			# console.log 'considering possible discoevr', command.attributes.entity, command
 			# Check that each of them is in the SETASIDE zone
 			isDiscover = true
 			choices = []
 			# console.log 'discovering?', command
 			for entity in command.fullEntities
-				# console.log '\tdiscovering?', entity, @entities[entity.id]
+				console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
-				if @entities[entity.id].tags.CARDTYPE != 6
+				# PARENT_CARD is for the "choose one" variations
+				if @entities[entity.id].tags.CARDTYPE != 6 && !@entities[entity.id].tags.PARENT_CARD
 					choices.push entity
 					if entity.tags.ZONE != 6
 						isDiscover = false
 
 			if isDiscover and choices.length == 3
-				# console.log 'parsing discover action', command, choices
+				console.log 'parsing discover action', command, choices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -852,8 +856,8 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				command.isDiscover = true
-				# console.log 'adding discover action', action
 				@addAction @currentTurnNumber, action
+				console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
 
 
 	parseSummons: (item) ->
