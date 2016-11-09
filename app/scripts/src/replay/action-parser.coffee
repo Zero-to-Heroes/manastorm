@@ -541,8 +541,7 @@ class ActionParser extends EventEmitter
 		command = item.node
 		if command.attributes.type in ['3', '5'] 
 
-			if command.attributes.entity is '14' and command.attributes.target is '69'
-				console.log 'considering power trigger', item
+			# console.log 'consider power effects', command.attributes.entity
 
 			if command.meta?.length > 0
 				for meta in command.meta 
@@ -789,7 +788,7 @@ class ActionParser extends EventEmitter
 	parseAttacks: (item) ->
 		command = item.node
 		if command.attributes.type == '1'
-			#console.log 'considering attack', command
+			# console.log 'considering attack', command, entity, command.target, command
 			action = {
 				turn: @currentTurnNumber - 1
 				timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -836,7 +835,7 @@ class ActionParser extends EventEmitter
 			choices = []
 			# console.log 'discovering?', command
 			for entity in command.fullEntities
-				console.log '\tdiscovering?', entity, @entities[entity.id]
+				# console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
 				# PARENT_CARD is for the "choose one" variations
 				if @entities[entity.id].tags.CARDTYPE != 6 && !@entities[entity.id].tags.PARENT_CARD
@@ -845,7 +844,7 @@ class ActionParser extends EventEmitter
 						isDiscover = false
 
 			if isDiscover and choices.length == 3
-				console.log 'parsing discover action', command, choices
+				# console.log 'parsing discover action', command, choices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -857,7 +856,7 @@ class ActionParser extends EventEmitter
 				}
 				command.isDiscover = true
 				@addAction @currentTurnNumber, action
-				console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+				# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
 
 
 	parseSummons: (item) ->

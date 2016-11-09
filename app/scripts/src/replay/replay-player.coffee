@@ -290,7 +290,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
+		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]

@@ -220,8 +220,9 @@ class Card extends React.Component
 
 		# console.log 'entity in card', entity, entity.getEnchantments
 		if entity.getEnchantments?()?.length > 0
-			# console.log '\tcard rendered', entity.cardID, entity
-			# console.log 'enchantments', entity.getEnchantments()
+			# console.log 'enchantments', entity.cardID, entity, entity.getEnchantments()
+
+			seqNumber = 0
 
 			enchantments = entity.getEnchantments().map (enchant) ->
 				enchantor = entity.replay.entities[enchant.tags.CREATOR]
@@ -233,7 +234,7 @@ class Card extends React.Component
 						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
 					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
 
-				<div className="enchantment" key={'enchantment' + entity.id + enchant.cardID}>
+				<div className="enchantment" key={'enchantment' + entity.id + enchant.cardID + seqNumber++}>
 					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>
 					<div className="info-container">
 						<div className="icon" style={enchantImage}></div>
