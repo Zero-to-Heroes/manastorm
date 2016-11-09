@@ -126,8 +126,8 @@ TurnLog = React.createClass
 	# Action specific logs
 	# ===================
 	buildSecretRevealedLog: (action) ->
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>'
 		log = <ActionDisplayLog newLog={newLog} />
@@ -140,8 +140,6 @@ TurnLog = React.createClass
 		# Don't show hidden information
 		if action.owner == @replay.player
 			cardLink = @buildList action.data
-			# card = if action?.data then action.data['cardID'] else ''
-			# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 		else if action.data.length == 1
 			cardLink = '<span> ' + action.data.length + ' card </span>'
 			cardLink = <SpanDisplayLog newLog={cardLink} />
@@ -201,8 +199,6 @@ TurnLog = React.createClass
 	buildOverdrawLog: (action) ->
 		if action.owner == @replay.player
 			cardLink = @buildList action.data
-			# card = if action?.data then action.data['cardID'] else ''
-			# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
 		else if action.data.length == 1
 			cardLink = '<span> ' + action.data.length + ' card! </span>'
 			cardLink = <SpanDisplayLog newLog={cardLink} />
@@ -230,9 +226,9 @@ TurnLog = React.createClass
 		return drawLog
 
 	buildPlayedCardFromHandLog: (action) ->
-		card = action.data['cardID']
+		# card = action.data['cardID']
 		# console.log 'buildPlayedCardFromHandLog', action, card
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
@@ -243,8 +239,8 @@ TurnLog = React.createClass
 		return log
 
 	buildHeroPowerLog: (action) ->
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
@@ -257,8 +253,8 @@ TurnLog = React.createClass
 	buildPlayedSecretFromHandLog: (action) ->
 		# console.log 'logging secret played', action, @replay.mainPlayerId, @replay
 		if action.owner.id == parseInt(@replay.mainPlayerId)
-			card = action.data['cardID']
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			# card = action.data['cardID']
+			cardLink = @buildCardLink action.data
 			link1 = <span>(</span>
 			link2 = <span>)</span>
 			# console.log '\tand building card link', card
@@ -281,10 +277,10 @@ TurnLog = React.createClass
 
 		secrets = []
 		for secret in action.secrets
-			card = secret['cardID']
+			# card = secret['cardID']
 			# Secret is public
 			if action.owner == @replay.player
-				cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+				cardLink = @buildCardLink secret
 				secretLog = <span className="list">
 						{indent}
 						<span>: </span>
@@ -307,8 +303,8 @@ TurnLog = React.createClass
 	buildPowerDamageLog: (action) ->
 		# console.log 'building power-damage log', action
 		if !action.sameOwnerAsParent
-			card = if action.data then action.data['cardID'] else ''
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			# card = if action.data then action.data['cardID'] else ''
+			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 		else 
 			cardLog = <span>which </span>
@@ -332,8 +328,8 @@ TurnLog = React.createClass
 	buildPowerTargetLog: (action) ->
 		# console.log 'buildPowerTargetLog', action
 		if !action.sameOwnerAsParent
-			card = if action.data then action.data['cardID'] else ''
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			# card = if action.data then action.data['cardID'] else ''
+			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 		else 
 			cardLog = <span>which </span>
@@ -344,10 +340,6 @@ TurnLog = React.createClass
 			indentLog = <span>...</span>
 
 		targets = @buildList action.target
-
-
-		# target = @replay.entities[action.target]['cardID']
-		# targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={'log' + ++@logIndex} className={cls}>
 			    {indentLog}
@@ -361,8 +353,8 @@ TurnLog = React.createClass
 	buildPowerHealingLog: (action) ->
 		# console.log 'building power-healing log', action
 		if !action.sameOwnerAsParent
-			card = if action.data then action.data['cardID'] else ''
-			cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+			# card = if action.data then action.data['cardID'] else ''
+			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 
 		# The effect occured as a response to another action, so we need to make that clear
@@ -385,8 +377,8 @@ TurnLog = React.createClass
 		index = 1
 		targets = []
 		for targetId in actionIds
-			target = @replay.entities[targetId]['cardID']
-			targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+			# target = @replay.entities[targetId]['cardID']
+			targetLink = @buildCardLink @replay.entities[targetId]
 			targets.push <SpanDisplayLog newLog={targetLink} />
 			if actionIds.length > 1 
 				if index == actionIds.length - 1
@@ -399,7 +391,7 @@ TurnLog = React.createClass
 	buildPlayedCardWithTargetLog: (action) ->
 		# console.log 'buildPlayedCardWithTargetLog', action
 		target = @replay.entities[action.target]['cardID']
-		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+		targetLink = @buildCardLink @replay.entities[action.target]
 
 		log = <p key={'log' + ++@logIndex}>
 			    <span className="indented-log">...which </span>
@@ -410,14 +402,14 @@ TurnLog = React.createClass
 		return log
 
 	buildTriggerFullEntityLog: (action) ->
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink @replay.entities[action.target]
 
 		creations = []
 		for entity in action.newEntities
-			target = entity['cardID']
+			# target = entity['cardID']
 			if target
-				targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+				targetLink = @buildCardLink entity # @replay.buildCardLink(@replay.cardUtils.getCard(target))
 				creationLog = <span key={'log' + ++@logIndex} className="list"> 
 					<SpanDisplayLog newLog={cardLink} />
 					<span> creates </span>
@@ -432,11 +424,11 @@ TurnLog = React.createClass
 		return log
 
 	buildAttackLog: (action) ->
-		card = if action.data then action.data['cardID'] else ''
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = if action.data then action.data['cardID'] else ''
+		cardLink = @buildCardLink action.data
 
-		target = @replay.entities[action.target]['cardID']
-		targetLink = @replay.buildCardLink(@replay.cardUtils.getCard(target))
+		# target = @replay.entities[action.target]['cardID']
+		targetLink = @buildCardLink @replay.entities[action.target] # @replay.buildCardLink(@replay.cardUtils.getCard(target))
 
 		log = <p key={'log' + ++@logIndex}>
 			    <SpanDisplayLog newLog={cardLink} />
@@ -447,9 +439,6 @@ TurnLog = React.createClass
 		return log
 
 	buildMinionDeathLog: (action) ->
-		# card = @replay.entities[action.data]['cardID']
-		# cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
-
 		targets = @buildList action.deads
 		if targets.length > 1
 			dies = <span> die </span>
@@ -463,8 +452,8 @@ TurnLog = React.createClass
 
 	buildDiscoverLog: (action) ->
 		# console.log 'building discover log', action
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		if !action.owner or action.owner.id == parseInt(@replay.mainPlayerId)
 			# console.log 'discover for main player, showing everything'
@@ -472,7 +461,7 @@ TurnLog = React.createClass
 			for choice in action.choices
 				choiceCard = choice['cardID']
 				if choiceCard
-					choiceCardLink = @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
+					choiceCardLink = @buildCardLink choice # @replay.buildCardLink(@replay.cardUtils.getCard(choiceCard))
 					choicesCards.push <SpanDisplayLog className="discovered-card indented-log" newLog={choiceCardLink} />
 
 		log = <p key={'log' + ++@logIndex}>
@@ -491,8 +480,8 @@ TurnLog = React.createClass
 		else
 			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
 			    {indent}		
@@ -509,8 +498,8 @@ TurnLog = React.createClass
 		else
 			indent = <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
 			    {indent}
@@ -521,8 +510,8 @@ TurnLog = React.createClass
 		return log
 
 	buildNewHeroPowerLog: (action) ->
-		card = action.data['cardID']
-		cardLink = @replay.buildCardLink(@replay.cardUtils.getCard(card))
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
 			    <PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
@@ -575,11 +564,11 @@ TurnLog = React.createClass
 		# Additional data on cards mulliganed
 		if turn.playerMulligan?.length > 0
 			for mulliganed in turn.playerMulligan
-				cardId = @replay.entities[mulliganed].cardID
+				# cardId = @replay.entities[mulliganed].cardID
 				# console.log 'cardId', cardId
-				card = @replay.cardUtils.getCard(cardId)
+				# card = @replay.cardUtils.getCard(cardId)
 				# console.log 'card', card
-				cardLink = @replay.buildCardLink(card)
+				cardLink = @buildCardLink @replay.entities[mulliganed]
 				cardLog = <p key={'log' + ++@logIndex}>
 							<PlayerNameDisplayLog active={true} name={@replay.player.name} />
 							<span> mulligans </span>
@@ -606,10 +595,17 @@ TurnLog = React.createClass
 	playerName: (turn) -> 
 		return <PlayerNameDisplayLog active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
 
+	buildCardLink: (entity) ->
+		# If the card is hidden and the "show hidden card" not activated, we don't show the card
+		# For now, hidden only means "in hand"
+		cardID = if entity then entity['cardID'] else ''
+		return @replay.buildCardLink(@replay.cardUtils.getCard(cardID))
 
 # ===============
-# And DRY obkects
+# And DRY objects
 # ===============
+
+
 TurnDisplayLog = React.createClass
 	componentDidMount: ->
 		$("#turnLog").scrollTo("max")

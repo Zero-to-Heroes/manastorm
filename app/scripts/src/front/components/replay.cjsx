@@ -319,6 +319,7 @@ class Replay extends React.Component
 
 	onShowCardsChange: =>
 		@showAllCards = !@showAllCards
+		@state.replay.showAllCards = @showAllCards
 		@callProtectedCallback()
 
 	onMainPlayerSwitchedChange: =>
