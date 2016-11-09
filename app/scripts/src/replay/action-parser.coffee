@@ -187,10 +187,9 @@ class ActionParser extends EventEmitter
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
-			# console.log 'parsing mulligan', item
+			console.log 'parsing mulligan', item
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
-				# @currentPlayer = @players[++@playerIndex % 2]
 			else 
 				@turns[@turnNumber] = {
 					turn: 'Mulligan'
@@ -202,10 +201,6 @@ class ActionParser extends EventEmitter
 				}
 				@turns.length++
 				@turnNumber++
-				# if item.node.entity == 3
-				# 	@playerIndex = 1
-				# 	@currentPlayer = @players[@playerIndex]
-				# @currentPlayer = @players[++@playerIndex % 2]
 
 	parseChangeActivePlayer: (item) ->
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
@@ -410,13 +405,15 @@ class ActionParser extends EventEmitter
 	parseMulliganCards: (item) ->
 		command = item.node
 		# Mulligan
-		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities
+		# Prince Malchezaar has the same signature, but with a different entity ID
+		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities and command.attributes.entity in ['2', '3']
+			console.log 'parsing mulligan cards hideEntities', command
 			@turns[@currentTurnNumber].playerMulligan = command.hideEntities
 
 		# Mulligan opponent
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.attributes.entity != @mainPlayerId and command.tags
 			mulliganed = []
-			# console.log 'debug opponent mulligan', command, command.tags
+			console.log 'debug opponent mulligan', command, command.tags
 			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value == 2
 					@turns[@currentTurnNumber].opponentMulligan.push tag.entity
