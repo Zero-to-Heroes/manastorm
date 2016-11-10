@@ -408,7 +408,7 @@ TurnLog = React.createClass
 		creations = []
 		for entity in action.newEntities
 			# target = entity['cardID']
-			if target
+			if entity['cardID']
 				targetLink = @buildCardLink entity # @replay.buildCardLink(@replay.cardUtils.getCard(target))
 				creationLog = <span key={'log' + ++@logIndex} className="list"> 
 					<SpanDisplayLog newLog={cardLink} />
