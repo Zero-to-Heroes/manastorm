@@ -151,7 +151,7 @@ class ReplayPlayer extends EventEmitter
 
 		@currentActionInTurn++
 
-		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if @turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1
 			@goToAction()
@@ -679,8 +679,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		if change.tag is 'ZONE'
-			console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		# if change.tag is 'ZONE'
+		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value

@@ -339,7 +339,8 @@ TurnLog = React.createClass
 			cls = "indented-log"
 			indentLog = <span>...</span>
 
-		targets = @buildList action.target
+		console.log 'building targets log', action
+		targets = @buildList action.target, action
 
 		log = <p key={'log' + ++@logIndex} className={cls}>
 			    {indentLog}
@@ -373,19 +374,27 @@ TurnLog = React.createClass
 
 		return log
 
-	buildList: (actionIds) ->
+	buildList: (actionIds, action) ->
 		index = 1
 		targets = []
-		for targetId in actionIds
-			# target = @replay.entities[targetId]['cardID']
-			targetLink = @buildCardLink @replay.entities[targetId]
-			targets.push <SpanDisplayLog newLog={targetLink} />
-			if actionIds.length > 1 
-				if index == actionIds.length - 1
-					targets.push <span key={'log' + ++@logIndex}> and </span>
-				else if index < actionIds.length - 1
-					targets.push <span key={'log' + ++@logIndex}>, </span>
-			index++
+
+		console.log 'building list', action, actionIds
+		if action and action.revealTarget and !action.revealTarget(@replay)
+			hiddenLink = '' + actionIds.length + ' cards'
+			targets.push <SpanDisplayLog newLog={hiddenLink} /> 
+
+		else
+			for targetId in actionIds
+				# target = @replay.entities[targetId]['cardID']
+				targetLink = @buildCardLink @replay.entities[targetId]
+				targets.push <SpanDisplayLog newLog={targetLink} />
+				if actionIds.length > 1 
+					if index == actionIds.length - 1
+						targets.push <span key={'log' + ++@logIndex}> and </span>
+					else if index < actionIds.length - 1
+						targets.push <span key={'log' + ++@logIndex}>, </span>
+				index++
+
 		return targets
 
 	buildPlayedCardWithTargetLog: (action) ->

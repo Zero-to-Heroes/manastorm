@@ -629,6 +629,19 @@ class ActionParser extends EventEmitter
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 					initialCommand: command
 					previousAction: lastAction
+					revealTarget: (replay) =>
+						# Always show effects on ourself
+						shouldHide = action.owner is replay.opponent
+						console.log '\tshouldHide1?', shouldHide, action.owner, replay.opponent
+						# Only hide effects that happen on the cards in hand
+						shouldHide = shouldHide && @entities[action.target[0]]?.tags?.ZONE is 3
+						console.log '\tshouldHide2?', shouldHide, @entities[action.target[0]]?.tags?.ZONE, action.target[0], @entities[action.target[0]]
+						# Don't hide the effects if we're showing all the cards
+						shouldHide = shouldHide && !replay.showAllCards
+						console.log '\tshouldHide3?', shouldHide, replay.showAllCards
+						if shouldHide
+							return false
+						return true
 				}
 				# console.log '\tparsing target action', action, command, command.isDiscover
 				if mainAction
