@@ -334,6 +334,10 @@ class ReplayPlayer extends EventEmitter
 
 				# console.log 'index', index
 
+				if action.actionType == 'discover'
+					@discoverAction = action
+					@discoverController = @getController(@entities[action.data.id].tags.CONTROLLER)
+
 				@goToIndex index
 
 				# We already decided that some actions shouldn't execute, so we don't recompute that. 
@@ -721,9 +725,9 @@ class ReplayPlayer extends EventEmitter
 
 	receiveAction: (definition) ->
 		# console.log '\t\treceiving action', definition
-		if definition.isDiscover
-			@discoverAction = definition
-			@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
+		# if definition.isDiscover
+		# 	@discoverAction = definition
+		# 	@discoverController = @getController(@entities[definition.attributes.entity].tags.CONTROLLER)
 		# console.log 'received action"'
 
 	receiveOptions: (options) ->

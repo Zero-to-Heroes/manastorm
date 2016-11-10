@@ -339,7 +339,7 @@ TurnLog = React.createClass
 			cls = "indented-log"
 			indentLog = <span>...</span>
 
-		console.log 'building targets log', action
+		# console.log 'building targets log', action
 		targets = @buildList action.target, action
 
 		log = <p key={'log' + ++@logIndex} className={cls}>
@@ -378,7 +378,7 @@ TurnLog = React.createClass
 		index = 1
 		targets = []
 
-		console.log 'building list', action, actionIds
+		# console.log 'building list', action, actionIds
 		if action and action.revealTarget and !action.revealTarget(@replay)
 			hiddenLink = '' + actionIds.length + ' cards'
 			targets.push <SpanDisplayLog newLog={hiddenLink} /> 

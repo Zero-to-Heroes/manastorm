@@ -629,16 +629,18 @@ class ActionParser extends EventEmitter
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 					initialCommand: command
 					previousAction: lastAction
+					# Some cards have an effect on cards in hand, and we don't know this when building the actions list
+					# Used by the turnlog to decide what to display
 					revealTarget: (replay) =>
 						# Always show effects on ourself
 						shouldHide = action.owner is replay.opponent
-						console.log '\tshouldHide1?', shouldHide, action.owner, replay.opponent
+						# console.log '\tshouldHide1?', shouldHide, action.owner, replay.opponent
 						# Only hide effects that happen on the cards in hand
 						shouldHide = shouldHide && @entities[action.target[0]]?.tags?.ZONE is 3
-						console.log '\tshouldHide2?', shouldHide, @entities[action.target[0]]?.tags?.ZONE, action.target[0], @entities[action.target[0]]
+						# console.log '\tshouldHide2?', shouldHide, @entities[action.target[0]]?.tags?.ZONE, action.target[0], @entities[action.target[0]]
 						# Don't hide the effects if we're showing all the cards
 						shouldHide = shouldHide && !replay.showAllCards
-						console.log '\tshouldHide3?', shouldHide, replay.showAllCards
+						# console.log '\tshouldHide3?', shouldHide, replay.showAllCards
 						if shouldHide
 							return false
 						return true
@@ -839,37 +841,55 @@ class ActionParser extends EventEmitter
 
 	parseDiscovers: (item) ->
 		command = item.node
+
+		# Hard-code Yogg-Saron. There might be a way to get around this using "Choices" block instead (Yogg doesn't have them)
+		# This will have to be for a later phase, as it's way more work (though cleaner)
+		if @entities[command.attributes.entity]?.cardID == 'OG_134'
+			return
+
 		# Always discover 3 cards
 		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
 		if command.attributes.type == '3' and command.fullEntities?.length >= 3
-			# console.log 'considering possible discoevr', command.attributes.entity, command
-			# Check that each of them is in the SETASIDE zone
+			entities = command.fullEntities
+			# Tracking discovers from our own deck, so it doesn't actually create cards
+			fullEntities = true
+		else if command.attributes.type == '3' and command.showEntities?.length >= 3
+			entities = command.showEntities
+
+
+		if entities
 			isDiscover = true
 			choices = []
-			# console.log 'discovering?', command
-			for entity in command.fullEntities
-				# console.log '\tdiscovering?', entity, @entities[entity.id]
+
+			console.log 'discovering?', @entities[command.attributes.entity].cardID, command
+			for entity in entities
+				console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
 				# PARENT_CARD is for the "choose one" variations
-				if @entities[entity.id].tags.CARDTYPE != 6 && !@entities[entity.id].tags.PARENT_CARD
+				# Check that each of them is in the SETASIDE zone
+				if @entities[entity.id].tags.CARDTYPE != 6 && !@entities[entity.id].tags.PARENT_CARD && (!fullEntities || @entities[entity.id].tags.CREATOR == parseInt(command.attributes.entity)) && entity.tags.ZONE == 6
+					console.log '\tadding entity', entity, @entities[entity.id]
 					choices.push entity
-					if entity.tags.ZONE != 6
-						isDiscover = false
 
-			if isDiscover and choices.length == 3
-				# console.log 'parsing discover action', command, choices
+			# Taken into accoutn the double discover from fandral
+			currentIndex = 0
+			while choices.length >= currentIndex + 3
+				actionChoices = choices.slice currentIndex, currentIndex + 3
+				console.log 'parsing discover action', command, choices, actionChoices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'discover'
 					data: @entities[command.attributes.entity]
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
-					choices: choices
+					choices: actionChoices
 					initialCommand: command
 				}
 				command.isDiscover = true
 				@addAction @currentTurnNumber, action
-				# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+				console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+				currentIndex += 3
+
 
 
 	parseSummons: (item) ->
