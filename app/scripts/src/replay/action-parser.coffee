@@ -276,7 +276,7 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
-							# console.log action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE
+							# console.log 'shouldexecute?', action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE, action
 							return action.fullData.tags.ZONE != 1
 					}
 					@addAction @currentTurnNumber, action

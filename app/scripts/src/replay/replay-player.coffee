@@ -151,7 +151,7 @@ class ReplayPlayer extends EventEmitter
 
 		@currentActionInTurn++
 
-		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
+		console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions
 		# Navigating within the same turn
 		if @turns[@currentTurn] && @currentActionInTurn <= @turns[@currentTurn].actions.length - 1
 			@goToAction()
@@ -296,6 +296,8 @@ class ReplayPlayer extends EventEmitter
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
 
+			# console.log '\tshould execute?', action.shouldExecute?(), action?.fullData?.tags?.ZONE
+
 			if action.shouldExecute and !action.shouldExecute() 
 				if !@seeking
 					# console.log 'skipping action'
@@ -322,6 +324,7 @@ class ReplayPlayer extends EventEmitter
 				while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
 					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
+				# console.log 'nextAction', nextAction
 				if nextAction
 					index = nextAction.index - 1
 				else if @turns[@currentTurn + 1]
@@ -329,7 +332,14 @@ class ReplayPlayer extends EventEmitter
 				else
 					index = @history[@history.length - 1].index
 
+				# console.log 'index', index
+
 				@goToIndex index
+
+				# We already decided that some actions shouldn't execute, so we don't recompute that. 
+				# -1 is to place the cursor at the step we're actually are, and let the "next action" move the cursor to the 
+				# action that should actually be executed
+				@currentActionInTurn = @currentActionInTurn + (nextActionIndex - 1)
 				
 
 	goToTurn: (gameTurn) ->
@@ -669,8 +679,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		# if change.tag is 'RESOURCES'
-		# console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		if change.tag is 'ZONE'
+			console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value
