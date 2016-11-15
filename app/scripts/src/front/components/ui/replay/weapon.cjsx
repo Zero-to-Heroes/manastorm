@@ -3,6 +3,7 @@ ReactDOM = require 'react-dom'
 Card = require './card'
 Secret = require './Secret'
 Health = require './health'
+ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../../../subscription'
 
 class Weapon extends Card
@@ -12,6 +13,7 @@ class Weapon extends Card
 		#console.log 'trying to render weapon', @props.entity
 		return <div className="weapon-container"></div> unless @props.entity?.cardID
 		#console.log '\trendering weapon', @props.entity
+		entity = @props.entity
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{@props.entity.cardID}.png"
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
@@ -34,7 +36,6 @@ class Weapon extends Card
 		if @props.entity.tags.DAMAGE > 0
 			healthClass += " damaged"
 
-
 		atkCls = "card__stats__attack"
 		if originalCard
 			originalAtk = originalCard.attack
@@ -50,15 +51,36 @@ class Weapon extends Card
 			<div className={healthClass}><span>{tagDurability - (@props.entity.tags.DAMAGE or 0)}</span></div>
 		</div>
 
-		@updateDimensions()
-		link = '<img src="' + art + '">';
+		enchantments = @buildEnchantments entity
+		statuses = @buildStatuses entity
 
-		return <div className="weapon-container" data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip">
+		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
+		cardTooltip = 
+			<div className="card-container">
+				<div className="game-info">
+					<img src={art} />
+					<div className={enchantmentClass}>
+						{enchantments}
+					</div>
+				</div>
+				<div className='statuses'>
+					<div className="filler"></div>
+					{statuses}
+				</div>
+			</div>
+
+		@updateDimensions()
+		# link = '<img src="' + art + '">';
+
+		return <div key={'card' + entity.id} className="weapon-container" data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 					<div className={cls}>
 						<div className="game-card" style={style}></div>
 						<div className="art"></div>
 						{stats}
 					</div>
+					<ReactTooltip id={"" + entity.id} >
+					    {cardTooltip}
+					</ReactTooltip>
 				</div>
 
 module.exports = Weapon
