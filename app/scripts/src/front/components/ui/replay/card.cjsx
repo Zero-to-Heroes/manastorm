@@ -133,6 +133,11 @@ class Card extends React.Component
 
 		if entity.tags.DAMAGE - entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
+		else if entity.tags.DAMAGE - entity.damageTaken < 0
+			healing = <span className="healing"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
+
+		if entity.id is 83
+			console.log 'rendering', entity.cardID, entity
 
 		enchantments = @buildEnchantments entity
 		statuses = @buildStatuses entity
@@ -172,6 +177,7 @@ class Card extends React.Component
 				{windfury}
 				{overlay}
 				{damage}
+				{healing}
 				{exhausted}
 				{stats}
 				{divineShield}
@@ -193,6 +199,7 @@ class Card extends React.Component
 				{windfury}
 				{overlay}
 				{damage}
+				{healing}
 				{exhausted}
 				{stats}
 				{divineShield}

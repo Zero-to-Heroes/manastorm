@@ -31,6 +31,7 @@ class ReplayPlayer extends EventEmitter
 		if @entities
 			for k,v of @entities
 				v.damageTaken = 0
+				v.healingDone = 0
 				v.highlighted = false
 
 		@entities = {}

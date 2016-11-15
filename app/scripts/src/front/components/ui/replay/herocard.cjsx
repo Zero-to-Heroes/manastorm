@@ -51,6 +51,8 @@ class HeroCard extends Card
 		entity.damageTaken = entity.damageTaken or 0
 		if entity.tags.DAMAGE - entity.damageTaken > 0
 			damage = <span className="damage"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
+		else if entity.tags.DAMAGE - entity.damageTaken < 0
+			healing = <span className="healing"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
 		# console.log 'build statuses', entity.cardID, entity
 		statuses = @buildStatuses entity
@@ -77,6 +79,7 @@ class HeroCard extends Card
 					<Health entity={entity}/>
 					<Armor entity={entity}/>
 					{damage}
+					{healing}
 					<ReactTooltip id={"" + entity.id} >
 					    {cardTooltip}
 					</ReactTooltip>
