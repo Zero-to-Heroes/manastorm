@@ -168,9 +168,13 @@ class ActionParser extends EventEmitter
 			if !actions[i]
 				continue
 			# Don't need to log both the targeting and the damage
-			if actions[i].actionType is 'power-damage' and actions[i - 1].actionType is 'power-target'
+			if actions[i].actionType is 'power-damage' and actions[i - 1]?.actionType is 'power-target'
 				actions[i].index = actions[i - 1].index
 				actions[i - 1] = undefined
+
+			# Until we support the Choices elements properly
+			if actions[i].actionType is 'discover' and actions[i + 1]?.actionType is 'card-draw'
+				actions[i].discovered = actions[i + 1].data[0]
 
 			if !actions[i].owner
 				# console.log 'adding owner', actions[i], @turns[actions[i].turn], @turns

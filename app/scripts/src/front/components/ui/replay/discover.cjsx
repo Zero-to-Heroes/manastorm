@@ -13,7 +13,8 @@ class Discover extends React.Component
 		hidden = @props.isHidden
 		cards = @props.discoverAction.choices.slice(0, 3).map (entity) =>
 			#console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
-			<Card entity={entity} key={entity.id} isHidden={hidden} static={true}/>
+			discovered = if @props.discoverAction.discovered is entity.id then 'picked' else ''
+			<Card className={discovered} entity={entity} key={entity.id} isHidden={hidden} static={true}/>
 
 		return  <div className="discover-container">
 					<div className="discover">
