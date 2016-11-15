@@ -314,12 +314,24 @@ TurnLog = React.createClass
 			cls = "indented-log"
 			indentLog = <span>...</span>
 
-		targets = @buildList action.target
+		targets = []
+		targetsByValue = {}
+		for k, v of action.targets
+			if !targetsByValue[v]
+				targetsByValue[v] = []
+			targetsByValue[v].push k
+
+		for k, v of targetsByValue
+			# console.log 'building damage link', k, v, action.targets
+			cardLink = @buildList v
+			targets.push <span><span> {k} damage to </span>{cardLink},</span>
+
+		# targets = @buildList action.target
 
 		log = <p key={'log' + ++@logIndex} className={cls}>
 			    {indentLog}
 			    {cardLog}
-			    <span> deals {action.amount} damage to </span>
+			    <span> deals </span>
 			    {targets}
 			</p>
 
@@ -357,19 +369,32 @@ TurnLog = React.createClass
 			# card = if action.data then action.data['cardID'] else ''
 			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+		else 
+			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
 		if action.mainAction
 			cls = "indented-log"
-			cardLog = <span>...which </span>
+			indentLog = <span>...</span>
 
-		targets = @buildList action.target
+		targets = []
+		targetsByValue = {}
+		for k, v of action.targets
+			if !targetsByValue[v]
+				targetsByValue[v] = []
+			targetsByValue[v].push k
+
+		for k, v of targetsByValue
+			# console.log 'building damage link', k, v, action.targets
+			cardLink = @buildList v
+			targets.push <span>{cardLink}<span> for {k} life </span>,</span>
+
 
 		log = <p key={'log' + ++@logIndex} className={cls}>
+			    {indentLog}
 			    {cardLog}
 			    <span> heals </span> 
 			    {targets}
-			    <span> for {action.amount} life </span>
 			</p>
 
 		return log

@@ -29,9 +29,10 @@ class TargetManager extends React.Component
 			# console.log 'merged cards', allCards
 			source = @findCard allCards, replay.targetSource
 
-		for targetId in replay.targetDestination
+		uniqueTargets = _.uniq replay.targetDestination
+		for targetId in uniqueTargets
 			target = @findCard allCards, targetId
-			# console.log 'finding target', target, source
+			# console.log 'finding target', target, source, replay.targetDestination
 			if target and source
 				targetComponent = <Target source={source} target={target} type={replay.targetType} key={'target' + replay.targetSource + '' + targetId}/>
 				targets.push targetComponent

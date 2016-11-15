@@ -575,6 +575,7 @@ class ActionParser extends EventEmitter
 				}
 				@addAction @currentTurnNumber, action
 
+	# TODO: all cases are really similar, probably possible to regroup all of them?
 	addMeta: (item, meta, info) ->
 
 		command = item.node
@@ -605,9 +606,9 @@ class ActionParser extends EventEmitter
 
 					# If the same source deals the same amount of damage, we group all of that together
 					if action.actionType is 'power-target' and action.data.id is parseInt(command.attributes.entity)
-
 						# If no info node (hsreplay), then default to action target
 						action.target.push target
+						action.target = _.uniq action.target
 						action.index = meta.index
 						subAction = true
 
@@ -616,6 +617,7 @@ class ActionParser extends EventEmitter
 			if !mainAction and lastAction?.actionType is 'power-target' and lastAction.data.id is parseInt(command.attributes.entity)
 				# console.log 'previous action is target, dont add this one', lastAction, command, lastAction.actionType, lastAction.actionType is 'power-target'
 				lastAction.target.push target
+				lastAction.target = _.uniq lastAction.target
 				lastAction.index = meta.index
 				subAction = true
 
@@ -660,10 +662,18 @@ class ActionParser extends EventEmitter
 			if mainAction?.actions 
 				for action in mainAction.actions
 					# If the same source deals the same amount of damage, we group all of that together
-					if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+					if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) 	
 						action.target.push target
+						action.target = _.uniq action.target
 						action.index = meta.index
 						subAction = true
+
+						if action.targets[target]
+							action.targets[target] = action.targets[target] + parseInt(meta.data)
+						else
+							action.targets[target] = parseInt(meta.data)
+
+
 
 			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 			lastActionIndex = 1
@@ -678,11 +688,20 @@ class ActionParser extends EventEmitter
 						lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
 						continue
 
-					if lastAction.amount is meta.data
-						lastAction.target.push target
-						lastAction.index = meta.index
-						subAction = true
-						break
+					# if lastAction.amount is meta.data
+					lastAction.target.push target
+					lastAction.target = _.uniq lastAction.target
+					lastAction.index = meta.index
+					subAction = true
+
+					if !lastAction.targets
+						lastAction.targets = {}
+
+					if lastAction.targets[target]
+						lastAction.targets[target] = lastAction.targets[target] + parseInt(meta.data)
+					else
+						lastAction.targets[target] = parseInt(meta.data)
+					# break
 
 					if @turns[@currentTurnNumber].actions.length - lastActionIndex < 0
 						break
@@ -695,6 +714,7 @@ class ActionParser extends EventEmitter
 					timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
 					index: meta.index
 					target: [target]
+					targets: {}
 					# Renaming in hsreplay 1.1
 					amount: meta.data
 					mainAction: mainAction
@@ -705,6 +725,7 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 					debug_initialLastAction: initialLastAction
 				}
+				action.targets[target] = parseInt(meta.data)
 				if mainAction
 					mainAction.actions = mainAction.actions or []
 					mainAction.actions.push action
@@ -716,15 +737,32 @@ class ActionParser extends EventEmitter
 			if mainAction?.actions 
 				for action in mainAction.actions
 					# If the same source deals the same amount of damage, we group all of that together
-					if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity) and action.amount is meta.data
+					if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity)
 						action.target.push target
+						action.target = _.uniq action.target
+						action.index = meta.index
 						subAction = true
+
+						if action.targets[target]
+							action.targets[target] = action.targets[target] + parseInt(meta.data)
+						else
+							action.targets[target] = parseInt(meta.data)
 						
 			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 			lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
-			if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity) and lastAction.amount is meta.data
+			if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity)
 				lastAction.target.push target
+				lastAction.target = _.uniq lastAction.target
+				lastAction.index = meta.index
 				subAction = true
+
+				if !lastAction.targets
+					lastAction.targets = {}
+
+				if lastAction.targets[target]
+					lastAction.targets[target] = lastAction.targets[target] + parseInt(meta.data)
+				else
+					lastAction.targets[target] = parseInt(meta.data)
 
 			if !subAction
 				action = {
@@ -732,6 +770,7 @@ class ActionParser extends EventEmitter
 					timestamp: meta.ts || tsToSeconds(command.attributes.ts) || item.timestamp
 					index: meta.index
 					target: [target]
+					targets: {}
 					# Renaming in hsreplay 1.1
 					amount: meta.data
 					mainAction: mainAction
@@ -741,6 +780,7 @@ class ActionParser extends EventEmitter
 					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 					initialCommand: command
 				}
+				action.targets[target] = parseInt(meta.data)
 				if mainAction
 					mainAction.actions = mainAction.actions or []
 					mainAction.actions.push action
