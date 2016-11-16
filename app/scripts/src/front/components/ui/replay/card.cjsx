@@ -141,7 +141,7 @@ class Card extends React.Component
 
 		enchantments = @buildEnchantments entity
 		statuses = @buildStatuses entity
-
+		createdBy = @buildCreator entity
 
 		# Build the card link on hover. It includes the card image + the status alterations		
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
@@ -152,6 +152,7 @@ class Card extends React.Component
 					<div className={enchantmentClass}>
 						{enchantments}
 					</div>
+					{createdBy}
 				</div>
 				<div className='statuses'>
 					<div className="filler"></div>
@@ -254,7 +255,6 @@ class Card extends React.Component
 		return enchantments
 
 	buildStatuses: (entity) ->
-		cardUtils = @props.cardUtils
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 
 		# The keywords
@@ -279,5 +279,16 @@ class Card extends React.Component
 				keywords.push statusElement
 
 		return keywords
+
+	buildCreator: (entity) ->
+		if entity.tags.CREATOR
+			cardUtils = @props.cardUtils
+			cardName = cardUtils?.getCard(entity.replay?.entities[entity.tags.CREATOR]?.cardID)?.name
+			if cardName
+				createdBy = 
+					<div className="created-by">
+						Created by <span className="card-name">{cardName}</span>
+					</div>
+		return createdBy
 
 module.exports = Card

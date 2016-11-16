@@ -905,21 +905,21 @@ class ActionParser extends EventEmitter
 			isDiscover = true
 			choices = []
 
-			console.log 'discovering?', @entities[command.attributes.entity].cardID, command
+			# console.log 'discovering?', @entities[command.attributes.entity].cardID, command
 			for entity in entities
-				console.log '\tdiscovering?', entity, @entities[entity.id]
+				# console.log '\tdiscovering?', entity, @entities[entity.id]
 				# Have to do this for ALitD - no Enchantments
 				# PARENT_CARD is for the "choose one" variations
 				# Check that each of them is in the SETASIDE zone
 				if @entities[entity.id].tags.CARDTYPE != 6 && !@entities[entity.id].tags.PARENT_CARD && (!fullEntities || @entities[entity.id].tags.CREATOR == parseInt(command.attributes.entity)) && entity.tags.ZONE == 6
-					console.log '\tadding entity', entity, @entities[entity.id]
+					# console.log '\tadding entity', entity, @entities[entity.id]
 					choices.push entity
 
 			# Taken into accoutn the double discover from fandral
 			currentIndex = 0
 			while choices.length >= currentIndex + 3
 				actionChoices = choices.slice currentIndex, currentIndex + 3
-				console.log 'parsing discover action', command, choices, actionChoices
+				# console.log 'parsing discover action', command, choices, actionChoices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -931,7 +931,7 @@ class ActionParser extends EventEmitter
 				}
 				command.isDiscover = true
 				@addAction @currentTurnNumber, action
-				console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+				# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
 				currentIndex += 3
 
 
