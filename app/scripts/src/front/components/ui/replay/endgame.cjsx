@@ -18,6 +18,9 @@ class EndGame extends React.Component
 			else
 				state = <span> Lost</span>
 
+		else if @props.entity.tags.PLAYSTATE is 6
+			state = <span> Tied</span>
+
 		return  <div className="end-state">
 					<span>{@props.entity.name}</span>
 					{state}
