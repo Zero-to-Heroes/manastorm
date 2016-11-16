@@ -80,6 +80,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'power-target'
 			log = @buildPowerTargetLog action
 
+		else if action.actionType == 'splash-reveal'
+			log = @buildSplashRevealLog action
+
 		else if action.actionType == 'played-card-with-target'
 			log = @buildPlayedCardWithTargetLog action
 
@@ -398,6 +401,19 @@ TurnLog = React.createClass
 			</p>
 
 		return log
+
+	buildSplashRevealLog: (action) ->
+		cardLink = @buildCardLink action.data
+		cardLog =  <SpanDisplayLog newLog={cardLink} /> 
+
+		log = <p key={'log' + ++@logIndex}>
+			    {cardLog}
+			    <span> reveals himself!</span>
+			</p>
+
+		return log
+
+
 
 	buildList: (actionIds, action) ->
 		index = 1

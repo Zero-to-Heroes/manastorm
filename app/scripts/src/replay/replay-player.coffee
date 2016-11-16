@@ -338,6 +338,8 @@ class ReplayPlayer extends EventEmitter
 				if action.actionType == 'discover'
 					@discoverAction = action
 					@discoverController = @getController(@entities[action.data.id].tags.CONTROLLER)
+				else if action.actionType == 'splash-reveal'
+					@splashEntity = @entities[action.data.id]
 
 				@goToIndex index
 
@@ -479,6 +481,7 @@ class ReplayPlayer extends EventEmitter
 		@discoverAction = undefined
 		@previousActiveSpell = @activeSpell
 		@activeSpell = undefined
+		@splashEntity = undefined
 		# console.log 'new step', @activeSpell, @previousActiveSpell
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0
@@ -550,6 +553,9 @@ class ReplayPlayer extends EventEmitter
 			return true
 
 		if @isEndGame
+			return true
+
+		if @splashEntity
 			return true
 
 		return false

@@ -545,9 +545,21 @@ class ActionParser extends EventEmitter
 		command = item.node
 		if command.attributes.type in ['3', '5'] 
 
+			# Hard-code for Malchezaar
+			if @entities[command.attributes.entity]?.cardID is 'KAR_096' and command.attributes.type is '5' 
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+					actionType: 'splash-reveal'
+					data: @entities[command.attributes.entity]
+					owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+					initialCommand: command
+				}
+				@addAction @currentTurnNumber, action
+
 			# console.log 'consider power effects', command.attributes.entity
 
-			if command.meta?.length > 0
+			else if command.meta?.length > 0
 				for meta in command.meta 
 					if !meta.info and !meta.meta
 						continue

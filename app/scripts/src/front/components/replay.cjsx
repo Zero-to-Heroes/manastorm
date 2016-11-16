@@ -12,6 +12,7 @@ Mulligan = require './ui/replay/mulligan'
 Discover = require './ui/replay/discover'
 EndGame = require './ui/replay/endgame'
 SecretRevealed = require './ui/replay/secretRevealed'
+SplashReveal = require './ui/replay/splashReveal'
 Fatigue = require './ui/replay/fatigue'
 Board = require './ui/replay/board'
 Mana = require './ui/replay/mana'
@@ -166,6 +167,7 @@ class Replay extends React.Component
 			commonOverlay = <div className="common">
 				<Fatigue entity={replay.getActivePlayer()} isFatigue={replay.isFatigue()} action={replay.getCurrentAction()} />
 				<SecretRevealed entity={replay.revealedSecret} replay={replay} />
+				<SplashReveal entity={replay.splashEntity} replay={replay} />
 			</div>
 			# console.log 'components are ok'
 
