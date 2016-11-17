@@ -30,6 +30,8 @@ class ActionParser extends EventEmitter
 
 	populateEntities: ->
 		players = [@player, @opponent]
+		@player.tags.RESOURCES_USED = 0
+		@opponent.tags.RESOURCES_USED = 0
 
 		#First add the missing card / entity info
 		playerIndex = 0
@@ -84,6 +86,7 @@ class ActionParser extends EventEmitter
 	parseActions: ->
 		# Build the list of turns along with the history position of each
 		@players = [@player, @opponent]
+		
 		@playerIndex = 0
 		@turnNumber = 1
 		# @currentPlayer = @players[@playerIndex]

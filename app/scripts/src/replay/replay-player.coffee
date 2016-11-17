@@ -238,14 +238,14 @@ class ReplayPlayer extends EventEmitter
 
 		# console.log 'rollbackAction', rollbackAction
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
+			console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 
 		else
-			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+			console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'previous-action', rollbackAction
@@ -690,8 +690,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		# if change.tag is 'ZONE'
-		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		if change.tag is 'RESOURCES_USED'
+			console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value
