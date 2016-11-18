@@ -10,10 +10,20 @@ class Card extends React.Component
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		cardUtils = @props.cardUtils
 		entity = @props.entity
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{entity.cardID}.png"
+
+		premium = ''
+		premiumClass = ''
+		suffix = '.png'
+
+		if entity.tags.PREMIUM is 1
+			premiumClass = 'golden'
+			premium = premiumClass + '/'
+			suffix = '.gif'
+
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{premium}#{entity.cardID}" + suffix
 
 
-		imageCls = "art"
+		imageCls = "art "
 		if entity.cardID && !@props.isHidden
 			originalCard = cardUtils?.getCard(entity.cardID)
 			# Keep both the img (for hand) and background (for the rest)
@@ -44,6 +54,8 @@ class Card extends React.Component
 			# imgSrc = "images/cardback.png"
 			imageCls += " card--unknown"
 
+		cls += ' ' + premiumClass
+
 		frameCls = "frame minion"
 		legendaryCls = ""
 
@@ -53,7 +65,8 @@ class Card extends React.Component
 			legendaryCls = " legendary"
 
 		if entity.tags.TAUNT
-			frameCls += " card--taunt"
+			taunt = <div className="taunt"></div>
+			# frameCls += " card--taunt"
 
 		if entity.tags.DEATHRATTLE
 			effect = <div className="effect deathrattle"></div>
@@ -116,7 +129,7 @@ class Card extends React.Component
 
 		# Can attack
 		if entity.highlighted
-			cls += " option-on"
+			cls += " option-on frame-highlight"
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
 
@@ -160,7 +173,7 @@ class Card extends React.Component
 				</div>
 			</div>
 
-		frameHighlight = frameCls + " frame-highlight" + legendaryCls
+		# frameHighlight = frameCls + " frame-highlight" + legendaryCls
 
 		@updateDimensions()
 
@@ -168,7 +181,7 @@ class Card extends React.Component
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
 			return <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
-				<div className={frameHighlight}></div>
+				{taunt}
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls}></img>
 				<div className={frameCls}></div>
@@ -190,7 +203,7 @@ class Card extends React.Component
 
 		else
 			return <div key={'card' + entity.id} className={cls} style={@props.style}>
-				<div className={frameHighlight}></div>
+				{taunt}
 				<div className={imageCls} style={style}></div>
 				<img src={imgSrc} className={imageCls} style={style}></img>
 				<div className={frameCls}></div>

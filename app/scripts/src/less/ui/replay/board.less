@@ -40,15 +40,19 @@
 		}
 
 		.frame.minion {
-			background: url(images/card_border.png) center center no-repeat;
-		    background-size: contain;
-		    width: 120%;
-		    // height: 120%;
 		    display: block;
 		    position: absolute;
-		    top: -5%;
-		    left: -15%;
+			// background: url(images/card_border.png) center center no-repeat;
+		 //    width: 120%;
+		 //    top: -5%;
+		 //    left: -15%;
 
+			background: url(images/inplay_minion.png) center center no-repeat;
+		    width: 160%;
+		    top: -25%;
+		    left: -32%;
+
+		    background-size: contain;
 			&::before {
 			    content: "";
 			    padding-top: 128%;
@@ -58,7 +62,7 @@
 		}
 
 	    .legendary {
-	    	background: url(images/minion_legendary.png) center center no-repeat;
+	    	background: url(images/inplay_minion_legendary.png) center center no-repeat;
 		    width: 120%;
 		    height: 120%;
 		    position: absolute;
@@ -68,15 +72,16 @@
 
 	    }
 
-		.frame.minion.card--taunt::before {
+		.taunt::before {
 			content: "";
-		    height: 100%;
-		    width: 100%;
-		    background: url(images/minion-taunting.png) center center no-repeat;
+    		padding-top: 128%;
+		    height: 170%;
+		    width: 170%;
+		    background: url(images/minion_taunt.png) center center no-repeat;
 		    background-size: contain;
 		    position: absolute;
-		    top: 0;
-		    left: 0;
+		    top: -29%;
+		    left: -38%;
 		}
 
 
@@ -100,10 +105,9 @@
 		//     border-radius: 50%;
 		// }
 
-		&.option-on .frame-highlight {
-			background-image: url(images/card_border_noshadow.png);
-		    top: -5%;
-		    left: -15%;
+		&.option-on {
+			// background-image: url(images/card_border_noshadow.png);
+			// background-image: url(images/inplay_minion.png);
 			-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow) 
 							drop-shadow(@glowSize @glowSize 1px @innerGlow) 
 							drop-shadow(-@glowSize @glowSize 1px @innerGlow) 
@@ -117,19 +121,19 @@
 					drop-shadow(0px 0px 0.5em @outerGlow) 
 					drop-shadow(0px 0px 0.8em @outerGlow);
 
-			&.legendary {
-				background-image: url(images/card_border_noshadow_legendary.png);
-			    width: 157%;
-			    top: -20%;
-			    left: -26%;
-			    height: 142%;
+			// &.legendary {
+			// 	// background-image: url(images/card_border_noshadow_legendary.png);
+			//     width: 157%;
+			//     top: -20%;
+			//     left: -26%;
+			//     height: 142%;
 
-			    &.card--taunt::before {
-				    padding-top: 0;
-				    width: 71%;
-				    left: 7%;
-				}
-			}
+			//     &.taunt::before {
+			// 	    padding-top: 0;
+			// 	    width: 71%;
+			// 	    left: 7%;
+			// 	}
+			// }
 
 		}
 
@@ -137,7 +141,7 @@
 
 			.card__stats__attack {
 				width: 45%;
-			    bottom: 5%;
+			    bottom: 4%;
 			    left: -6%;
 
 				span {
@@ -155,8 +159,8 @@
 
 			.card__stats__health {
 				width: 45%;
-			    bottom: 5%;
-			    left: 60%;
+			    bottom: 2%;
+			    left: 58%;
 
 				span {
 					position: absolute;
@@ -264,6 +268,29 @@
 			&.trigger {
 				background-image: url(images/icon_trigger.png);
 			}
+		}
+	}
+
+	.golden {
+		.frame.minion {
+			background-image: url(images/golden/inplay_minion_premium.png);
+		}
+
+	    .legendary {
+	    	background-image: url(images/golden/inplay_minion_legendary_premium.png);
+	    }
+
+		.taunt::before {
+		    background-image: url(images/golden/minion_taunt.png);
+		    top: -35%;
+		}
+
+		&.option-on {
+			// background-image: url(images/golden/inplay_minion_premium.png);
+
+			// &.legendary {
+			// 	background-image: url(images/golden/card_border_noshadow_legendary.png);
+			// }
 		}
 	}
 }
