@@ -128,8 +128,9 @@ class Card extends React.Component
 		# console.log entity.cardID, entity
 
 		# Can attack
+		highlightCls = ''
 		if entity.highlighted
-			cls += " option-on frame-highlight"
+			highlightCls += " option-on frame-highlight"
 			highlight = <div className="option-on"></div>
 			imageCls += " img-option-on"
 
@@ -181,21 +182,23 @@ class Card extends React.Component
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
 			return <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
-				{taunt}
-				<div className={imageCls} style={style}></div>
-				<img src={imgSrc} className={imageCls}></img>
-				<div className={frameCls}></div>
-				<div className={legendaryCls}></div>
-				{highlight}
-				{effect}
-				{windfury}
-				{overlay}
-				{damage}
-				{healing}
-				{exhausted}
-				{stats}
-				{divineShield}
-				{cost}
+				<div className={highlightCls}>
+					{taunt}
+					<div className={imageCls} style={style}></div>
+					<img src={imgSrc} className={imageCls}></img>
+					<div className={frameCls}></div>
+					<div className={legendaryCls}></div>
+					{highlight}
+					{effect}
+					{windfury}
+					{overlay}
+					{damage}
+					{healing}
+					{exhausted}
+					{stats}
+					{divineShield}
+					{cost}
+				</div>
 				<ReactTooltip id={"" + entity.id} >
 				    {cardTooltip}
 				</ReactTooltip>
