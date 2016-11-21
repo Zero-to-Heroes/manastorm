@@ -1,14 +1,11 @@
 Stream = require 'string-stream'
 sax = require 'sax'
+moment = require 'moment'
+
 {tagNames, metaTagNames} = require '../enums'
 
 tsToSeconds = (ts) ->
-	parts = ts.split(':')
-	hours = parseInt(parts[0]) * 60 * 60
-	minutes = parseInt(parts[1]) * 60
-	seconds = parseFloat(parts[2])
-
-	return hours + minutes + seconds
+	return moment(ts, [moment.ISO_8601, 'HH:mm:ss']).unix()
 
 class HSReplayParser
 	constructor: (@xmlReplay) ->
@@ -42,6 +39,7 @@ class HSReplayParser
 			when 'Game'.toLowerCase()
 				# console.log '\tparsing node', node
 				@replay.startTimestamp = tsToSeconds(node.attributes.ts)
+				# console.log 'set starting startTimestamp', @replay.startTimestamp
 
 			when 'Action'.toLowerCase(), 'Block'.toLowerCase()
 				# console.log '\tparsing node', node

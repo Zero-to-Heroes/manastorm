@@ -1,19 +1,11 @@
 Entity = require './entity'
 Player = require './player'
 _ = require 'lodash'
+moment = require 'moment'
 EventEmitter = require 'events'
 
 tsToSeconds = (ts) ->
-	parts = ts?.split?(':')
-
-	if !parts
-		return null
-
-	hours = parseInt(parts[0]) * 60 * 60
-	minutes = parseInt(parts[1]) * 60
-	seconds = parseFloat(parts[2])
-
-	return hours + minutes + seconds
+	return moment(ts, [moment.ISO_8601, 'HH:mm:ss']).unix()
 
 class ActionParser extends EventEmitter
 	constructor: (@replay) ->

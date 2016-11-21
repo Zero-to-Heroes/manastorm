@@ -492,6 +492,7 @@ class ReplayPlayer extends EventEmitter
 		i = 1
 		while !timestamp and @history.length - i > 0
 			timestamp = @history[@history.length - i++]?.timestamp
+		# console.log 'getting total length', timestamp, @startTimestamp
 		if timestamp
 			return timestamp - @startTimestamp
 		return null

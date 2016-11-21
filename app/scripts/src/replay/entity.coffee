@@ -30,8 +30,6 @@ class Entity extends EventEmitter
 
 	update: (definition, action) ->
 		old = _.assign {}, @tags
-		if @id == 3
-			console.log 'updating entity', definition.id, definition, action
 
 		if definition.tags.ZONE
 			@lastZone = old.ZONE
@@ -48,11 +46,11 @@ class Entity extends EventEmitter
 			for k, v of definition.tags
 				if action
 					# Always keep the oldest
-					if @id == 3
-						console.log '\tsetting property', @id, action.rollbackInfo, action.rollbackInfo[@id], k, v, @tags[k], @tags
+					# if @id == 3
+					# 	console.log '\tsetting property', @id, action.rollbackInfo, action.rollbackInfo[@id], k, v, @tags[k], @tags
 					action.rollbackInfo[@id][k] = if action.rollbackInfo[@id][k] != undefined then action.rollbackInfo[@id][k] else @tags[k]
-					if @id == 3
-						console.log '\t\tsetting rollback', action.rollbackInfo[@id][k]
+					# if @id == 3
+					# 	console.log '\t\tsetting rollback', action.rollbackInfo[@id][k]
 				@tags[k] = v
 
 			# Keep track of concedes
