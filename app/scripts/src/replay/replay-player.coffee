@@ -23,6 +23,11 @@ class ReplayPlayer extends EventEmitter
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@entities = {}
+		@newStep()
+
 		@init()
 
 
@@ -482,6 +487,7 @@ class ReplayPlayer extends EventEmitter
 		@previousActiveSpell = @activeSpell
 		@activeSpell = undefined
 		@splashEntity = undefined
+		@isEndGame = undefined
 		# console.log 'new step', @activeSpell, @previousActiveSpell
 		for k,v of @entities
 			v.damageTaken = v.tags.DAMAGE or 0

@@ -15,10 +15,21 @@ var manastorm = {
 		manastorm.loadReplay(replayXml);
 	},
 
+	initPlayer: function() {
+		var bundle = require('./js/src/front/bundle.js');
+		bundle.init('');
+	},
+
 	loadReplay: function(replayXml) {
 		// console.log('serializing to string', replayXml)
 		if (replayXml) {
-			var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+			try {
+				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+			}
+			catch(e) {
+				// console.log('couldnt parse as XML', JSON.stringify(e))
+				var strReplayXml = replayXml
+			}
 		}
 		//console.log('string xml', strReplayXml);
 
@@ -29,7 +40,22 @@ var manastorm = {
 		window.replay.cardUtils = window['parseCardsText']
 	},
 
+	reload: function(replayXml) {
+		if (replayXml) {
+			try {
+				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
+			}
+			catch(e) {
+				// console.log('couldnt parse as XML', JSON.stringify(e))
+				var strReplayXml = replayXml
+			}
+		}
+
+		window.replay.reload(strReplayXml)
+	},
+
 	goToTimestamp: function(turnNumber) {
+		// console.log('going to turn', turnNumber)
 		var regex = /(?:t?)(\d?\d?\do?|mulligan|endgame)/
 		var match = turnNumber.match(regex)
 		var turn = match[1]

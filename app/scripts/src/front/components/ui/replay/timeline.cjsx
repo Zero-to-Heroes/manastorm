@@ -8,7 +8,7 @@ class Timeline extends React.Component
 
 		return null unless replay.getTotalLength()
 
-		console.log 'rendering timeline', replay.getTotalLength(), replay.getElapsed()
+		# console.log 'rendering timeline', replay.getTotalLength(), replay.getElapsed()
 
 		length = replay.getTotalLength()
 		totalSeconds = "" + Math.floor(length % 60)
