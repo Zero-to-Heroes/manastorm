@@ -200,7 +200,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -243,14 +243,14 @@ class ReplayPlayer extends EventEmitter
 
 		console.log 'rollbackAction', rollbackAction, rollbackAction.shouldExecute, rollbackAction.shouldExecute?()
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn, @turns[@currentTurn]
+			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn, @turns[@currentTurn]
 			@currentActionInTurn = targetAction
 			@currentTurn = targetTurn
 			# @emit 'previous-action', rollbackAction
 			@goPreviousAction lastIteration
 
 		else
-			console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 			@rollbackAction rollbackAction
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emit 'previous-action', rollbackAction
@@ -306,7 +306,7 @@ class ReplayPlayer extends EventEmitter
 
 			if action.shouldExecute and !action.shouldExecute() 
 				if !@seeking
-					console.log 'skipping action', action
+					# console.log 'skipping action', action
 					# Still need to call update() to populate the rollback properly
 					index = action.index - 1
 					@goToIndex index
@@ -331,13 +331,13 @@ class ReplayPlayer extends EventEmitter
 				nextActionIndex = 1
 				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
 				while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
-					console.log 'next action is skipping', nextAction, nextAction.shouldExecute
+					# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
 					# Still need to call update() to populate the rollback properly
 					index = nextAction.index - 1
 					@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex
 					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
-				console.log 'nextAction', nextAction
+				# console.log 'nextAction', nextAction
 				if nextAction
 					index = nextAction.index - 1
 				else if @turns[@currentTurn + 1]
@@ -707,8 +707,8 @@ class ReplayPlayer extends EventEmitter
 			#console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		if change.tag is 'RESOURCES_USED'
-			console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
+		# if change.tag is 'RESOURCES_USED'
+		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value

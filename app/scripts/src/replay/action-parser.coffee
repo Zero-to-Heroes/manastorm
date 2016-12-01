@@ -276,6 +276,7 @@ class ActionParser extends EventEmitter
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
 							# console.log 'shouldexecute?', action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE, action
+							 # https://github.com/Zero-to-Heroes/zerotoheroes.com/issues/50
 							return true
 							# Leads to complex scenarios, and we'd probably need to rething the whole engine from the ground up
 							# to take all of this into account
@@ -361,7 +362,8 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
-							return action.fullData.tags.ZONE == 3
+							return true
+							# return action.fullData.tags.ZONE == 3
 					}
 					@addAction @currentTurnNumber, action
 
