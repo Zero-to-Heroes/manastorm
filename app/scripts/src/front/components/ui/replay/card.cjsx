@@ -18,10 +18,10 @@ class Card extends React.Component
 		premiumClass = ''
 		suffix = '.png'
 
-		# if entity.tags.PREMIUM is 1 and originalCard?.goldenImage
-		# 	premiumClass = 'golden'
-		# 	premium = premiumClass + '/'
-		# 	suffix = '.gif'
+		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage
+			premiumClass = 'golden'
+			premium = premiumClass + '/'
+			suffix = '.gif'
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{premium}#{entity.cardID}" + suffix
 
