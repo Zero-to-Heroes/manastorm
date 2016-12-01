@@ -19,6 +19,7 @@ class Card extends React.Component
 		suffix = '.png'
 
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage
+			console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'
