@@ -13,7 +13,7 @@ class Mulligan extends React.Component
 		hidden = @props.isHidden
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
 			# console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
-			<Card entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan.indexOf(entity.id) != -1} />
+			<Card entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan.indexOf(entity.id) != -1} cardUtils={@props.replay.cardUtils} />
 
 		return <div className="mulligan">
 				{cards}

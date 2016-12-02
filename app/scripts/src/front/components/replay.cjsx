@@ -145,7 +145,7 @@ class Replay extends React.Component
 			</div>
 
 			topOverlay = <div className="top" >
-				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} />
+				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} replay={replay}/>
 				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
 				<EndGame entity={replay.opponent} isEnd={replay.isEndGame} />
 			</div>
@@ -159,7 +159,7 @@ class Replay extends React.Component
 			</div>
 
 			bottomOverlay = <div className="bottom">
-				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} />
+				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} replay={replay}/>
 				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
 				<EndGame entity={replay.player} isEnd={replay.isEndGame} />
 			</div>

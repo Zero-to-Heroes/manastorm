@@ -18,16 +18,22 @@ class Card extends React.Component
 		premiumClass = ''
 		suffix = '.png'
 
+		imageCls = "art "
+		console.log 'rendering card', entity.cardID, originalCard, entity, originalCard?.set?.toLowerCase()
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage
 			console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'
+		else if originalCard?.set?.toLowerCase() is 'gangs'
+			console.log '\tgangs card'
+			imageCls += " quick-fix"
+
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{premium}#{entity.cardID}" + suffix
 
 
-		imageCls = "art "
+		# imageCls = "art "
 		if entity.cardID && !@props.isHidden
 			# Keep both the img (for hand) and background (for the rest)
 			imgSrc = art
