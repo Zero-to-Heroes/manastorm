@@ -147,14 +147,15 @@ class ReplayPlayer extends EventEmitter
 	# Moving inside the replay (with player controls)
 	# ========================
 	goNextAction: ->
-		# console.log 'goNextAction', @currentTurn, @currentActionInTurn, @historyPosition
-		@newStep()
+		actionIndex = @currentActionInTurn
+		# console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @turns, @turns.length, @turns[@currentTurn]
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
-			# console.log 'doing nothing, end of the game', @currentTurn, @turns.length, @currentActionInTurn, @turns[@currentTurn].actions.length - 1
+			console.log 'doing nothing, end of the game', @currentTurn, @turns.length, actionIndex, @turns[@currentTurn].actions.length - 1
 			return null
 
+		@newStep()
 		@currentActionInTurn++
 
 		# console.log 'goNextAction', @turns[@currentTurn], @currentActionInTurn, if @turns[@currentTurn] then @turns[@currentTurn].actions

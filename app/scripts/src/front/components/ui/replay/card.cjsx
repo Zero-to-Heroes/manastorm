@@ -19,14 +19,15 @@ class Card extends React.Component
 		suffix = '.png'
 
 		imageCls = "art "
-		console.log 'rendering card', entity.cardID, originalCard, entity, originalCard?.set?.toLowerCase()
+		# console.log 'rendering card', entity.cardID, originalCard, entity, originalCard?.set?.toLowerCase()
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage
-			console.log 'showing golden card', entity, originalCard
+			# console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'
-		else if originalCard?.set?.toLowerCase() is 'gangs'
-			console.log '\tgangs card'
+		
+		if originalCard?.set?.toLowerCase() is 'gangs'
+			# console.log '\tgangs card'
 			imageCls += " quick-fix"
 
 
