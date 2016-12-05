@@ -362,8 +362,11 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
-							return true
-							# return action.fullData.tags.ZONE == 3
+							console.log 'should execute discard?', action.fullData, action.fullData.tags.ZONE
+							#  https://github.com/Zero-to-Heroes/manastorm/issues/44
+							# return true
+							# https://github.com/Zero-to-Heroes/manastorm/issues/53
+							return action.fullData.tags.ZONE == 3
 					}
 					@addAction @currentTurnNumber, action
 

@@ -525,7 +525,7 @@ class ReplayPlayer extends EventEmitter
 
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
+			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[turn]
 				action = @turns[turn].actions[actionIndex]
