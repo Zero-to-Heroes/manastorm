@@ -26,7 +26,7 @@ class Card extends React.Component
 			premium = premiumClass + '/'
 			suffix = '.gif'
 		
-		if originalCard?.set?.toLowerCase() is 'gangs'
+		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden
 			# console.log '\tgangs card'
 			imageCls += " quick-fix"
 
