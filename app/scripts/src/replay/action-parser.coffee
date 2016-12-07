@@ -275,9 +275,12 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
+							# return true
+							action.executed = action.executed || action.fullData.tags.ZONE != 1
+							console.log 'should execute', action
 							# console.log 'shouldexecute?', action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE, action
-							 # https://github.com/Zero-to-Heroes/zerotoheroes.com/issues/50
-							return true
+							# https://github.com/Zero-to-Heroes/zerotoheroes.com/issues/50
+							return action.executed
 							# Leads to complex scenarios, and we'd probably need to rething the whole engine from the ground up
 							# to take all of this into account
 							# return action.fullData.tags.ZONE != 1
@@ -362,11 +365,15 @@ class ActionParser extends EventEmitter
 						debug_lastAction: lastAction
 						debug_entity: @entities[item.node.entity]
 						shouldExecute: =>
-							console.log 'should execute discard?', action.fullData, action.fullData.tags.ZONE
+							# return true
+							action.executed = action.executed || action.fullData.tags.ZONE == 3
+							console.log 'should execute', action
+							return action.executed
+							# console.log 'should execute discard?', action.fullData, action.fullData.tags.ZONE
 							#  https://github.com/Zero-to-Heroes/manastorm/issues/44
 							# return true
 							# https://github.com/Zero-to-Heroes/manastorm/issues/53
-							return action.fullData.tags.ZONE == 3
+							# return action.fullData.tags.ZONE == 3
 					}
 					@addAction @currentTurnNumber, action
 
@@ -477,7 +484,8 @@ class ActionParser extends EventEmitter
 				if tag.tag == 'ZONE' and tag.value == 1
 					entity = @entities[tag.entity]
 					card = @replay.cardUtils.getCard(entity['cardID'])
-					if card.type == 'Hero Power'
+					# console.log 'getting card', card, entity['cardID'], entity
+					if card?.type == 'Hero Power'
 						action = {
 							turn: @currentTurnNumber - 1
 							timestamp: tsToSeconds(command.attributes.ts) || item.timestamp

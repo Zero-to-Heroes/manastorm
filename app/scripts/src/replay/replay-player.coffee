@@ -201,7 +201,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration
+		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration, @turns
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -234,50 +234,64 @@ class ReplayPlayer extends EventEmitter
 			changeTurn = true
 			# console.log 'emitting new turn event',  @turns[targetTurn]
 			@notifyChangedTurn @turns[@currentTurn].turn
-			@emit 'new-turn', @turns[targetTurn]
+			# @emit 'previous-action', rollbackAction
+			# Removing the "turn" action log
+			console.log 'going to previous turn', lastIteration
 			@emit 'previous-action', rollbackAction
+			# @emit 'new-turn', @turns[targetTurn]
 
 		else
 			targetTurn = @currentTurn
 			targetAction = @currentActionInTurn - 1
 
 
-		console.log 'rollbackAction', rollbackAction, rollbackAction.shouldExecute, rollbackAction.shouldExecute?()
+		# console.log 'rollbackAction', rollbackAction, rollbackAction.shouldExecute, rollbackAction.shouldExecute?()
+		# if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
+		# 	# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn, @turns[@currentTurn]
+		# 	@currentActionInTurn = targetAction
+		# 	@currentTurn = targetTurn
+		# 	# @emit 'previous-action', rollbackAction
+		# 	@goPreviousAction lastIteration
+
+		# else
+
+			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+		@rollbackAction rollbackAction
+		@notifyChangedTurn @turns[@currentTurn].turn
+
+		# @emit 'previous-action', rollbackAction
+		if @currentActionInTurn >= 0 and (!rollbackAction.shouldExecute or rollbackAction.shouldExecute())
+			@emit 'previous-action', rollbackAction
+		
+
+
+
+		# previousAction = @turns[targetTurn].actions[targetAction]
+		# @updateActiveSpell previousAction
+
+		# actionBeforeUpdate = @currentActionInTurn
+		@currentActionInTurn = targetAction
+		@currentTurn = targetTurn
+
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn, @turns[@currentTurn]
-			@currentActionInTurn = targetAction
-			@currentTurn = targetTurn
-			# @emit 'previous-action', rollbackAction
+			console.log 'action should not execute, propagating rollback', rollbackAction, lastIteration
 			@goPreviousAction lastIteration
 
-		else
-			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
-			@rollbackAction rollbackAction
-			@notifyChangedTurn @turns[@currentTurn].turn
-			@emit 'previous-action', rollbackAction
-
-			# previousAction = @turns[targetTurn].actions[targetAction]
-			# @updateActiveSpell previousAction
-
-			actionBeforeUpdate = @currentActionInTurn
-			@currentActionInTurn = targetAction
-			@currentTurn = targetTurn
-
-			if !lastIteration
-				@goPreviousAction true
-				# Go back to the very beginning of turn if appropriate
-
-
-			# hack to handle better all targeting, active spell and so on
-			# ultimately all the info should be contained in the action itself and we only read from it
-			if lastIteration			
-				# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
-				if @currentActionInTurn is -1
-					# console.log 'position back to start of turn'
-					while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
-						@historyPosition--
-					# console.log '\tdone'
-				@goNextAction()
+		else if !lastIteration
+			console.log 'doing back to handle targeting and stuff'
+			@goPreviousAction true
+			# Go back to the very beginning of turn if appropriate
+		# hack to handle better all targeting, active spell and so on
+		# ultimately all the info should be contained in the action itself and we only read from it
+		else 
+			# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
+			if @currentActionInTurn is -1
+				# console.log 'position back to start of turn'
+				while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
+					@historyPosition--
+				# console.log '\tdone'
+			console.log 'doing forth to handle targeting and stuff'
+			@goNextAction()
 
 
 	goPreviousTurn: ->
@@ -305,61 +319,64 @@ class ReplayPlayer extends EventEmitter
 
 			# console.log '\tshould execute?', action.shouldExecute?(), action?.fullData?.tags?.ZONE
 
-			if action.shouldExecute and !action.shouldExecute() 
-				if !@seeking
-					# console.log 'skipping action', action
-					# Still need to call update() to populate the rollback properly
-					index = action.index - 1
-					@goToIndex index
-					@goNextAction()
+			# if action.shouldExecute and !action.shouldExecute() 
+			# 	if !@seeking
+			# 		# console.log 'skipping action', action
+			# 		# Still need to call update() to populate the rollback properly
+			# 		index = action.index - 1
+			# 		@goToIndex index
+			# 		@goNextAction()
 
-			else
-				# console.log 'will execute action', action
-				@updateActiveSpell action
-				@updateEndGame action
-				@updateSecret action
+			# console.log 'will execute action', action
+			@updateActiveSpell action
+			@updateEndGame action
+			@updateSecret action
+
+			# We only transmit a new event if the action is actually executed
+			if !action.shouldExecute or action.shouldExecute() 
 				@emit 'new-action', action
 
-				if action.target
-					@targetSource = action?.data.id
-					@targetDestination = action.target
-					# console.log 'setting target destination', @targetDestination, @targetSource, action
-					@targetType = action.actionType
 
-				# Now we want to go to the action, and to show the effects of the action - ie all 
-				# that happens until the next action. Otherwise the consequence of an action would 
-				# be bundled with the next action, which is less intuitive
-				nextActionIndex = 1
-				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
-				while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
-					# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
-					# Still need to call update() to populate the rollback properly
-					index = nextAction.index - 1
-					@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex
-					nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
+			if action.target
+				@targetSource = action?.data.id
+				@targetDestination = action.target
+				# console.log 'setting target destination', @targetDestination, @targetSource, action
+				@targetType = action.actionType
 
-				# console.log 'nextAction', nextAction
-				if nextAction
-					index = nextAction.index - 1
-				else if @turns[@currentTurn + 1]
-					index = @turns[@currentTurn + 1].index - 1
-				else
-					index = @history[@history.length - 1].index
+			# Now we want to go to the action, and to show the effects of the action - ie all 
+			# that happens until the next action. Otherwise the consequence of an action would 
+			# be bundled with the next action, which is less intuitive
+			nextActionIndex = 1
+			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
+			while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
+				# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
+				# Still need to call update() to populate the rollback properly
+				index = nextAction.index - 1
+				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex
+				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
-				# console.log 'index', index
+			# console.log 'nextAction', nextAction
+			if nextAction
+				index = nextAction.index - 1
+			else if @turns[@currentTurn + 1]
+				index = @turns[@currentTurn + 1].index - 1
+			else
+				index = @history[@history.length - 1].index
 
-				if action.actionType == 'discover'
-					@discoverAction = action
-					@discoverController = @getController(@entities[action.data.id].tags.CONTROLLER)
-				else if action.actionType == 'splash-reveal'
-					@splashEntity = @entities[action.data.id]
+			# console.log 'index', index
 
-				@goToIndex index
+			if action.actionType == 'discover'
+				@discoverAction = action
+				@discoverController = @getController(@entities[action.data.id].tags.CONTROLLER)
+			else if action.actionType == 'splash-reveal'
+				@splashEntity = @entities[action.data.id]
 
-				# We already decided that some actions shouldn't execute, so we don't recompute that. 
-				# -1 is to place the cursor at the step we're actually are, and let the "next action" move the cursor to the 
-				# action that should actually be executed
-				@currentActionInTurn = @currentActionInTurn + (nextActionIndex - 1)
+			@goToIndex index
+
+			# We already decided that some actions shouldn't execute, so we don't recompute that. 
+			# -1 is to place the cursor at the step we're actually are, and let the "next action" move the cursor to the 
+			# action that should actually be executed
+			@currentActionInTurn = @currentActionInTurn + (nextActionIndex - 1)
 				
 
 	goToTurn: (gameTurn) ->
@@ -525,7 +542,7 @@ class ReplayPlayer extends EventEmitter
 
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
+			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[turn]
 				action = @turns[turn].actions[actionIndex]
