@@ -37,6 +37,7 @@ class Replay extends React.Component
 
 		# @reloadGame props.route.replay
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
+		@configurationOptions = props.route.configurationOptions
 		# console.log 'replay-player created'
 
 		@state.style = {}
@@ -84,11 +85,12 @@ class Replay extends React.Component
 		@displayConf = {
 			showLog: false
 		}
-		# console.log 'new version'
+		# console.log 'loaded'
 
 
 	bindKeypressHandlers: =>
 		window.addEventListener 'keydown', (e) =>
+			# console.log 'pressed key', e, 'mousing over', @mousingover
 			if @mousingover
 				@handleKeyDown e
 
@@ -96,6 +98,7 @@ class Replay extends React.Component
 		window.addEventListener 'resize', @updateDimensions
 
 		@mounted = true
+		# console.log 'component mounted'
 		@updateDimensions()
 
 	callProtectedCallback: ->
@@ -105,10 +108,13 @@ class Replay extends React.Component
 
 
 	updateDimensions: =>
+		# console.log 'trying to update dimensions'
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
 			# console.log 'updated dimensions'
 			@callProtectedCallback()
+		else 
+			setTimeout @updateDimensions, 200
 
 	callback: =>
 		if !@mounted
@@ -229,7 +235,7 @@ class Replay extends React.Component
 							{commonOverlay}
 						</div>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
+					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick} hide={@configurationOptions.hideSideLog}/>
 					<form className="replay__controls padded">
 						<div className="btn-group">
 							 <button className="btn btn-default btn-control glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
@@ -252,13 +258,15 @@ class Replay extends React.Component
 						</div>
 						<div id="padding"></div>
 					</form>
-					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog}/>
+					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions.hideButtomLog} />
 				</div>
 
 
 	handleKeyDown: (e) =>
 		# console.log 'keydown', e
-		switch e.code
+		keyCode = e.code or e.key
+		# console.log 'keyCode', keyCode
+		switch keyCode
 			when 'ArrowRight'
 				@goNextAction e
 			when 'ArrowLeft'

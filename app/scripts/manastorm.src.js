@@ -15,9 +15,9 @@ var manastorm = {
 		manastorm.loadReplay(replayXml);
 	},
 
-	initPlayer: function() {
+	initPlayer: function(configurationOptions) {
 		var bundle = require('./js/src/front/bundle.js');
-		bundle.init('');
+		bundle.init('', configurationOptions);
 	},
 
 	loadReplay: function(replayXml) {

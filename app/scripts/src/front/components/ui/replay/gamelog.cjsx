@@ -12,6 +12,7 @@ class GameLog extends React.Component
 			@log = log
 
 	render: ->
+		return null unless !@props.hide
 		# console.log 'rendering gamelog'
 		buttonText = <span>Full log</span>
 		if @props.logOpen

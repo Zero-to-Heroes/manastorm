@@ -22,14 +22,16 @@ TurnLog = React.createClass
 			newLog = @buildActionLog action
 			for logLine in newLog
 				@logs.push logLine
+				console.log 'adding log line', logLine, action, action, action?.data?.cardID
 
 		@subs.add @replay, 'previous-action', (action) =>
 			popped = @logs.pop()
-			# console.log 'popping last element from game log', popped
+			console.log 'popping last element from game log', popped, action, action?.data?.cardID
 
 		@subs.add @replay, 'new-turn', (turn) =>
 			newLog = @buildTurnLog turn
 			@logs.push newLog
+			console.log 'adding turn line', newLog, turn
 
 		@subs.add @replay, 'reset',  =>
 			@logs = []
@@ -37,7 +39,7 @@ TurnLog = React.createClass
 		@replay.forceReemit()
 
 	render: ->
-		return null unless @props.show
+		return null unless @props.show and !@props.hide
 
 		# console.log 'rendering turnLog'
 
@@ -453,7 +455,7 @@ TurnLog = React.createClass
 
 	buildTriggerFullEntityLog: (action) ->
 		# card = action.data['cardID']
-		cardLink = @buildCardLink @replay.entities[action.target]
+		cardLink = @buildCardLink action.data
 
 		creations = []
 		for entity in action.newEntities
