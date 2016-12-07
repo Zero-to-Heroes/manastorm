@@ -235,7 +235,7 @@ class Replay extends React.Component
 							{commonOverlay}
 						</div>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick} hide={@configurationOptions.hideSideLog}/>
+					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick} hide={@configurationOptions?.hideSideLog}/>
 					<form className="replay__controls padded">
 						<div className="btn-group">
 							 <button className="btn btn-default btn-control glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
@@ -258,7 +258,7 @@ class Replay extends React.Component
 						</div>
 						<div id="padding"></div>
 					</form>
-					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions.hideButtomLog} />
+					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
 				</div>
 
 
