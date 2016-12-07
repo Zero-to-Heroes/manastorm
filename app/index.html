@@ -42,11 +42,14 @@
 				url: 'replay.xml',
 				dataType: 'xml',
 				success: function(response) {
-					manastorm.loadReplay(response)
+					manastorm.initPlayer({})
+					manastorm.reload(response)
 
 					if (window.location.search) {
 						var ts = window.location.search.split('?ts=')[1]
-						manastorm.goToTimestamp(ts)
+						setTimeout(function() {
+							manastorm.goToTimestamp(ts)
+						})
 					}
 				}
 			})
