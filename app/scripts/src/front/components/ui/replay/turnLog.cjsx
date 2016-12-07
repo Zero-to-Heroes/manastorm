@@ -22,16 +22,16 @@ TurnLog = React.createClass
 			newLog = @buildActionLog action
 			for logLine in newLog
 				@logs.push logLine
-				console.log 'adding log line', logLine, action, action, action?.data?.cardID
+				# console.log 'adding log line', logLine, action, action, action?.data?.cardID
 
 		@subs.add @replay, 'previous-action', (action) =>
 			popped = @logs.pop()
-			console.log 'popping last element from game log', popped, action, action?.data?.cardID
+			# console.log 'popping last element from game log', popped, action, action?.data?.cardID
 
 		@subs.add @replay, 'new-turn', (turn) =>
 			newLog = @buildTurnLog turn
 			@logs.push newLog
-			console.log 'adding turn line', newLog, turn
+			# console.log 'adding turn line', newLog, turn
 
 		@subs.add @replay, 'reset',  =>
 			@logs = []
