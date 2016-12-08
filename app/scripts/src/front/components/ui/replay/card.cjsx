@@ -25,10 +25,6 @@ class Card extends React.Component
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'
-		
-		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden
-			# console.log '\tgangs card'
-			imageCls += " quick-fix"
 
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{premium}#{entity.cardID}" + suffix
@@ -169,6 +165,14 @@ class Card extends React.Component
 
 		# Build the card link on hover. It includes the card image + the status alterations		
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
+
+
+		
+		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden
+			# console.log '\tgangs card'
+			imageCls += " quick-fix"
+			enchantmentClass += ' quick-fix'
+
 		cardTooltip = 
 			<div className="card-container">
 				<div className="game-info">
