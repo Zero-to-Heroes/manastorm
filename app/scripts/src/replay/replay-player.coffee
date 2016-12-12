@@ -19,7 +19,7 @@ class ReplayPlayer extends EventEmitter
 		@currentActionInTurn = 0
 		@cardUtils = window['parseCardsText']
 
-	reload: (xmlReplay) ->
+	reload: (xmlReplay, callback) ->
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -29,6 +29,9 @@ class ReplayPlayer extends EventEmitter
 		@newStep()
 
 		@init()
+
+		if callback
+			callback()
 
 
 	init: ->

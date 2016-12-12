@@ -85,7 +85,11 @@ class Replay extends React.Component
 		@displayConf = {
 			showLog: false
 		}
-		# console.log 'loaded'
+
+		if props.route.callback
+			console.log 'init, calling callback'
+			props.route.callback()
+		console.log 'loaded', @props
 
 
 	bindKeypressHandlers: =>

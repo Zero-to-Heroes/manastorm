@@ -10,9 +10,9 @@ var manastorm = {
 		return text;
 	},
 
-	init: function(config, review) {
+	init: function(config, review, callback) {
 		var replayXml = review.replayXml;
-		manastorm.loadReplay(replayXml);
+		manastorm.loadReplay(replayXml, callback);
 	},
 
 	initPlayer: function(configurationOptions) {
@@ -20,7 +20,7 @@ var manastorm = {
 		bundle.init('', configurationOptions);
 	},
 
-	loadReplay: function(replayXml) {
+	loadReplay: function(replayXml, callback) {
 		// console.log('serializing to string', replayXml)
 		if (replayXml) {
 			try {
@@ -35,12 +35,12 @@ var manastorm = {
 
 		//require('coffee-react/register');
 		var bundle = require('./js/src/front/bundle.js');
-		bundle.init(strReplayXml);
+		bundle.init(strReplayXml, null, callback);
 
 		window.replay.cardUtils = window['parseCardsText']
 	},
 
-	reload: function(replayXml) {
+	reload: function(replayXml, callback) {
 		if (replayXml) {
 			try {
 				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
@@ -51,7 +51,7 @@ var manastorm = {
 			}
 		}
 
-		window.replay.reload(strReplayXml)
+		window.replay.reload(strReplayXml, callback)
 	},
 
 	goToTimestamp: function(turnNumber) {

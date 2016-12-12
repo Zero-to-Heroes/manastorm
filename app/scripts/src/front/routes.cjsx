@@ -1,5 +1,5 @@
 routes = {
-	init: (xmlReplay, configurationOptions) ->
+	init: (xmlReplay, configurationOptions, callback) ->
 		React = require 'react'
 		{Router, Route} = require 'react-router'
 		{render} = require 'react-dom'
@@ -8,8 +8,10 @@ routes = {
 		Application = require './components/application'
 		@Replay = require './components/replay'
 
+		console.log 'in routes', callback
+		
 		routes = <Route path="/" component={Application}>
-					<Route path="/replay" component={@Replay} replay={xmlReplay} configurationOptions={configurationOptions} />
+					<Route path="/replay" component={@Replay} replay={xmlReplay} configurationOptions={configurationOptions} callback={callback}/>
 				</Route>
 
 		#console.log 'created routes', routes
