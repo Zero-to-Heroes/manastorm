@@ -87,8 +87,10 @@ class Replay extends React.Component
 		}
 
 		if props.route.callback
-			console.log 'init, calling callback'
+			console.log 'init, calling callback', this.refs['root']
 			props.route.callback()
+			# setTimeout @updateDimensions 200
+
 		console.log 'loaded', @props
 
 
@@ -112,10 +114,10 @@ class Replay extends React.Component
 
 
 	updateDimensions: =>
-		# console.log 'trying to update dimensions'
-		if this.refs['root']
+		console.log 'trying to update dimensions', this.refs['root']?.offsetWidth
+		if this.refs['root']?.offsetWidth > 10
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-			# console.log 'updated dimensions'
+			console.log 'updated dimensions'
 			@callProtectedCallback()
 		else 
 			setTimeout @updateDimensions, 200
