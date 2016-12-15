@@ -8,6 +8,15 @@
 }
 
 .btn-group {
-  width: 230px;
-  display: table-cell;
+	display: flex;
+  // width: 230px;
+  // display: table-cell;
+}
+
+.btn-group label {
+	margin-bottom: 0;
+}
+
+.btn-group > * + * {
+	margin-left: -1px;
 }

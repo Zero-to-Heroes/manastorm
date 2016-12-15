@@ -1,10 +1,14 @@
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,500,700);
 @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
 .hearthstone {
-  background: #edd6aa url(images/new/bg-hearthstone-2.png) top center no-repeat !important;
+  /*background: #edd6aa url(images/new/bg-hearthstone-2.png) top center no-repeat !important;*/
   color: #edd6aa;
   font-family: 'Raleway', Arial, sans-serif;
+  /*background-color: #c6a64b;*/
+  background-color: #c3aa7d;
+  padding: 20px;
 }
+
 .hearthstone {
   /* =============
 ** Class icons
@@ -172,6 +176,7 @@
   position: relative;
   border: none;
   padding: 10px 15px;
+  top: 0;
 }
 .hearthstone .ngrs-range-slider {
   background: transparent;
@@ -1129,6 +1134,10 @@
     margin-top: 20px;
   }
 }
+
+/*player btn active state*/
+.hearthstone .btn-default:active,
+.hearthstone .btn-default.active,
 .hearthstone .btn-default:active:hover,
 .hearthstone .btn-default.active:hover,
 .hearthstone .open > .dropdown-toggle.btn-default:hover,
@@ -1138,8 +1147,15 @@
 .hearthstone .btn-default:active.focus,
 .hearthstone .btn-default.active.focus,
 .hearthstone .open > .dropdown-toggle.btn-default.focus {
-  background-color: transparent;
+  /*background-color: #4c3519;*/
+  /*color: white;*/
+  /*background-color: transparent;*/
+
+  border-color: black;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+  background-color: rgb(64, 154, 204);
 }
+
 .hearthstone .btn:focus,
 .hearthstone .btn:active:focus,
 .hearthstone .btn.active:focus,
@@ -1170,12 +1186,23 @@
   background-color: #ead5aa;
 }
 .hearthstone .btn-control {
-  background: #68471f;
-  color: #fff;
+/*  background: #68471f;
+  color: #fff;*/
+
+  color: #68471f;
+  border: 1px solid currentColor;
+  background: transparent;
 }
+
 .hearthstone .btn-control:hover {
-  background-color: #8b6029;
+  /*background-color: #8b6029;*/
+
+  background-color: rgb(64, 154, 204);
+  color: white;
+  border-color: #8b6029;
+  border-color: black;
 }
+
 .hearthstone .btn-primary:hover {
   background: #4f1464;
 }

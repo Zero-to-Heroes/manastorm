@@ -37,7 +37,6 @@ class Replay extends React.Component
 
 		# @reloadGame props.route.replay
 		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
-		@configurationOptions = props.route.configurationOptions
 		# console.log 'replay-player created'
 
 		@state.style = {}
@@ -85,16 +84,11 @@ class Replay extends React.Component
 		@displayConf = {
 			showLog: false
 		}
-
-		if props.route.callback
-			console.log 'init, calling callback'
-			props.route.callback()
-		console.log 'loaded', @props
+		# console.log 'new version'
 
 
 	bindKeypressHandlers: =>
 		window.addEventListener 'keydown', (e) =>
-			# console.log 'pressed key', e, 'mousing over', @mousingover
 			if @mousingover
 				@handleKeyDown e
 
@@ -102,7 +96,6 @@ class Replay extends React.Component
 		window.addEventListener 'resize', @updateDimensions
 
 		@mounted = true
-		# console.log 'component mounted'
 		@updateDimensions()
 
 	callProtectedCallback: ->
@@ -112,13 +105,10 @@ class Replay extends React.Component
 
 
 	updateDimensions: =>
-		# console.log 'trying to update dimensions'
 		if this.refs['root']
 			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
 			# console.log 'updated dimensions'
 			@callProtectedCallback()
-		else 
-			setTimeout @updateDimensions, 200
 
 	callback: =>
 		if !@mounted
@@ -215,14 +205,7 @@ class Replay extends React.Component
 		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 					<ReactTooltip />
-					<div className="additional-controls">
-						<label>
-							<input type="checkbox" checked={@showAllCards} onChange={@onShowCardsChange} />Try to show hidden cards
-						</label>
-						<label>
-							<input type="checkbox" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} />Switch main player
-						</label>
-					</div>
+					
 					<div className="game">
 						<div className={"game-area " + blur}>
 							{topArea}
@@ -238,8 +221,10 @@ class Replay extends React.Component
 							{bottomOverlay}
 							{commonOverlay}
 						</div>
+						<div className={"game-border"}></div>
 					</div>
-					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick} hide={@configurationOptions?.hideSideLog}/>
+					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick}/>
+					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog}/>
 					<form className="replay__controls padded">
 						<div className="btn-group">
 							 <button className="btn btn-default btn-control glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
@@ -249,28 +234,36 @@ class Replay extends React.Component
 							 <button className="btn btn-default btn-control glyphicon glyphicon-forward" onClick={@goNextTurn}/>
 						</div>
 						<Timeline replay={replay} />
-						<div className="playback-speed">
-							<div className="dropup"> 
-								<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
-								<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-									<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
-								</ul> 
+						<div className="btn-group">
+							<div className="playback-speed">
+								<div className="dropup"> 
+									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
+									<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
+										<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
+									</ul> 
+								</div>
 							</div>
+
+							<label className="btn btn-default btn-control glyphicon glyphicon-backward" for="show-hidden-cards">
+							<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
+							</label>
+
+							<label className="btn btn-default btn-control glyphicon glyphicon-backward" for="switch-main-player">
+								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
+							</label>
 						</div>
 						<div id="padding"></div>
 					</form>
-					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
+					
 				</div>
 
 
 	handleKeyDown: (e) =>
 		# console.log 'keydown', e
-		keyCode = e.code or e.key
-		# console.log 'keyCode', keyCode
-		switch keyCode
+		switch e.code
 			when 'ArrowRight'
 				@goNextAction e
 			when 'ArrowLeft'
