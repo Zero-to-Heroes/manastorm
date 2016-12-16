@@ -1,17 +1,25 @@
 .player-name {
 	background: rgba(0, 0, 0, 0.5);
+
 	color: white;
-	text-shadow: 0 0 3px rgba(0, 0, 0, 0.75);
-	padding: 0.5%;
-	padding-right: 2%;
-	height: 6%;
+	// text-shadow: 0 0 3px rgba(0, 0, 0, 0.75);
+	// padding: 0.5%;
+	// padding-right: 2%;
+	// height: 6%;
 	box-sizing: border-box;
-	line-height: 1.2em;
+	// line-height: 1.2em;
 	position: absolute;
 	top: 50%;
 	left: 0;
-    border-top-right-radius: 1em;
-    border-bottom-right-radius: 1em;
+    // border-top-right-radius: 1em;
+    // border-bottom-right-radius: 1em;
+
+    // padding: 10px;
+    padding: 2%;
+ 	font-size: 1.1em;
+ 	text-transform: uppercase;
+ 	font-weight: 600;
+ 	transform: translateY(-50%);
 
 	// &::after {
 	// 	content: '';
@@ -27,7 +35,8 @@
 	// }
 
 	&.active {
-		background: rgba(64, 154, 204, 0.5);
+		// background: rgba(64, 154, 204, 0.5);
+		background: rgba(64, 154, 204, .8);
 	}
 
 	// &.active::after {
@@ -38,4 +47,5 @@
 .bottom .player-name {
 	top: auto;
 	bottom: 50%;
+	transform: translateY(50%);
 }

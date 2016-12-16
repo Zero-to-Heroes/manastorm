@@ -15,15 +15,50 @@
 	flex-direction: column;
 	// flex-grow: 1;
 	overflow: hidden;
-	min-height: 0;
+	overflow: visible;
+	// min-height: 0;
+	min-height: 1;
 	min-width: 0;
+	// padding-bottom: 20px;
+	// padding-bottom: 10px;
+	padding-bottom: 2%;
 
 	border: none;
-    height: 83%;
+    // height: 83%;
+    height: 89%;
+    background-image: url(images/app-bg-wood.jpg);
+    
+    background-size: cover;
 }
 
+.game-border {
+	pointer-events: none;
+	position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+	// width: 100%;
+	// height: 100%;
+	z-index: 99;
+	box-shadow: 2px 2px 20px 5px rgba(0, 0, 0, 0.75), inset 0 0 20px 0px rgba(0,0,0,.8);
+}
+
+.game-border::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    bottom: -8px;
+    left: -8px;
+    border: 8px solid rgb(222, 199, 155);
+    border-width: 20px 20px;
+    border-image: url(images/border-image.png) 20 20 stretch;
+    z-index: -1;
+}		  
+
 .replay__controls {
-	height: 10%;
+	// height: 10%;
 	flex-grow: 0;
 	flex-shrink: 0;
 	margin-bottom: 0;
@@ -41,12 +76,13 @@
 	flex-grow: 1;
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
 
     background-image: url(images/game-board-bg.png);
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: contain;
-    background-color: #C3AA7D;
+    // background-color: #C3AA7D;
 }
 
 .game .overlay {

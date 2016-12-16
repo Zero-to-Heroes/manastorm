@@ -15,7 +15,7 @@ body {
 }
 
 .external-player {
-    background: #000;
+    // background: #000;
     position: absolute;
     top: 0;
     bottom: 0;

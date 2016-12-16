@@ -203,10 +203,14 @@ class Replay extends React.Component
 			# 	console.log 'adding target', target, source
 			# 	targets.push <Target source={source} target={target} type={replay.targetType} key={'target' + replay.targetSource + '' + targetId}/>
 
-		playButton = <button className="btn btn-default btn-control glyphicon glyphicon-play" onClick={@onClickPlay} />
+		playButton = <button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay} />
 
 		if @state.replay.speed > 0
-			playButton = <button className="btn btn-default btn-control glyphicon glyphicon-pause" onClick={@onClickPause}/>
+			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
+
+		if @configurationOptions?.showGameBorder
+			console.log 'showing border'
+			showBorder = <div className={"game-border"} ></div>
 
 		blur = ""
 		overlayCls = "overlay"
@@ -217,14 +221,6 @@ class Replay extends React.Component
 		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 					<ReactTooltip />
-					<div className="additional-controls">
-						<label>
-							<input type="checkbox" checked={@showAllCards} onChange={@onShowCardsChange} />Try to show hidden cards
-						</label>
-						<label>
-							<input type="checkbox" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} />Switch main player
-						</label>
-					</div>
 					<div className="game">
 						<div className={"game-area " + blur}>
 							{topArea}
@@ -240,31 +236,47 @@ class Replay extends React.Component
 							{bottomOverlay}
 							{commonOverlay}
 						</div>
+						{showBorder}
 					</div>
 					<TurnLog show={@displayConf.showLog} replay={replay} onTurnClick={@onGoToTurnClick} onClose={@onTurnClick} hide={@configurationOptions?.hideSideLog}/>
+					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
 					<form className="replay__controls padded">
 						<div className="btn-group">
-							 <button className="btn btn-default btn-control glyphicon glyphicon-backward" onClick={@goPreviousTurn}/>
-							 <button className="btn btn-default btn-control glyphicon glyphicon-step-backward" onClick={@goPreviousAction}/>
+							 <button className="btn btn-default glyphicon glyphicon-backward" onClick={@goPreviousTurn} title="Go to previous turn"/>
+							 <button className="btn btn-default glyphicon glyphicon-step-backward" onClick={@goPreviousAction} title="Go to previous action"/>
 							{playButton}
-							 <button className="btn btn-default btn-control glyphicon glyphicon-step-forward" onClick={@goNextAction}/>
-							 <button className="btn btn-default btn-control glyphicon glyphicon-forward" onClick={@goNextTurn}/>
+							 <button className="btn btn-default glyphicon glyphicon-step-forward" onClick={@goNextAction} title="Go to next action"/>
+							 <button className="btn btn-default glyphicon glyphicon-forward" onClick={@goNextTurn} title="Go to next turn"/>
 						</div>
 						<Timeline replay={replay} />
-						<div className="playback-speed">
-							<div className="dropup"> 
-								<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> </button> 
-								<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-									<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
-									<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
-								</ul> 
+						<div className="btn-group">
+							<div className="playback-speed">
+								<div className="dropup"> 
+									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" title="Change game speed"> {@state.replay.speed}x <span className="caret"></span> </button> 
+									<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
+										<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
+									</ul> 
+								</div>
 							</div>
-						</div>
+
+							<label className="btn btn-default glyphicon glyphicon-eye-open" htmlFor="show-hidden-cards" title="Try to show hidden cards">
+ 								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
+ 							</label>
+ 
+ 							<label className="btn btn-default glyphicon glyphicon-retweet" htmlFor="switch-main-player" title="Switch main player">
+ 								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
+ 							</label>
+
+ 
+ 							<label className="btn btn-default glyphicon glyphicon-list-alt" htmlFor="show-log" title="Show full game log">
+ 								<input type="checkbox" id="show-log" checked={@displayConf.showLog} onChange={@onTurnClick} hidden />
+ 							</label>
+ 						</div>
 						<div id="padding"></div>
 					</form>
-					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
 				</div>
 
 

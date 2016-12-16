@@ -1,17 +1,36 @@
 .replay__controls {
 	width: 100%;
 	// display: table;
-	background-color: #C3AA7D;
-	padding-top: 4%;
-	padding-bottom: 3%;
-	padding-left: 2%;
-	padding-right: 8px;
+	// background-color: #C3AA7D;
+	// padding-top: 4%;
+	// padding-bottom: 3%;
+	// padding-left: 2%;
+	// padding-right: 8px;
+	width: 100%;
 	display: flex;
 	flex-wrap: wrap;
+	padding-top: 2%;
+	color: black;
+    justify-content: center;
+}
+
+.replay__controls .btn {
+	color: inherit;
+	background: transparent;
+	border-color: black;
+	border: 1px solid black;
+	top: 0;
+
+	&:hover, &:focus {
+		// box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+		background-color: rgb(64, 154, 204);
+		color: white;
+	}
 }
 
 .replay__controls button {
 	margin-right: 2px;
+	margin-right: 0;
 }
 
 .replay__controls > div {
@@ -20,16 +39,16 @@
 
 .replay__controls .playback-speed {
 	display: table-cell;
-	width: 70px;
+	// width: 70px;
 	text-align: right;
 }
 
-@media screen and (max-width: 600px) {
-	.replay__controls {
-		// height: 100px;
-		padding-bottom: 100px;
-	}
-}
+// @media screen and (max-width: 600px) {
+// 	.replay__controls {
+// 		// height: 100px;
+// 		padding-bottom: 100px;
+// 	}
+// }
 @media screen and (max-width: 500px) {
 	// Controls need more space on mobile
 	.replay__controls .timeline {
