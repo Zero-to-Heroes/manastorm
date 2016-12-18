@@ -15,6 +15,8 @@
 }
 
 .replay__controls .btn {
+	display: flex;
+    align-items: center;
 	color: inherit;
 	background: transparent;
 	border-color: black;
@@ -25,6 +27,17 @@
 		// box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
 		background-color: rgb(64, 154, 204);
 		color: white;
+	}
+
+	&:active, &.active {
+ 		border-color: black;
+		box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+		background-color: rgb(64, 154, 204);
+	}
+
+
+	&.glyphicon:before {
+		margin: auto;
 	}
 }
 
@@ -37,11 +50,11 @@
 	// vertical-align: top;
 }
 
-.replay__controls .playback-speed {
-	display: table-cell;
-	// width: 70px;
-	text-align: right;
-}
+// .replay__controls .playback-speed {
+// 	display: table-cell;
+// 	// width: 70px;
+// 	text-align: right;
+// }
 
 // @media screen and (max-width: 600px) {
 // 	.replay__controls {

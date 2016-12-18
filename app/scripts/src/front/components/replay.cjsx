@@ -218,6 +218,12 @@ class Replay extends React.Component
 			blur = "blur"
 			overlayCls += " silent"
 
+		if !@configurationOptions?.hideSideLog
+			showSideLogButton = 
+				<label className="btn btn-default glyphicon glyphicon-list-alt" htmlFor="show-log" title="Show full game log">
+					<input type="checkbox" id="show-log" checked={@displayConf.showLog} onChange={@onTurnClick} hidden />
+				</label>
+
 		# console.log 'applying style', @state.style
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 					<ReactTooltip />
@@ -242,11 +248,11 @@ class Replay extends React.Component
 					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
 					<form className="replay__controls padded">
 						<div className="btn-group">
-							 <button className="btn btn-default glyphicon glyphicon-backward" onClick={@goPreviousTurn} title="Go to previous turn"/>
-							 <button className="btn btn-default glyphicon glyphicon-step-backward" onClick={@goPreviousAction} title="Go to previous action"/>
+							 <button className={'btn btn-default glyphicon glyphicon-backward ' + @activeGoPreviousTurn} onClick={@goPreviousTurn} title="Go to previous turn"/>
+							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction} title="Go to previous action"/>
 							{playButton}
-							 <button className="btn btn-default glyphicon glyphicon-step-forward" onClick={@goNextAction} title="Go to next action"/>
-							 <button className="btn btn-default glyphicon glyphicon-forward" onClick={@goNextTurn} title="Go to next turn"/>
+							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction" title="Go to next action"/>
+							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn} title="Go to next turn"/>
 						</div>
 						<Timeline replay={replay} />
 						<div className="btn-group">
@@ -270,10 +276,7 @@ class Replay extends React.Component
  								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
  							</label>
 
- 
- 							<label className="btn btn-default glyphicon glyphicon-list-alt" htmlFor="show-log" title="Show full game log">
- 								<input type="checkbox" id="show-log" checked={@displayConf.showLog} onChange={@onTurnClick} hidden />
- 							</label>
+ 							{showSideLogButton}
  						</div>
 						<div id="padding"></div>
 					</form>
@@ -285,14 +288,27 @@ class Replay extends React.Component
 		keyCode = e.code or e.key
 		# console.log 'keyCode', keyCode
 		switch keyCode
-			when 'ArrowRight'
+			when 'ArrowRight'	
+				@activeGoNextAction = 'active'
 				@goNextAction e
 			when 'ArrowLeft'
+				@activeGoPreviousAction = 'active'
 				@goPreviousAction e
 			when 'ArrowUp'
+				@activeGoNextTurn = 'active'
 				@goNextTurn e
 			when 'ArrowDown'
+				@activeGoPreviousTurn = 'active'
 				@goPreviousTurn e
+
+		setTimeout @clearActiveStyles, 50
+
+	clearActiveStyles: =>
+		@activeGoNextAction = ''
+		@activeGoPreviousAction = ''
+		@activeGoNextTurn = ''
+		@activeGoPreviousTurn = ''
+		@callProtectedCallback()
 
 	onMouseEnter: (e) =>
 		# console.log 'mouse entered', e
