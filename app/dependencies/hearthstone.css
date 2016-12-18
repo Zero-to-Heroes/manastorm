@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,500,700);
 @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:400,700);
 .hearthstone {
-  background: #edd6aa url(images/new/bg-hearthstone-2.png) top center no-repeat !important;
+  background: #edd6aa top center no-repeat !important;
   color: #edd6aa;
   font-family: 'Raleway', Arial, sans-serif;
 }
@@ -82,6 +82,9 @@
 .hearthstone a {
   color: #f7cf44;
   text-decoration: none;
+}
+.hearthstone a:hover {
+  color: #f7cf44;
 }
 .hearthstone a.btn-default {
   color: #333;
@@ -177,9 +180,6 @@
   background: transparent;
   border: none;
 }
-.hearthstone .announcements {
-  margin-bottom: -70px;
-}
 .hearthstone .announcements a {
   color: #3178FF;
 }
@@ -228,7 +228,9 @@
 .hearthstone .warrior-icon {
   background-position: 100% 0;
 }
-.hearthstone .any-class-icon {
+.hearthstone .any-class-icon,
+.hearthstone .unknown-icon,
+.hearthstone .-icon {
   height: 45px;
   width: 45px;
   background: url(images/classes/any-class.png) no-repeat;
@@ -421,60 +423,95 @@
   border: none;
 }
 .hearthstone .hearthstone-participants {
-  display: table;
-  table-layout: fixed;
-  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 30px;
-  height: 52px;
+  min-height: 52px;
+}
+.hearthstone .hearthstone-participants .player-details button {
+  background: transparent;
+  width: 50px;
+  margin-right: 10px;
+}
+.hearthstone .hearthstone-participants .form-group {
+  display: flex;
+  margin-bottom: 0;
+}
+.hearthstone .hearthstone-participants .player-details button {
+  background: transparent;
+  width: 50px;
 }
 .hearthstone .hearthstone-participants .form-group {
   margin-bottom: 0;
 }
-.hearthstone .hearthstone-participants .class-select ul {
-  padding: 15px 0 0 15px;
+.hearthstone .class-select ul {
+  padding: 0;
   max-width: 200px;
   background: rgba(0, 0, 0, 0.9);
+  display: flex !important;
+  flex-wrap: wrap;
+  justify-content: space-around;
 }
-.hearthstone .hearthstone-participants .class-select li,
-.hearthstone .hearthstone-participants .class-select a {
+.hearthstone .class-select li {
   background: transparent;
-}
-.hearthstone .hearthstone-participants .class-select li,
-.hearthstone .hearthstone-participants .class-select a,
-.hearthstone .hearthstone-participants .class-select span {
-  display: inline-block;
+  display: flex;
+  align-items: center;
   padding: 0;
-  margin-right: 5px;
-  margin-bottom: 5px;
+  margin: 2.5px;
+  padding: 2.5px;
 }
-.hearthstone .hearthstone-participants .class-select .caret {
+.hearthstone .class-select li:hover,
+.hearthstone .class-select li:focus {
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+.hearthstone .class-select li.active {
+  border-radius: 5px;
+  background-color: #dfab2e;
+}
+.hearthstone .class-select a {
+  background: transparent;
+  display: flex;
+  padding: 0;
+}
+.hearthstone .class-select li span {
+  display: flex;
+}
+.hearthstone .class-select li > a:focus,
+.hearthstone .class-select li > a:hover {
+  background-color: transparent;
+}
+.hearthstone .class-select .caret {
   display: none;
 }
-.hearthstone .hearthstone-participants .player-details,
-.hearthstone .hearthstone-participants .opponent-details {
-  display: table-cell;
-  vertical-align: middle;
+.hearthstone .class-select .all-classes {
+  flex-basis: 100%;
+  display: flex;
+  height: 47px;
+  align-items: center;
+  justify-content: center;
+}
+.hearthstone .class-select .all-classes a {
+  color: #edd6aa;
+  margin: 0;
+  font-size: 16px;
+}
+.hearthstone hearthstone-participants-details-arena .hearthstone-participants .level-details {
+  display: none;
 }
 .hearthstone .hearthstone-participants .player-name {
   display: inline-block;
-  max-width: calc(100% - 110px);
   margin-right: 10px;
 }
 .hearthstone .hearthstone-participants .opponent-name {
   display: inline-block;
-  max-width: calc(100% - 110px);
 }
 .hearthstone .hearthstone-participants .separation {
   display: table-cell;
   vertical-align: middle;
   padding-left: 5px;
   padding-right: 25px;
-}
-.hearthstone .hearthstone-participants .level-details {
-  display: table-cell;
-  vertical-align: middle;
-  padding-left: 45px;
-  width: 230px;
 }
 .hearthstone .participants-container .hearthstone-participants .level-details tags-input {
   height: 55px;
@@ -500,14 +537,14 @@
 .hearthstone .hearthstone-participants .level-details .tag-item {
   position: absolute;
 }
-.hearthstone .hearthstone-participants .btn-class-select,
-.hearthstone .hearthstone-participants .btn-class-select:hover,
-.hearthstone .hearthstone-participants .btn-class-select:active {
-  display: inline-block;
-  background: transparent;
+.hearthstone .class-select .btn-class-select,
+.hearthstone .class-select .btn-class-select:hover,
+.hearthstone .class-select .btn-class-select:active {
+  display: flex;
+  justify-content: center;
   padding: 0;
-  color: rgba(255, 255, 255, 0.7);
-  width: 90px;
+  height: 100%;
+  border-radius: 5px;
 }
 .hearthstone .watch-and-learn .hearthstone-participants {
   margin-bottom: 0;
@@ -853,9 +890,6 @@
   width: 75px;
   margin-bottom: 5px;
 }
-.hearthstone .video-listing .specific-info {
-  width: 400px;
-}
 .hearthstone .video-listing .hearthstone-participants {
   margin: 0;
   margin-left: 10px;
@@ -869,7 +903,7 @@
 .hearthstone .video-listing .hearthstone-participants.arena-draft .player-details {
   width: 220px;
 }
-.hearthstone .video-listing .hearthstone-participants .class-select span {
+.hearthstone .video-listing .class-select span {
   max-width: none;
   margin: 0;
 }
@@ -1166,7 +1200,8 @@
 .hearthstone .btn-default {
   background: #f9f1e1;
 }
-.hearthstone .btn-default:hover {
+.hearthstone .btn-default:hover,
+.hearthstone .btn-default.selected {
   background-color: #ead5aa;
 }
 .hearthstone .btn-control {
@@ -1297,6 +1332,18 @@
 .hearthstone .review-list-item .stat-view .stat-icon {
   background-image: url(images/new/picto-nb-view.png);
 }
+.hearthstone .review-list-item .won {
+  background-image: url(images/victory.png);
+}
+.hearthstone .review-list-item .lost {
+  background-image: url(images/defeat.png);
+}
+.hearthstone .review-list-item .play-coin.play {
+  background-image: url(images/playcoin-play.png);
+}
+.hearthstone .review-list-item .play-coin.coin {
+  background-image: url(images/playcoin-coin.png);
+}
 .hearthstone .review-list-item .visibility {
   width: 45px;
 }
@@ -1326,13 +1373,6 @@
 .hearthstone .page-choices .choice .fromurl {
   width: 75%;
 }
-.hearthstone .external-player .replay__controls {
-  background-image: url(images/new/border-top.png);
-  background-repeat: no-repeat;
-  background-position: top center;
-  background-size: 100%;
-  background-position-y: 10px;
-}
 .hearthstone .profile-page .activity-feed .new-review .icon {
   background-image: url(images/new/icon-new-review.png);
 }
@@ -1357,6 +1397,14 @@
 }
 .hearthstone .footer a {
   color: white;
+}
+.hearthstone .manastorm #externalPlayer .replay .game-log {
+  margin-top: 0;
+  background-color: #3a240f;
+}
+.hearthstone .manastorm #externalPlayer .replay .game-log p {
+  font-weight: normal;
+  color: #edd6aa;
 }
 @media screen and (max-width: 500px) {
   .hearthstone .navbar.navbar-default {

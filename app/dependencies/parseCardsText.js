@@ -53,8 +53,10 @@ var parseCardsText = {
 		if (!parseCardsText.isUpdatePending) {
 			parseCardsText.isUpdatePending = true
 			setTimeout(function() {
-				$('[data-toggle="tooltip"]').tooltip()
-				parseCardsText.isUpdatePending = false
+				if ($('[data-toggle="tooltip"]').tooltip) {
+					$('[data-toggle="tooltip"]').tooltip()
+					parseCardsText.isUpdatePending = false
+				}
 			}, 300)
 		}
 
@@ -138,7 +140,7 @@ var parseCardsText = {
 			match: /\[\[[a-zA-Z\-\s0-9\.\:\']{3,}$/,
 			search: function (term, callback, match) {
 				var cards = $.map(parseCardsText.jsonDatabase, function(card) {
-					if (!card.name)	return false
+					if (!card.name)	return null
 
 					var localizeName = parseCardsText.localizeName(card);
 					var res = S(localizeName.toLowerCase()).latinise().s.indexOf(S(term).latinise().s.substring(2).toLowerCase()) !== -1;
