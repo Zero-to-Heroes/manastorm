@@ -112,7 +112,10 @@ class Card extends React.Component
 		atkCls = "card__stats__attack"
 		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed
 			originalAtk = originalCard.attack
-			tagAtk = entity.tags.ATK || originalAtk
+			if entity.tags.ATK?
+				tagAtk = entity.tags.ATK 
+			else
+				tagAtk = originalAtk
 			if tagAtk > originalAtk
 				atkCls += " buff"
 			else if tagAtk < originalAtk
