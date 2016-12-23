@@ -55,6 +55,13 @@ class Weapon extends Card
 		statuses = @buildStatuses entity
 
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
+		
+		imageCls = "game-card"
+		if originalCard?.set?.toLowerCase() is 'gangs'
+			# console.log '\tgangs card'
+			imageCls += " msg-card"
+			enchantmentClass += ' msg-card'
+
 		cardTooltip = 
 			<div className="card-container">
 				<div className="game-info">
@@ -74,7 +81,7 @@ class Weapon extends Card
 
 		return <div key={'card' + entity.id} className="weapon-container" data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 					<div className={cls}>
-						<div className="game-card" style={style}></div>
+						<div className={imageCls} style={style}></div>
 						<div className="art"></div>
 						{stats}
 					</div>

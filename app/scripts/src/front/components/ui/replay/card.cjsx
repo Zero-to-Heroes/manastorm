@@ -173,8 +173,8 @@ class Card extends React.Component
 		
 		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden
 			# console.log '\tgangs card'
-			imageCls += " quick-fix"
-			enchantmentClass += ' quick-fix'
+			imageCls += " msg-card"
+			enchantmentClass += ' msg-card'
 
 		cardTooltip = 
 			<div className="card-container">
