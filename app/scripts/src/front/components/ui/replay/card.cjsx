@@ -19,15 +19,17 @@ class Card extends React.Component
 		suffix = '.png'
 
 		imageCls = "art "
+		baseFolder = 'allCards'
 		# console.log 'rendering card', entity.cardID, originalCard, entity, originalCard?.set?.toLowerCase()
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage and !@props.conf?.noGolden
 			# console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'
+		else if @props.conf?.useCompressedImages
+			baseFolder = 'fullcards/256'
 
-
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{premium}#{entity.cardID}" + suffix
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/#{baseFolder}/#{premium}#{entity.cardID}" + suffix
 
 
 		# imageCls = "art "
