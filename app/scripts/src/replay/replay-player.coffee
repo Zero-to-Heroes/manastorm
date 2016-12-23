@@ -623,12 +623,16 @@ class ReplayPlayer extends EventEmitter
 
 
 	updateOptions: (action) ->
-		# console.log 'updating options'
+		# console.log 'updating options', @historyPosition
 		# Use current action and check if there is no parent? IE allow options only when top-level action has resolved?
 		if !@history[@historyPosition]?.parent and @getActivePlayer() == @player
 			# console.log 'updating options', @history.length, @historyPosition
 			currentCursor = @historyPosition
 			while currentCursor > 0
+				# If going back to previous turn, stop, as it screws the display of possible options
+				if @history[currentCursor]?.command is 'receiveTagChange' and @history[currentCursor].node.tag is 'TURN'
+					# console.log 'going back in turn so not updating history'
+					return
 				if @history[currentCursor]?.command is 'receiveOptions'
 					# console.log 'updating options?', @history[currentCursor], @history, currentCursor
 					@history[currentCursor].execute(this, action)
