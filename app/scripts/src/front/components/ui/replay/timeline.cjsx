@@ -37,13 +37,13 @@ class Timeline extends React.Component
 
 		<div className="timeline">
 			<div className="timeline-container">
-				<div className="time-display">{elapsedMinutes}:{elapsedSeconds}</div>
+				<div className="time-display" onClick={@moveToStart} title="Go back to the beginning">{elapsedMinutes}:{elapsedSeconds}</div>
 				<div className="scrub-bar" onClick={this.handleClick}>
 					<div className="slider">
 						<div className="current-time" style={handleStyle}></div>
 					</div>
 				</div>
-				<div className="time-display">{totalMinutes}:{totalSeconds}</div>
+				<div className="time-display" onClick={@moveToEnd} title="Go to the end">{totalMinutes}:{totalSeconds}</div>
 			</div>
 		</div>
 
@@ -56,5 +56,11 @@ class Timeline extends React.Component
 
 		progression = (e.clientX - left) / e.target.offsetWidth
 		@replay.moveTime(progression)
+
+	moveToStart: (e) ->
+		@replay.moveTime(0)
+
+	moveToEnd: (e) ->
+		@replay.moveTime(100)
 
 module.exports = Timeline
