@@ -7,7 +7,7 @@ class Card extends React.Component
 
 	render: ->
 		# console.log 'rendering card'
-		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
+		# locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 
@@ -27,7 +27,7 @@ class Card extends React.Component
 			suffix = '.gif'
 
 
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{premium}#{entity.cardID}" + suffix
+		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/#{premium}#{entity.cardID}" + suffix
 
 
 		# imageCls = "art "
