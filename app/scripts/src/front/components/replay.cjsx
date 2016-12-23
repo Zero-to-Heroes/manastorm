@@ -150,9 +150,9 @@ class Replay extends React.Component
 			topArea = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.opponent} />
-				<Hand entity={replay.opponent} isInfoConcealed={true} isHidden={!@showAllCards} replay={replay}/>
-				<Hero entity={replay.opponent} replay={replay} ref="topHero" showConcealedInformation={@showAllCards}/>
-				<Board entity={replay.opponent} ref="topBoard" tooltips={true} replay={replay}/>
+				<Hand entity={replay.opponent} isInfoConcealed={true} isHidden={!@showAllCards} replay={replay} conf={@configurationOptions} />
+				<Hero entity={replay.opponent} replay={replay} ref="topHero" showConcealedInformation={@showAllCards} conf={@configurationOptions} />
+				<Board entity={replay.opponent} ref="topBoard" tooltips={true} replay={replay} conf={@configurationOptions} />
 				<Mana entity={replay.opponent} />
 			</div>
 
@@ -162,11 +162,12 @@ class Replay extends React.Component
 				<EndGame entity={replay.opponent} isEnd={replay.isEndGame} />
 			</div>
 
-			bottomArea = <div className="bottom"><Board entity={replay.player} ref="bottomBoard" tooltips={true} replay={replay}/>
+			bottomArea = <div className="bottom">
+				<Board entity={replay.player} ref="bottomBoard" tooltips={true} replay={replay} conf={@configurationOptions} />
 				<PlayerName entity={replay.player} isActive={replay.player.id == replay.getActivePlayer().id}/>
 				<Deck entity={replay.player} />
-				<Hero entity={replay.player} replay={replay} ref="bottomHero" showConcealedInformation={true}/>
-				<Hand entity={replay.player} isInfoConcealed={false} isHidden={false} replay={replay} />
+				<Hero entity={replay.player} replay={replay} ref="bottomHero" showConcealedInformation={true} conf={@configurationOptions} />
+				<Hand entity={replay.player} isInfoConcealed={false} isHidden={false} replay={replay} conf={@configurationOptions}  />
 				<Mana entity={replay.player} />
 			</div>
 
