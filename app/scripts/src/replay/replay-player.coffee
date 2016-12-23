@@ -398,6 +398,26 @@ class ReplayPlayer extends EventEmitter
 			while @currentActionInTurn >= 0
 				@goPreviousAction()
 
+	getTurnNumberFromLabel: (turn) ->
+		if turn is 'mulligan' or turn is '00mulligan'
+			gameTurn = 0
+
+		else if turn is 'endgame'
+			return 500
+
+		else if @turns[2].activePlayer == @player
+			if turn.indexOf('o') != -1
+				gameTurn = turn.substring(1, turn.length - 1) * 2 + 1
+			else
+				gameTurn = turn.substring(1, turn.length) * 2
+		else
+			if turn.indexOf('o') == -1
+				gameTurn = turn.substring(1, turn.length) * 2 + 1
+			else
+				gameTurn = turn.substring(1, turn.length - 1) * 2
+
+		console.log 'getTurnNumberFromLabel', turn, gameTurn
+		return gameTurn
 
 	goToFriendlyTurn: (turn) ->
 		console.log 'going to turn in replay-player', turn
@@ -807,24 +827,47 @@ class ReplayPlayer extends EventEmitter
 		@emit 'new-log', log
 
 	notifyChangedTurn: (inputTurnNumber) ->
+		console.log 'notifying changed turn', inputTurnNumber
 		if inputTurnNumber in ['Mulligan', 'mulligan']
-			turnNumber = 'mulligan'
+			turnNumber = 0 #'mulligan'
 
 		else if inputTurnNumber is 'endgame'
-			turnNumber = 'endgame'
+			turnNumber = 500 #'endgame'
+
+		@onTurnChanged? turnNumber || inputTurnNumber
+
+
+	getTurnLabel: (inputTurnNumber) ->
+		console.log 'getting turn label', inputTurnNumber
+		# Backward-compatibility
+		if !isFinite(inputTurnNumber)
+			if '00mulligan' is inputTurnNumber
+				return 'mulligan'
+			if 'ZZendgame' is inputTurnNumber
+				return 'endgame'
+			# console.log 'non-numeric turn', inputTurnNumber
+			return inputTurnNumber
+		
+		inputTurnNumber = parseInt(inputTurnNumber)
+		if inputTurnNumber is 0
+			turnLabel = 'mulligan'
+
+		else if inputTurnNumber is 500
+			turnLabel = 'endgame'
 
 		else if @turns[2].activePlayer == @player
 			if inputTurnNumber % 2 == 0
-				turnNumber = 't' + inputTurnNumber / 2 + 'o'
+				turnLabel = 't' + inputTurnNumber / 2 + 'o'
 			else
-				turnNumber = 't' + (inputTurnNumber + 1) / 2
+				turnLabel = 't' + (inputTurnNumber + 1) / 2
 		else
 			if inputTurnNumber % 2 != 0
-				turnNumber = 't' + (inputTurnNumber + 1) / 2 + 'o'
+				turnLabel = 't' + (inputTurnNumber + 1) / 2 + 'o'
 			else
-				turnNumber = 't' + inputTurnNumber / 2
+				turnLabel = 't' + inputTurnNumber / 2
 
-		@onTurnChanged? turnNumber
+		console.log 'returning ' + turnLabel
+		return turnLabel
 
 	getPlayerInfo: ->
 		# console.log 'getting player info', @opponent, @entities[@opponent.tags.HERO_ENTITY], @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)

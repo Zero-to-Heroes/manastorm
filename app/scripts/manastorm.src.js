@@ -66,6 +66,7 @@ var manastorm = {
 
 	onTurnChanged: function(callback) {
 		window.replay.onTurnChanged = function(turn) {
+			// console.log('on src.js callback', turn)
 			callback(turn)
 		}
 	},
@@ -73,6 +74,14 @@ var manastorm = {
 	getCurrentTimestamp: function() {
 		var turn = window.replay.getCurrentTurn().toLowerCase()
 		return turn
+	},
+
+	getTurnLabel: function(turn) {
+		return window.replay.getTurnLabel(turn)
+	},
+
+	getTurnNumber: function(label) {
+		return window.replay.getTurnNumberFromLabel(label)
 	},
 	
 	getPlayerInfo: function() {
