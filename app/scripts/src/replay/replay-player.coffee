@@ -398,29 +398,61 @@ class ReplayPlayer extends EventEmitter
 			while @currentActionInTurn >= 0
 				@goPreviousAction()
 
+	getTurnLabel: (inputTurnNumber) ->
+		# console.log 'getting turn label', inputTurnNumber
+		# Backward-compatibility
+		if !isFinite(inputTurnNumber)
+			if '00mulligan' is inputTurnNumber
+				return 'mulligan'
+			if 'ZZendgame' is inputTurnNumber
+				return 'endgame'
+			# console.log 'non-numeric turn', inputTurnNumber
+			return inputTurnNumber
+		
+		inputTurnNumber = parseInt(inputTurnNumber)
+		if inputTurnNumber is 0
+			turnLabel = 'mulligan'
+
+		else if inputTurnNumber is 500
+			turnLabel = 'endgame'
+
+		else if @turns[2].activePlayer == @player
+			if inputTurnNumber % 2 == 0
+				turnLabel = 't' + inputTurnNumber / 2 + 'o'
+			else
+				turnLabel = 't' + (inputTurnNumber + 1) / 2
+		else
+			if inputTurnNumber % 2 != 0
+				turnLabel = 't' + (inputTurnNumber + 1) / 2 + 'o'
+			else
+				turnLabel = 't' + inputTurnNumber / 2
+
+		# console.log 'returning ' + turnLabel
+		return turnLabel
+
 	getTurnNumberFromLabel: (turn) ->
-		if turn is 'mulligan' or turn is '00mulligan'
+		if turn in ['mulligan', '00mulligan']
 			gameTurn = 0
 
-		else if turn is 'endgame'
+		else if turn in ['endgame', 'ZZendgame']
 			return 500
 
 		else if @turns[2].activePlayer == @player
 			if turn.indexOf('o') != -1
-				gameTurn = turn.substring(1, turn.length - 1) * 2 + 1
+				gameTurn = turn.substring(1, turn.length - 1) * 2
 			else
-				gameTurn = turn.substring(1, turn.length) * 2
+				gameTurn = turn.substring(1, turn.length) * 2 - 1
 		else
 			if turn.indexOf('o') == -1
-				gameTurn = turn.substring(1, turn.length) * 2 + 1
+				gameTurn = turn.substring(1, turn.length) * 2
 			else
-				gameTurn = turn.substring(1, turn.length - 1) * 2
+				gameTurn = turn.substring(1, turn.length - 1) * 2 - 1
 
 		console.log 'getTurnNumberFromLabel', turn, gameTurn
 		return gameTurn
 
 	goToFriendlyTurn: (turn) ->
-		console.log 'going to turn in replay-player', turn
+		# console.log 'going to turn in replay-player', turn
 
 		if turn is 'mulligan' or turn is 0 or turn is '0'
 			gameTurn = 1
@@ -841,37 +873,6 @@ class ReplayPlayer extends EventEmitter
 		@onTurnChanged? turnNumber || inputTurnNumber
 
 
-	getTurnLabel: (inputTurnNumber) ->
-		console.log 'getting turn label', inputTurnNumber
-		# Backward-compatibility
-		if !isFinite(inputTurnNumber)
-			if '00mulligan' is inputTurnNumber
-				return 'mulligan'
-			if 'ZZendgame' is inputTurnNumber
-				return 'endgame'
-			# console.log 'non-numeric turn', inputTurnNumber
-			return inputTurnNumber
-		
-		inputTurnNumber = parseInt(inputTurnNumber)
-		if inputTurnNumber is 0
-			turnLabel = 'mulligan'
-
-		else if inputTurnNumber is 500
-			turnLabel = 'endgame'
-
-		else if @turns[2].activePlayer == @player
-			if inputTurnNumber % 2 == 0
-				turnLabel = 't' + inputTurnNumber / 2 + 'o'
-			else
-				turnLabel = 't' + (inputTurnNumber + 1) / 2
-		else
-			if inputTurnNumber % 2 != 0
-				turnLabel = 't' + (inputTurnNumber + 1) / 2 + 'o'
-			else
-				turnLabel = 't' + inputTurnNumber / 2
-
-		console.log 'returning ' + turnLabel
-		return turnLabel
 
 	getPlayerInfo: ->
 		# console.log 'getting player info', @opponent, @entities[@opponent.tags.HERO_ENTITY], @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)
