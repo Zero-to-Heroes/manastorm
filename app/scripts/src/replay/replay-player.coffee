@@ -870,7 +870,8 @@ class ReplayPlayer extends EventEmitter
 		else if inputTurnNumber is 'endgame'
 			turnNumber = 500 #'endgame'
 
-		@onTurnChanged? turnNumber || inputTurnNumber
+		console.log 'final turn', turnNumber
+		@onTurnChanged? if turnNumber isnt undefined then turnNumber else inputTurnNumber
 
 
 
