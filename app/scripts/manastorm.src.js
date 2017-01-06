@@ -72,7 +72,7 @@ var manastorm = {
 	},
 
 	getCurrentTimestamp: function() {
-		var turn = window.replay.getCurrentTurn().toLowerCase()
+		var turn = window.replay.getCurrentTurn()
 		return turn
 	},
 

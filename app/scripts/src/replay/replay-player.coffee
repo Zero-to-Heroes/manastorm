@@ -95,6 +95,7 @@ class ReplayPlayer extends EventEmitter
 		# Preload the images
 		images = @buildImagesArray()
 		@preloadPictures images
+
 		# console.log 'preloadPictures done'
 
 		# @updateActionsInfo()
@@ -102,6 +103,8 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
+		console.log 'notifying changed turn'
+		@notifyChangedTurn @turns[@currentTurn].turn
 		# console.log 'init done in manastorm', @turns
 
 
@@ -135,14 +138,23 @@ class ReplayPlayer extends EventEmitter
 
 	getCurrentTurn: ->
 		# console.log 'getting current turn', @turns[@currentTurn]
-		if @turns[@currentTurn].turn is 'Mulligan'
-			return 'mulligan'
-		else if @isEndGame
-			return 'endgame'
-		else if @getActivePlayer() == @player
-			return 't' + Math.ceil(@turns[@currentTurn].turn / 2)
-		else
-			return 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
+		currentTurn = @turns[@currentTurn].turn
+
+		if currentTurn in ['Mulligan', 'mulligan']
+			currentTurn = 0
+
+		else if currentTurn is 'endgame'
+			currentTurn = 500
+
+		return currentTurn
+		# if @turns[@currentTurn].turn is 'Mulligan'
+		# 	return 'mulligan'
+		# else if @isEndGame
+		# 	return 'endgame'
+		# else if @getActivePlayer() == @player
+		# 	return 't' + Math.ceil(@turns[@currentTurn].turn / 2)
+		# else
+		# 	return 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
 
 
