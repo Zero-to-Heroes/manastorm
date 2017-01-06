@@ -10,6 +10,7 @@ class HeroPower extends Card
 
 	render: ->
 		# console.log 'rendering HeroPower'
+		return null unless @props.entity
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 

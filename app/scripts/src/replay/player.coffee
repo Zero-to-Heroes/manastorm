@@ -38,7 +38,10 @@ class Player extends Entity
 
 	getHeroPower: ->
 		heroPower = _.filter @replay.entities, (entity) =>
+			# if entity.id is 68
+				# console.log 'considering entity', entity
 			entity.tags.ZONE is zones.PLAY and entity.tags.CARDTYPE is cardTypes.HERO_POWER and entity.tags.CONTROLLER is @tags.CONTROLLER
+		# console.log 'heroPower', heroPower
 		return heroPower[0]
 
 	getOpponent: ->
