@@ -269,7 +269,7 @@ class Replay extends React.Component
 								</div>
 							</div>
 
-							<label className="btn btn-default glyphicon glyphicon-eye-open" htmlFor="show-hidden-cards" title="Try to show hidden cards">
+							<label className="btn btn-default glyphicon glyphicon-eye-open show-hidden-cards #{@showAllCards}" htmlFor="show-hidden-cards" title="Try to show hidden cards">
  								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
  							</label>
  

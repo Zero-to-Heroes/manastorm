@@ -12,32 +12,37 @@
 	padding-top: 2%;
 	color: black;
     justify-content: center;
-}
 
-.replay__controls .btn {
-	display: flex;
-    align-items: center;
-	color: inherit;
-	background: transparent;
-	border-color: black;
-	border: 1px solid black;
-	top: 0;
+     .btn {
+		display: flex;
+	    align-items: center;
+		color: inherit;
+		background: transparent;
+		border-color: black;
+		border: 1px solid black;
+		top: 0;
 
-	&:hover, &:focus {
-		// box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+		&:hover, &:focus {
+			// box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+			background-color: rgb(64, 154, 204);
+			color: white;
+		}
+
+		&:active, &.active {
+	 		border-color: black;
+			box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
+			background-color: rgb(64, 154, 204);
+		}
+
+
+		&.glyphicon:before {
+			margin: auto;
+		}
+	}
+
+	.show-hidden-cards.true {
 		background-color: rgb(64, 154, 204);
 		color: white;
-	}
-
-	&:active, &.active {
- 		border-color: black;
-		box-shadow: inset 0 0 10px rgba(0, 0, 0, .4);
-		background-color: rgb(64, 154, 204);
-	}
-
-
-	&.glyphicon:before {
-		margin: auto;
 	}
 }
 
