@@ -172,8 +172,8 @@ class Card extends React.Component
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
 
 
-		
-		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden
+		# Hacks... Really need to start thinking about building the cards myself
+		if originalCard?.set?.toLowerCase() is 'gangs' and !@props.isHidden and entity.cardID != 'CFM_020'
 			# console.log '\tgangs card'
 			imageCls += " msg-card"
 			enchantmentClass += ' msg-card'
