@@ -114,13 +114,16 @@ class Replay extends React.Component
 
 
 	updateDimensions: =>
-		console.log 'trying to update dimensions', this.refs['root']?.offsetWidth
-		if this.refs['root']?.offsetWidth > 10
-			@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-			console.log 'updated dimensions'
-			@callProtectedCallback()
-		else 
-			setTimeout @updateDimensions, 200
+		setTimeout () =>
+			console.log 'trying to update dimensions', this.refs['root']?.offsetWidth
+			if this.refs['root']?.offsetWidth > 10
+				@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
+				console.log 'updated dimensions'
+				@callProtectedCallback()
+			else 
+				@updateDimensions()
+		, 50
+
 
 	callback: =>
 		if !@mounted
@@ -269,11 +272,11 @@ class Replay extends React.Component
 								</div>
 							</div>
 
-							<label className="btn btn-default glyphicon glyphicon-eye-open show-hidden-cards #{@showAllCards}" htmlFor="show-hidden-cards" title="Try to show hidden cards">
+							<label className="btn btn-default glyphicon glyphicon-eye-open mode-button #{@showAllCards}" htmlFor="show-hidden-cards" title="Try to show hidden cards">
  								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
  							</label>
  
- 							<label className="btn btn-default glyphicon glyphicon-retweet" htmlFor="switch-main-player" title="Switch main player">
+ 							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player" title="Switch main player">
  								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
  							</label>
 
