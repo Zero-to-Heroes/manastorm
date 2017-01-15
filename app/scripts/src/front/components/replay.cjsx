@@ -207,7 +207,15 @@ class Replay extends React.Component
 			# 	console.log 'adding target', target, source
 			# 	targets.push <Target source={source} target={target} type={replay.targetType} key={'target' + replay.targetSource + '' + targetId}/>
 
-		playButton = <button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay} />
+		playButton = 
+			<button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay}>
+				<div className="tooltip bottom">
+					<p>Play automatically</p>
+					<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+						<polygon points="12,0 6,4 0,0 "/>
+					</svg>
+				</div>
+			</button>
 
 		if @state.replay.speed > 0
 			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
@@ -229,7 +237,9 @@ class Replay extends React.Component
 				</label>
 
 		# console.log 'applying style', @state.style
+		#TODO externalise the controls to their own components
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
+
 					<ReactTooltip />
 					<div className="game">
 						<div className={"game-area " + blur}>
@@ -252,11 +262,39 @@ class Replay extends React.Component
 					<GameLog replay={replay} onLogClick={@onTurnClick} logOpen={@displayConf.showLog} hide={@configurationOptions?.hideButtomLog} />
 					<form className="replay__controls padded">
 						<div className="btn-group">
-							 <button className={'btn btn-default glyphicon glyphicon-backward ' + @activeGoPreviousTurn} onClick={@goPreviousTurn} title="Go to previous turn"/>
-							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction} title="Go to previous action"/>
+							 <button className={'btn btn-default glyphicon glyphicon-backward ' + @activeGoPreviousTurn} onClick={@goPreviousTurn}>
+								<div className="tooltip bottom">
+									<p>Previous turn</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
+							 </button>
+							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction} title="Go to previous action">
+								<div className="tooltip bottom">
+									<p>Previous action</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
+							 </button>
 							{playButton}
-							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction" title="Go to next action"/>
-							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn} title="Go to next turn"/>
+							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction" title="Go to next action">
+								<div className="tooltip bottom">
+									<p>Next action</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
+							 </button>
+							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn} title="Go to next turn">
+								<div className="tooltip bottom">
+									<p>Next turn</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
+							 </button>
 						</div>
 						<Timeline replay={replay} />
 						<div className="btn-group">
@@ -273,15 +311,15 @@ class Replay extends React.Component
 							</div>
 
 							<label className="btn btn-default glyphicon glyphicon-eye-open mode-button #{@showAllCards}" htmlFor="show-hidden-cards" title="Try to show hidden cards">
- 								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
- 							</label>
+								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
+							</label>
  
- 							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player" title="Switch main player">
- 								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
- 							</label>
+							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player" title="Switch main player">
+								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
+							</label>
 
- 							{showSideLogButton}
- 						</div>
+							{showSideLogButton}
+						</div>
 						<div id="padding"></div>
 					</form>
 				</div>
@@ -404,8 +442,8 @@ class Replay extends React.Component
 
 	# https://gist.github.com/sheldonh/6089299
 	merge: (xs...) ->
-	  	if xs?.length > 0
-	    	tap {}, (m) -> m[k] = v for k,v of x for x in xs
+		if xs?.length > 0
+			tap {}, (m) -> m[k] = v for k,v of x for x in xs
 		tap = (o, fn) -> fn(o); o
 
 module.exports = Replay
