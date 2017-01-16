@@ -232,8 +232,14 @@ class Replay extends React.Component
 
 		if !@configurationOptions?.hideSideLog
 			showSideLogButton = 
-				<label className="btn btn-default glyphicon glyphicon-list-alt" htmlFor="show-log" title="Show full game log">
+				<label className="btn btn-default glyphicon glyphicon-list-alt mode-button" htmlFor="show-log">
 					<input type="checkbox" id="show-log" checked={@displayConf.showLog} onChange={@onTurnClick} hidden />
+					<div className="tooltip bottom">
+						<p>Show full game log</p>
+						<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+							<polygon points="12,0 6,4 0,0 "/>
+						</svg>
+					</div>
 				</label>
 
 		# console.log 'applying style', @state.style
@@ -270,7 +276,7 @@ class Replay extends React.Component
 									</svg>
 								</div>
 							 </button>
-							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction} title="Go to previous action">
+							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction}>
 								<div className="tooltip bottom">
 									<p>Previous action</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
@@ -279,7 +285,7 @@ class Replay extends React.Component
 								</div>
 							 </button>
 							{playButton}
-							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction" title="Go to next action">
+							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction">
 								<div className="tooltip bottom">
 									<p>Next action</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
@@ -287,7 +293,7 @@ class Replay extends React.Component
 									</svg>
 								</div>
 							 </button>
-							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn} title="Go to next turn">
+							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn}>
 								<div className="tooltip bottom">
 									<p>Next turn</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
@@ -300,7 +306,14 @@ class Replay extends React.Component
 						<div className="btn-group">
 							<div className="playback-speed">
 								<div className="dropup"> 
-									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" title="Change game speed"> {@state.replay.speed}x <span className="caret"></span> </button> 
+									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> 
+										<div className="tooltip bottom">
+											<p>Change game speed</p>
+											<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+												<polygon points="12,0 6,4 0,0 "/>
+											</svg>
+										</div>
+									</button> 
 									<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
 										<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
 										<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
@@ -310,12 +323,24 @@ class Replay extends React.Component
 								</div>
 							</div>
 
-							<label className="btn btn-default glyphicon glyphicon-eye-open mode-button #{@showAllCards}" htmlFor="show-hidden-cards" title="Try to show hidden cards">
+							<label className="btn btn-default glyphicon glyphicon-eye-open mode-button #{@showAllCards}" htmlFor="show-hidden-cards">
 								<input type="checkbox" id="show-hidden-cards" checked={@showAllCards} onChange={@onShowCardsChange} hidden />
+								<div className="tooltip bottom">
+									<p>Try to show hidden cards</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
 							</label>
  
-							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player" title="Switch main player">
+							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player">
 								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
+								<div className="tooltip bottom">
+									<p>Switch main player</p>
+									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
+										<polygon points="12,0 6,4 0,0 "/>
+									</svg>
+								</div>
 							</label>
 
 							{showSideLogButton}
