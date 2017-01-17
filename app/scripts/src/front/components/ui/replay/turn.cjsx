@@ -13,7 +13,20 @@ Turn = React.createClass
 		if @props.active
 			cls += ' active' 
 
-		return 	<div className={cls} onClick={@props.onClick} >
+		turn = @props.replay.getCurrentTurn()
+		if turn is 0
+			turnDisplay = 'Mulligan'
+		else if turn is 500
+			turnDisplay = 'Endgame'
+		else 
+			turnDisplay = 'Turn ' + Math.ceil(turn / 2)
+
+		if @props.replay.getActivePlayer()?.name
+			turnDisplay += ' - ' + @props.replay.getActivePlayer().name
+
+		console.log 'rendering turn button', turnDisplay, @props.replay.getActivePlayer()
+
+		return 	<div className={cls} data-tip={turnDisplay} data-effect="solid">
 					<div className="text">
 						<span>{@props.replay.getCurrentTurnString()}</span>
 					</div>
