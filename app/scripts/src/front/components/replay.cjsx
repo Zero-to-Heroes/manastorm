@@ -115,10 +115,10 @@ class Replay extends React.Component
 
 	updateDimensions: =>
 		setTimeout () =>
-			console.log 'trying to update dimensions', this.refs['root']?.offsetWidth
+			# console.log 'trying to update dimensions', this.refs['root']?.offsetWidth
 			if this.refs['root']?.offsetWidth > 10
 				@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
-				console.log 'updated dimensions'
+				# console.log 'updated dimensions'
 				@callProtectedCallback()
 			else 
 				@updateDimensions()
@@ -221,7 +221,7 @@ class Replay extends React.Component
 			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
 
 		if @configurationOptions?.showGameBorder
-			console.log 'showing border'
+			# console.log 'showing border'
 			showBorder = <div className={"game-border"} ></div>
 
 		blur = ""
@@ -243,6 +243,7 @@ class Replay extends React.Component
 				</label>
 
 		# console.log 'applying style', @state.style
+		console.log 'rerendering', replay
 		#TODO externalise the controls to their own components
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 
@@ -435,6 +436,7 @@ class Replay extends React.Component
 
 	onMainPlayerSwitchedChange: =>
 		@mainPlayerSwitched = !@mainPlayerSwitched
+		console.log 'switching main player', @state.replay
 		@state.replay.switchMainPlayer()
 		@callProtectedCallback()
 

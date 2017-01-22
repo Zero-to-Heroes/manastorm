@@ -24,7 +24,7 @@ Turn = React.createClass
 		if @props.replay.getActivePlayer()?.name
 			turnDisplay += ' - ' + @props.replay.getActivePlayer().name
 
-		console.log 'rendering turn button', turnDisplay, @props.replay.getActivePlayer()
+		# console.log 'rendering turn button', turnDisplay, @props.replay.getActivePlayer()
 
 		return 	<div className={cls} data-tip={turnDisplay} data-effect="solid">
 					<div className="text">

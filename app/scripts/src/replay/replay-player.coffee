@@ -47,6 +47,7 @@ class ReplayPlayer extends EventEmitter
 		@emit 'reset'
 
 		@game = null
+		@mainPlayerId = null
 		@player = null
 		@opponent = null
 		@activeSpell = null
@@ -81,7 +82,7 @@ class ReplayPlayer extends EventEmitter
 		@actionParser.populateEntities()
 		# console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		# console.log 'parseActions done'
+		console.log 'parseActions done', @mainPlayerId, this
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
@@ -103,7 +104,7 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		console.log 'notifying changed turn'
+		# console.log 'notifying changed turn'
 		@notifyChangedTurn @turns[@currentTurn].turn
 		# console.log 'init done in manastorm', @turns
 
@@ -715,16 +716,17 @@ class ReplayPlayer extends EventEmitter
 			@isEndGame = false
 		# action.activeSpell = @activeSpell
 
-	mainPlayer: (entityId) ->
-		if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
-			@mainPlayerId = entityId
+	# mainPlayer: (entityId) ->
+	# 	if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
+	# 		console.log 'setting mainPlayer', entityId, this
+	# 		@mainPlayerId = entityId
 
 	switchMainPlayer: ->
 		tempOpponent = @player
 		@player = @opponent
 		@opponent = tempOpponent
 		@mainPlayerId = @player.id
-		# console.log 'switched main player, new one is', @mainPlayerId, @player
+		console.log 'switched main player, new one is', @mainPlayerId, @player
 
 	getController: (controllerId) ->
 		# console.log 'getting controller', @player, @opponent, this
@@ -776,9 +778,9 @@ class ReplayPlayer extends EventEmitter
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
-		# console.log 'receiving player', entity
 
 		if entity.tags.CURRENT_PLAYER
+			console.log 'receiving player and setting main player', entity, this
 			@player = entity
 		else
 			@opponent = entity
@@ -834,7 +836,7 @@ class ReplayPlayer extends EventEmitter
 				else 
 					@opponent = player
 					# console.log '\tsetting opponent', @opponent
-			# console.log 'set player and opponent', @player, @opponent
+			console.log 'set player and opponent', @player, @opponent
 
 	receiveAction: (definition) ->
 		# console.log '\t\treceiving action', definition
@@ -875,14 +877,14 @@ class ReplayPlayer extends EventEmitter
 		@emit 'new-log', log
 
 	notifyChangedTurn: (inputTurnNumber) ->
-		console.log 'notifying changed turn', inputTurnNumber
+		# console.log 'notifying changed turn', inputTurnNumber
 		if inputTurnNumber in ['Mulligan', 'mulligan']
 			turnNumber = 0 #'mulligan'
 
 		else if inputTurnNumber is 'endgame'
 			turnNumber = 500 #'endgame'
 
-		console.log 'final turn', turnNumber
+		# console.log 'final turn', turnNumber
 		@onTurnChanged? if turnNumber isnt undefined then turnNumber else inputTurnNumber
 
 
