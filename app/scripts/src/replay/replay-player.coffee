@@ -61,6 +61,8 @@ class ReplayPlayer extends EventEmitter
 
 		@started = false
 		@speed = 0
+		@previousSpeed = 0
+		clearInterval @interval
 
 		@turns = {
 			length: 0
@@ -82,7 +84,7 @@ class ReplayPlayer extends EventEmitter
 		@actionParser.populateEntities()
 		# console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		console.log 'parseActions done', @mainPlayerId, this
+		# console.log 'parseActions done', @mainPlayerId, this
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
@@ -90,7 +92,7 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'switchMainPlayer done'
 
 		# Notify the UI controller
-		@emit 'game-generated', this
+		# @emit 'game-generated', this
 		# @emit 'players-ready'
 
 		# Preload the images
@@ -111,15 +113,19 @@ class ReplayPlayer extends EventEmitter
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
+		console.log 'in autoPlay', @previousSpeed, @speed
 		if @speed > 0
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
+			console.log 'speed > 0', @interval
 
 	pause: ->
-		# console.log 'pausing'
 		if @speed > 0
 			@previousSpeed = @speed
+			console.log 'speed was > 0, storing previous speed', @previousSpeed
 		@speed = 0
+		console.log 'pausing', @previousSpeed, @speed, @interval
 		clearInterval(@interval)
+		console.log 'cleared interval', @interval
 
 	changeSpeed: (speed) ->
 		# console.log 'changing speed'
@@ -327,7 +333,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -513,17 +519,13 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
-		@newStep()
+		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
+		# currentTimestamp = @getCurrentTimestamp()
+		# @newStep()
 
-		# lastTimestamp = 0
-		# index = 0
-		# while !lastTimestamp or (lastTimestamp < timestamp)
-		# 	lastTimestamp = @history[++index].timestamp
-
-		# Going forward
 		@seeking = true
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
+		# Going forward
 		if !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
 			# console.log '\tforward'
 			hasMoved = true
@@ -716,10 +718,10 @@ class ReplayPlayer extends EventEmitter
 			@isEndGame = false
 		# action.activeSpell = @activeSpell
 
-	# mainPlayer: (entityId) ->
-	# 	if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
-	# 		console.log 'setting mainPlayer', entityId, this
-	# 		@mainPlayerId = entityId
+	mainPlayer: (entityId) ->
+		if (!@mainPlayerId && (parseInt(entityId) == 2 || parseInt(entityId) == 3))
+			# console.log 'setting mainPlayer', entityId, this
+			@mainPlayerId = entityId
 
 	switchMainPlayer: ->
 		tempOpponent = @player
@@ -780,7 +782,7 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 		if entity.tags.CURRENT_PLAYER
-			console.log 'receiving player and setting main player', entity, this
+			# console.log 'receiving player and setting main player', entity, this
 			@player = entity
 		else
 			@opponent = entity
@@ -836,7 +838,7 @@ class ReplayPlayer extends EventEmitter
 				else 
 					@opponent = player
 					# console.log '\tsetting opponent', @opponent
-			console.log 'set player and opponent', @player, @opponent
+			# console.log 'set player and opponent', @player, @opponent
 
 	receiveAction: (definition) ->
 		# console.log '\t\treceiving action', definition
