@@ -277,7 +277,7 @@ class ActionParser extends EventEmitter
 						shouldExecute: =>
 							# return true
 							action.executed = action.executed || action.fullData.tags.ZONE != 1
-							console.log 'should execute', action
+							# console.log 'should execute', action
 							# console.log 'shouldexecute?', action.fullData, action.fullData.lastZone, action.fullData.tags.ZONE, action
 							# https://github.com/Zero-to-Heroes/zerotoheroes.com/issues/50
 							return action.executed
@@ -367,7 +367,7 @@ class ActionParser extends EventEmitter
 						shouldExecute: =>
 							# return true
 							action.executed = action.executed || action.fullData.tags.ZONE == 3
-							console.log 'should execute', action
+							# console.log 'should execute', action
 							return action.executed
 							# console.log 'should execute discard?', action.fullData, action.fullData.tags.ZONE
 							#  https://github.com/Zero-to-Heroes/manastorm/issues/44

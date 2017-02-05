@@ -243,7 +243,7 @@ class Replay extends React.Component
 				</label>
 
 		# console.log 'applying style', @state.style
-		console.log 'rerendering', replay
+		# console.log 'rerendering', replay
 		#TODO externalise the controls to their own components
 		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
 
@@ -416,11 +416,13 @@ class Replay extends React.Component
 		@callProtectedCallback()
 
 	onClickPlay: (e) =>
+		console.log 'clicked on Play'
 		e.preventDefault()
 		@state.replay.autoPlay()
 		@callProtectedCallback()
 
 	onClickPause: (e) =>
+		console.log 'clicked on Pause'
 		e.preventDefault()
 		@state.replay.pause()
 		@callProtectedCallback()
