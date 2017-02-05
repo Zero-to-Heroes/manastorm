@@ -113,19 +113,19 @@ class ReplayPlayer extends EventEmitter
 
 	autoPlay: ->
 		@speed = @previousSpeed || 1
-		console.log 'in autoPlay', @previousSpeed, @speed
+		# console.log 'in autoPlay', @previousSpeed, @speed
 		if @speed > 0
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
-			console.log 'speed > 0', @interval
+			# console.log 'speed > 0', @interval
 
 	pause: ->
 		if @speed > 0
 			@previousSpeed = @speed
 			console.log 'speed was > 0, storing previous speed', @previousSpeed
 		@speed = 0
-		console.log 'pausing', @previousSpeed, @speed, @interval
+		# console.log 'pausing', @previousSpeed, @speed, @interval
 		clearInterval(@interval)
-		console.log 'cleared interval', @interval
+		# console.log 'cleared interval', @interval
 
 	changeSpeed: (speed) ->
 		# console.log 'changing speed'
@@ -627,9 +627,18 @@ class ReplayPlayer extends EventEmitter
 
 
 		@updateOptions()
-		if @history[@historyPosition - 1]?.timestamp
-			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
-			# console.log '\tupdating timestamp', @currentReplayTime
+		@updateCurrentReplayTime()
+
+	updateCurrentReplayTime: ->
+		currentCursor = @historyPosition
+		while @history[currentCursor] and !@history[currentCursor].timestamp
+			currentCursor--
+
+		if @history[currentCursor]?.timestamp
+			@currentReplayTime = @history[currentCursor].timestamp - @startTimestamp
+			# console.log '\tupdating currentReplayTime', @currentReplayTime
+		else 
+			# console.log 'could not update currentReplayTime', @history[currentCursor], currentCursor
 
 		# console.log 'update finished'.
 
@@ -644,9 +653,7 @@ class ReplayPlayer extends EventEmitter
 			@entities[k].update tags: v
 
 		@updateOptions()
-		if @history[@historyPosition - 1]?.timestamp
-			@currentReplayTime = @history[@historyPosition - 1].timestamp - @startTimestamp
-			# console.log '\tupdating timestamp', @currentReplayTime
+		@updateCurrentReplayTime()
 
 	choosing: ->
 		# Blur during mulligan
