@@ -147,6 +147,29 @@
 	border: none;
 }
 
+// The jquery tooltips
+.parse-cards-text.tooltip {
+
+    width: 50%;
+    max-width: 210px;
+    padding: 0;
+
+    .tooltip-inner {
+        background: transparent;
+        max-width: inherit;
+        padding: 0;
+
+        img {
+            width: 100%;
+        }
+    }
+
+    &.in {
+        opacity: 1;
+    }
+}
+
+
 @media screen and (max-width: 1070px) {
     // Because the width seems to be based on the viewport, and not the replay area
     // And we grow the replay area on smaller screens

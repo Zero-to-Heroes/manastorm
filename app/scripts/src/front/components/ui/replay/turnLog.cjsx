@@ -651,7 +651,7 @@ TurnLog = React.createClass
 		# If the card is hidden and the "show hidden card" not activated, we don't show the card
 		# For now, hidden only means "in hand"
 		cardID = if entity then entity['cardID'] else ''
-		return @replay.buildCardLink(@replay.cardUtils.getCard(cardID))
+		return @replay.buildCardLink(@replay.cardUtils.getCard(cardID), null, '#externalPlayer')
 
 # ===============
 # And DRY objects
