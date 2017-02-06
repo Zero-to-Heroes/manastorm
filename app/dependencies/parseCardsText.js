@@ -43,7 +43,7 @@ var parseCardsText = {
 
 		container = container || 'body'
 
-		console.log('building card link on container', container)
+		// console.log('building card link on container', container)
 
 		lang = lang || parseCardsText.getLang();
 		var localizedName = parseCardsText.localizeName(card, lang);
@@ -54,15 +54,7 @@ var parseCardsText = {
 		var title = '<img src=\'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/' + localizedImage + '\'>';
 		var link = '<span class="autocomplete card ' + cssClass + '" data-toggle="tooltip" data-template="' + tooltipTemplate + '" data-title="' + title + '"data-placement="auto left" data-html="true" data-animation="false" data-container="' + container + '">' + localizedName + '</span>';
 
-		if (!parseCardsText.isUpdatePending) {
-			parseCardsText.isUpdatePending = true
-			setTimeout(function() {
-				if ($('[data-toggle="tooltip"]').tooltip) {
-					$('[data-toggle="tooltip"]').tooltip()
-					parseCardsText.isUpdatePending = false
-				}
-			}, 300)
-		}
+		parseCardsText.refreshTooltips()
 
 		return link;
 	},
@@ -75,6 +67,11 @@ var parseCardsText = {
 				parseCardsText.isUpdatePending = false
 			}, 300)
 		}
+	},
+
+	destroyTooltips: function() {
+		console.log('removing tooltips')
+		$('#externalPlayer .tooltip.parse-cards-text').remove()
 	},
 
 	buildFullCardImageUrl: function(card, lang) {
@@ -190,6 +187,16 @@ var parseCardsText = {
 				})
 			}
 		});
+
+		(function($){
+		  $.event.special.destroyed = {
+		    remove: function(o) {
+		      if (o.handler) {
+		        o.handler()
+		      }
+		    }
+		  }
+		})(jQuery)
 	},
 
 	removeDuplicates: function(list) {

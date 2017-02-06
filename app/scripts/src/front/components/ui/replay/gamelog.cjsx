@@ -13,6 +13,9 @@ class GameLog extends React.Component
 
 	render: ->
 		# console.log 'rendering gamelog'
+		# clear lingering tooltips - not good design
+		@replay?.cardUtils?.destroyTooltips()
+
 		buttonText = <span>Full log</span>
 		if @props.logOpen
 			buttonText = <span>Hide log</span>
