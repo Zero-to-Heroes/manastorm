@@ -64,7 +64,7 @@ class HSReplayParser
 
 				@replay.enqueue 'receiveTagChange', tag
 
-			when 'GameEntity'.toLowerCase(), 'Player'.toLowerCase(), 'FullEntity'.toLowerCase(), 'ShowEntity'.toLowerCase()
+			when 'GameEntity'.toLowerCase(), 'Player'.toLowerCase(), 'FullEntity'.toLowerCase(), 'ShowEntity'.toLowerCase(), 'ChangeEntity'.toLowerCase()
 				# console.log '\tpushing game entity to state', node
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
@@ -160,11 +160,15 @@ class HSReplayParser
 				@state.pop()
 				@replay.enqueue 'receiveShowEntity', @entityDefinition, ts
 				@entityDefinition = {tags: {}}
+			when 'ChangeEntity'.toLowerCase()
+				@state.pop()
+				@replay.enqueue 'receiveChangeEntity', @entityDefinition, ts
+				@entityDefinition = {tags: {}}
 
 	actionState: (node) ->
 		node.index = @index++
 		switch node.name.toLowerCase()
-			when 'ShowEntity'.toLowerCase(), 'FullEntity'.toLowerCase()
+			when 'ShowEntity'.toLowerCase(), 'FullEntity'.toLowerCase(), 'ChangeEntity'.toLowerCase()
 				@state.push('entity')
 				@entityDefinition.id = parseInt(node.attributes.entity or node.attributes.id)
 
@@ -188,7 +192,7 @@ class HSReplayParser
 					@stack[@stack.length - 2].showEntities = @stack[@stack.length - 2].showEntities || []
 					@stack[@stack.length - 2].showEntities.push @entityDefinition
 				# Need that to distinguish actions that create tokens
-				else 
+				else if node.name.toLowerCase() is 'FullEntity'.toLowerCase()
 					@stack[@stack.length - 2].fullEntity = @entityDefinition
 					# Support for multiple ShowEntity nodes, should replace the standard definition
 					@stack[@stack.length - 2].fullEntities = @stack[@stack.length - 2].fullEntities || []

@@ -847,6 +847,13 @@ class ReplayPlayer extends EventEmitter
 					# console.log '\tsetting opponent', @opponent
 			# console.log 'set player and opponent', @player, @opponent
 
+	receiveChangeEntity: (definition, action) ->
+		console.log '\t\treceiving change entity', definition.id, definition
+		if @entities[definition.id]
+			@entities[definition.id].update(definition, action)
+		else
+			@entities[definition.id] = new Entity(definition, this)
+
 	receiveAction: (definition) ->
 		# console.log '\t\treceiving action', definition
 		# if definition.isDiscover
