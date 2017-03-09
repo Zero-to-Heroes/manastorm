@@ -18,6 +18,7 @@ class ReplayPlayer extends EventEmitter
 		@currentTurn = 0
 		@currentActionInTurn = 0
 		@cardUtils = window['parseCardsText']
+		# console.log 'constructor done'
 
 	reload: (xmlReplay, callback) ->
 		@parser.xmlReplay = xmlReplay
@@ -27,10 +28,12 @@ class ReplayPlayer extends EventEmitter
 		@currentActionInTurn = 0
 		@entities = {}
 		@newStep()
+		# console.log 'reload done'
 
 		@init()
 
 		if callback
+			# console.log 'calling reload callback'
 			callback()
 
 
@@ -139,9 +142,9 @@ class ReplayPlayer extends EventEmitter
 		else if @isEndGame
 			return 'End game'
 		else if @getActivePlayer() == @player
-			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2)
+			return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2)
 		else
-			return 'Turn ' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
+			return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2) + 'o'
 
 	getCurrentTurn: ->
 		# console.log 'getting current turn', @turns[@currentTurn]
@@ -154,14 +157,6 @@ class ReplayPlayer extends EventEmitter
 			currentTurn = 500
 
 		return currentTurn
-		# if @turns[@currentTurn].turn is 'Mulligan'
-		# 	return 'mulligan'
-		# else if @isEndGame
-		# 	return 'endgame'
-		# else if @getActivePlayer() == @player
-		# 	return 't' + Math.ceil(@turns[@currentTurn].turn / 2)
-		# else
-		# 	return 't' + Math.ceil(@turns[@currentTurn].turn / 2) + 'o'
 
 
 
@@ -246,6 +241,7 @@ class ReplayPlayer extends EventEmitter
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
 			@currentTurn = 0
 			@currentActionInTurn = 0
+			console.log 'init because of going to previous action'
 			@init()
 			return
 
@@ -499,6 +495,7 @@ class ReplayPlayer extends EventEmitter
 	goToIndex: (index, turn, actionIndex) ->
 		# console.log 'going to index', index
 		if index < @historyPosition
+			console.log 'init because going to index', index, @historyPosition
 			@historyPosition = 0
 			@init()
 
@@ -758,18 +755,6 @@ class ReplayPlayer extends EventEmitter
 				break
 			index++
 
-		# while @history[index].command isnt 'receiveAction'
-		# 	# console.log '\tSkipping to first action', index
-		# 	index++			
-		# 	# console.log index, @history[index], @history
-		# index++
-		# # console.log index, @history[index], @history
-		# while @history[index].command isnt 'receiveAction'
-		# 	# console.log '\tSkipping to secdon action', index
-		# 	index++
-		# 	# console.log index, @history[index], @history
-		# console.log 'last index before action', index, @history[index], @history[index + 1]
-		# @goToIndex @history[index].index
 		@goToIndex lastAction.index
 
 

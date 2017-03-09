@@ -20,6 +20,9 @@ class ActionParser extends EventEmitter
 		@getController = @replay.getController
 		@cardUtils = @replay.cardUtils
 
+		@turnNumber = 1
+
+
 	populateEntities: ->
 		players = [@player, @opponent]
 		@player.tags.RESOURCES_USED = 0
@@ -27,12 +30,26 @@ class ActionParser extends EventEmitter
 
 		#First add the missing card / entity info
 		playerIndex = 0
-		turnNumber = 1
 		actionIndex = 0
 		currentPlayer = players[playerIndex]
 
 		# populate the entities
 		for item in @history
+			# console.log 'item', item
+			if item.command == 'receiveGameEntity'
+				# console.log 'game', item.node, item
+				@replay.turnOffset = item.node.tags['TURN'] - 1 || 0
+				# console.log 'starting game at turn', @turnNumber
+			else if item.command == 'receivePlayer'
+				if item.node.tags['CURRENT_PLAYER'] is 1
+					# console.log 'CURRENT_PLAYER tag present', item, @player, @opponent
+					if @player.id is item.node.id
+						@currentPlayer = @player
+					else if @opponent.id is item.node.id
+						@currentPlayer = @opponent
+					else 
+						console.error 'could not set current player'
+
 			## Populate relevant data for cards
 			if item.command == 'receiveEntity'
 				if item.node.id and !@entities[item.node.id]
@@ -80,7 +97,6 @@ class ActionParser extends EventEmitter
 		@players = [@player, @opponent]
 		
 		@playerIndex = 0
-		@turnNumber = 1
 		# @currentPlayer = @players[@playerIndex]
 
 		for item in @history
@@ -206,15 +222,18 @@ class ActionParser extends EventEmitter
 	parseChangeActivePlayer: (item) ->
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
 			previousPlayer = @currentPlayer
-			# console.log 'previous player', previousPlayer, @turns[@turnNumber - 1], @turns[@turnNumber - 1]?.activePlayer
 			@currentPlayer = _.find @players, (o) ->
 				return o.id == item.node.entity
+
+			# if @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
+			# 	console.log 'no active player, forcing it', @turns[@turnNumber - 1]
 
 			# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't 
 			# become active player next turn
 			if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
 				@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
 					return o.id != item.node.entity
+
 				# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
 
 			# console.log 'switching active player', item, @currentPlayer, @players
