@@ -17,10 +17,13 @@ class ReplayPlayer extends EventEmitter
 
 		@currentTurn = 0
 		@currentActionInTurn = 0
+		@initializing = false
 		@cardUtils = window['parseCardsText']
 		# console.log 'constructor done'
 
+
 	reload: (xmlReplay, callback) ->
+		console.log 'reloading'
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -38,7 +41,17 @@ class ReplayPlayer extends EventEmitter
 
 
 	init: ->
-		# console.log 'starting init in manastorm'
+		console.log 'trying to init'
+		if @initializing
+			setTimeout () =>
+				@init()
+			, 50
+			return
+
+		console.log 'init starting'
+			
+		@initializing = true
+
 		if @entities
 			for k,v of @entities
 				v.damageTaken = 0
@@ -48,6 +61,8 @@ class ReplayPlayer extends EventEmitter
 		@entities = {}
 		@players = []
 		@emit 'reset'
+
+		console.log 'starting init in manastorm', @players
 
 		@game = null
 		@mainPlayerId = null
@@ -71,28 +86,33 @@ class ReplayPlayer extends EventEmitter
 			length: 0
 		}
 
+		console.log 'retrieving cardUtils'
+
 		@buildCardLink = @cardUtils.buildCardLink
 
+		console.log 'checking xmlReplay'
 		if !@parser.xmlReplay
+			@initializing = false
 			return
 
 		@parser.parse(this)
+		console.log 'parsing done'
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
-		# console.log 'initializeGameState done'
+		console.log 'initializeGameState done', @players
 
 		# Parse the data to build the game structure
 		@actionParser = new ActionParser(this)
 		@actionParser.populateEntities()
 		# console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		# console.log 'parseActions done', @mainPlayerId, this
+		console.log 'parseActions done', @mainPlayerId, this
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
 			@switchMainPlayer()
-		# console.log 'switchMainPlayer done'
+		console.log 'switchMainPlayer done', @players
 
 		# Notify the UI controller
 		# @emit 'game-generated', this
@@ -109,9 +129,11 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		# console.log 'notifying changed turn'
+		console.log 'notifying changed turn', @players
 		@notifyChangedTurn @turns[@currentTurn].turn
-		# console.log 'init done in manastorm', @turns
+		console.log 'init done in manastorm', @turns, @players
+
+		@initializing = false
 
 
 	autoPlay: ->
@@ -165,7 +187,7 @@ class ReplayPlayer extends EventEmitter
 	# ========================
 	goNextAction: ->
 		actionIndex = @currentActionInTurn
-		# console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @turns, @turns.length, @turns[@currentTurn]
+		console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
@@ -182,8 +204,8 @@ class ReplayPlayer extends EventEmitter
 
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
-			# console.log 'goign to next turn', @currentTurn + 1
 			@currentTurn++
+			console.log 'goign to next turn', @currentTurn, @turns[@currentTurn]
 			@currentActionInTurn = -1
 
 			if !@turns[@currentTurn]
@@ -194,7 +216,16 @@ class ReplayPlayer extends EventEmitter
 			@notifyChangedTurn @turns[@currentTurn].turn
 			@emitter.emit 'new-turn', @turns[@currentTurn]
 
-			@goToIndex @turns[@currentTurn].index
+			index = @turns[@currentTurn].index
+			i = 0
+			while !index and @turns[@currentTurn].actions and i < @turns[@currentTurn].actions.length
+				index = @turns[@currentTurn].actions[i].index
+
+			if index
+				@goToIndex index
+			# This can happen because of the fake turns introduced to simulate mulligans in spectate mode
+			else
+				return @goNextAction()
 
 		return true
 
@@ -241,7 +272,7 @@ class ReplayPlayer extends EventEmitter
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
 			@currentTurn = 0
 			@currentActionInTurn = 0
-			console.log 'init because of going to previous action'
+			# console.log 'init because of going to previous action'
 			@init()
 			return
 
@@ -254,7 +285,7 @@ class ReplayPlayer extends EventEmitter
 			@notifyChangedTurn @turns[@currentTurn].turn
 			# @emit 'previous-action', rollbackAction
 			# Removing the "turn" action log
-			console.log 'going to previous turn', lastIteration
+			# console.log 'going to previous turn', lastIteration
 			@emit 'previous-action', rollbackAction
 			# @emit 'new-turn', @turns[targetTurn]
 
@@ -329,7 +360,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -493,8 +524,8 @@ class ReplayPlayer extends EventEmitter
 		@goToTurn gameTurn
 
 	goToIndex: (index, turn, actionIndex) ->
-		# console.log 'going to index', index
-		if index < @historyPosition
+		console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
+		if index < @history[@historyPosition].index
 			console.log 'init because going to index', index, @historyPosition
 			@historyPosition = 0
 			@init()
@@ -607,9 +638,10 @@ class ReplayPlayer extends EventEmitter
 		turn = turn || @currentTurn
 		actionIndex = actionIndex || @currentActionInTurn
 
-		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
+		console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			# console.log '\tprocessing', @historyPosition, @targetIndex, @history[@historyPosition], @history[@historyPosition + 1]
+			
+			# console.log '\tprocessing', @history[@historyPosition], @history[@historyPosition].index, @targetIndex
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[turn]
 				action = @turns[turn].actions[actionIndex]
@@ -622,7 +654,7 @@ class ReplayPlayer extends EventEmitter
 				break
 			# console.log '\t\tprocessed'
 
-
+		console.log 'finished updating', @history[@historyPosition], @historyPosition
 		@updateOptions()
 		@updateCurrentReplayTime()
 
@@ -745,16 +777,22 @@ class ReplayPlayer extends EventEmitter
 	# Initialization
 	# ==================
 	initializeGameState: ->
+		console.log 'initializing gs'
 		# Find the index of the last FullEntity creation
 		index = 0
 		# Go to first mulligan
 		while @history[index]
 			if @history[index].command is 'receiveAction'
 				lastAction = @history[index]
-			if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE'
+			# In case we spectate a game, we don't always have the mulligan
+			if @history[index].command is 'receiveAction' and @history[index].node.attributes.type == '7'
+				console.log 'stopping gs init because we found a play action'
+				break
+			else if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE'
 				break
 			index++
 
+		console.log 'stopping game state init at ', lastAction
 		@goToIndex lastAction.index
 
 
@@ -768,13 +806,13 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
+		console.log 'receiving player', entity, this
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
 
 		if entity.tags.CURRENT_PLAYER
-			# console.log 'receiving player and setting main player', entity, this
 			@player = entity
 		else
 			@opponent = entity

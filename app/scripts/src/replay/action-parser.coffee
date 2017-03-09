@@ -49,6 +49,11 @@ class ActionParser extends EventEmitter
 						@currentPlayer = @opponent
 					else 
 						console.error 'could not set current player'
+					# Need to create a fake first turn
+					# We create it twice to not mess with the logic that assumes that first turn 
+					# is mulligan with no active player
+					@createFirstTurnForSpectate item
+					@createFirstTurnForSpectate item
 
 			## Populate relevant data for cards
 			if item.command == 'receiveEntity'
@@ -98,6 +103,7 @@ class ActionParser extends EventEmitter
 		
 		@playerIndex = 0
 		# @currentPlayer = @players[@playerIndex]
+		# console.log 'parsing history', @history
 
 		for item in @history
 
@@ -125,6 +131,8 @@ class ActionParser extends EventEmitter
 					@parseTriggerFullEntityCreation item
 					@parseTriggerPutSecretInPlay item
 					@parseNewHeroPower item
+				else
+					# console.log 'no turn number', @currentTurnNumber, @turns[@currentTurnNumber], @turns, @turns.length, item
 
 
 			if item.command is 'receiveTagChange'
@@ -221,22 +229,22 @@ class ActionParser extends EventEmitter
 
 	parseChangeActivePlayer: (item) ->
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
-			previousPlayer = @currentPlayer
-			@currentPlayer = _.find @players, (o) ->
-				return o.id == item.node.entity
+				previousPlayer = @currentPlayer
+				@currentPlayer = _.find @players, (o) ->
+					return o.id == item.node.entity
 
-			# if @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
-			# 	console.log 'no active player, forcing it', @turns[@turnNumber - 1]
+				# if @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
+				# 	console.log 'no active player, forcing it', @turns[@turnNumber - 1]
 
-			# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't 
-			# become active player next turn
-			if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
-				@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
-					return o.id != item.node.entity
+				# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't 
+				# become active player next turn
+				if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
+					@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
+						return o.id != item.node.entity
 
-				# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
+					# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
 
-			# console.log 'switching active player', item, @currentPlayer, @players
+				# console.log 'switching active player', item, @currentPlayer, @players
 
 	parseStartOfTurn: (item) ->
 		# Start of turn
@@ -255,6 +263,18 @@ class ActionParser extends EventEmitter
 			@turnNumber++
 			# @currentPlayer = @players[++@playerIndex % 2]
 
+
+	createFirstTurnForSpectate: (item) ->
+		console.log 'creating fake turn', @turnNumber, @turns
+		@turns[@turnNumber] = {
+			turn: @turnNumber - 1
+			timestamp: item.timestamp
+			actions: []
+			activePlayer: @currentPlayer
+			index: undefined
+		}
+		@turns.length++
+		@turnNumber++
 
 	parseDrawCard: (item) ->
 		currentCommand = item.node
