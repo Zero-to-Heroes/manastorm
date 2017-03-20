@@ -953,6 +953,10 @@ class ActionParser extends EventEmitter
 		if @entities[command.attributes.entity]?.cardID == 'OG_134'
 			return
 
+		# Also hard-code Evolve and Devolve
+		if @entities[command.attributes.entity]?.cardID in ['OG_027', 'CFM_696']
+			return
+
 		# Always discover 3 cards
 		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
 		if command.attributes.type == '3' and command.fullEntities?.length >= 3

@@ -148,7 +148,7 @@ class Replay extends React.Component
 
 		if replay.players.length == 2
 			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
-			# console.log 'All players are here'
+			console.log 'All players are here', replay
 
 			topArea = <div className="top" >
 				<PlayerName entity={replay.opponent} isActive={replay.opponent.id == replay.getActivePlayer().id}/>

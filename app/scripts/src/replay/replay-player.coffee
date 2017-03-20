@@ -96,7 +96,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		@parser.parse(this)
-		# console.log 'parsing done'
+		console.log 'parsing done'
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
@@ -272,7 +272,7 @@ class ReplayPlayer extends EventEmitter
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
 			@currentTurn = 0
 			@currentActionInTurn = 0
-			# console.log 'init because of going to previous action'
+			# console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
 			@init()
 			return
 
@@ -360,7 +360,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -398,13 +398,13 @@ class ReplayPlayer extends EventEmitter
 			nextActionIndex = 1
 			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
 			while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
-				# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
+				console.log 'next action is skipping', nextAction, nextAction.shouldExecute
 				# Still need to call update() to populate the rollback properly
 				index = nextAction.index - 1
-				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex
+				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex, true
 				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
-			# console.log 'nextAction', nextAction
+			console.log 'nextAction', nextAction
 			if nextAction
 				index = nextAction.index - 1
 			else if @turns[@currentTurn + 1]
@@ -523,10 +523,10 @@ class ReplayPlayer extends EventEmitter
 
 		@goToTurn gameTurn
 
-	goToIndex: (index, turn, actionIndex) ->
+	goToIndex: (index, turn, actionIndex, skipping) ->
 		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
-		if index < @history[@historyPosition].index
-			# console.log 'init because going to index', index, @historyPosition
+		if index < @history[@historyPosition].index and !skipping
+			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
 
