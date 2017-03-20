@@ -20,9 +20,9 @@ class Card extends React.Component
 
 		imageCls = "art "
 		baseFolder = 'allCards'
-		# console.log 'rendering card', entity.cardID, originalCard, entity, originalCard?.set?.toLowerCase()
+		# console.log 'rendering card', entity.cardID, originalCard, entity, @props.conf
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage and !@props.conf?.noGolden
-			# console.log 'showing golden card', entity, originalCard
+			console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premium = premiumClass + '/'
 			suffix = '.gif'

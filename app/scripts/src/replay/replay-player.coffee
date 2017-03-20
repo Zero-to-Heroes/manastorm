@@ -96,7 +96,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		@parser.parse(this)
-		console.log 'parsing done'
+		# console.log 'parsing done'
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
@@ -249,7 +249,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration, @turns
+		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration, @turns
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
@@ -323,11 +323,11 @@ class ReplayPlayer extends EventEmitter
 		@currentTurn = targetTurn
 
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			console.log 'action should not execute, propagating rollback', rollbackAction, lastIteration
+			# console.log 'action should not execute, propagating rollback', rollbackAction, lastIteration
 			@goPreviousAction lastIteration
 
 		else if !lastIteration
-			console.log 'doing back to handle targeting and stuff'
+			# console.log 'doing back to handle targeting and stuff'
 			@goPreviousAction true
 			# Go back to the very beginning of turn if appropriate
 		# hack to handle better all targeting, active spell and so on
@@ -339,7 +339,7 @@ class ReplayPlayer extends EventEmitter
 				while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 					@historyPosition--
 				# console.log '\tdone'
-			console.log 'doing forth to handle targeting and stuff'
+			# console.log 'doing forth to handle targeting and stuff'
 			@goNextAction()
 
 
@@ -398,13 +398,13 @@ class ReplayPlayer extends EventEmitter
 			nextActionIndex = 1
 			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
 			while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
-				console.log 'next action is skipping', nextAction, nextAction.shouldExecute
+				# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
 				# Still need to call update() to populate the rollback properly
 				index = nextAction.index - 1
 				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex, true
 				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
-			console.log 'nextAction', nextAction
+			# console.log 'nextAction', nextAction
 			if nextAction
 				index = nextAction.index - 1
 			else if @turns[@currentTurn + 1]
@@ -430,7 +430,7 @@ class ReplayPlayer extends EventEmitter
 
 	goToTurn: (gameTurn) ->
 		targetTurn = parseInt(gameTurn)
-		console.log 'going to turn', targetTurn
+		# console.log 'going to turn', targetTurn
 
 		if targetTurn > @currentTurn
 			while targetTurn > @currentTurn
@@ -494,7 +494,7 @@ class ReplayPlayer extends EventEmitter
 			else
 				gameTurn = turn.substring(1, turn.length - 1) * 2 - 1
 
-		console.log 'getTurnNumberFromLabel', turn, gameTurn
+		# console.log 'getTurnNumberFromLabel', turn, gameTurn
 		return gameTurn
 
 	goToFriendlyTurn: (turn) ->
@@ -504,7 +504,7 @@ class ReplayPlayer extends EventEmitter
 			gameTurn = 1
 
 		else if turn is 'endgame'
-			console.log 'going to endgame'
+			# console.log 'going to endgame'
 			@goToEndGame()
 			return
 
@@ -519,14 +519,14 @@ class ReplayPlayer extends EventEmitter
 			else
 				gameTurn = turn.substring(0, turn.length - 1) * 2
 
-		console.log 'gameTurn', gameTurn
+		# console.log 'gameTurn', gameTurn
 
 		@goToTurn gameTurn
 
 	goToIndex: (index, turn, actionIndex, skipping) ->
 		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
 		if index < @history[@historyPosition].index and !skipping
-			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
+			# console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
 
@@ -748,7 +748,7 @@ class ReplayPlayer extends EventEmitter
 	updateEndGame: (action) ->
 		if action.actionType is 'end-game'
 			@isEndGame = true
-			console.log 'notifying endgame'
+			# console.log 'notifying endgame'
 			@notifyChangedTurn 'endgame'
 		else 
 			@isEndGame = false
@@ -764,7 +764,7 @@ class ReplayPlayer extends EventEmitter
 		@player = @opponent
 		@opponent = tempOpponent
 		@mainPlayerId = @player.id
-		console.log 'switched main player, new one is', @mainPlayerId, @player
+		# console.log 'switched main player, new one is', @mainPlayerId, @player
 
 	getController: (controllerId) ->
 		# console.log 'getting controller', @player, @opponent, this
@@ -777,7 +777,7 @@ class ReplayPlayer extends EventEmitter
 	# Initialization
 	# ==================
 	initializeGameState: ->
-		console.log 'initializing gs'
+		# console.log 'initializing gs'
 		# Find the index of the last FullEntity creation
 		index = 0
 		# Go to first mulligan
@@ -786,13 +786,13 @@ class ReplayPlayer extends EventEmitter
 				lastAction = @history[index]
 			# In case we spectate a game, we don't always have the mulligan
 			if @history[index].command is 'receiveAction' and @history[index].node.attributes.type == '7'
-				console.log 'stopping gs init because we found a play action'
+				# console.log 'stopping gs init because we found a play action'
 				break
 			else if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE'
 				break
 			index++
 
-		console.log 'stopping game state init at ', lastAction
+		# console.log 'stopping game state init at ', lastAction
 		@goToIndex lastAction.index
 
 
@@ -871,7 +871,7 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'set player and opponent', @player, @opponent
 
 	receiveChangeEntity: (definition, action) ->
-		console.log '\t\treceiving change entity', definition.id, definition
+		# console.log '\t\treceiving change entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
