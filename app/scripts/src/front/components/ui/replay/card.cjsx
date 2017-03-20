@@ -161,8 +161,8 @@ class Card extends React.Component
 		else if entity.tags.DAMAGE - entity.damageTaken < 0
 			healing = <span className="healing"><span>{-(entity.tags.DAMAGE - entity.damageTaken)}</span></span>
 
-		if entity.id is 83
-			console.log 'rendering', entity.cardID, entity
+		if entity.tags.TRANSFORMED_FROM_CARD
+			visual = <div className="transformed-from-card"></div>
 
 		enchantments = @buildEnchantments entity
 		statuses = @buildStatuses entity
@@ -214,6 +214,7 @@ class Card extends React.Component
 					{damage}
 					{healing}
 					{exhausted}
+					{visual}
 					{stats}
 					{divineShield}
 					{cost}
@@ -237,6 +238,7 @@ class Card extends React.Component
 				{damage}
 				{healing}
 				{exhausted}
+				{visual}
 				{stats}
 				{divineShield}
 			</div>

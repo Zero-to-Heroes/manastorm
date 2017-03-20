@@ -23,7 +23,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	reload: (xmlReplay, callback) ->
-		console.log 'reloading'
+		# console.log 'reloading'
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -41,14 +41,14 @@ class ReplayPlayer extends EventEmitter
 
 
 	init: ->
-		console.log 'trying to init'
+		# console.log 'trying to init'
 		if @initializing
 			setTimeout () =>
 				@init()
 			, 50
 			return
 
-		console.log 'init starting'
+		# console.log 'init starting'
 			
 		@initializing = true
 
@@ -62,7 +62,7 @@ class ReplayPlayer extends EventEmitter
 		@players = []
 		@emit 'reset'
 
-		console.log 'starting init in manastorm', @players
+		# console.log 'starting init in manastorm', @players
 
 		@game = null
 		@mainPlayerId = null
@@ -86,33 +86,33 @@ class ReplayPlayer extends EventEmitter
 			length: 0
 		}
 
-		console.log 'retrieving cardUtils'
+		# console.log 'retrieving cardUtils'
 
 		@buildCardLink = @cardUtils.buildCardLink
 
-		console.log 'checking xmlReplay'
+		# console.log 'checking xmlReplay'
 		if !@parser.xmlReplay
 			@initializing = false
 			return
 
 		@parser.parse(this)
-		console.log 'parsing done'
+		# console.log 'parsing done'
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
-		console.log 'initializeGameState done', @players
+		# console.log 'initializeGameState done', @players
 
 		# Parse the data to build the game structure
 		@actionParser = new ActionParser(this)
 		@actionParser.populateEntities()
 		# console.log 'popuplateEntities done'
 		@actionParser.parseActions()
-		console.log 'parseActions done', @mainPlayerId, this
+		# console.log 'parseActions done', @mainPlayerId, this
 
 		# Adjust who is player / opponent
 		if (parseInt(@opponent.id) == parseInt(@mainPlayerId))
 			@switchMainPlayer()
-		console.log 'switchMainPlayer done', @players
+		# console.log 'switchMainPlayer done', @players
 
 		# Notify the UI controller
 		# @emit 'game-generated', this
@@ -129,9 +129,9 @@ class ReplayPlayer extends EventEmitter
 		# @finalizeInit()
 		# And go to the fisrt action
 		@goNextAction()
-		console.log 'notifying changed turn', @players
+		# console.log 'notifying changed turn', @players
 		@notifyChangedTurn @turns[@currentTurn].turn
-		console.log 'init done in manastorm', @turns, @players
+		# console.log 'init done in manastorm', @turns, @players
 
 		@initializing = false
 
@@ -146,7 +146,7 @@ class ReplayPlayer extends EventEmitter
 	pause: ->
 		if @speed > 0
 			@previousSpeed = @speed
-			console.log 'speed was > 0, storing previous speed', @previousSpeed
+			# console.log 'speed was > 0, storing previous speed', @previousSpeed
 		@speed = 0
 		# console.log 'pausing', @previousSpeed, @speed, @interval
 		clearInterval(@interval)
@@ -187,11 +187,11 @@ class ReplayPlayer extends EventEmitter
 	# ========================
 	goNextAction: ->
 		actionIndex = @currentActionInTurn
-		console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
+		# console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
-			console.log 'doing nothing, end of the game', @currentTurn, @turns.length, actionIndex, @turns[@currentTurn].actions.length - 1
+			# console.log 'doing nothing, end of the game', @currentTurn, @turns.length, actionIndex, @turns[@currentTurn].actions.length - 1
 			return null
 
 		@newStep()
@@ -205,7 +205,7 @@ class ReplayPlayer extends EventEmitter
 		# Going to the next turn
 		else if @turns[@currentTurn + 1]
 			@currentTurn++
-			console.log 'goign to next turn', @currentTurn, @turns[@currentTurn]
+			# console.log 'goign to next turn', @currentTurn, @turns[@currentTurn]
 			@currentActionInTurn = -1
 
 			if !@turns[@currentTurn]
@@ -360,7 +360,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
+		# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn]
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -524,9 +524,9 @@ class ReplayPlayer extends EventEmitter
 		@goToTurn gameTurn
 
 	goToIndex: (index, turn, actionIndex) ->
-		console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
+		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
 		if index < @history[@historyPosition].index
-			console.log 'init because going to index', index, @historyPosition
+			# console.log 'init because going to index', index, @historyPosition
 			@historyPosition = 0
 			@init()
 
@@ -638,7 +638,7 @@ class ReplayPlayer extends EventEmitter
 		turn = turn || @currentTurn
 		actionIndex = actionIndex || @currentActionInTurn
 
-		console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
+		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			
 			# console.log '\tprocessing', @history[@historyPosition], @history[@historyPosition].index, @targetIndex
@@ -654,7 +654,7 @@ class ReplayPlayer extends EventEmitter
 				break
 			# console.log '\t\tprocessed'
 
-		console.log 'finished updating', @history[@historyPosition], @historyPosition
+		# console.log 'finished updating', @history[@historyPosition], @historyPosition
 		@updateOptions()
 		@updateCurrentReplayTime()
 
@@ -806,7 +806,7 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		console.log 'receiving player', entity, this
+		# console.log 'receiving player', entity, this
 		entity = new Player(this)
 		@entities[definition.id] = entity
 		@players.push(entity)
