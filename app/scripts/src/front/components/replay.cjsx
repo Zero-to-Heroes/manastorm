@@ -160,8 +160,8 @@ class Replay extends React.Component
 			</div>
 
 			topOverlay = <div className="top" >
-				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} replay={replay}/>
-				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} />
+				<Mulligan entity={replay.opponent} inMulligan={inMulligan} mulligan={replay.turns[1].opponentMulligan} isHidden={!@showAllCards} replay={replay} conf={@configurationOptions} />
+				<Discover entity={replay.opponent} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={!@showAllCards} conf={@configurationOptions} />
 				<EndGame entity={replay.opponent} isEnd={replay.isEndGame} />
 			</div>
 
@@ -175,8 +175,8 @@ class Replay extends React.Component
 			</div>
 
 			bottomOverlay = <div className="bottom">
-				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} replay={replay}/>
-				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} />
+				<Mulligan entity={replay.player} inMulligan={inMulligan} mulligan={replay.turns[1].playerMulligan} isHidden={false} replay={replay} conf={@configurationOptions} />
+				<Discover entity={replay.player} discoverController={replay.discoverController} discoverAction={replay.discoverAction} isHidden={false} conf={@configurationOptions} />
 				<EndGame entity={replay.player} isEnd={replay.isEndGame} />
 			</div>
 
@@ -254,7 +254,7 @@ class Replay extends React.Component
 							{bottomArea}
 							{targetManager}
 							<div className="active-spell-container">
-								<ActiveSpell ref="activeSpell" replay={replay} />
+								<ActiveSpell ref="activeSpell" replay={replay} conf={@configurationOptions}/>
 							</div>
 							<Turn replay={replay} onClick={@onTurnClick} active={@displayConf.showLog }/>
 						</div>
