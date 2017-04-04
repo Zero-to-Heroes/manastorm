@@ -249,14 +249,14 @@ class ReplayPlayer extends EventEmitter
 
 
 	goPreviousAction: (lastIteration) ->
-		# console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration, @turns
+		console.log 'going to previous action', @currentTurn, @currentActionInTurn, @historyPosition, lastIteration, @turns
 		@newStep()
 		# todo handle this properly - find out what action should be running at this stage, and update the active spell accordingly
 		# for now removing it to avoid showing incorrect things
 		@previousActiveSpell = undefined
 
 		if @currentActionInTurn == -1 and @currentTurn > 2
-			# console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
+			console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
 			rollbackAction = @turns[@currentTurn - 1].actions[@turns[@currentTurn - 1].actions.length - 1]
 
 		else 
@@ -272,74 +272,52 @@ class ReplayPlayer extends EventEmitter
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
 			@currentTurn = 0
 			@currentActionInTurn = 0
-			# console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
+			console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
 			@init()
 			return
 
 		else if @currentActionInTurn < 0
-			# console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
+			console.log 'targeting end of previous turn. Previous turn is', @turns[@currentTurn - 1]
 			targetTurn = @currentTurn - 1
 			targetAction = @turns[targetTurn].actions.length - 1
 			changeTurn = true
-			# console.log 'emitting new turn event',  @turns[targetTurn]
+			console.log 'emitting new turn event',  @turns[targetTurn]
 			@notifyChangedTurn @turns[@currentTurn].turn
-			# @emit 'previous-action', rollbackAction
 			# Removing the "turn" action log
-			# console.log 'going to previous turn', lastIteration
+			console.log 'going to previous turn', lastIteration
 			@emit 'previous-action', rollbackAction
-			# @emit 'new-turn', @turns[targetTurn]
 
 		else
 			targetTurn = @currentTurn
 			targetAction = @currentActionInTurn - 1
 
-
-		# console.log 'rollbackAction', rollbackAction, rollbackAction.shouldExecute, rollbackAction.shouldExecute?()
-		# if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-		# 	# console.log '\tskipping back', rollbackAction, @currentTurn, @currentActionInTurn, @turns[@currentTurn]
-		# 	@currentActionInTurn = targetAction
-		# 	@currentTurn = targetTurn
-		# 	# @emit 'previous-action', rollbackAction
-		# 	@goPreviousAction lastIteration
-
-		# else
-
-			# console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
+		console.log '\trolling back action', rollbackAction, @currentTurn, @currentActionInTurn
 		@rollbackAction rollbackAction
 		@notifyChangedTurn @turns[@currentTurn].turn
 
-		# @emit 'previous-action', rollbackAction
 		if @currentActionInTurn >= 0 and (!rollbackAction.shouldExecute or rollbackAction.shouldExecute())
 			@emit 'previous-action', rollbackAction
 		
-
-
-
-		# previousAction = @turns[targetTurn].actions[targetAction]
-		# @updateActiveSpell previousAction
-
-		# actionBeforeUpdate = @currentActionInTurn
 		@currentActionInTurn = targetAction
 		@currentTurn = targetTurn
 
 		if rollbackAction.shouldExecute and !rollbackAction.shouldExecute() and !changeTurn
-			# console.log 'action should not execute, propagating rollback', rollbackAction, lastIteration
+			console.log 'action should not execute, propagating rollback', rollbackAction, lastIteration
 			@goPreviousAction lastIteration
 
 		else if !lastIteration
-			# console.log 'doing back to handle targeting and stuff'
+			console.log 'doing back to handle targeting and stuff'
 			@goPreviousAction true
-			# Go back to the very beginning of turn if appropriate
 		# hack to handle better all targeting, active spell and so on
 		# ultimately all the info should be contained in the action itself and we only read from it
 		else 
 			# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
 			if @currentActionInTurn is -1
-				# console.log 'position back to start of turn'
+				console.log 'position back to start of turn'
 				while @history[@historyPosition] and @history[@historyPosition].index > @turns[@currentTurn].index
 					@historyPosition--
-				# console.log '\tdone'
-			# console.log 'doing forth to handle targeting and stuff'
+				console.log '\tdone'
+			console.log 'doing forth to handle targeting and stuff'
 			@goNextAction()
 
 
@@ -360,23 +338,13 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
+		console.log 'going to action', @currentActionInTurn, @currentTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
 			# There are some actions that we can't filter out at construction time (like a minion being returned in hand with Sap)
 
-			# console.log '\tshould execute?', action.shouldExecute?(), action?.fullData?.tags?.ZONE
-
-			# if action.shouldExecute and !action.shouldExecute() 
-			# 	if !@seeking
-			# 		# console.log 'skipping action', action
-			# 		# Still need to call update() to populate the rollback properly
-			# 		index = action.index - 1
-			# 		@goToIndex index
-			# 		@goNextAction()
-
-			# console.log 'will execute action', action
+			console.log 'will execute action', action
 			@updateActiveSpell action
 			@updateEndGame action
 			@updateSecret action
@@ -398,13 +366,13 @@ class ReplayPlayer extends EventEmitter
 			nextActionIndex = 1
 			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
 			while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
-				# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
+				console.log 'next action is skipping', nextAction, nextAction.shouldExecute
 				# Still need to call update() to populate the rollback properly
 				index = nextAction.index - 1
 				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex, true
 				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
 
-			# console.log 'nextAction', nextAction
+			console.log 'nextAction', nextAction
 			if nextAction
 				index = nextAction.index - 1
 			else if @turns[@currentTurn + 1]
@@ -412,7 +380,7 @@ class ReplayPlayer extends EventEmitter
 			else
 				index = @history[@history.length - 1].index
 
-			# console.log 'index', index
+			console.log 'index', index
 
 			if action.actionType == 'discover'
 				@discoverAction = action
@@ -524,9 +492,9 @@ class ReplayPlayer extends EventEmitter
 		@goToTurn gameTurn
 
 	goToIndex: (index, turn, actionIndex, skipping) ->
-		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
+		console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
 		if index < @history[@historyPosition].index and !skipping
-			# console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
+			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
 
@@ -638,7 +606,7 @@ class ReplayPlayer extends EventEmitter
 		turn = turn || @currentTurn
 		actionIndex = actionIndex || @currentActionInTurn
 
-		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
+		console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
 			
 			# console.log '\tprocessing', @history[@historyPosition], @history[@historyPosition].index, @targetIndex
@@ -654,7 +622,7 @@ class ReplayPlayer extends EventEmitter
 				break
 			# console.log '\t\tprocessed'
 
-		# console.log 'finished updating', @history[@historyPosition], @historyPosition
+		console.log 'finished updating', @history[@historyPosition]
 		@updateOptions()
 		@updateCurrentReplayTime()
 
