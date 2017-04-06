@@ -493,7 +493,8 @@ class ReplayPlayer extends EventEmitter
 
 	goToIndex: (index, turn, actionIndex, skipping) ->
 		console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
-		if index < @history[@historyPosition].index and !skipping
+		# The -1 is an ugly hack, no idea why sometimes the index is not properly positioned
+		if index < @history[@historyPosition].index - 1 and !skipping
 			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
