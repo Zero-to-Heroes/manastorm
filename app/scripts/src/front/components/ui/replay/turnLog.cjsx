@@ -73,6 +73,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'played-secret-from-hand'
 			log = @buildPlayedSecretFromHandLog action
 
+		else if action.actionType == 'played-quest-from-hand'
+			log = @buildPlayedQuestFromHandLog action
+
 		else if action.actionType == 'power-damage'
 			log = @buildPowerDamageLog action
 
@@ -269,6 +272,27 @@ TurnLog = React.createClass
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 				<span> plays a </span> 
 				<span className="secret-revealed">Secret </span>
+				{link1}
+				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+				{link2}
+			</p>
+
+		return log
+
+	buildPlayedQuestFromHandLog: (action) ->
+		# console.log 'logging quest played', action, @replay.mainPlayerId, @replay
+		if action.owner.id == parseInt(@replay.mainPlayerId)
+			# card = action.data['cardID']
+			cardLink = @buildCardLink action.data
+			link1 = <span>(</span>
+			link2 = <span>)</span>
+			# console.log '\tand building card link', card
+		else
+
+		log = <p key={'log' + ++@logIndex}>
+				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
+				<span> plays a </span> 
+				<span className="secret-revealed">Quest </span>
 				{link1}
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 				{link2}

@@ -795,8 +795,8 @@ class ReplayPlayer extends EventEmitter
 
 		@entities[definition.id] = entity
 		entity.update(definition, action)
-		#if definition.id is 72
-			#console.log 'receving entity', definition, entity
+		# if definition.id is 13
+		# 	console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
 		# if change.tag is 'RESOURCES_USED'

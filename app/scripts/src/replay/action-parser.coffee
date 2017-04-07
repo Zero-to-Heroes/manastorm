@@ -76,6 +76,9 @@ class ActionParser extends EventEmitter
 				# Adding information that this entity is a secret
 				if item.node.tag == 'SECRET' and item.node.value == 1
 					@entities[item.node.entity].tags[item.node.tag] = item.node.value
+				# Adding information that this entity is a quest
+				if item.node.tag == 'QUEST' and item.node.value == 1
+					@entities[item.node.entity].tags[item.node.tag] = item.node.value
 				# Add parent tag, needed for discover
 				if item.node.tag == 'PARENT_CARD'
 					@entities[item.node.entity].tags[item.node.tag] = item.node.value
@@ -122,6 +125,7 @@ class ActionParser extends EventEmitter
 					@parseCardPlayedFromHand item
 					@parseHeroPowerUsed item
 					@parseSecretPlayedFromHand item
+					@parseQuestPlayedFromHand item
 					@parseAttacks item
 					@parseDiscovers item
 					@parsePowerEffects item
@@ -581,6 +585,38 @@ class ActionParser extends EventEmitter
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
 					actionType: 'played-secret-from-hand'
+					# If it's a secret, we want to know who put it in play
+					data: entity
+					owner: owner
+					initialCommand: command
+				}
+				@addAction @currentTurnNumber, action
+
+
+
+	parseQuestPlayedFromHand: (item) ->
+		command = item.node
+		if command.attributes.type == '7' and command.tags
+
+			playedCard = -1
+			quest = false
+			for tag in command.tags
+				# Either in play or a quest
+				if tag.tag == 'ZONE' and tag.value == 7
+					playedCard = tag.entity
+				if tag.tag == 'QUEST' and tag.value == 1
+					quest = true
+
+			if !quest and @entities[playedCard]?.tags.QUEST == 1
+				quest = true
+
+			if playedCard > -1 and quest
+				entity = @entities[playedCard]
+				owner = @getController(entity.tags.CONTROLLER) 
+				action = {
+					turn: @currentTurnNumber - 1
+					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+					actionType: 'played-quest-from-hand'
 					# If it's a secret, we want to know who put it in play
 					data: entity
 					owner: owner

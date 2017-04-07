@@ -46,7 +46,6 @@ class HeroCard extends Card
 			show = @props.showSecrets
 			secrets = @props.secrets.map (secret) ->
 				<Secret entity={secret} key={secret.id} showSecret={show}/>
-			#console.log 'rendering secrets', @props.secrets, secrets
 
 		entity.damageTaken = entity.damageTaken or 0
 		if entity.tags.DAMAGE - entity.damageTaken > 0
