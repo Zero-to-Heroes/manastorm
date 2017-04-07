@@ -348,6 +348,7 @@ class ReplayPlayer extends EventEmitter
 			@updateActiveSpell action
 			@updateEndGame action
 			@updateSecret action
+			@updateQuest action
 
 			# We only transmit a new event if the action is actually executed
 			if !action.shouldExecute or action.shouldExecute() 
@@ -703,7 +704,7 @@ class ReplayPlayer extends EventEmitter
 			# console.log '\tupdating active spell', mainEntity
 			@activeSpell = mainEntity
 
-		else if realAction.actionType in ['minion-death', 'secret-revealed', 'card-draw']
+		else if realAction.actionType in ['minion-death', 'secret-revealed', 'quest-completed', 'card-draw']
 			# console.log '\tstill showing previous spell', @activeSpell, @previousActiveSpell
 			@activeSpell = @previousActiveSpell
 			@previousActiveSpell = undefined
@@ -713,6 +714,12 @@ class ReplayPlayer extends EventEmitter
 			@revealedSecret = action.data
 		else 
 			@revealedSecret = false
+
+	updateQuest: (action) ->
+		if action.actionType is 'quest-completed'
+			@questCompleted = action.data
+		else 
+			@questCompleted = false
 
 	updateEndGame: (action) ->
 		if action.actionType is 'end-game'

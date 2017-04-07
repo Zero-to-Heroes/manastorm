@@ -64,6 +64,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'secret-revealed'
 			log = @buildSecretRevealedLog action
 
+		else if action.actionType == 'quest-completed'
+			log = @buildQuestCompletedLog action
+
 		else if action.actionType == 'played-card-from-hand'
 			log = @buildPlayedCardFromHandLog action
 
@@ -138,6 +141,17 @@ TurnLog = React.createClass
 		cardLink = @buildCardLink action.data
 
 		newLog = '<span><span class="secret-revealed">\tSecret revealed! </span>' + cardLink + '</span>'
+		log = <ActionDisplayLog newLog={newLog} />
+
+		@replay.notifyNewLog log
+
+		return [log]
+
+	buildQuestCompletedLog: (action) ->
+		# card = action.data['cardID']
+		cardLink = @buildCardLink action.data
+
+		newLog = '<span><span class="secret-revealed">\tQuest completed! </span>' + cardLink + '</span>'
 		log = <ActionDisplayLog newLog={newLog} />
 
 		@replay.notifyNewLog log

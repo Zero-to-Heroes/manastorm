@@ -121,6 +121,7 @@ class ActionParser extends EventEmitter
 
 					# We need to keep this one high priority, as it often has the same timestamp as its consequence
 					@parseSecretRevealed item
+					@parseQuestCompleted item
 					@parseMulliganCards item
 					@parseCardPlayedFromHand item
 					@parseHeroPowerUsed item
@@ -1094,6 +1095,7 @@ class ActionParser extends EventEmitter
 					}
 					@addAction @currentTurnNumber, action
 
+
 	parseSecretRevealed: (item) ->
 		command = item.node
 		if command.attributes.type == '5'
@@ -1107,6 +1109,23 @@ class ActionParser extends EventEmitter
 					initialCommand: command
 				}
 				@addAction @currentTurnNumber, action
+
+
+	parseQuestCompleted: (item) ->
+		command = item.node
+		if command.attributes.type == '5'
+			entity = @entities[command.attributes.entity]
+			if entity?.tags?.QUEST == 1
+				console.log 'possible quest', command, entity
+				if command.fullEntities?.length is 1
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+						actionType: 'quest-completed'
+						data: entity
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
 
 
 	parseFatigueDamage: (item) ->
