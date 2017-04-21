@@ -687,7 +687,7 @@ class ReplayPlayer extends EventEmitter
 					# console.log 'going back in turn so not updating history'
 					return
 				if @history[currentCursor]?.command is 'receiveOptions'
-					console.log 'updating options?', @history[currentCursor], @history, currentCursor
+					# console.log 'updating options?', @history[currentCursor], @history, currentCursor
 					@history[currentCursor].execute(this, action)
 					return
 				currentCursor--
@@ -861,13 +861,13 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'received action"'
 
 	receiveOptions: (options) ->
-		console.log '\t\treceiving options', options
+		# console.log '\t\treceiving options', options
 
 		for k,v of @entities
 			v.highlighted = false
 
 		for option in options.options
-			console.log 'highlighting', @entities[option.entity], option
+			# console.log 'highlighting', @entities[option.entity], option
 			# Older games don't have the error attribute on options
 			if !option.error or option.error is -1
 				@entities[option.entity]?.highlighted = true

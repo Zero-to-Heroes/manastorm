@@ -985,6 +985,8 @@ class ActionParser extends EventEmitter
 	parseDiscovers: (item) ->
 		command = item.node
 
+		numberOfChoices = 3
+
 		# Hard-code Yogg-Saron. There might be a way to get around this using "Choices" block instead (Yogg doesn't have them)
 		# This will have to be for a later phase, as it's way more work (though cleaner)
 		if @entities[command.attributes.entity]?.cardID == 'OG_134'
@@ -994,13 +996,18 @@ class ActionParser extends EventEmitter
 		if @entities[command.attributes.entity]?.cardID in ['OG_027', 'CFM_696']
 			return
 
+		# Kalimos
+		if @entities[command.attributes.entity]?.cardID == 'UNG_211'
+			# console.log 'discovering from Kalimos'
+			numberOfChoices = 4
+
 		# Always discover 3 cards
 		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
-		if command.attributes.type == '3' and command.fullEntities?.length >= 3
+		if command.attributes.type == '3' and command.fullEntities?.length >= numberOfChoices
 			entities = command.fullEntities
 			# Tracking discovers from our own deck, so it doesn't actually create cards
 			fullEntities = true
-		else if command.attributes.type == '3' and command.showEntities?.length >= 3
+		else if command.attributes.type == '3' and command.showEntities?.length >= numberOfChoices
 			entities = command.showEntities
 
 
@@ -1020,9 +1027,8 @@ class ActionParser extends EventEmitter
 
 			# Taken into accoutn the double discover from fandral
 			currentIndex = 0
-			while choices.length >= currentIndex + 3
-				actionChoices = choices.slice currentIndex, currentIndex + 3
-				# console.log 'parsing discover action', command, choices, actionChoices
+			while choices.length >= currentIndex + numberOfChoices
+				actionChoices = choices.slice currentIndex, currentIndex + numberOfChoices
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -1035,7 +1041,8 @@ class ActionParser extends EventEmitter
 				command.isDiscover = true
 				@addAction @currentTurnNumber, action
 				# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
-				currentIndex += 3
+				currentIndex += numberOfChoices
+				# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
 
 
 
