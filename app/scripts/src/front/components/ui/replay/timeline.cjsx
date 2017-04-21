@@ -38,7 +38,7 @@ class Timeline extends React.Component
 		<div className="timeline">
 			<div className="timeline-container">
 				<div className="time-display" onClick={@moveToStart} title="Go back to the beginning">{elapsedMinutes}:{elapsedSeconds}</div>
-				<div className="scrub-bar" onClick={this.handleClick}>
+				<div className="scrub-bar" onClick={this.handleClick} ref="scrub-bar">
 					<div className="slider">
 						<div className="current-time" style={handleStyle}></div>
 					</div>
@@ -47,14 +47,19 @@ class Timeline extends React.Component
 			</div>
 		</div>
 
-	handleClick: (e) ->
+	handleClick: (e) =>
 		left = 0
-		element = e.target
+		element = @refs['scrub-bar']
+		target = element
 		while (element != null) 
 			left += (element.offsetLeft || 0)
 			element = element.offsetParent
 
-		progression = (e.clientX - left) / e.target.offsetWidth
+		progression = (e.clientX - left) / target.offsetWidth
+		console.log 'moving to progression', progression, element, left, e.clientX, target, target.offsetWidth
+		# This avoids small deviations and keeps the impression that we can click on the same point and not move the timeline
+		progression = progression.toFixed(2)
+		console.log 'rounded', progression
 		@replay.moveTime(progression)
 
 	moveToStart: (e) ->
