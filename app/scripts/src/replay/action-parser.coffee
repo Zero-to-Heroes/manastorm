@@ -597,33 +597,61 @@ class ActionParser extends EventEmitter
 
 	parseQuestPlayedFromHand: (item) ->
 		command = item.node
-		if command.attributes.type == '7' and command.tags
+		if command.attributes.type == '7' 
 
-			playedCard = -1
-			quest = false
-			for tag in command.tags
-				# Either in play or a quest
-				if tag.tag == 'ZONE' and tag.value == 7
-					playedCard = tag.entity
-				if tag.tag == 'QUEST' and tag.value == 1
+			# main player
+			if command.tags
+				playedCard = -1
+				quest = false
+				for tag in command.tags
+					# Either in play or a quest
+					if tag.tag == 'ZONE' and tag.value == 7
+						playedCard = tag.entity
+					if tag.tag == 'QUEST' and tag.value == 1
+						quest = true
+
+				if !quest and @entities[playedCard]?.tags.QUEST == 1
 					quest = true
 
-			if !quest and @entities[playedCard]?.tags.QUEST == 1
-				quest = true
+				if playedCard > -1 and quest
+					entity = @entities[playedCard]
+					owner = @getController(entity.tags.CONTROLLER) 
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+						actionType: 'played-quest-from-hand'
+						# If it's a secret, we want to know who put it in play
+						data: entity
+						owner: owner
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
 
-			if playedCard > -1 and quest
-				entity = @entities[playedCard]
-				owner = @getController(entity.tags.CONTROLLER) 
-				action = {
-					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
-					actionType: 'played-quest-from-hand'
-					# If it's a secret, we want to know who put it in play
-					data: entity
-					owner: owner
-					initialCommand: command
-				}
-				@addAction @currentTurnNumber, action
+			# opponent
+			if !action and command.showEntity and command.showEntity.tags
+				playedCard = -1
+				quest = false
+				# Either in play or a quest
+				if command.showEntity.tags.ZONE == 7 and command.showEntity.tags.QUEST == 1
+					playedCard = parseInt(command.attributes.entity)
+					quest = true
+
+				if !quest and @entities[playedCard]?.tags.QUEST == 1
+					quest = true
+
+				if playedCard > -1 and quest
+					entity = @entities[playedCard]
+					owner = @getController(entity.tags.CONTROLLER) 
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+						actionType: 'played-quest-from-hand'
+						# If it's a secret, we want to know who put it in play
+						data: entity
+						owner: owner
+						initialCommand: command
+					}
+					@addAction @currentTurnNumber, action
 
 
 
