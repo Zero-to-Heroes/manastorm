@@ -1031,15 +1031,17 @@ class ActionParser extends EventEmitter
 
 		# Always discover 3 cards
 		# A Light in the Darkness breaks this, as it creates another entity for the enchantment
-		if command.attributes.type == '3' and command.fullEntities?.length >= numberOfChoices
+		# Vicious Fledgling discovers after an attack, so it's a result of a power, not a card played
+		if command.attributes.type in ['3', '5'] and command.fullEntities?.length >= numberOfChoices
 			entities = command.fullEntities
 			# Tracking discovers from our own deck, so it doesn't actually create cards
 			fullEntities = true
-		else if command.attributes.type == '3' and command.showEntities?.length >= numberOfChoices
+		else if command.attributes.type in ['3', '5'] and command.showEntities?.length >= numberOfChoices
 			entities = command.showEntities
 
 
 		if entities
+
 			isDiscover = true
 			choices = []
 
