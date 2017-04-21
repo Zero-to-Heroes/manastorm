@@ -210,29 +210,29 @@
 			background-image: url(images/weapon_unsheathed.png);
 		}
 
-		// &.sheathed::before {
-		// 	content: "";
-		// 	width: 130%;
-		// 	height: 130%;
-		// 	background-image: url(images/weapon_sheathed.png);
-		// 	display: block;
-		// 	position: relative;
-		// 	background-size: contain;
-		// 	top: -15%;
-		// 	left: -15%;
-		// }
+		.effect {
+			position: absolute;
+		    width: 100%;
+		    height: 45%;
+		    background-size: contain;
+		    background-position: center;
+		    background-repeat: no-repeat;
+		    bottom: -5%;
+		    left: 0;
 
-		// &.unsheathed::before {
-		// 	content: "";
-		// 	width: 130%;
-		// 	height: 130%;
-		// 	background-image: url(images/weapon_unsheathed.png);
-		// 	display: block;
-		// 	position: relative;
-		// 	background-size: contain;
-		// 	top: -15%;
-		// 	left: -15%;
-		// }
+			&.deathrattle {
+				background-image: url(images/icon_deathrattle.png);
+			}
+			&.insptire {
+				background-image: url(images/icon_inspire.png);
+			}
+			&.poisonous {
+				background-image: url(images/icon_poisonous.png);
+			}
+			&.trigger {
+				background-image: url(images/icon_trigger.png);
+			}
+		}
 
 		.card__stats {
 

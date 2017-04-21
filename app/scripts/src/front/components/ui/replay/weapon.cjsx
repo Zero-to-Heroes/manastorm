@@ -32,6 +32,9 @@ class Weapon extends Card
 		if @props.className
 			cls += " " + @props.className
 
+		if entity.tags.POISONOUS
+			effect = <div className="effect poisonous"></div>
+
 		healthClass = "card__stats__health"
 		if @props.entity.tags.DAMAGE > 0
 			healthClass += " damaged"
@@ -83,6 +86,7 @@ class Weapon extends Card
 					<div className={cls}>
 						<div className={imageCls} style={style}></div>
 						<div className="art"></div>
+						{effect}
 						{stats}
 					</div>
 					<ReactTooltip id={"" + entity.id} >
