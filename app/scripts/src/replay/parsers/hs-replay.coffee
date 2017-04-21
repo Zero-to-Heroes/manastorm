@@ -109,6 +109,7 @@ class HSReplayParser
 				option = {
 					entity: parseInt(node.attributes.entity)
 					optionIndex:  parseInt(node.attributes.index)
+					error: parseInt(node.attributes.error)
 					type: parseInt(node.attributes.type)
 					parent: @stack[@stack.length - 2]
 					index: @index++
