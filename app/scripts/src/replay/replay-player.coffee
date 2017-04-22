@@ -9,7 +9,7 @@ EventEmitter = require 'events'
 HSReplayParser = require './parsers/hs-replay'
 
 class ReplayPlayer extends EventEmitter
-	constructor: (@parser) ->
+	constructor: (@parser, @conf) ->
 		EventEmitter.call(this)
 		@emitter = new EventEmitter
 
@@ -1018,26 +1018,39 @@ class ReplayPlayer extends EventEmitter
 	# Image preloading
 	# ==================
 	buildImagesArray: ->
-		images = []
-
-		ids = []
-		# console.log 'building image array', @entities
+		entities = []
 		# Entities are roughly added in the order of apparition
 		for k,v of @entities
-			ids.push v.cardID
+			entities.push v
 
-		for id in ids
-			card = @cardUtils.getCard(id)
-			# console.log 'preloading', id, card
-			if card and card.type != 'Enchantment'
-				images.push @cardUtils.buildFullCardImageUrl(card)
+		images = []
+		for entity in entities
+			if entity.cardID
+				card = @cardUtils.getCard(entity.cardID)
+				# TODO: extract this to its own component, and reuse it from card.cjsx
+				if card and card.type != 'Enchantment'
+					baseFolder = 'allCards'
+					premiumDir = ''
+					if entity.tags.PREMIUM is 1 and card?.goldenImage and !@conf?.noGolden
+						premiumClass = 'golden'
+						premiumDir = 'golden_single_frame/'
+
+						if @conf?.useCompressedImages
+							premiumDir = 'golden/'
+							
+					if @conf?.useCompressedImages
+						baseFolder = 'fullcards/en/256'
+
+					imgUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/#{baseFolder}/#{premiumDir}#{entity.cardID}.png"
+					images.push imgUrl
 
 		# console.log 'image array', images
 		return images
 
 	preloadPictures: (arrayOfImages) ->
+		console.log 'preloading', arrayOfImages
 		arrayOfImages.forEach (img) ->
-			# console.log 'preloading', img
+			console.log '\tpreloading', img
 			(new Image()).src = img
 
 

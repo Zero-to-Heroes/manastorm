@@ -37,9 +37,9 @@ class Replay extends React.Component
 		super(props)
 
 		# @reloadGame props.route.replay
-		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay))
 		@configurationOptions = props.route.configurationOptions
-		# console.log 'replay-player created'
+		@state = replay: new ReplayPlayer(new HSReplayParser(props.route.replay), @configurationOptions)
+		# console.log 'replay-player created', @configurationOptions, @state
 
 		@state.style = {}
 
