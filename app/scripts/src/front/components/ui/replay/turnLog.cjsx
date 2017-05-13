@@ -541,7 +541,7 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		# console.log 'building discover log', action
+		console.log 'building discover log', action
 		# card = action.data['cardID']
 		cardLink = @buildCardLink action.data
 

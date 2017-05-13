@@ -23,7 +23,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	reload: (xmlReplay, callback) ->
-		# console.log 'reloading'
+		console.log 'reloading'
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -36,19 +36,19 @@ class ReplayPlayer extends EventEmitter
 		@init()
 
 		if callback
-			# console.log 'calling reload callback'
+			console.log 'calling reload callback'
 			callback()
 
 
 	init: ->
-		# console.log 'trying to init'
+		console.log 'trying to init'
 		if @initializing
 			setTimeout () =>
 				@init()
 			, 50
 			return
 
-		# console.log 'init starting'
+		console.log 'init starting'
 			
 		@initializing = true
 
@@ -62,7 +62,7 @@ class ReplayPlayer extends EventEmitter
 		@players = []
 		@emit 'reset'
 
-		# console.log 'starting init in manastorm', @players
+		console.log 'starting init in manastorm', @players
 
 		@game = null
 		@mainPlayerId = null
@@ -131,9 +131,9 @@ class ReplayPlayer extends EventEmitter
 		@goNextAction()
 		# console.log 'notifying changed turn', @players
 		@notifyChangedTurn @turns[@currentTurn].turn
-		# console.log 'init done in manastorm', @turns, @players
 
 		@initializing = false
+		console.log 'init done in manastorm', @turns, @players
 
 
 	autoPlay: ->
@@ -272,7 +272,7 @@ class ReplayPlayer extends EventEmitter
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
 			@currentTurn = 0
 			@currentActionInTurn = 0
-			# console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
+			console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
 			@init()
 			return
 
@@ -496,7 +496,7 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
 		# The -1 is an ugly hack, no idea why sometimes the index is not properly positioned
 		if index < @history[@historyPosition].index - 1 and !skipping
-			# console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
+			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
 
@@ -782,8 +782,8 @@ class ReplayPlayer extends EventEmitter
 		entity.update(definition)
 
 	receivePlayer: (definition) ->
-		# console.log 'receiving player', entity, this
 		entity = new Player(this)
+		console.log 'receiving player', entity, this
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)

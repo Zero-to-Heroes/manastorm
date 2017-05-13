@@ -275,10 +275,21 @@ class HSReplayParser
 					min: node.attributes.min
 					playerID: node.attributes.playerID
 					source: node.attributes.source
+					type: node.attributes.type
 					ts: tsToSeconds(node.attributes.ts)
 					index: @index++
 					cards: []
 				@state.push('choices')
+				
+
+			when 'ChosenEntities'.toLowerCase()
+				@chosen =
+					entity: node.attributes.entity
+					playerID: node.attributes.playerID || node.attributes.playerid
+					ts: tsToSeconds(node.attributes.ts)
+					cards: []
+					index: @index++
+				@state.push('chosenEntities')
 
 		@entityDefinition.indent = if @entityDefinition.parent?.indent then @entityDefinition.parent.indent + 1 else 1
 

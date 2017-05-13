@@ -86,6 +86,9 @@ class ActionParser extends EventEmitter
 			if item.command == 'receiveShowEntity'
 				if item.node.tags.SECRET == 1
 					@entities[item.node.id].tags.SECRET = 1
+			if item.command == 'receiveChoices'
+				@usesChoices = true
+				console.log 'using choices'
 
 		# Sometimes card type isn't precised
 		for k,v of @entities
@@ -128,7 +131,7 @@ class ActionParser extends EventEmitter
 					@parseSecretPlayedFromHand item
 					@parseQuestPlayedFromHand item
 					@parseAttacks item
-					@parseDiscovers item
+					@parseDiscoversOld item
 					@parsePowerEffects item
 					@parseDeaths item
 					@parseSummons item
@@ -139,12 +142,17 @@ class ActionParser extends EventEmitter
 				else
 					# console.log 'no turn number', @currentTurnNumber, @turns[@currentTurnNumber], @turns, @turns.length, item
 
-
 			if item.command is 'receiveTagChange'
 				@currentTurnNumber = @turnNumber - 1
 				if @turns[@currentTurnNumber]
 					@parseFatigueDamage item
 					@parseEndGame item
+
+			if item.command is 'receiveChoices'
+				@parseDiscovers item
+
+			if item.command is 'receiveChosenEntities'
+				@parseDiscoverPick item
 
 			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
 			# tap before drawing the card)
@@ -197,7 +205,7 @@ class ActionParser extends EventEmitter
 				actions[i - 1] = undefined
 
 			# Until we support the Choices elements properly
-			if actions[i].actionType is 'discover' and actions[i + 1]?.actionType is 'card-draw'
+			if !@usesChoices and actions[i].actionType is 'discover' and actions[i + 1]?.actionType is 'card-draw'
 				actions[i].discovered = actions[i + 1].data[0]
 
 			if !actions[i].owner
@@ -1011,6 +1019,45 @@ class ActionParser extends EventEmitter
 
 
 	parseDiscovers: (item) ->
+		command = item.node
+
+		if command.type is '2'
+			console.log 'possible choices', command
+
+			choices = []
+			for entity in command.cards
+				console.log '\tdiscovering?', entity, @entities[entity]
+				choices.push @entities[entity]
+
+			action = {
+				turn: @currentTurnNumber - 1
+				timestamp: tsToSeconds(command.ts) || item.timestamp
+				actionType: 'discover'
+				data: @entities[command.source]
+				owner: @entities[command.entity]
+				choices: choices
+				initialCommand: command
+			}
+			command.isDiscover = true
+			@addAction @currentTurnNumber, action
+			console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+			# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
+
+
+	parseDiscoverPick: (item) -> 
+		command = item.node
+		console.log 'considering last pick', item, @turns[@currentTurnNumber].actions, @currentTurnNumber, @turns
+
+		lastAction = @turns[@currentTurnNumber].actions?[@turns[@currentTurnNumber].actions.length - 1];
+		if lastAction?.actionType is 'discover'
+			lastAction.discovered = @entities[command.cards[0]]?.id
+			console.log 'highlighting pick', lastAction, item
+
+
+	parseDiscoversOld: (item) ->
+		if @usesChoices
+			return
+
 		command = item.node
 
 		numberOfChoices = 3
