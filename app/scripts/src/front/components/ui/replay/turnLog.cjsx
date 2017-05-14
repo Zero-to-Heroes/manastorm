@@ -70,6 +70,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'played-card-from-hand'
 			log = @buildPlayedCardFromHandLog action
 
+		else if action.actionType == 'played-card-by-minion'
+			log = @buildPlayedCardByMinionLog action
+
 		else if action.actionType == 'hero-power'
 			log = @buildHeroPowerLog action
 
@@ -255,6 +258,16 @@ TurnLog = React.createClass
 		log = <p key={'log' + ++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
 				<span> plays </span>
+				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
+			</p>
+
+		return log
+
+	buildPlayedCardByMinionLog: (action) ->
+		cardLink = @buildCardLink action.data
+
+		log = <p key={'log' + ++@logIndex}>
+				<span  className="indented-log">... who casts </span>
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
 			</p>
 
@@ -541,7 +554,7 @@ TurnLog = React.createClass
 			</p>
 
 	buildDiscoverLog: (action) ->
-		console.log 'building discover log', action
+		# console.log 'building discover log', action
 		# card = action.data['cardID']
 		cardLink = @buildCardLink action.data
 

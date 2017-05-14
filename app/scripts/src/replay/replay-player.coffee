@@ -338,7 +338,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		# console.log 'going to action', @currentActionInTurn, @currentTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
+		console.log 'going to action', @currentActionInTurn, @currentTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -700,7 +700,7 @@ class ReplayPlayer extends EventEmitter
 		realAction = action.mainAction?.associatedAction || action
 		mainEntity = action.mainAction?.associatedAction?.data || action.data
 		# console.log 'updating active spell', action, realAction, mainEntity
-		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType in ['played-card-from-hand', 'played-card-with-target']
+		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType in ['played-card-from-hand', 'played-card-with-target', 'played-card-by-minion']
 			# console.log '\tupdating active spell', mainEntity
 			@activeSpell = mainEntity
 

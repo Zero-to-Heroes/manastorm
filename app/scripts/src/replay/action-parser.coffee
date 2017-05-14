@@ -113,6 +113,8 @@ class ActionParser extends EventEmitter
 
 		for item in @history
 
+			console.log 'parsing history item', item
+
 			@parseMulliganTurn item
 			@parseChangeActivePlayer item
 			@parseStartOfTurn item
@@ -147,6 +149,7 @@ class ActionParser extends EventEmitter
 				if @turns[@currentTurnNumber]
 					@parseFatigueDamage item
 					@parseEndGame item
+					@parseMinionCasting item
 
 			if item.command is 'receiveChoices'
 				@parseDiscovers item
@@ -154,11 +157,15 @@ class ActionParser extends EventEmitter
 			if item.command is 'receiveChosenEntities'
 				@parseDiscoverPick item
 
+			if item.command is 'receiveEntity'
+				@parseCardPlayedByMinion item
+
 			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
 			# tap before drawing the card)
 			@parseDrawCard item
 			@parseOverdraw item
 			@parseDiscardCard item
+
 
 		# Sort the actions chronologically
 		tempTurnNumber = 1
@@ -490,11 +497,13 @@ class ActionParser extends EventEmitter
 	# Not secrets
 	parseCardPlayedFromHand: (item) ->
 		command = item.node
+		playedCard = -1
+
+		# Standard spell casting
 		if command.attributes.type == '7' and command.tags
 			# Check that the entity was in our hand before
 			entity = @entities[command.attributes.entity]
 
-			playedCard = -1
 			# The case of a ShowEntity command when the card was already known - basically 
 			# when we play our own card. In that case, the tags are already known, and 
 			# tag changes are the only things we care about
@@ -513,21 +522,43 @@ class ActionParser extends EventEmitter
 					if showEntity.tags.ZONE in [1] and showEntity.tags.CARDTYPE != 6
 						playedCard = showEntity.id
 
-			# Possibly check that the card was in hand before being in play?
-			if playedCard > -1
-				# target = if command.attributes.target is '0' then null else command.attributes.target
-				action = {
-					turn: @currentTurnNumber - 1
-					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
-					actionType: 'played-card-from-hand'
-					data: @entities[playedCard]
-					# target: [command.attributes.target]
-					owner: @turns[@currentTurnNumber].activePlayer
-					initialCommand: command
-				}
-				
-				# console.log '\tAnd it is a valid play', action
-				@addAction @currentTurnNumber, action
+
+
+		if playedCard > -1
+			# target = if command.attributes.target is '0' then null else command.attributes.target
+			action = {
+				turn: @currentTurnNumber - 1
+				timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+				actionType: 'played-card-from-hand'
+				data: @entities[playedCard]
+				# target: [command.attributes.target]
+				owner: @turns[@currentTurnNumber].activePlayer
+				initialCommand: command
+			}
+			
+			# console.log '\tAnd it is a valid play', action
+			@addAction @currentTurnNumber, action
+
+
+	parseCardPlayedByMinion: (item) -> 
+		command = item.node
+		playedCard = -1
+
+		# Spell cast by a minion (typically Yogg or Servant of Yogg)
+		if @minionCasting and command.tags.CREATOR is @minionCasting
+			action = {
+				turn: @currentTurnNumber - 1
+				timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+				actionType: 'played-card-by-minion'
+				data: @entities[command.id]
+				# target: [command.attributes.target]
+				owner: @turns[@currentTurnNumber].activePlayer
+				initialCommand: command
+			}
+			console.log 'minion casting', action
+			@addAction @currentTurnNumber, action
+
+
 
 	parseNewHeroPower: (item) ->
 		command = item.node
@@ -550,6 +581,8 @@ class ActionParser extends EventEmitter
 						# console.log '\tAnd it is a valid play', action
 						@addAction @currentTurnNumber, action
 
+
+
 	parseHeroPowerUsed: (item) ->
 		command = item.node
 		if command.attributes.type == '7'
@@ -569,6 +602,8 @@ class ActionParser extends EventEmitter
 				}
 				# console.log '\tAnd it is a valid play', action
 				@addAction @currentTurnNumber, action
+
+
 
 	parseSecretPlayedFromHand: (item) ->
 		command = item.node
@@ -599,6 +634,7 @@ class ActionParser extends EventEmitter
 					owner: owner
 					initialCommand: command
 				}
+				console.log 'secret played from hand', action
 				@addAction @currentTurnNumber, action
 
 
@@ -936,11 +972,13 @@ class ActionParser extends EventEmitter
 					if tag.tag == 'ZONE' and tag.value == 7
 						entity = @entities[tag.entity]
 						secretsPutInPlay.push entity
+						index = tag.index
 
 				if secretsPutInPlay.length > 0
 					action = {
 						turn: @currentTurnNumber - 1
 						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+						index: index
 						secrets: secretsPutInPlay
 						mainAction: command.parent
 						actionType: 'trigger-secret-play'
@@ -948,6 +986,7 @@ class ActionParser extends EventEmitter
 						owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 						initialCommand: command
 					}
+					console.log 'secret put in play', action
 					@addAction @currentTurnNumber, action
 
 	# The other effects, like battlecry, echoing ooze duplication, etc.
@@ -1227,6 +1266,19 @@ class ActionParser extends EventEmitter
 				initialCommand: command
 			}
 			@addAction @currentTurnNumber, action
+
+
+
+	parseMinionCasting: (item) -> 
+		command = item.node
+		if command.tag == 'CAST_RANDOM_SPELLS'
+			if command.value is 1
+				@minionCasting = parseInt(command.entity)
+				console.log 'in minion casting mode'
+			else
+				@minionCasting = undefined
+				console.log 'ending minion casting mode'
+
 
 
 	parseEndGame: (item) ->
