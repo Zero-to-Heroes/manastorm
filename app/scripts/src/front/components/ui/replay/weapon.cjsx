@@ -20,11 +20,11 @@ class Weapon extends Card
 
 		# console.log 'rendering weapon', @props.entity
 		cls = "weapon"
-		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer().tags.PLAYER_ID
+		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer()?.tags?.PLAYER_ID
 			# console.log 'shearthing', @props.replay.getActivePlayer().tags.PLAYER_ID, @props.entity
 			cls += " sheathed"
 			style = {}
-		else 
+		else
 			cls += " unsheathed"
 			style =
 				backgroundImage: "url(#{art})"
@@ -58,14 +58,14 @@ class Weapon extends Card
 		statuses = @buildStatuses entity
 
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
-		
+
 		imageCls = "game-card"
 		if originalCard?.set?.toLowerCase() is 'gangs'
 			# console.log '\tgangs card'
 			imageCls += " msg-card"
 			enchantmentClass += ' msg-card'
 
-		cardTooltip = 
+		cardTooltip =
 			<div className="card-container">
 				<div className="game-info">
 					<img src={art} />
