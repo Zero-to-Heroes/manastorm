@@ -6,8 +6,8 @@ class Mulligan extends React.Component
 
 	render: ->
 		# console.log 'rendering mulligan?', @props.entity, @props.entity.getHand(), @props.mulligan
-		return null unless @props.inMulligan 
-		
+		return null unless @props.inMulligan
+
 
 		# console.log '\tyes'
 		hidden = @props.isHidden

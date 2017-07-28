@@ -8,7 +8,7 @@
 		<meta name="robots" content="index,follow" />
 		<!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 		<link rel="icon" type="image/png" href="/images/favicon.png">
-		
+
 
 		<!-- Adding the dependencies manually, as they are only for scaffolding and I want to keep things simple here -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" ></script>
@@ -35,8 +35,8 @@
 			</div>
 		</div>
 
-		<script src="dependencies/parseCardsText.js"></script>	
-		<script src="scripts/out/manastorm.js"></script>	
+		<script src="dependencies/parseCardsText.js"></script>
+		<script src="scripts/out/manastorm.js"></script>
 
 		<script>
 			console.log('ok', manastorm)
@@ -47,7 +47,7 @@
 					manastorm.initPlayer({
 						showGameBorder: true,
 						useCompressedImages: true,
-						// noGolden: true,
+						noGolden: true,
 					})
 					manastorm.reload(response)
 
@@ -59,7 +59,7 @@
 					}
 				}
 			})
-			// 
+			//
 		</script>
 	</body>
 </html>

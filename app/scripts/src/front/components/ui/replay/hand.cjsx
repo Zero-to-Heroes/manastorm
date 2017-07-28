@@ -1,4 +1,5 @@
 React = require 'react'
+CardInHand = require './rendered-card'
 Card = require './card'
 SubscriptionList = require '../../../../subscription-list'
 ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
@@ -29,12 +30,12 @@ Hand = React.createClass
 			else if active.length == 10
 				margin = -11
 
-			style = { 
+			style = {
 				marginLeft: margin + '%'
 			}
 
 			# console.log 'rendering card in hand', entity.cardID, entity
-			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
+			<CardInHand isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
 
 		return <div className="hand">
 				<div>{cards}</div>

@@ -281,7 +281,7 @@ class Replay extends React.Component
 						<div className="btn-group">
 							 <button className={'btn btn-default glyphicon glyphicon-backward ' + @activeGoPreviousTurn} onClick={@goPreviousTurn}>
 								<div className="tooltip bottom">
-									<p>Previous turn</p>
+									<p>Previous turn (shortcut: bottom arrow)</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
 										<polygon points="12,0 6,4 0,0 "/>
 									</svg>
@@ -289,7 +289,7 @@ class Replay extends React.Component
 							 </button>
 							 <button className={'btn btn-default glyphicon glyphicon-step-backward ' + @activeGoPreviousAction} onClick={@goPreviousAction}>
 								<div className="tooltip bottom">
-									<p>Previous action</p>
+									<p>Previous action (shortcut: left arrow)</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
 										<polygon points="12,0 6,4 0,0 "/>
 									</svg>
@@ -298,7 +298,7 @@ class Replay extends React.Component
 							{playButton}
 							 <button className={'btn btn-default glyphicon glyphicon-step-forward ' + @activeGoNextAction} onClick={@goNextAction} ref="goNextAction">
 								<div className="tooltip bottom">
-									<p>Next action</p>
+									<p>Next action (shortcut: right arrow)</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
 										<polygon points="12,0 6,4 0,0 "/>
 									</svg>
@@ -306,7 +306,7 @@ class Replay extends React.Component
 							 </button>
 							 <button className={'btn btn-default glyphicon glyphicon-forward ' + @activeGoNextTurn} onClick={@goNextTurn}>
 								<div className="tooltip bottom">
-									<p>Next turn</p>
+									<p>Next turn (shortcut: up arrow)</p>
 									<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
 										<polygon points="12,0 6,4 0,0 "/>
 									</svg>
