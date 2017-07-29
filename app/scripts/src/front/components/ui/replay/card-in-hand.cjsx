@@ -76,14 +76,16 @@ class CardInHand extends React.Component
 			path = <path id={pathId} d="M 0,20 C 50,30 150,-10 200,20" />
 
 		nameText = <div className="name-text">
-						<svg x="0" y ="0" width="100%" height="100%" viewBox="0 0 200 30">
-							<defs>
-								{path}
-							</defs>
-    						<text textAnchor="middle">
-    							<textPath startOffset="50%" xlinkHref={'#' + pathId}>{originalCard.name}</textPath>
-    						</text>
-						</svg>
+						<ReactFitText>
+							<svg x="0" y ="0" width="100%" height="100%" viewBox="0 0 200 30">
+								<defs>
+									{path}
+								</defs>
+	    						<text textAnchor="middle">
+	    							<textPath startOffset="50%" xlinkHref={'#' + pathId}>{originalCard.name}</textPath>
+	    						</text>
+							</svg>
+						</ReactFitText>
 					</div>
 
 		# card text

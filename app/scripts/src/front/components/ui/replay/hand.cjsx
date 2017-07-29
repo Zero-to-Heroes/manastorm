@@ -1,5 +1,5 @@
 React = require 'react'
-CardInHand = require './rendered-card'
+CardInHand = require './card-in-hand'
 Card = require './card'
 SubscriptionList = require '../../../../subscription-list'
 ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
