@@ -106,8 +106,12 @@ class CardInHand extends React.Component
 		if originalCard.rarity and originalCard.rarity isnt 'Free'
 			if originalCard.type is 'Minion'
 				rarity = 'rarity-minion-' + originalCard.rarity.toLowerCase() + '.png'
+				if originalCard.rarity.toLowerCase() is 'legendary'
+					legendaryFrame = <img src={'scripts/static/images/card/legendary-minion.png'} className="legendary-frame"/>
 			else if originalCard.type is 'Spell'
 				rarity = 'rarity-spell-' + originalCard.rarity.toLowerCase() + '.png'
+				if originalCard.rarity.toLowerCase() is 'legendary'
+					legendaryFrame = <img src={'scripts/static/images/card/legendary-spell.png'} className="legendary-frame"/>
 			else if originalCard.type is 'Weapon'
 				rarity = 'rarity-weapon-' + originalCard.rarity.toLowerCase() + '.png'
 
@@ -162,7 +166,7 @@ class CardInHand extends React.Component
 				imageCls += " img-option-on combo"
 
 		if entity.tags.TRANSFORMED_FROM_CARD
-			visual = <div className="transformed-from-card"></div>
+			tranformedEffect = <div className="transformed-from-card"></div>
 
 		@updateDimensions()
 
@@ -174,8 +178,9 @@ class CardInHand extends React.Component
 						{nameBanner}
 						{nameText}
 						{cardText}
+						{legendaryFrame}
 						{highlight}
-						{visual}
+						{tranformedEffect}
 						{race}
 						{stats}
 						{cost}
