@@ -2,12 +2,10 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 ReactTooltip = require("react-tooltip")
 ReactFitText = require('react-fittext');
-CardTooltip = require('./card-tooltip');
 {subscribe} = require '../../../../subscription'
 
-class CardInHand extends React.Component
+class CardTooltip extends React.Component
 
-	# TODO: for now only handle cards in hand, will handle the rest with subclassing / composition
 	render: ->
 		# console.log 'rendering card'
 		# locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
@@ -171,7 +169,7 @@ class CardInHand extends React.Component
 
 		@updateDimensions()
 
-		return  <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
+		return  <div key={'card' + entity.id} className={cls} style={@props.style}>
 					<div className={highlightCls}>
 						<img src={cardArt} className={imageCls} />
 						<img src={frame} className="frame"/>
@@ -186,9 +184,6 @@ class CardInHand extends React.Component
 						{stats}
 						{cost}
 					</div>
-					<ReactTooltip id={"" + entity.id} >
-					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
-					</ReactTooltip>
 				</div>
 
 
@@ -205,4 +200,4 @@ class CardInHand extends React.Component
 		#console.log 'getting dimensions for card', @centerX, @centerY
 		return {@centerX, @centerY}
 
-module.exports = CardInHand
+module.exports = CardTooltip
