@@ -1,5 +1,6 @@
 .game .card-tooltip {
     width: 21%;
+    // width: 60%;
 }
 
 .card-tooltip {
@@ -108,7 +109,7 @@
     				content: "";
     				padding-top: 100%;
 					position: relative;
-					display: block; 	
+					display: block;
     			}
 
     			&:after {
@@ -145,6 +146,42 @@
 
 .card-tooltip:after {
 	border: none;
+}
+
+.game {
+    .rendered-card-tooltip {
+        width: 26%;
+    }
+}
+
+.rendered-card-tooltip {
+
+    &.show {
+        display: flex !important;
+    }
+
+    .rendered-card {
+        width: 50%;
+        font-size: 1.2em;
+
+        .card-cost {
+            font-size: 2.5em;
+        }
+    }
+}
+
+.hand {
+    .game-card.rendered-card {
+        .card-tooltip.rendered-card-tooltip {
+            .card__stats {
+                span {
+                    font-size: 1.7em;
+                    padding-top: 14%;
+                }
+            }
+
+        }
+    }
 }
 
 // The jquery tooltips

@@ -187,14 +187,6 @@
 
 	.rendered-card {
 
-		& > div {
-		    position: absolute;
-		    top: 0;
-		    left: 0;
-		    width: 100%;
-		    height: 100%;
-		}
-
 		.art {
 			background-size: inherit;
 		    width: 80%;
@@ -224,6 +216,14 @@
 		.card-cost {
 			top: 8%;
 			left: 1%;
+			line-height: inherit;
+			display: flex;
+
+			span {
+				position: relative;
+				line-height: 1em;
+				margin: auto;
+			}
 		}
 
 		.name-banner {
@@ -238,10 +238,14 @@
 		    width: 76%;
 		    height: 10%;
 		    left: 14%;
-		    top: 49%;
+		    top: 47%;
 		    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 		    font-size: 0.4em;
 		    color: white;
+
+		    svg {
+		    	overflow: visible;
+		    }
 		}
 
 		text {
@@ -262,13 +266,17 @@
 		    color: black;
 		    width: 61%;
 		    left: 21%;
-		    height: 21%;
-		    top: 66%;
+		    height: 20%;
+		    top: 65%;
 		    font-size: 0.4em;
 		    text-align: center;
 		    font-weight: 500;
 		    overflow: hidden;
 		    display: flex;
+
+		    & > span {
+		    	display: flex !important;
+		    }
 
 		    p {
 		    	margin: auto;
@@ -309,6 +317,10 @@
 		    width: 80%;
 		    left: 24%;
 		    top: 1%;
+		}
+
+		.card__stats {
+			height: 20%;
 		}
 	}
 

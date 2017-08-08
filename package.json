@@ -23,13 +23,13 @@
     "react": "^15.6.1",
     "react-addons-css-transition-group": "^0.14.3",
     "react-dom": "^15.6.0",
-    "react-fittext": "^1.0.0",
     "react-router": "^1.0.0",
     "react-split-pane": "^0.1.65",
     "react-tooltip": "^3.3.0",
     "sax": "^1.1.4",
     "serve-static": "^1.11.1",
-    "string-stream": "0.0.7"
+    "string-stream": "0.0.7",
+    "textfit": "^2.3.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
