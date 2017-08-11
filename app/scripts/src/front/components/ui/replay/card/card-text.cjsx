@@ -17,7 +17,8 @@ class CardText extends React.Component
 
 	updateText: ->
 		setTimeout () =>
-			textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true}
+			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]
+			textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, maxFontSize: rootFontSize * 0.8}
 		, 20
 
 module.exports = CardText

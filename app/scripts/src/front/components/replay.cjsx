@@ -60,14 +60,14 @@ class Replay extends React.Component
 			@callProtectedCallback()
 
 		# subscribe @state.replay, 'reset', =>
-		# 	console.log 'in reset' 
+		# 	console.log 'in reset'
 		# 	@callback
 
 		subscribe @state.replay, 'moved-timestamp', =>
 			# console.log 'in moved-timestamp'
 			@callProtectedCallback()
 			# if !@dirty
-			# 	@dirty = true 
+			# 	@dirty = true
 			# 	setTimeout @callback, 300
 
 		subscribe @state.replay, 'game-generated', =>
@@ -118,7 +118,7 @@ class Replay extends React.Component
 
 	callProtectedCallback: ->
 		if !@dirty
-			@dirty = true 
+			@dirty = true
 			@callback()
 
 
@@ -129,7 +129,7 @@ class Replay extends React.Component
 				@state.style.fontSize = this.refs['root'].offsetWidth / 50.0 + 'px'
 				# console.log 'updated dimensions'
 				@callProtectedCallback()
-			else 
+			else
 				@updateDimensions()
 		, 50
 
@@ -197,7 +197,7 @@ class Replay extends React.Component
 			</div>
 			# console.log 'components are ok'
 
-		else 
+		else
 			console.warn 'Missing players', replay.players
 			return null
 
@@ -217,7 +217,7 @@ class Replay extends React.Component
 			# 	console.log 'adding target', target, source
 			# 	targets.push <Target source={source} target={target} type={replay.targetType} key={'target' + replay.targetSource + '' + targetId}/>
 
-		playButton = 
+		playButton =
 			<button className="btn btn-default glyphicon glyphicon-play" onClick={@onClickPlay}>
 				<div className="tooltip bottom">
 					<p>Play automatically</p>
@@ -241,7 +241,7 @@ class Replay extends React.Component
 			overlayCls += " silent"
 
 		if !@configurationOptions?.hideSideLog
-			showSideLogButton = 
+			showSideLogButton =
 				<label className="btn btn-default glyphicon glyphicon-list-alt mode-button" htmlFor="show-log">
 					<input type="checkbox" id="show-log" checked={@displayConf.showLog} onChange={@onTurnClick} hidden />
 					<div className="tooltip bottom">
@@ -255,7 +255,7 @@ class Replay extends React.Component
 		# console.log 'applying style', @state.style
 		# console.log 'rerendering', replay
 		#TODO externalise the controls to their own components
-		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave}>
+		return <div className="replay" ref="root" style={@state.style} onMouseEnter={@onMouseEnter} onMouseLeave={@onMouseLeave} id="replayMainArea">
 
 					<ReactTooltip />
 					<div className="game">
@@ -316,21 +316,21 @@ class Replay extends React.Component
 						<Timeline replay={replay} />
 						<div className="btn-group">
 							<div className="playback-speed">
-								<div className="dropup"> 
-									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span> 
+								<div className="dropup">
+									<button className="btn btn-default btn-control dropdown-toggle ng-binding" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"> {@state.replay.speed}x <span className="caret"></span>
 										<div className="tooltip bottom">
 											<p>Change game speed</p>
 											<svg className="tooltip-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 4">
 												<polygon points="12,0 6,4 0,0 "/>
 											</svg>
 										</div>
-									</button> 
+									</button>
 									<ul className="dropdown-menu" aria-labelledby="dropdownMenu1">
-										<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li> 
-										<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li> 
-										<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li> 
-										<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li> 
-									</ul> 
+										<li><a onClick={@onClickChangeSpeed.bind(this, 1)}>1x</a></li>
+										<li><a onClick={@onClickChangeSpeed.bind(this, 2)}>2x</a></li>
+										<li><a onClick={@onClickChangeSpeed.bind(this, 4)}>4x</a></li>
+										<li><a onClick={@onClickChangeSpeed.bind(this, 8)}>8x</a></li>
+									</ul>
 								</div>
 							</div>
 
@@ -343,7 +343,7 @@ class Replay extends React.Component
 									</svg>
 								</div>
 							</label>
- 
+
 							<label className="btn btn-default glyphicon glyphicon-retweet mode-button #{@mainPlayerSwitched}" htmlFor="switch-main-player">
 								<input type="checkbox" id="switch-main-player" checked={@mainPlayerSwitched} onChange={@onMainPlayerSwitchedChange} hidden />
 								<div className="tooltip bottom">
@@ -366,7 +366,7 @@ class Replay extends React.Component
 		keyCode = e.code or e.key
 		# console.log 'keyCode', keyCode
 		switch keyCode
-			when 'ArrowRight'	
+			when 'ArrowRight'
 				@activeGoNextAction = 'active'
 				@goNextAction e
 			when 'ArrowLeft'
@@ -466,7 +466,7 @@ class Replay extends React.Component
 		# Mulligan is turn 1
 		@state.replay.goToTurn(turn + 1)
 		@callProtectedCallback()
-		
+
 
 
 	findCard: (allCards, cardID) ->
