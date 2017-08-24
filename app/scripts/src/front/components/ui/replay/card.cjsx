@@ -116,7 +116,8 @@ class Card extends React.Component
 			healthClass += " damaged"
 
 		atkCls = "card__stats__attack"
-		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed
+		# Don't show stats for Death Knights in hand
+		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed and originalCard.type isnt 'Hero'
 			originalAtk = originalCard.attack
 			if entity.tags.ATK?
 				tagAtk = entity.tags.ATK 
@@ -138,6 +139,8 @@ class Card extends React.Component
 				<div className={healthClass}><span>{(tagHealth or tagDurability) - (entity.tags.DAMAGE or 0)}</span></div>
 			</div>
 
+		if originalCard?.type is 'Hero'
+			cls += ' hero-card'
 
 		entity.damageTaken = entity.damageTaken or 0
 		# console.log entity.cardID, entity
