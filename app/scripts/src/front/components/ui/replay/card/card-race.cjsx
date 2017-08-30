@@ -1,5 +1,4 @@
 React = require 'react'
-{ Textfit } = require('react-textfit');
 
 class CardRace extends React.Component
 

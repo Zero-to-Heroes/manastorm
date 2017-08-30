@@ -1,6 +1,5 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
-{ Textfit } = require('react-textfit')
 
 CardArt = require('./card/card-art')
 CardCost = require('./card/card-cost')
