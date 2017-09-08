@@ -1,10 +1,14 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
-Card = require './card'
+ReactTooltip = require("react-tooltip")
+
 Secret = require './Secret'
 Health = require './health'
-ReactTooltip = require("react-tooltip")
-{subscribe} = require '../../../../subscription'
+
+Card = require './card'
+CardArt = require './card/card-art'
+CardEffect = require './card/card-effect'
+WeaponTooltip = require './card/weapon-tooltip'
 
 class Weapon extends Card
 	componentDidMount: ->
@@ -12,30 +16,21 @@ class Weapon extends Card
 	render: ->
 		#console.log 'trying to render weapon', @props.entity
 		return <div className="weapon-container"></div> unless @props.entity?.cardID
-		# console.log '\trendering weapon', @props.entity.cardID, @props.entity.tags
-		entity = @props.entity
 
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{@props.entity.cardID}.png"
-		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
+		entity = @props.entity
+		cardUtils = @props.cardUtils
+		originalCard = cardUtils.getCard(@props.entity.cardID)
+
+		art = <CardArt cardUtils={cardUtils} entity={entity} />
+		weaponVisual = <img src="scripts/static/images/weapon_unsheathed.png" className="visual" />
 
 		# console.log 'rendering weapon', @props.entity
-		cls = "weapon"
-		if @props.entity.tags.CONTROLLER != @props.replay.getActivePlayer()?.tags?.PLAYER_ID
-			# console.log 'shearthing', @props.replay.getActivePlayer().tags.PLAYER_ID, @props.entity
-			cls += " sheathed"
-			style = {}
-		else
-			cls += " unsheathed"
-			style =
-				backgroundImage: "url(#{art})"
+		if entity.tags.CONTROLLER != @props.replay.getActivePlayer()?.tags?.PLAYER_ID
+			weaponVisual = <img src="scripts/static/images/weapon_sheathed.png" className="visual" />
 
+		cls = "weapon"
 		if @props.className
 			cls += " " + @props.className
-
-		if entity.tags.POISONOUS
-			effect = <div className="effect poisonous"></div>
-		if entity.tags.LIFESTEAL
-			effect = <div className="effect lifesteal"></div>
 
 		healthClass = "card__stats__health"
 		if @props.entity.tags.DAMAGE > 0
@@ -86,13 +81,13 @@ class Weapon extends Card
 
 		return <div key={'card' + entity.id} className="weapon-container" data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 					<div className={cls}>
-						<div className={imageCls} style={style}></div>
-						<div className="art"></div>
-						{effect}
+						{art}
+						{weaponVisual}
+						<CardEffect cardUtils={cardUtils} entity={entity} />
 						{stats}
 					</div>
 					<ReactTooltip id={"" + entity.id} >
-					    {cardTooltip}
+					    <WeaponTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

@@ -11,9 +11,10 @@ CardRarity = require('./card-rarity')
 CardStats = require('./card-stats')
 CardNameBanner = require('./card-name-banner')
 
-class HeroPowerTooltip extends React.Component
+class WeaponTooltip extends React.Component
 
 	render: ->
+		return null
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		conf = @props.conf
@@ -89,4 +90,4 @@ class HeroPowerTooltip extends React.Component
 		#console.log 'getting dimensions for card', @centerX, @centerY
 		return {@centerX, @centerY}
 
-module.exports = HeroPowerTooltip
+module.exports = WeaponTooltip
