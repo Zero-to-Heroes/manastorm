@@ -23,62 +23,33 @@
 
 	.power-container {
 		position: relative;
-		width: 35%;
+	    width: 36%;
+	    top: -18%;
+	    left: 5%;
 		height: auto;
 		align-self: flex-end;
-		margin-bottom: 3%;
 		display: flex;
-		align-items: flex-end;
+		align-items: flex-start;
 		flex-direction: column;
 	}
 
 	.power {
 		position: relative;
-		width: 70%;
-		background-size: 200% auto;
-		// margin-right: 8%;
-
-		&::before {
-			content: "";
-			padding-top: 100%;
-			position: relative;
-			display: block;
-		}
+		width: 72%;
 
 		.art {
-			background: url(images/hero_power.png) center center no-repeat;
 			width: 100%;
-			position: absolute;
-			background-size: contain;
-			bottom: 0;
-			right: 0;
-
-			&::before {
-				content: "";
-				padding-top: 100%;
-				position: relative;
-				display: block;
-			}
+			clip-path: ellipse(40% 45% at 54% 54%);
 		}
 
-		.game-card {
+		.visual {
 			position: absolute;
-			width: 90%;
-			// background-size: 200% auto;
-			background-position: 50% 25%;
-			left: 5%;
-			top: 10%;
-
-			&::before {
-				content: "";
-				padding-top: 100%;
-				position: relative;
-				display: block;
-			}
+		    width: 100%;
+		    top: 0;
+		    left: 0;
 		}
 
-		.mana-cost {
-			// background: url(images/mana.png) center center no-repeat;
+		.card-cost {
 			background-size: contain;
 			position: absolute;
 			top: 0;
@@ -505,10 +476,6 @@
 		// margin-top: 2%;
 		align-self: flex-start;
 		padding-top: 2%;
-	}
-
-	.power-container {
-		margin-bottom: 4%;
 	}
 
 	.secret {
