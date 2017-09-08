@@ -10,7 +10,6 @@ CardRace = require('./card/card-race')
 CardRarity = require('./card/card-rarity')
 CardStats = require('./card/card-stats')
 CardNameBanner = require('./card/card-name-banner')
-CardTooltip = require('./card-tooltip')
 
 class CardTooltip extends React.Component
 

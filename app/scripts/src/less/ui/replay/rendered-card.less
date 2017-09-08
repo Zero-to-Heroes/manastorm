@@ -1,11 +1,18 @@
 // FIXME: make sure we override the already defined style
-.rendered-card.rendered-card.rendered-card.rendered-card.rendered-card {
+.rendered-card {
+
+	&::before {
+		content: "";
+		padding-top: 148%;
+		position: relative;
+		display: block;
+	}
 
  	// FIXME: temporary override until we clear card.less
 	img {
 		display: inherit;
 	}
-
+	
 	.art {
 		background-size: inherit;
 	    width: 80%;
@@ -15,7 +22,7 @@
 	}
 
 	&.minion .art {
-		clip-path: ellipse(40% 45% at 52% 49%);
+		clip-path: ellipse(34% 41% at 51% 52%)
 	}
 
 	&.spell .art {
@@ -174,5 +181,44 @@
 
 	.card__stats {
 		height: 20%;
+
+		.card__stats__attack {
+			width: 33%;
+			bottom: 1%;
+			background: url(images/attack.png) center center no-repeat;
+			background-size: contain;
+
+			span {
+				position: absolute;
+				display: inline-block;
+				text-align: center;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				line-height: 2.6em;
+				font-size: 1.1em;
+			}
+		}
+
+		.card__stats__health {
+			width: 33%;
+			bottom: 1%;
+			left: 68%;
+			background: url(images/health_new.png) center center no-repeat;
+			background-size: contain;
+
+			span {
+				position: absolute;
+				display: inline-block;
+				text-align: center;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				line-height: 2.4em;
+				font-size: 1.1em;
+			}
+		}
 	}
 }

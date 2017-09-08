@@ -8,7 +8,9 @@ Health = require './health'
 Card = require './card'
 CardArt = require './card/card-art'
 CardEffect = require './card/card-effect'
-WeaponTooltip = require './card/weapon-tooltip'
+CardStats = require './card/card-stats'
+WeaponVisual = require './card/weapon-visual'
+CardTooltip = require './card-tooltip'
 
 class Weapon extends Card
 	componentDidMount: ->
@@ -20,36 +22,6 @@ class Weapon extends Card
 		entity = @props.entity
 		cardUtils = @props.cardUtils
 		originalCard = cardUtils.getCard(@props.entity.cardID)
-
-		art = <CardArt cardUtils={cardUtils} entity={entity} />
-		weaponVisual = <img src="scripts/static/images/weapon_unsheathed.png" className="visual" />
-
-		# console.log 'rendering weapon', @props.entity
-		if entity.tags.CONTROLLER != @props.replay.getActivePlayer()?.tags?.PLAYER_ID
-			weaponVisual = <img src="scripts/static/images/weapon_sheathed.png" className="visual" />
-
-		cls = "weapon"
-		if @props.className
-			cls += " " + @props.className
-
-		healthClass = "card__stats__health"
-		if @props.entity.tags.DAMAGE > 0
-			healthClass += " damaged"
-
-		atkCls = "card__stats__attack"
-		if originalCard
-			originalAtk = originalCard.attack
-			tagAtk = @props.entity.tags.ATK || originalAtk
-			if tagAtk > originalAtk
-				atkCls += " buff"
-			else if tagAtk < originalAtk
-				atkCls += " debuff"
-
-		tagDurability = @props.entity.tags.DURABILITY || originalCard.durability
-		stats = <div className="card__stats">
-			<div className={atkCls}><span>{tagAtk or 0}</span></div>
-			<div className={healthClass}><span>{tagDurability - (@props.entity.tags.DAMAGE or 0)}</span></div>
-		</div>
 
 		enchantments = @buildEnchantments entity
 		statuses = @buildStatuses entity
@@ -65,7 +37,7 @@ class Weapon extends Card
 		cardTooltip =
 			<div className="card-container">
 				<div className="game-info">
-					<img src={art} />
+					<img src='' />
 					<div className={enchantmentClass}>
 						{enchantments}
 					</div>
@@ -77,17 +49,20 @@ class Weapon extends Card
 			</div>
 
 		@updateDimensions()
-		# link = '<img src="' + art + '">';
 
-		return <div key={'card' + entity.id} className="weapon-container" data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
+		cls = "weapon rendered-card"
+		if @props.className
+			cls += " " + @props.className
+
+		return <div key={'card' + entity.id} className="weapon-container" data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="10" data-class="card-tooltip rendered-card-tooltip">
 					<div className={cls}>
-						{art}
-						{weaponVisual}
+						<CardArt cardUtils={cardUtils} entity={entity} />
+						<WeaponVisual replay={@props.replay} cardUtils={cardUtils} entity={entity} />
 						<CardEffect cardUtils={cardUtils} entity={entity} />
-						{stats}
+						<CardStats cardUtils={cardUtils} entity={entity} />
 					</div>
 					<ReactTooltip id={"" + entity.id} >
-					    <WeaponTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

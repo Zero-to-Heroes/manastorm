@@ -8,7 +8,7 @@ class CardStats extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		return null unless originalCard.attack or originalCard.health
+		return null unless originalCard.attack or originalCard.health or originalCard.durability
 
 		healthClass = "card__stats__health"
 		atkCls = "card__stats__attack"

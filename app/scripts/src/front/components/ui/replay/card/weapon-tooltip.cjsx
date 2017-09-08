@@ -14,17 +14,13 @@ CardNameBanner = require('./card-name-banner')
 class WeaponTooltip extends React.Component
 
 	render: ->
-		return null
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		conf = @props.conf
 
-		if !entity.cardID or @props.isHidden
-			return <div key={'card' + entity.id} className="game-card rendered-card" style={@props.style}>
-				<div className="art card--unknown"></div>
-			</div>
+		originalCard = cardUtils?.getCard(entity?.cardID)
 
-		originalCard = cardUtils?.getCard(entity.cardID)
+		return null unless originalCard
 
 		cls = 'game-card rendered-card visible'
 		if originalCard.type is 'Minion'

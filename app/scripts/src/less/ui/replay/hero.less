@@ -126,12 +126,15 @@
 		.art {
 			width: 100%;
 			clip-path: ellipse(40% 40% at 50% 50%);
+		    left: 0;
+		    top: auto;
+		    bottom: 0;
 		}
 
 		.visual {
 			position: absolute;
 		    width: 100%;
-		    top: 0;
+		    bottom: 0;
 		    left: 0;
 		}
 
@@ -165,22 +168,10 @@
 		.card__stats {
 
 			.card__stats__attack {
-				background: transparent;
 				width: 45%;
 			    bottom: 5%;
 			    left: -2%;
-
-				span {
-					position: absolute;
-					display: inline-block;
-					text-align: center;
-					top: 0;
-					bottom: 0;
-					left: 0;
-					right: 0;
-					line-height: 2.6em;
-					font-size: 1.1em;
-				}
+			    background: transparent;
 			}
 
 			.card__stats__health {
@@ -188,18 +179,6 @@
 			    bottom: 5%;
 			    left: 57%;
 			    background: transparent;
-
-				span {
-					position: absolute;
-					display: inline-block;
-					text-align: center;
-					top: 0;
-					bottom: 0;
-					left: 0;
-					right: 0;
-					line-height: 2.6em;
-					font-size: 1.1em;
-				}
 			}
 		}
 	}
