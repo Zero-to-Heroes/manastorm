@@ -173,19 +173,30 @@
             font-size: 0.8em;
             bottom: 46%;
         }
-    }
-}
 
-.hand {
-    .game-card.rendered-card {
-        .card-tooltip.rendered-card-tooltip {
-            .card__stats {
-                span {
-                    font-size: 1.7em;
-                    padding-top: 14%;
-                }
+        .art {
+            background-size: inherit;
+            width: 80%;
+            position: absolute;
+            left: 10%;
+            top: 5%;
+        }
+
+        .card__stats {
+            span {
+                font-size: 1.7em;
+                padding-top: 14%;
             }
+        }
 
+        &.weapon .card__stats__attack {
+            background-image: url(images/card/weapon-attack.png);
+            width: 30%;
+        }
+
+        &.weapon .card__stats__health {
+            background-image: url(images/card/weapon-durability.png);
+            width: 30%;
         }
     }
 }
