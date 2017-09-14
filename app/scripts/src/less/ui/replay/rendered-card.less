@@ -14,15 +14,20 @@
 	}
 	
 	.art {
-		background-size: inherit;
-	    width: 80%;
+		width: 90%;
 	    position: absolute;
-	    left: 10%;
-	    top: 5%;
+		clip-path: ellipse(40% 40% at 50% 50%);
+
+		height: auto;
+	    width: 74%;
+	    position: absolute;
+	    left: 15%;
+	    top: 7%;
 	}
 
 	&.minion .art {
-		clip-path: ellipse(34% 41% at 51% 52%)
+		clip-path: ellipse(34% 41% at 51% 52%);
+		clip-path: ellipse(41% 60% at 53% 59%);
 	}
 
 	&.spell .art {
@@ -31,6 +36,17 @@
 	    left: 17%;
 	    top: 12%;
 	}
+
+	&.weapon .art {
+    	clip-path: ellipse(45% 45% at 50% 50%);
+	}
+
+	// .art {
+	// 	width: 100%;
+	//     left: 0;
+	//     top: auto;
+	//     bottom: 0;
+	// }
 
 	.frame {
 	    width: 100%;
@@ -108,13 +124,13 @@
 		height: 9%;
 	}
 
-	&.weapon .card-text {
+	&.weapon .name-text {
 		height: 8%;
 	}
 
 	text {
 		font-size: 2.7em;
-	    fill: #d4d4d4;
+	    fill: white;
 	    font-weight: bold;
 	}
 
@@ -229,4 +245,18 @@
 			}
 		}
 	}
+
+    &.weapon .card__stats__attack {
+        background-image: url(images/card/weapon-attack.png);
+        width: 24%;
+	    bottom: 10%;
+	    left: 4%;
+    }
+
+    &.weapon .card__stats__health {
+        background-image: url(images/card/weapon-durability.png);
+        width: 24%;
+		right: 0%;
+		left: auto;
+    }
 }

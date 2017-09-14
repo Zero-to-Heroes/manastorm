@@ -25,18 +25,19 @@
 		background: transparent;
 
 		.art {
-			height: auto;
-			width: 100%;
-			position: absolute;
-			left: 0;
-			top: 0;
-			background-size: contain;
+			// height: auto;
+			// width: 100%;
+			// position: absolute;
+			// left: 0;
+			// top: 0;
+			// background-size: contain;
 
 			&.card--unknown {
 				background: url(images/cardback.png) top left no-repeat;
-				background-size: contain !important; // Needed until we move completely to the rendered cards
+				background-size: contain;
 				height: 94%;
 				width: 94%;
+    			clip-path: none;
 			}
 
 			&.img-option-on {

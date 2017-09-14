@@ -174,14 +174,6 @@
             bottom: 46%;
         }
 
-        .art {
-            background-size: inherit;
-            width: 80%;
-            position: absolute;
-            left: 10%;
-            top: 5%;
-        }
-
         .card__stats {
             span {
                 font-size: 1.7em;
@@ -189,14 +181,12 @@
             }
         }
 
-        &.weapon .card__stats__attack {
-            background-image: url(images/card/weapon-attack.png);
-            width: 30%;
-        }
-
-        &.weapon .card__stats__health {
-            background-image: url(images/card/weapon-durability.png);
-            width: 30%;
+        &.weapon .card__stats {
+            span {
+                padding-top: 0;
+                line-height: 1.7em;
+                font-size: 2em;
+            }
         }
     }
 }
