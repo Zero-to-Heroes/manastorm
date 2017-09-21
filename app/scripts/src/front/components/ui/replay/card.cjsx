@@ -29,7 +29,7 @@ class Card extends React.Component
 
 			if @props.conf?.useCompressedImages
 				premiumDir = 'golden/'
-				
+
 		if @props.conf?.useCompressedImages
 			baseFolder = 'fullcards/en/256'
 
@@ -44,7 +44,7 @@ class Card extends React.Component
 				backgroundImage: "url(#{art})"
 			cls = "game-card visible"
 
-			# Cost update 
+			# Cost update
 			# We don't have the data for the cards in our opponent's hand
 			if @props.cost and !@props.isInfoConcealed
 				# console.log 'showing card cost', entity.cardID, entity, !@props.isInfoConcealed
@@ -71,7 +71,7 @@ class Card extends React.Component
 		frameCls = "frame minion"
 		legendaryCls = ""
 
-		# console.log 'rendering card', entity.cardID, @props.cost, entity.tags.COST, @props.isHidden, entity, @props.isInfoConcealed
+		console.log 'rendering card', entity.cardID, entity.tags, entity
 
 		if originalCard?.rarity is 'Legendary'
 			legendaryCls = " legendary"
@@ -97,16 +97,14 @@ class Card extends React.Component
 
 		if entity.tags.DIVINE_SHIELD
 			divineShield = <div className="overlay divine-shield"></div>
-
 		if entity.tags.SILENCED
 			overlay = <div className="overlay silenced"></div>
-
 		if entity.tags.FROZEN
 			overlay = <div className="overlay frozen"></div>
-
 		if entity.tags.STEALTH
 			overlay = <div className="overlay stealth"></div>
-
+		if entity.tags.CANT_BE_TARGETED_BY_ABILITIES and entity.tags.CANT_BE_TARGETED_BY_HERO_POWERS
+			effect = <div className="overlay elusive"></div>
 		if entity.tags.WINDFURY
 			windfury = <div className="overlay windfury"></div>
 
@@ -120,7 +118,7 @@ class Card extends React.Component
 		if originalCard and (originalCard.attack or originalCard.health) and !@props.isInfoConcealed and originalCard.type isnt 'Hero'
 			originalAtk = originalCard.attack
 			if entity.tags.ATK?
-				tagAtk = entity.tags.ATK 
+				tagAtk = entity.tags.ATK
 			else
 				tagAtk = originalAtk
 			if tagAtk > originalAtk
@@ -175,7 +173,7 @@ class Card extends React.Component
 		statuses = @buildStatuses entity
 		createdBy = @buildCreator entity
 
-		# Build the card link on hover. It includes the card image + the status alterations		
+		# Build the card link on hover. It includes the card image + the status alterations
 		enchantmentClass = if enchantments?.length > 0 then 'enchantments' else ''
 
 
@@ -185,7 +183,7 @@ class Card extends React.Component
 			imageCls += " msg-card"
 			enchantmentClass += ' msg-card'
 
-		cardTooltip = 
+		cardTooltip =
 			<div className="card-container">
 				<div className="game-info">
 					<img src={art} />
@@ -282,7 +280,7 @@ class Card extends React.Component
 				enchantCard = cardUtils?.getCard(enchant.cardID)
 
 				if enchantor
-					enchantImage = 
+					enchantImage =
 						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png)"
 					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{enchantor.cardID}.png"
 
@@ -314,7 +312,7 @@ class Card extends React.Component
 				name = cardUtils?.localizeKeyword(key)
 				text = cardUtils?.localizeKeyword(key + '_TEXT')
 				# console.log '\t\texists', name, text
-				statusElement = 
+				statusElement =
 					<div className="status" key={'status' + entity.id + key}>
 						<h3>{name}</h3>
 						<span>{text}</span>
@@ -329,7 +327,7 @@ class Card extends React.Component
 			cardUtils = @props.cardUtils
 			cardName = cardUtils?.getCard(entity.replay?.entities[entity.tags.CREATOR]?.cardID)?.name
 			if cardName
-				createdBy = 
+				createdBy =
 					<div className="created-by">
 						Created by <span className="card-name">{cardName}</span>
 					</div>
