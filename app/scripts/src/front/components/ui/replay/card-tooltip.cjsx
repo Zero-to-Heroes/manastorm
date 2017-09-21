@@ -58,7 +58,7 @@ class CardTooltip extends React.Component
 
 		@updateDimensions()
 
-		return  <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip rendered-card-tooltip">
+		return  <div key={'card' + entity.id} className={cls} style={@props.style}>
 					<div className={highlightCls}>
 						<CardArt cardUtils={cardUtils} entity={entity} />
 						<CardFrame cardUtils={cardUtils} entity={entity} conf={conf} />
@@ -78,15 +78,13 @@ class CardTooltip extends React.Component
 
 	updateDimensions: ->
 		setTimeout () =>
-			domNode = ReactDOM.findDOMNode(this)
-			if domNode
-				dimensions = @dimensions = domNode.getBoundingClientRect()
-				@centerX = dimensions.left + dimensions.width / 2
-				@centerY = dimensions.top + dimensions.height / 2
-		, 0
+			tooltipNode = ReactDOM.findDOMNode(this)
 
-	getDimensions: ->
-		#console.log 'getting dimensions for card', @centerX, @centerY
-		return {@centerX, @centerY}
+			return null unless tooltipNode
+
+			# Get the enclosing replay element
+			root = document.getElementById('externalPlayer')
+			tooltipNode.style.width = 0.33 * root.offsetWidth + 'px'
+		, 0
 
 module.exports = CardTooltip

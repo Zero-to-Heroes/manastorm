@@ -14,7 +14,6 @@ class CardName extends React.Component
 		else if originalCard.type is 'Spell'
 			pathId = 'spellPath'
 			path = <path id={pathId} d="M 0,30 Q 100,-10 200,30" />
-		# TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 		else if originalCard.type is 'Weapon'
 			pathId = 'weaponPath'
 			path = <path id={pathId} d="M 0,10 C 100,10 100,10 200,10" />
@@ -38,6 +37,6 @@ class CardName extends React.Component
 		setTimeout () =>
 			bb = @svgRef.getBBox()
 			@svgRef.setAttribute("viewBox", [bb.x, bb.y, bb.width, bb.height].join(' '))
-		, 0
+		, 100
 
 module.exports = CardName

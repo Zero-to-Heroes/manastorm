@@ -479,6 +479,7 @@ class Replay extends React.Component
 		#console.log '\tFound card', card
 		return card
 
+
 	# https://gist.github.com/sheldonh/6089299
 	merge: (xs...) ->
 		if xs?.length > 0

@@ -21,6 +21,9 @@ class CardInHand extends React.Component
 		entity = @props.entity
 		conf = @props.conf
 
+		@entityRefId = "" + entity.id
+		@tooltipRefId = 'tooltip' + @entityRefId
+
 		if !entity.cardID or @props.isHidden
 			return <div key={'card' + entity.id} className="game-card rendered-card" style={@props.style}>
 				<div className="art card--unknown"></div>
@@ -76,7 +79,7 @@ class CardInHand extends React.Component
 						<CardStats cardUtils={cardUtils} entity={entity} />
 						<CardCost cardUtils={cardUtils} entity={entity} />
 					</div>
-					<ReactTooltip id={"" + entity.id} >
+					<ReactTooltip id={@entityRefId} >
 					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
@@ -89,7 +92,7 @@ class CardInHand extends React.Component
 				dimensions = @dimensions = domNode.getBoundingClientRect()
 				@centerX = dimensions.left + dimensions.width / 2
 				@centerY = dimensions.top + dimensions.height / 2
-		, 0
+		, 20
 
 	getDimensions: ->
 		#console.log 'getting dimensions for card', @centerX, @centerY
