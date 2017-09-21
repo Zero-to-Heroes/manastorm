@@ -12,7 +12,7 @@ class Weapon extends Card
 	render: ->
 		#console.log 'trying to render weapon', @props.entity
 		return <div className="weapon-container"></div> unless @props.entity?.cardID
-		console.log '\trendering weapon', @props.entity.cardID, @props.entity.tags
+		# console.log '\trendering weapon', @props.entity.cardID, @props.entity.tags
 		entity = @props.entity
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{@props.entity.cardID}.png"

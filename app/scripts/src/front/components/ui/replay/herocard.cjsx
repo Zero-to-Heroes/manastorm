@@ -19,7 +19,7 @@ class HeroCard extends Card
 
 		weapon = @props.weapon
 
-		# console.log 'rendering hero', entity.cardID, entity
+		console.log 'rendering hero', entity.cardID, entity
 
 		if entity.cardID && !@props.isHidden
 			style =
@@ -37,11 +37,13 @@ class HeroCard extends Card
 			overlays.push <div className="overlay heavily-armored"></div>
 		if entity.tags.CANT_BE_DAMAGED and entity.tags.CANT_BE_DAMAGED != 0
 			overlays.push <div className="overlay immune"></div>
+		if entity.tags.STEALTH and entity.tags.STEALTH != 0
+			overlays.push <div className="overlay stealth"></div>
 
 		# console.log 'rendering hero', entity
 		if entity.highlighted
 			cls += " option-on"
-			
+
 		if @props.secrets
 			show = @props.showSecrets
 			secrets = @props.secrets.map (secret) ->
@@ -56,14 +58,14 @@ class HeroCard extends Card
 		# console.log 'build statuses', entity.cardID, entity
 		statuses = @buildStatuses entity
 
-		cardTooltip = 
+		cardTooltip =
 			<div className="card-container">
 				<div className='statuses'>
 					<div className="filler"></div>
 					{statuses}
 				</div>
 			</div>
-			
+
 		@updateDimensions()
 
 		return 	<div className={cls} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
