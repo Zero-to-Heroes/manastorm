@@ -1036,28 +1036,15 @@ class ReplayPlayer extends EventEmitter
 		for entity in entities
 			if entity.cardID
 				card = @cardUtils.getCard(entity.cardID)
-				# TODO: extract this to its own component, and reuse it from card.cjsx
+
 				if card and card.type != 'Enchantment'
-					baseFolder = 'allCards'
-					premiumDir = ''
-					if entity.tags.PREMIUM is 1 and card?.goldenImage and !@conf?.noGolden
-						premiumClass = 'golden'
-						premiumDir = 'golden_single_frame/'
-
-						if @conf?.useCompressedImages
-							premiumDir = 'golden/'
-
-					if @conf?.useCompressedImages
-						baseFolder = 'fullcards/en/256'
-
-					imgUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/#{baseFolder}/#{premiumDir}#{entity.cardID}.png"
+					imgUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/cardart/256x/#{entity.cardID}.jpg"
 					images.push imgUrl
 
 		# console.log 'image array', images
 		return images
 
 	preloadPictures: (arrayOfImages) ->
-		console.log 'preloading', arrayOfImages
 		arrayOfImages.forEach (img) ->
 			console.log '\tpreloading', img
 			(new Image()).src = img
