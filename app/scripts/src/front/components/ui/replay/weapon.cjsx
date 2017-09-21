@@ -12,7 +12,7 @@ class Weapon extends Card
 	render: ->
 		#console.log 'trying to render weapon', @props.entity
 		return <div className="weapon-container"></div> unless @props.entity?.cardID
-		#console.log '\trendering weapon', @props.entity
+		console.log '\trendering weapon', @props.entity.cardID, @props.entity.tags
 		entity = @props.entity
 
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{@props.entity.cardID}.png"
@@ -34,6 +34,8 @@ class Weapon extends Card
 
 		if entity.tags.POISONOUS
 			effect = <div className="effect poisonous"></div>
+		if entity.tags.LIFESTEAL
+			effect = <div className="effect lifesteal"></div>
 
 		healthClass = "card__stats__health"
 		if @props.entity.tags.DAMAGE > 0

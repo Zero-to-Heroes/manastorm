@@ -88,6 +88,8 @@ class Card extends React.Component
 			effect = <div className="effect poisonous"></div>
 		if entity.tags.TRIGGER
 			effect = <div className="effect trigger"></div>
+		if entity.tags.LIFESTEAL
+			effect = <div className="effect lifesteal"></div>
 
 		if @props.className
 			cls += " " + @props.className
