@@ -17,7 +17,12 @@ class CardText extends React.Component
 	updateText: ->
 		setTimeout () =>
 			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]
-			textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, maxFontSize: rootFontSize * 0.8}
-		, 100
+			if rootFontSize <= 0
+				@updateText()
+			else
+				console.log 'min max font sizes', document.getElementById('replayMainArea').style.fontSize, rootFontSize * 0.8
+				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: rootFontSize * 0.9}
+				console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
+		, 50
 
 module.exports = CardText

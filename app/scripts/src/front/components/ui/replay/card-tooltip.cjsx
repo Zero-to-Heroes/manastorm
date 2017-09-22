@@ -82,6 +82,7 @@ class CardTooltip extends React.Component
 
 			return null unless tooltipNode
 
+			console.log('updated dimensions')
 			# Get the enclosing replay element
 			root = document.getElementById('externalPlayer')
 			tooltipNode.style.width = 0.33 * root.offsetWidth + 'px'
