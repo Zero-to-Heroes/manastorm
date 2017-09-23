@@ -51,19 +51,19 @@ class Timeline extends React.Component
 		left = 0
 		element = @refs['scrub-bar']
 		target = element
-		while (element != null) 
+		while (element != null)
 			left += (element.offsetLeft || 0)
 			element = element.offsetParent
 
 		progression = (e.clientX - left) / target.offsetWidth
-		console.log 'moving to progression', progression, element, left, e.clientX, target, target.offsetWidth
+		# console.log 'moving to progression', progression, element, left, e.clientX, target, target.offsetWidth
 		# This avoids small deviations and keeps the impression that we can click on the same point and not move the timeline
 		progression = progression.toFixed(2)
-		console.log 'rounded', progression
+		# console.log 'rounded', progression
 		@replay.moveTime(progression)
 
 	moveToStart: (e) ->
-		@replay.moveTime(0)
+		@replay.moveToStart()
 
 	moveToEnd: (e) ->
 		@replay.moveTime(100)

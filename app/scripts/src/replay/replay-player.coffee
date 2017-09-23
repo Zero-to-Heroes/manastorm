@@ -49,7 +49,7 @@ class ReplayPlayer extends EventEmitter
 			return
 
 		console.log 'init starting'
-			
+
 		@initializing = true
 
 		if @entities
@@ -259,7 +259,7 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'rolling back to previous turn', @turns, @currentTurn - 1, @turns[@currentTurn - 1].actions.length - 1
 			rollbackAction = @turns[@currentTurn - 1].actions[@turns[@currentTurn - 1].actions.length - 1]
 
-		else 
+		else
 			rollbackAction = @turns[@currentTurn].actions[@currentActionInTurn]
 
 
@@ -270,6 +270,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Go to Mulligan
 		else if @currentActionInTurn < 0 and @currentTurn <= 2
+			@moveToStart()
 			@currentTurn = 0
 			@currentActionInTurn = 0
 			console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
@@ -297,7 +298,7 @@ class ReplayPlayer extends EventEmitter
 
 		if @currentActionInTurn >= 0 and (!rollbackAction.shouldExecute or rollbackAction.shouldExecute())
 			@emit 'previous-action', rollbackAction
-		
+
 		@currentActionInTurn = targetAction
 		@currentTurn = targetTurn
 
@@ -310,7 +311,7 @@ class ReplayPlayer extends EventEmitter
 			@goPreviousAction true
 		# hack to handle better all targeting, active spell and so on
 		# ultimately all the info should be contained in the action itself and we only read from it
-		else 
+		else
 			# hack - because soem tags are only processed with the initial action of the turn, and otherwise we don't go back far enough
 			if @currentActionInTurn is -1
 				# console.log 'position back to start of turn'
@@ -338,7 +339,7 @@ class ReplayPlayer extends EventEmitter
 				@goNextAction()
 
 	goToAction: ->
-		console.log 'going to action', @currentActionInTurn, @currentTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
+		# console.log 'going to action', @currentActionInTurn, @currentTurn, @turns[@currentTurn].actions[@currentActionInTurn], @turns[@currentTurn], @turns
 		if @currentActionInTurn >= 0
 			# console.log 'going to action', @currentActionInTurn, @turns[@currentTurn].actions
 			action = @turns[@currentTurn].actions[@currentActionInTurn]
@@ -351,7 +352,7 @@ class ReplayPlayer extends EventEmitter
 			@updateQuest action
 
 			# We only transmit a new event if the action is actually executed
-			if !action.shouldExecute or action.shouldExecute() 
+			if !action.shouldExecute or action.shouldExecute()
 				@emit 'new-action', action
 
 
@@ -361,17 +362,17 @@ class ReplayPlayer extends EventEmitter
 				# console.log 'setting target destination', @targetDestination, @targetSource, action
 				@targetType = action.actionType
 
-			# Now we want to go to the action, and to show the effects of the action - ie all 
-			# that happens until the next action. Otherwise the consequence of an action would 
+			# Now we want to go to the action, and to show the effects of the action - ie all
+			# that happens until the next action. Otherwise the consequence of an action would
 			# be bundled with the next action, which is less intuitive
 			nextActionIndex = 1
-			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex] 
+			nextAction = @turns[@currentTurn].actions[@currentActionInTurn + nextActionIndex]
 			while nextAction and (nextAction.shouldExecute and !nextAction.shouldExecute())
 				# console.log 'next action is skipping', nextAction, nextAction.shouldExecute
 				# Still need to call update() to populate the rollback properly
 				index = nextAction.index - 1
 				@goToIndex index, @currentTurn, @currentActionInTurn + nextActionIndex, true
-				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex] 
+				nextAction = @turns[@currentTurn].actions[@currentActionInTurn + ++nextActionIndex]
 
 			# console.log 'nextAction', nextAction
 			if nextAction
@@ -391,11 +392,11 @@ class ReplayPlayer extends EventEmitter
 
 			@goToIndex index
 
-			# We already decided that some actions shouldn't execute, so we don't recompute that. 
-			# -1 is to place the cursor at the step we're actually are, and let the "next action" move the cursor to the 
+			# We already decided that some actions shouldn't execute, so we don't recompute that.
+			# -1 is to place the cursor at the step we're actually are, and let the "next action" move the cursor to the
 			# action that should actually be executed
 			@currentActionInTurn = @currentActionInTurn + (nextActionIndex - 1)
-				
+
 
 	goToTurn: (gameTurn) ->
 		targetTurn = parseInt(gameTurn)
@@ -409,7 +410,7 @@ class ReplayPlayer extends EventEmitter
 			while targetTurn < @currentTurn
 				@goPreviousTurn()
 
-		else 
+		else
 			while @currentActionInTurn >= 0
 				@goPreviousAction()
 
@@ -423,7 +424,7 @@ class ReplayPlayer extends EventEmitter
 				return 'endgame'
 			# console.log 'non-numeric turn', inputTurnNumber
 			return inputTurnNumber
-		
+
 		inputTurnNumber = parseInt(inputTurnNumber)
 		if inputTurnNumber is 0
 			turnLabel = 'mulligan'
@@ -508,7 +509,15 @@ class ReplayPlayer extends EventEmitter
 	# ========================
 	# Moving inside the replay (with direct timestamp manipulation)
 	# ========================
+	moveToStart: () ->
+		@currentTurn = 0
+		@currentActionInTurn = 0
+		@init()
+
 	moveTime: (progression) ->
+		if progression == 0
+			@moveToStart()
+
 		target = @getTotalLength() * progression
 		@moveToTimestamp target
 
@@ -610,7 +619,7 @@ class ReplayPlayer extends EventEmitter
 
 		# console.log 'moving to index', @targetIndex, @historyPosition, @history[@historyPosition]
 		while @history[@historyPosition] and @history[@historyPosition].index <= @targetIndex
-			
+
 			# console.log '\tprocessing', @history[@historyPosition], @history[@historyPosition].index, @targetIndex
 			# console.log '\t\tturns', @turns[@currentTurn], @currentTurn, @turns
 			if @turns[turn]
@@ -620,7 +629,7 @@ class ReplayPlayer extends EventEmitter
 
 			if @history[@historyPosition + 1]
 				@historyPosition++
-			else 
+			else
 				break
 			# console.log '\t\tprocessed'
 
@@ -636,7 +645,7 @@ class ReplayPlayer extends EventEmitter
 		if @history[currentCursor]?.timestamp
 			@currentReplayTime = @history[currentCursor].timestamp - @startTimestamp
 			# console.log '\tupdating currentReplayTime', @currentReplayTime
-		else 
+		else
 			# console.log 'could not update currentReplayTime', @history[currentCursor], currentCursor
 
 		# console.log 'update finished'.
@@ -658,7 +667,7 @@ class ReplayPlayer extends EventEmitter
 		# Blur during mulligan
 		if @turns[@currentTurn].turn is 'Mulligan'
 			return true
-			
+
 		# Same for discover
 		if @discoverAction
 			return true
@@ -712,13 +721,13 @@ class ReplayPlayer extends EventEmitter
 	updateSecret: (action) ->
 		if action.actionType is 'secret-revealed'
 			@revealedSecret = action.data
-		else 
+		else
 			@revealedSecret = false
 
 	updateQuest: (action) ->
 		if action.actionType is 'quest-completed'
 			@questCompleted = action.data
-		else 
+		else
 			@questCompleted = false
 
 	updateEndGame: (action) ->
@@ -726,7 +735,7 @@ class ReplayPlayer extends EventEmitter
 			@isEndGame = true
 			# console.log 'notifying endgame'
 			@notifyChangedTurn 'endgame'
-		else 
+		else
 			@isEndGame = false
 		# action.activeSpell = @activeSpell
 
@@ -841,7 +850,7 @@ class ReplayPlayer extends EventEmitter
 				if player.tags.CONTROLLER is entity.tags.CONTROLLER
 					@player = player
 					# console.log '\tsetting player', @player
-				else 
+				else
 					@opponent = player
 					# console.log '\tsetting opponent', @opponent
 			# console.log 'set player and opponent', @player, @opponent
@@ -912,22 +921,22 @@ class ReplayPlayer extends EventEmitter
 			player: {
 				'name': @player.name,
 				'class': @getClass(@entities[@player.tags.HERO_ENTITY].cardID)
-			}, 
+			},
 			opponent: {
 				'name': @opponent.name,
 				'class': @getClass(@entities[@opponent.tags.HERO_ENTITY].cardID)
 			}
 		}
-		
+
 		return playerInfo
 
 	getClass: (cardID) ->
 		return @cardUtils.getCard(cardID)?.playerClass?.toLowerCase()
 
 	isValid: ->
-		return if !@getClass(@entities[@player.tags.HERO_ENTITY].cardID) then false else true 
-		
-		# console.log 'preloaded images'	
+		return if !@getClass(@entities[@player.tags.HERO_ENTITY].cardID) then false else true
+
+		# console.log 'preloaded images'
 
 	# Replace the tN keywords
 	replaceKeywordsWithTimestamp: (text) ->
@@ -997,7 +1006,7 @@ class ReplayPlayer extends EventEmitter
 
 		replaceString = '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match[0] + '</a>'
 		text = text.substring(0, match.index) + replaceString + text.substring(match.index + match[0].length)
-			
+
 		turnRegex.lastIndex += replaceString.length
 		# console.log 'replacing match', match
 		# text = text.replace match, '<a ng-click="mediaPlayer.goToTimestamp(\'' + inputTurnNumber + '\')" class="ng-scope">' + match + '</a>'
@@ -1037,7 +1046,7 @@ class ReplayPlayer extends EventEmitter
 
 						if @conf?.useCompressedImages
 							premiumDir = 'golden/'
-							
+
 					if @conf?.useCompressedImages
 						baseFolder = 'fullcards/en/256'
 

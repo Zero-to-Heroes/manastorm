@@ -47,10 +47,10 @@ class ActionParser extends EventEmitter
 						@currentPlayer = @player
 					else if @opponent.id is item.node.id
 						@currentPlayer = @opponent
-					else 
+					else
 						console.error 'could not set current player'
 					# Need to create a fake first turn
-					# We create it twice to not mess with the logic that assumes that first turn 
+					# We create it twice to not mess with the logic that assumes that first turn
 					# is mulligan with no active player
 					@createFirstTurnForSpectate item
 					@createFirstTurnForSpectate item
@@ -64,7 +64,7 @@ class ActionParser extends EventEmitter
 					# Entity not in the game yet
 					definition.tags.ZONE = 6
 					entity.update(definition)
-			# Order is important, since a card can be first created with fullentity then info (like card id) be added with 
+			# Order is important, since a card can be first created with fullentity then info (like card id) be added with
 			# showentity, eg rallying blade
 			if item.command == 'receiveShowEntity'
 				if item.node.id and @entities[item.node.id]
@@ -106,14 +106,14 @@ class ActionParser extends EventEmitter
 	parseActions: ->
 		# Build the list of turns along with the history position of each
 		@players = [@player, @opponent]
-		
+
 		@playerIndex = 0
 		# @currentPlayer = @players[@playerIndex]
 		# console.log 'parsing history', @history
 
 		for item in @history
 
-			console.log 'parsing history item', item
+			# console.log 'parsing history item', item
 
 			@parseMulliganTurn item
 			@parseChangeActivePlayer item
@@ -160,7 +160,7 @@ class ActionParser extends EventEmitter
 			if item.command is 'receiveEntity'
 				@parseCardPlayedByMinion item
 
-			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life 
+			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life
 			# tap before drawing the card)
 			@parseDrawCard item
 			@parseOverdraw item
@@ -235,7 +235,7 @@ class ActionParser extends EventEmitter
 			# console.log 'parsing mulligan', item
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
-			else 
+			else
 				@turns[@turnNumber] = {
 					turn: 'Mulligan'
 					playerMulligan: []
@@ -256,7 +256,7 @@ class ActionParser extends EventEmitter
 				# if @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
 				# 	console.log 'no active player, forcing it', @turns[@turnNumber - 1]
 
-				# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't 
+				# Looks like the first turn doesn't get the tag, so we deduce the active player was the one who didn't
 				# become active player next turn
 				if !previousPlayer and @turns[@turnNumber - 1] and !@turns[@turnNumber - 1]?.activePlayer
 					@turns[@turnNumber - 1].activePlayer = _.find @players, (o) ->
@@ -307,7 +307,7 @@ class ActionParser extends EventEmitter
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
-				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+				# When a card is played that makes you draw, the "root" action isn't an action owned by the player,
 				# but by the card itself. So we need to find out who that card controller is
 				# ownerId = currentCommand.attributes.entity
 				ownerId = item.node.entity
@@ -353,7 +353,7 @@ class ActionParser extends EventEmitter
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
-				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+				# When a card is played that makes you draw, the "root" action isn't an action owned by the player,
 				# but by the card itself. So we need to find out who that card controller is
 				ownerId = currentCommand.attributes.entity
 				if ownerId not in ['2', '3']
@@ -366,7 +366,7 @@ class ActionParser extends EventEmitter
 					currentCommand = item.node
 					while currentCommand.parent and currentCommand.entity not in ['2', '3']
 						currentCommand = currentCommand.parent
-					
+
 					for entity in entities
 						if entity.tags.ZONE == 3
 							lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
@@ -397,7 +397,7 @@ class ActionParser extends EventEmitter
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
-				# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+				# When a card is played that makes you draw, the "root" action isn't an action owned by the player,
 				# but by the card itself. So we need to find out who that card controller is
 				# ownerId = currentCommand.attributes.entity
 				ownerId = item.node.entity
@@ -444,7 +444,7 @@ class ActionParser extends EventEmitter
 			while currentCommand.parent and currentCommand.entity not in ['2', '3']
 				currentCommand = currentCommand.parent
 
-			# When a card is played that makes you draw, the "root" action isn't an action owned by the player, 
+			# When a card is played that makes you draw, the "root" action isn't an action owned by the player,
 			# but by the card itself. So we need to find out who that card controller is
 			ownerId = currentCommand.attributes.entity
 			if ownerId not in ['2', '3']
@@ -457,7 +457,7 @@ class ActionParser extends EventEmitter
 				currentCommand = item.node
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
-				
+
 				for entity in entities
 					# ShowEntities are revealed with a zone = GRAVEYARD
 					if entity.tags.ZONE == 4
@@ -504,8 +504,8 @@ class ActionParser extends EventEmitter
 			# Check that the entity was in our hand before
 			entity = @entities[command.attributes.entity]
 
-			# The case of a ShowEntity command when the card was already known - basically 
-			# when we play our own card. In that case, the tags are already known, and 
+			# The case of a ShowEntity command when the card was already known - basically
+			# when we play our own card. In that case, the tags are already known, and
 			# tag changes are the only things we care about
 			for tag in command.tags
 				if tag.tag == 'ZONE' and tag.value in [1]
@@ -513,7 +513,7 @@ class ActionParser extends EventEmitter
 					if @entities[tag.entity].tags.CARDTYPE != 6
 						playedCard = tag.entity
 
-			# The case of a ShowEntity (or FullEntity) when we didn't previously know the 
+			# The case of a ShowEntity (or FullEntity) when we didn't previously know the
 			# card. In that case, a ShowEntity (or FullEntity) element is created that contains
 			# the tag with the proper zone
 			# Use entities when playing Eviscerate at t6o at http://www.zerotoheroes.com/r/hearthstone/572de12ee4b0d4231295c49e/an-arena-game-going-5-0
@@ -535,12 +535,12 @@ class ActionParser extends EventEmitter
 				owner: @turns[@currentTurnNumber].activePlayer
 				initialCommand: command
 			}
-			
+
 			# console.log '\tAnd it is a valid play', action
 			@addAction @currentTurnNumber, action
 
 
-	parseCardPlayedByMinion: (item) -> 
+	parseCardPlayedByMinion: (item) ->
 		command = item.node
 		playedCard = -1
 
@@ -624,7 +624,7 @@ class ActionParser extends EventEmitter
 
 			if playedCard > -1 and secret
 				entity = @entities[playedCard]
-				owner = @getController(entity.tags.CONTROLLER) 
+				owner = @getController(entity.tags.CONTROLLER)
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -641,7 +641,7 @@ class ActionParser extends EventEmitter
 
 	parseQuestPlayedFromHand: (item) ->
 		command = item.node
-		if command.attributes.type == '7' 
+		if command.attributes.type == '7'
 
 			# main player
 			if command.tags
@@ -659,7 +659,7 @@ class ActionParser extends EventEmitter
 
 				if playedCard > -1 and quest
 					entity = @entities[playedCard]
-					owner = @getController(entity.tags.CONTROLLER) 
+					owner = @getController(entity.tags.CONTROLLER)
 					action = {
 						turn: @currentTurnNumber - 1
 						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -685,7 +685,7 @@ class ActionParser extends EventEmitter
 
 				if playedCard > -1 and quest
 					entity = @entities[playedCard]
-					owner = @getController(entity.tags.CONTROLLER) 
+					owner = @getController(entity.tags.CONTROLLER)
 					action = {
 						turn: @currentTurnNumber - 1
 						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -702,10 +702,10 @@ class ActionParser extends EventEmitter
 	# Damage, healing and jousts
 	parsePowerEffects: (item) ->
 		command = item.node
-		if command.attributes.type in ['3', '5'] 
+		if command.attributes.type in ['3', '5']
 
 			# Hard-code for Malchezaar
-			if @entities[command.attributes.entity]?.cardID is 'KAR_096' and command.attributes.type is '5' 
+			if @entities[command.attributes.entity]?.cardID is 'KAR_096' and command.attributes.type is '5'
 				action = {
 					turn: @currentTurnNumber - 1
 					timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
@@ -719,20 +719,20 @@ class ActionParser extends EventEmitter
 			# console.log 'consider power effects', command.attributes.entity
 
 			else if command.meta?.length > 0
-				for meta in command.meta 
+				for meta in command.meta
 					if !meta.info and !meta.meta
 						continue
 
 					# The HSReplay version
 					if !meta.info and meta.meta
 						@addMeta item, meta, meta
-						
+
 					if meta.info
 						for info in meta.info
 							@addMeta item, meta, info
 
-						
-			
+
+
 			# Power overwhelming for instance doesn't use Meta tags
 			else if parseInt(command.attributes.target) > 0
 				action = {
@@ -772,7 +772,7 @@ class ActionParser extends EventEmitter
 			if parseInt(command.attributes.entity) == info.entity and @entities[command.attributes.entity].tags.CARDTYPE == 5
 				return
 
-			if mainAction?.actions 
+			if mainAction?.actions
 				for action in mainAction.actions
 
 					# If the same source deals the same amount of damage, we group all of that together
@@ -827,13 +827,13 @@ class ActionParser extends EventEmitter
 					mainAction.actions = mainAction.actions or []
 					mainAction.actions.push action
 				@addAction @currentTurnNumber, action
-				
+
 		# The power dealt some damage
 		if meta.meta == 'DAMAGE'
-			if mainAction?.actions 
+			if mainAction?.actions
 				for action in mainAction.actions
 					# If the same source deals the same amount of damage, we group all of that together
-					if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity) 	
+					if action.actionType is 'power-damage' and action.data.id is parseInt(command.attributes.entity)
 						action.target.push target
 						action.target = _.uniq action.target
 						action.index = meta.index
@@ -849,7 +849,7 @@ class ActionParser extends EventEmitter
 			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 			lastActionIndex = 1
 			initialLastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-			if !mainAction 
+			if !mainAction
 
 				lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
 				while lastAction?.actionType is 'power-damage'
@@ -878,7 +878,7 @@ class ActionParser extends EventEmitter
 						break
 
 					lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - lastActionIndex]
-						
+
 			if !subAction
 				action = {
 					turn: @currentTurnNumber - 1
@@ -905,7 +905,7 @@ class ActionParser extends EventEmitter
 
 		# The power healed someone
 		if meta.meta == 'HEALING'
-			if mainAction?.actions 
+			if mainAction?.actions
 				for action in mainAction.actions
 					# If the same source deals the same amount of damage, we group all of that together
 					if action.actionType is 'power-healing' and action.data.id is parseInt(command.attributes.entity)
@@ -918,7 +918,7 @@ class ActionParser extends EventEmitter
 							action.targets[target] = action.targets[target] + parseInt(meta.data)
 						else
 							action.targets[target] = parseInt(meta.data)
-						
+
 			# Check if previous action is not the same as the current one (eg Healing Totem power is not a sub action)
 			lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
 			if !mainAction and lastAction?.actionType is 'power-healing' and lastAction.data.id is parseInt(command.attributes.entity)
@@ -959,13 +959,13 @@ class ActionParser extends EventEmitter
 				# If the preceding action is a "targeting" one, we remove it, as the info would be redundent
 				if lastAction?.actionType is 'power-target'
 					@turns[@currentTurnNumber].actions.pop()
-					
+
 				# console.log 'creating power-healing', action, meta
 				@addAction @currentTurnNumber, action
 
 	parseTriggerPutSecretInPlay: (item) ->
 		command = item.node
-		if command.attributes.type in ['3', '5'] 
+		if command.attributes.type in ['3', '5']
 			secretsPutInPlay = []
 			if command.tags
 				for tag in command.tags
@@ -992,8 +992,8 @@ class ActionParser extends EventEmitter
 	# The other effects, like battlecry, echoing ooze duplication, etc.
 	parseTriggerFullEntityCreation: (item) ->
 		command = item.node
-		if command.attributes.type in ['5'] 
-			
+		if command.attributes.type in ['5']
+
 			if command.fullEntities?.length > 0
 				entities = command.fullEntities
 
@@ -1037,7 +1037,7 @@ class ActionParser extends EventEmitter
 
 	parseDeaths: (item) ->
 		command = item.node
-		if command.tags and command.attributes.type == '6' 
+		if command.tags and command.attributes.type == '6'
 			for tag in command.tags
 				# Graveyard
 				if tag.tag == 'ZONE' and tag.value == 4
@@ -1083,7 +1083,7 @@ class ActionParser extends EventEmitter
 			# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
 
 
-	parseDiscoverPick: (item) -> 
+	parseDiscoverPick: (item) ->
 		command = item.node
 		console.log 'considering last pick', item, @turns[@currentTurnNumber].actions, @currentTurnNumber, @turns
 
@@ -1165,7 +1165,7 @@ class ActionParser extends EventEmitter
 	parseSummons: (item) ->
 		command = item.node
 		# A power that creates new entities - minions
-		if command.attributes.type in ['3'] 
+		if command.attributes.type in ['3']
 
 			if command.fullEntities?.length > 0
 				entities = command.fullEntities
@@ -1269,7 +1269,7 @@ class ActionParser extends EventEmitter
 
 
 
-	parseMinionCasting: (item) -> 
+	parseMinionCasting: (item) ->
 		command = item.node
 		if command.tag == 'CAST_RANDOM_SPELLS'
 			if command.value is 1
