@@ -134,7 +134,7 @@ TurnLog = React.createClass
 		@replay.notifyNewLog log
 		return [log]
 
-	
+
 
 	# ===================
 	# Action specific logs
@@ -222,7 +222,7 @@ TurnLog = React.createClass
 		return drawLog
 
 	buildOverdrawLog: (action) ->
-		if action.owner == @replay.player
+		if action.owner == @replay.player or action.cardVisible
 			cardLink = @buildList action.data
 		else if action.data.length == 1
 			cardLink = '<span> ' + action.data.length + ' card! </span>'
@@ -297,7 +297,7 @@ TurnLog = React.createClass
 
 		log = <p key={'log' + ++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
-				<span> plays a </span> 
+				<span> plays a </span>
 				<span className="secret-revealed">Secret </span>
 				{link1}
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
@@ -318,7 +318,7 @@ TurnLog = React.createClass
 
 		log = <p key={'log' + ++@logIndex}>
 				<PlayerNameDisplayLog active={action.owner == @replay.player} name={action.owner.name} />
-				<span> plays a </span> 
+				<span> plays a </span>
 				<span className="secret-revealed">Quest </span>
 				{link1}
 				<span dangerouslySetInnerHTML={{__html: cardLink}}></span>
@@ -362,7 +362,7 @@ TurnLog = React.createClass
 			# card = if action.data then action.data['cardID'] else ''
 			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
-		else 
+		else
 			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
@@ -399,7 +399,7 @@ TurnLog = React.createClass
 			# card = if action.data then action.data['cardID'] else ''
 			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
-		else 
+		else
 			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
@@ -425,7 +425,7 @@ TurnLog = React.createClass
 			# card = if action.data then action.data['cardID'] else ''
 			cardLink = @buildCardLink action.data
 			cardLog = <span dangerouslySetInnerHTML={{__html: cardLink}}></span>
-		else 
+		else
 			cardLog = <span>which </span>
 
 		# The effect occured as a response to another action, so we need to make that clear
@@ -449,7 +449,7 @@ TurnLog = React.createClass
 		log = <p key={'log' + ++@logIndex} className={cls}>
 			    {indentLog}
 			    {cardLog}
-			    <span> heals </span> 
+			    <span> heals </span>
 			    {targets}
 			</p>
 
@@ -457,7 +457,7 @@ TurnLog = React.createClass
 
 	buildSplashRevealLog: (action) ->
 		cardLink = @buildCardLink action.data
-		cardLog =  <SpanDisplayLog newLog={cardLink} /> 
+		cardLog =  <SpanDisplayLog newLog={cardLink} />
 
 		log = <p key={'log' + ++@logIndex}>
 			    {cardLog}
@@ -475,14 +475,14 @@ TurnLog = React.createClass
 		# console.log 'building list', action, actionIds
 		if action and action.revealTarget and !action.revealTarget(@replay)
 			hiddenLink = '' + actionIds.length + ' cards'
-			targets.push <SpanDisplayLog newLog={hiddenLink} /> 
+			targets.push <SpanDisplayLog newLog={hiddenLink} />
 
 		else
 			for targetId in actionIds
 				# target = @replay.entities[targetId]['cardID']
 				targetLink = @buildCardLink @replay.entities[targetId]
 				targets.push <SpanDisplayLog newLog={targetLink} />
-				if actionIds.length > 1 
+				if actionIds.length > 1
 					if index == actionIds.length - 1
 						targets.push <span key={'log' + ++@logIndex}> and </span>
 					else if index < actionIds.length - 1
@@ -513,7 +513,7 @@ TurnLog = React.createClass
 			# target = entity['cardID']
 			if entity['cardID']
 				targetLink = @buildCardLink entity # @replay.buildCardLink(@replay.cardUtils.getCard(target))
-				creationLog = <span key={'log' + ++@logIndex} className="list"> 
+				creationLog = <span key={'log' + ++@logIndex} className="list">
 					<SpanDisplayLog newLog={cardLink} />
 					<span> creates </span>
 					<SpanDisplayLog newLog={targetLink} />
@@ -587,8 +587,8 @@ TurnLog = React.createClass
 		cardLink = @buildCardLink action.data
 
 		log = <p key={'log' + ++@logIndex}>
-			    {indent}		
-			    <span> summons </span> 
+			    {indent}
+			    <span> summons </span>
 			    <SpanDisplayLog newLog={cardLink} />
 			</p>
 
@@ -650,7 +650,7 @@ TurnLog = React.createClass
 			if turn.turn is 'Mulligan'
 				log = @buildMulliganLog turn
 				return log
-			else 
+			else
 				log = <p className="turn" key={'log' + ++@logIndex}>
 						<TurnDisplayLog turn={turn} active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} onClick={@props.onTurnClick.bind(this, turn.turn)} />
 					</p>
@@ -695,7 +695,7 @@ TurnLog = React.createClass
 	# ===============
 	# Utilities
 	# ===============
-	playerName: (turn) -> 
+	playerName: (turn) ->
 		return <PlayerNameDisplayLog active={turn.activePlayer == @replay.player} name={turn.activePlayer.name} />
 
 	buildCardLink: (entity) ->
@@ -712,7 +712,7 @@ TurnLog = React.createClass
 TurnDisplayLog = React.createClass
 	componentDidMount: ->
 		$("#turnLog").scrollTo("max")
-		
+
 	render: ->
 		if @props.active
 			return <span key={'log' + ++@logIndex}>
@@ -728,9 +728,9 @@ TurnDisplayLog = React.createClass
 PlayerNameDisplayLog = React.createClass
 	componentDidMount: ->
 		$("#turnLog").scrollTo("max")
-	
+
 	render: ->
-		if @props.active 
+		if @props.active
 			return <span className="main-player" key={'log' + ++@logIndex}>{@props.name}</span>
 		else
 			return <span className="opponent" key={'log' + ++@logIndex}>{@props.name}</span>

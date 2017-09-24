@@ -462,6 +462,7 @@ class ActionParser extends EventEmitter
 					# ShowEntities are revealed with a zone = GRAVEYARD
 					if entity.tags.ZONE == 4
 						lastAction = @turns[@currentTurnNumber].actions[@turns[@currentTurnNumber].actions.length - 1]
+						isCardVisible =
 						if lastAction?.actionType is 'overdraw' and lastAction.owner.id is parseInt(owner.id)
 							lastAction.data.push entity.id
 						else
@@ -472,6 +473,7 @@ class ActionParser extends EventEmitter
 								data: [entity.id]
 								mainAction: item.node.parent
 								owner: owner
+								cardVisible: entity.cardID
 								initialCommand: item.node
 								debug_lastAction: lastAction
 							}
