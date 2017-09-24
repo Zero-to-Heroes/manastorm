@@ -157,7 +157,7 @@ class ActionParser extends EventEmitter
 			if item.command is 'receiveChosenEntities'
 				@parseDiscoverPick item
 
-			if item.command is 'receiveEntity'
+			if item.command in ['receiveEntity', 'receiveShowEntity']
 				@parseCardPlayedByMinion item
 
 			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life
@@ -546,6 +546,8 @@ class ActionParser extends EventEmitter
 		command = item.node
 		playedCard = -1
 
+		# console.log 'parsing card played by minion?', @minionCasting, item
+
 		# Spell cast by a minion (typically Yogg or Servant of Yogg)
 		if @minionCasting and command.tags.CREATOR is @minionCasting
 			action = {
@@ -557,7 +559,7 @@ class ActionParser extends EventEmitter
 				owner: @turns[@currentTurnNumber].activePlayer
 				initialCommand: command
 			}
-			console.log 'minion casting', action
+			# console.log 'minion casting', action
 			@addAction @currentTurnNumber, action
 
 
