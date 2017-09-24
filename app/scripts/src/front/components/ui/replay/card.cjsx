@@ -20,7 +20,7 @@ class Card extends React.Component
 
 		imageCls = "art "
 		baseFolder = 'allCards'
-		# console.log 'rendering card', entity.cardID, originalCard, entity, @props.conf
+		console.log 'rendering card', entity.cardID, originalCard, entity, @props.conf
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage and !@props.conf?.noGolden
 			# console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
@@ -99,6 +99,8 @@ class Card extends React.Component
 
 		if entity.tags.DIVINE_SHIELD
 			divineShield = <div className="overlay divine-shield"></div>
+		if entity.tags.CANT_BE_DAMAGED
+			divineShield = <div className="overlay immune"></div>
 		if entity.tags.SILENCED
 			overlay = <div className="overlay silenced"></div>
 		if entity.tags.FROZEN
