@@ -2,16 +2,16 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 ReactTooltip = require("react-tooltip")
 
-CardArt = require('./card/card-art')
-CardCost = require('./card/card-cost')
-CardFrame = require('./card/card-frame')
-CardName = require('./card/card-name')
-CardText = require('./card/card-text')
-CardRace = require('./card/card-race')
-CardRarity = require('./card/card-rarity')
-CardStats = require('./card/card-stats')
-CardNameBanner = require('./card/card-name-banner')
-CardTooltip = require('./card-tooltip')
+CardArt = require('./card-art')
+CardCost = require('./card-cost')
+CardFrame = require('./card-frame')
+CardName = require('./card-name')
+CardText = require('./card-text')
+CardRace = require('./card-race')
+CardRarity = require('./card-rarity')
+CardStats = require('./card-stats')
+CardNameBanner = require('./card-name-banner')
+CardTooltip = require('../card-tooltip')
 
 
 class RenderedCard extends React.Component

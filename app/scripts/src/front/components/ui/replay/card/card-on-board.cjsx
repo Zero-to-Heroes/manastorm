@@ -2,12 +2,12 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 ReactTooltip = require("react-tooltip")
 
-CardArt = require('./card/card-art')
-CardFrameOnBoard = require('./card/card-frame-on-board')
-CardStats = require('./card/card-stats')
-CardEffect = require('./card/card-effect')
-CardOverlay = require('./card/card-overlay')
-CardTooltip = require('./card-tooltip')
+CardArt = require('./card-art')
+CardFrameOnBoard = require('./card-frame-on-board')
+CardStats = require('./card-stats')
+CardEffect = require('./card-effect')
+CardOverlay = require('./card-overlay')
+CardTooltip = require('../card-tooltip')
 
 
 class CardOnBoard extends React.Component
