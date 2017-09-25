@@ -14,7 +14,7 @@ CardNameBanner = require('./card/card-name-banner')
 CardTooltip = require('./card-tooltip')
 
 
-class CardInHand extends React.Component
+class RenderedCard extends React.Component
 
 	render: ->
 		cardUtils = @props.cardUtils
@@ -98,4 +98,4 @@ class CardInHand extends React.Component
 		#console.log 'getting dimensions for card', @centerX, @centerY
 		return {@centerX, @centerY}
 
-module.exports = CardInHand
+module.exports = RenderedCard

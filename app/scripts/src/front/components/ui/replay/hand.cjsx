@@ -1,5 +1,5 @@
 React = require 'react'
-CardInHand = require './card-in-hand'
+RenderedCard = require './card/rendered-card'
 Card = require './card'
 SubscriptionList = require '../../../../subscription-list'
 ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
@@ -35,7 +35,7 @@ Hand = React.createClass
 			}
 
 			# console.log 'rendering card in hand', entity.cardID, entity
-			<CardInHand isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
+			<RenderedCard isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
 
 		return <div className="hand">
 				<div>{cards}</div>

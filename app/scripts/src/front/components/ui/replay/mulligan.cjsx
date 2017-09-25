@@ -1,6 +1,6 @@
 React = require 'react'
 Card = require './card'
-CardInHand = require './card-in-hand'
+RenderedCard = require './card/rendered-card'
 _ = require 'lodash'
 
 class Mulligan extends React.Component
@@ -14,7 +14,7 @@ class Mulligan extends React.Component
 		hidden = @props.isHidden
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
 			# console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
-			<CardInHand entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan?.indexOf(entity.id) != -1} cost={true} cardUtils={@props.replay.cardUtils} conf={@props.conf}/>
+			<RenderedCard entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan?.indexOf(entity.id) != -1} cost={true} cardUtils={@props.replay.cardUtils} conf={@props.conf}/>
 
 
 		return <div className="mulligan">
