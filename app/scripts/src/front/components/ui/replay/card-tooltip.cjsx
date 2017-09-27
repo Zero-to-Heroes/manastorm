@@ -9,6 +9,9 @@ CardText = require('./card/card-text')
 CardRace = require('./card/card-race')
 CardRarity = require('./card/card-rarity')
 CardStats = require('./card/card-stats')
+CardEnchantments = require('./card/card-enchantments')
+CardCreator = require('./card/card-creator')
+CardKeywords = require('./card/card-keywords')
 CardNameBanner = require('./card/card-name-banner')
 
 class CardTooltip extends React.Component
@@ -40,26 +43,13 @@ class CardTooltip extends React.Component
 		if @props.className
 			cls += " " + @props.className
 
-		imageCls = "art "
-		highlightCls = ''
-		if entity.highlighted
-			highlightCls += " option-on frame-highlight"
-			highlight = <div className="option-on"></div>
-			imageCls += " img-option-on"
-
-			if @props.controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
-				imageCls += " combo"
-
-			if entity.tags.POWERED_UP == 1
-				imageCls += " img-option-on combo"
-
 		if entity.tags.TRANSFORMED_FROM_CARD
 			tranformedEffect = <div className="transformed-from-card"></div>
 
 		@updateDimensions()
 
-		return  <div key={'card' + entity.id} className={cls} style={@props.style}>
-					<div className={highlightCls}>
+		return  <div className="tooltip-info">
+					<div key={'card' + entity.id} className={cls} style={@props.style}>
 						<CardArt cardUtils={cardUtils} entity={entity} />
 						<CardFrame cardUtils={cardUtils} entity={entity} conf={conf} />
 						<CardRarity cardUtils={cardUtils} entity={entity} />
@@ -67,11 +57,15 @@ class CardTooltip extends React.Component
 						<CardName cardUtils={cardUtils} entity={entity} />
 						<CardText cardUtils={cardUtils} entity={entity} />
 						{legendaryFrame}
-						{highlight}
 						{tranformedEffect}
 						<CardRace cardUtils={cardUtils} entity={entity} />
 						<CardStats cardUtils={cardUtils} entity={entity} />
 						<CardCost cardUtils={cardUtils} entity={entity} />
+						<CardEnchantments cardUtils={cardUtils} entity={entity} />
+						<CardCreator cardUtils={cardUtils} entity={entity} />
+					</div>
+					<div className="keywords">
+						<CardKeywords cardUtils={cardUtils} entity={entity} />
 					</div>
 				</div>
 
@@ -82,10 +76,9 @@ class CardTooltip extends React.Component
 
 			return null unless tooltipNode
 
-			console.log('updated dimensions')
 			# Get the enclosing replay element
 			root = document.getElementById('externalPlayer')
-			tooltipNode.style.width = 0.33 * root.offsetWidth + 'px'
+			tooltipNode.style.width = 0.66 * root.offsetWidth + 'px'
 		, 0
 
 module.exports = CardTooltip
