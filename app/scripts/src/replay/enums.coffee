@@ -286,6 +286,9 @@ tags =
 	TARGETING_ARROW_TEXT: 325
 	LocalizationNotes: 344
 
+	# Not sure what this is, it seems to indicate that a temporary effect (shadow madness, corruption) is active?
+	_333: 333
+
 # Renamed
 tags.CANT_BE_DAMAGED = tags.IMMUNE
 tags.CANT_BE_DISPELLED = tags.CANT_BE_SILENCED

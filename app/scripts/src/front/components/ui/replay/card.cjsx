@@ -111,6 +111,8 @@ class Card extends React.Component
 			effect = <div className="overlay elusive"></div>
 		if entity.tags.WINDFURY
 			windfury = <div className="overlay windfury"></div>
+		if entity.tags._333
+			windfury = <div className="overlay temporary"></div>
 
 		# if @props.stats
 		healthClass = "card__stats__health"
