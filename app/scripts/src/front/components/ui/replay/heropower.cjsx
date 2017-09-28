@@ -9,16 +9,17 @@ Armor = require './armor'
 class HeroPower extends Card
 
 	render: ->
-		# console.log 'rendering HeroPower'
 		return null unless @props.entity
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards#{locale}/#{@props.entity.cardID}.png"
 
 		cls = "power"
 
-		if @props.entity.tags.EXHAUSTED
+		console.log 'rendering HeroPower', @props.entity, @props.controller
+
+		if @props.entity.tags.EXHAUSTED or @props.controller.tags.HERO_POWER_DISABLED
 			cls += " exhausted"
-		else 
+		else
 			style =
 				backgroundImage: "url(#{art})"
 
