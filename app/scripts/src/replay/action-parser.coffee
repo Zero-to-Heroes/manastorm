@@ -152,19 +152,23 @@ class ActionParser extends EventEmitter
 					@parseMinionCasting item
 
 			if item.command is 'receiveChoices'
-				@parseDiscovers item
+				if (@turns[@currentTurnNumber])
+					@parseDiscovers item
 
 			if item.command is 'receiveChosenEntities'
-				@parseDiscoverPick item
+				if (@turns[@currentTurnNumber])
+					@parseDiscoverPick item
 
 			if item.command in ['receiveEntity', 'receiveShowEntity']
-				@parseCardPlayedByMinion item
+				if (@turns[@currentTurnNumber])
+					@parseCardPlayedByMinion item
 
 			# Keeping that for last in order to make some non-timestamped action more coherent (like losing life from life
 			# tap before drawing the card)
-			@parseDrawCard item
-			@parseOverdraw item
-			@parseDiscardCard item
+			if (@turns[@currentTurnNumber])
+				@parseDrawCard item
+				@parseOverdraw item
+				@parseDiscardCard item
 
 
 		# Sort the actions chronologically

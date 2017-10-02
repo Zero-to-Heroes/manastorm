@@ -771,9 +771,9 @@ class ReplayPlayer extends EventEmitter
 				lastAction = @history[index]
 			# In case we spectate a game, we don't always have the mulligan
 			if @history[index].command is 'receiveAction' and @history[index].node.attributes.type == '7'
-				# console.log 'stopping gs init because we found a play action'
+				console.log 'stopping gs init because we found a play action'
 				break
-			else if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE'
+			else if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE' and lastAction
 				break
 			index++
 
