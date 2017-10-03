@@ -50,14 +50,12 @@ class RenderedCard extends React.Component
 		highlightCls = ''
 		if entity.highlighted
 			highlightCls += " option-on frame-highlight"
-			highlight = <div className="option-on"></div>
-			imageCls += " img-option-on"
 
 			if @props.controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
-				imageCls += " combo"
+				highlightCls += " combo"
 
 			if entity.tags.POWERED_UP == 1
-				imageCls += " img-option-on combo"
+				highlightCls += " combo"
 
 		if entity.tags.TRANSFORMED_FROM_CARD
 			tranformedEffect = <div className="transformed-from-card"></div>
@@ -73,7 +71,6 @@ class RenderedCard extends React.Component
 						<CardName cardUtils={cardUtils} entity={entity} />
 						<CardText cardUtils={cardUtils} entity={entity} />
 						{legendaryFrame}
-						{highlight}
 						{tranformedEffect}
 						<CardRace cardUtils={cardUtils} entity={entity} />
 						<CardStats cardUtils={cardUtils} entity={entity} />

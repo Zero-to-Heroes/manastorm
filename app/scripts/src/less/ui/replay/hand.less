@@ -40,36 +40,6 @@
     			clip-path: none;
 			}
 
-			&.img-option-on {
-				-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow)
-								drop-shadow(@glowSize @glowSize 1px @innerGlow)
-								drop-shadow(-@glowSize @glowSize 1px @innerGlow)
-								drop-shadow(@glowSize -@glowSize 1px @innerGlow)
-								drop-shadow(0px 0px 0.5em @outerGlow)
-								drop-shadow(0px 0px 0.8em @outerGlow);
-				filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow)
-						drop-shadow(@glowSize @glowSize 1px @innerGlow)
-						drop-shadow(-@glowSize @glowSize 1px @innerGlow)
-						drop-shadow(@glowSize -@glowSize 1px @innerGlow)
-						drop-shadow(0px 0px 0.5em @outerGlow)
-						drop-shadow(0px 0px 0.8em @outerGlow);
-
-				&.combo {
-					-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow)
-								drop-shadow(@glowSize @glowSize 1px @innerComboGlow)
-								drop-shadow(-@glowSize @glowSize 1px @innerComboGlow)
-								drop-shadow(@glowSize -@glowSize 1px @innerComboGlow)
-								drop-shadow(0px 0px 0.5em @outerComboGlow)
-								drop-shadow(0px 0px 0.8em @outerComboGlow);
-					filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow)
-							drop-shadow(@glowSize @glowSize 1px @innerComboGlow)
-							drop-shadow(-@glowSize @glowSize 1px @innerComboGlow)
-							drop-shadow(@glowSize -@glowSize 1px @innerComboGlow)
-							drop-shadow(0px 0px 0.5em @outerComboGlow)
-							drop-shadow(0px 0px 0.8em @outerComboGlow);
-				}
-			}
-
 			&.msg-card {
 			    top: 2%;
 			    width: 105%;
@@ -111,6 +81,37 @@
 		    left: 17%;
 		    top: 12%;
     	}
+
+
+		.option-on {
+			-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow)
+							drop-shadow(@glowSize @glowSize 1px @innerGlow)
+							drop-shadow(-@glowSize @glowSize 1px @innerGlow)
+							drop-shadow(@glowSize -@glowSize 1px @innerGlow)
+							drop-shadow(0px 0px 0.5em @outerGlow)
+							drop-shadow(0px 0px 0.8em @outerGlow);
+			filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow)
+					drop-shadow(@glowSize @glowSize 1px @innerGlow)
+					drop-shadow(-@glowSize @glowSize 1px @innerGlow)
+					drop-shadow(@glowSize -@glowSize 1px @innerGlow)
+					drop-shadow(0px 0px 0.5em @outerGlow)
+					drop-shadow(0px 0px 0.8em @outerGlow);
+
+			&.combo {
+				-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow)
+							drop-shadow(@glowSize @glowSize 1px @innerComboGlow)
+							drop-shadow(-@glowSize @glowSize 1px @innerComboGlow)
+							drop-shadow(@glowSize -@glowSize 1px @innerComboGlow)
+							drop-shadow(0px 0px 0.5em @outerComboGlow)
+							drop-shadow(0px 0px 0.8em @outerComboGlow);
+				filter: drop-shadow(-@glowSize -@glowSize 1px @innerComboGlow)
+						drop-shadow(@glowSize @glowSize 1px @innerComboGlow)
+						drop-shadow(-@glowSize @glowSize 1px @innerComboGlow)
+						drop-shadow(@glowSize -@glowSize 1px @innerComboGlow)
+						drop-shadow(0px 0px 0.5em @outerComboGlow)
+						drop-shadow(0px 0px 0.8em @outerComboGlow);
+			}
+		}
 
 		&.spell .name-text {
 			height: 9%;
