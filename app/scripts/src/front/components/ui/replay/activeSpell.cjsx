@@ -1,5 +1,5 @@
 React = require 'react'
-Card = require './card'
+RenderedCard = require './card/rendered-card'
 
 ActiveSpell = React.createClass
 	componentDidMount: ->
@@ -10,7 +10,7 @@ ActiveSpell = React.createClass
 		return null unless @spell
 
 		# console.log 'rendering activeSpell', @spell
-		return 	<Card entity={@spell} key={@spell.id} ref={@spell.id} cardUtils={@props.replay.cardUtils} conf={@props.conf} className="active-spell"/>
+		return 	<RenderedCard entity={@spell} key={@spell.id} ref={@spell.id} cardUtils={@props.replay.cardUtils} conf={@props.conf} className="active-spell"/>
 
 	getCardsMap: ->
 		result = {}
