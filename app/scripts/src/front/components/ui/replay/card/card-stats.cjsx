@@ -27,6 +27,8 @@ class CardStats extends React.Component
 		tagHealth = entity.tags.HEALTH || originalHealth
 		if tagHealth > originalHealth
 			healthClass += " buff"
+		if entity.tags.DAMAGE > 0
+			healthClass += " damaged"
 
 		tagDurability = entity.tags.DURABILITY || originalCard.durability
 		return <div className="card__stats">
