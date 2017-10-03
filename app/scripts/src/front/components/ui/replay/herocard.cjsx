@@ -58,13 +58,15 @@ class HeroCard extends Card
 		# console.log 'build statuses', entity.cardID, entity
 		statuses = @buildStatuses entity
 
-		cardTooltip =
-			<div className="card-container">
-				<div className='statuses'>
-					<div className="filler"></div>
-					{statuses}
+		if statuses.length > 0
+			cardTooltip = <ReactTooltip id={"" + entity.id} >
+				<div className="card-container">
+					<div className='statuses'>
+						<div className="filler"></div>
+						{statuses}
+					</div>
 				</div>
-			</div>
+			</ReactTooltip>
 
 		@updateDimensions()
 
@@ -81,9 +83,7 @@ class HeroCard extends Card
 					<Armor entity={entity}/>
 					{damage}
 					{healing}
-					<ReactTooltip id={"" + entity.id} >
-					    {cardTooltip}
-					</ReactTooltip>
+				    {cardTooltip}
 				</div>
 
 module.exports = HeroCard

@@ -26,6 +26,8 @@ class CardKeywords extends React.Component
 				# console.log '\t\tbuild', statusElement
 				keywords.push statusElement
 
+		return null unless keywords.length > 0
+
 		return <div className='keywords'>
 					<div className="filler"></div>
 					{keywords}
