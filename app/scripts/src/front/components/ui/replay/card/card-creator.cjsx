@@ -6,7 +6,7 @@ class CardCreator extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 
-		return null unless entity.tags?.CREATOR
+		return null unless entity.tags?.CREATOR and entity.replay.entities[entity.tags.CREATOR].cardID
 
 		cardName = cardUtils.getCard(entity.replay.entities[entity.tags.CREATOR].cardID).name
 

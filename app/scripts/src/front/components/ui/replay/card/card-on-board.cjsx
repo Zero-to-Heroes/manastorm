@@ -41,7 +41,7 @@ class CardOnBoard extends React.Component
 			cls += " " + @props.className
 
 		imageCls = "art "
-		highlightCls = ''
+		highlightCls = 'main '
 		if entity.highlighted
 			highlightCls += " option-on frame-highlight"
 			highlight = <div className="option-on"></div>

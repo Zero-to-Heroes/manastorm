@@ -14,12 +14,12 @@ class CardFrameOnBoard extends React.Component
 		if entity.tags.TAUNT
 			frame = 'onboard_minion_taunt.png'
 		else 
-			frame = 'onboard_minion.png'
+			frame = 'onboard_minion_frame.png'
 
 		if entity.tags.PREMIUM is 1 and !conf?.noGolden
 			frame = 'golden/' + frame
 
-		frame = 'scripts/static/images/card/' + frame
+		frame = 'scripts/static/images/' + frame
 
 		return <img src={frame} className="frame"/>
 
