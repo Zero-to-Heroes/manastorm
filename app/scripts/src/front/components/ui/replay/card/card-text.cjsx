@@ -8,13 +8,14 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		@updateText()
+		# @updateText()
 
 		return <div className="card-text" ref={ (div) => @cardText = div; } >
 					<p dangerouslySetInnerHTML={{ __html: originalCard.text?.replace('\n', '<br/>') }}></p>
 				</div>
 
 	updateText: ->
+		console.log 'updating text'
 		setTimeout () =>
 			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]
 			if rootFontSize <= 0
@@ -24,5 +25,9 @@ class CardText extends React.Component
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: rootFontSize * 0.9}
 				console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
 		, 50
+
+	componentDidMount: ->
+		window.addEventListener 'resize', @updateText
+		@updateText()
 
 module.exports = CardText

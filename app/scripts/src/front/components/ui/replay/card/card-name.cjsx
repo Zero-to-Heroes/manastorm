@@ -18,7 +18,7 @@ class CardName extends React.Component
 			pathId = 'weaponPath'
 			path = <path id={pathId} d="M 0,10 C 100,10 100,10 200,10" />
 
-		@updateText()
+		# @updateText()
 
 		# http://www.east5th.co/blog/2014/10/08/quest-for-scalable-svg-text/
 		return <div className="name-text">
@@ -37,6 +37,10 @@ class CardName extends React.Component
 		setTimeout () =>
 			bb = @svgRef.getBBox()
 			@svgRef.setAttribute("viewBox", [bb.x, bb.y, bb.width, bb.height].join(' '))
-		, 100
+		, 50
+
+	componentDidMount: ->
+		window.addEventListener 'resize', @updateText
+		@updateText()
 
 module.exports = CardName
