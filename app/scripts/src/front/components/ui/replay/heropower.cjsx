@@ -29,9 +29,12 @@ class HeroPower extends Card
 
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 		costCls = "mana-cost"
-		# console.log 'getting cost from', originalCard, @props.entity
+		console.log 'getting cost from', originalCard, @props.entity
 		originalCost = originalCard?.cost
-		tagCost = @props.entity.tags.COST || originalCost
+		if @props.entity.tags.COST is 0
+			tagCost = 0
+		else
+			tagCost = originalCost
 		if tagCost < originalCost
 			costCls += " lower-cost"
 		else if tagCost > originalCost
