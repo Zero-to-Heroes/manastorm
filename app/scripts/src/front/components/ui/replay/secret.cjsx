@@ -9,11 +9,7 @@ class Secret extends Card
 	render: ->
 		entity = @props.entity
 
-		# art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/allCards/secrets/#{entity.tags.CLASS}.png"
-
 		style = {}
-			# background: "url(#{art}) top left no-repeat"
-			# backgroundSize: '100% auto'
 		cls = "secret "
 		if entity.tags.QUEST is 1
 			cls += " quest"
@@ -35,7 +31,7 @@ class Secret extends Card
 			questArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
 			rewardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{cardRewardId}.png"
 
-			questProgress = 
+			questProgress =
 				<div className="quest-progress">
 					<img src={questArt} />
 					<div className="progress-indicator">
