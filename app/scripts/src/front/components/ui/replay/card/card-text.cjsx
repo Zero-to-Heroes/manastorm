@@ -8,7 +8,7 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		# @updateText()
+		#console.log 'rendering card', originalCard.name, entity, originalCard
 
 		return <div className="card-text" ref={ (div) => @cardText = div; } >
 					<p dangerouslySetInnerHTML={{ __html: originalCard.text?.replace('\n', '<br/>') }}></p>

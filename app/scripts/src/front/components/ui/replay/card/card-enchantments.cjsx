@@ -29,7 +29,7 @@ class CardEnchantments extends React.Component
 				</div>
 			</div>
 
-		return <div>
+		return <div className="enchantments">
 					{enchantments}
 				</div>
 
