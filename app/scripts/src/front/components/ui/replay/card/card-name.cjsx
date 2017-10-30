@@ -13,7 +13,7 @@ class CardName extends React.Component
 			path = <path id={pathId} d="M 0,130 C 30,140 100,140 180,125 M 180,125 C 250,110 750,-15 1000,100" ref={ (path) => @minionPathRef = path; } />
 		else if originalCard.type is 'Spell'
 			pathId = 'spellPath'
-			path = <path id={pathId} d="M 0,150 Q 500,-20 1000,150" />
+			path = <path id={pathId} d="M 0,140 Q 500,-23 1000,154" />
 		else if originalCard.type is 'Weapon'
 			pathId = 'weaponPath'
 			path = <path id={pathId} d="M 0,50 H 1000" />
