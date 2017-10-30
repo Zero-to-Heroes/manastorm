@@ -1,8 +1,5 @@
 React = require 'react'
-Card = require './card'
-ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
-_ = require 'lodash'
-{subscribe} = require '../../../../subscription'
+RenderedCard = require './card/rendered-card'
 
 class Discover extends React.Component
 
@@ -10,11 +7,13 @@ class Discover extends React.Component
 		return null unless (@props.discoverAction and @props.discoverController.id == @props.entity.id)
 
 		# console.log 'rendering discover', @props.discoverAction
+		replay = @props.replay
 		hidden = @props.isHidden
 		cards = @props.discoverAction.choices.slice(0, @props.discoverAction.choices.length).map (entity) =>
 			#console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
+			#console.log 'discover card', entity
 			discovered = if @props.discoverAction.discovered is entity.id then 'picked' else ''
-			<Card className={discovered} entity={entity} key={entity.id} isHidden={hidden} static={true} conf={@props.conf} />
+			<RenderedCard className={discovered} entity={entity} key={entity.id} isHidden={hidden} static={true} cardUtils={replay.cardUtils} conf={@props.conf} />
 
 		return  <div className="discover-container">
 					<div className="discover">
