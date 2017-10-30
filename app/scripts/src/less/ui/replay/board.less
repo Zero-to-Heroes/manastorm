@@ -19,6 +19,10 @@
 			    width: 160%;
 			    top: -16%;
 			    left: -32%;
+
+			    &.taunt {
+			    	top: -3%;
+			    }
 	    	}
 
 	    	.art {
@@ -53,18 +57,6 @@
     }
 
 	.game-card {
-
-		.taunt::before {
-			content: "";
-    		padding-top: 128%;
-		    height: 170%;
-		    width: 170%;
-		    background: url(images/minion_taunt.png) center center no-repeat;
-		    background-size: contain;
-		    position: absolute;
-		    top: -29%;
-		    left: -38%;
-		}
 
 		&:last-child {
 			margin-right: 0;
@@ -224,11 +216,6 @@
 	    .legendary {
 	    	background-image: url(images/golden/inplay_minion_legendary_premium.png);
 	    }
-
-		.taunt::before {
-		    background-image: url(images/golden/minion_taunt.png);
-		    top: -35%;
-		}
 	}
 }
 

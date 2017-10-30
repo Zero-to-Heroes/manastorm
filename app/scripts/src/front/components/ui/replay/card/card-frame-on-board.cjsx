@@ -9,10 +9,11 @@ class CardFrameOnBoard extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		cls = 'game-card rendered-card'
+		frameCls = 'frame'
 
 		if entity.tags.TAUNT
 			frame = 'onboard_minion_taunt.png'
+			frameCls += ' taunt'
 		else 
 			frame = 'onboard_minion_frame.png'
 
@@ -21,6 +22,6 @@ class CardFrameOnBoard extends React.Component
 
 		frame = 'scripts/static/images/' + frame
 
-		return <img src={frame} className="frame"/>
+		return <img src={frame} className={frameCls}/>
 
 module.exports = CardFrameOnBoard
