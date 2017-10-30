@@ -18,7 +18,7 @@ Hand = React.createClass
 		isInfoConcealed = @props.isInfoConcealed
 		conf = @props.conf
 
-		# console.log 'rendering hand for', @props.entity
+		console.log 'rendering hand for', @props.entity, controller
 		cards = active.map (entity) ->
 			margin = -6
 			if active.length == 7
@@ -35,7 +35,7 @@ Hand = React.createClass
 			}
 
 			# console.log 'rendering card in hand', entity.cardID, entity
-			<RenderedCard isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
+			<RenderedCard isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} replay={replay} style={style} conf={conf}/>
 
 		return <div className="hand">
 				<div>{cards}</div>

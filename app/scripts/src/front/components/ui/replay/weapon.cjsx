@@ -62,7 +62,7 @@ class Weapon extends Card
 						<CardStats cardUtils={cardUtils} entity={entity} />
 					</div>
 					<ReactTooltip id={"" + entity.id} >
-					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={@props.replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

@@ -20,6 +20,8 @@ class RenderedCard extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		conf = @props.conf
+		replay = @props.replay
+		controller = replay.getController(entity.tags.CONTROLLER)
 
 		@entityRefId = "" + entity.id
 		@tooltipRefId = 'tooltip' + @entityRefId
@@ -30,6 +32,7 @@ class RenderedCard extends React.Component
 			</div>
 
 		originalCard = cardUtils?.getCard(entity.cardID)
+		console.log 'rendering card', originalCard.name, entity.cardID, entity, originalCard, controller
 
 		cls = 'game-card rendered-card visible'
 		if originalCard.type is 'Minion'
@@ -51,7 +54,7 @@ class RenderedCard extends React.Component
 		if entity.highlighted
 			highlightCls += " option-on frame-highlight"
 
-			if @props.controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
+			if controller?.tags?.COMBO_ACTIVE == 1 and entity.tags.COMBO == 1
 				highlightCls += " combo"
 
 			if entity.tags.POWERED_UP == 1
@@ -69,7 +72,7 @@ class RenderedCard extends React.Component
 						<CardRarity cardUtils={cardUtils} entity={entity} />
 						<CardNameBanner cardUtils={cardUtils} entity={entity} />
 						<CardName cardUtils={cardUtils} entity={entity} />
-						<CardText cardUtils={cardUtils} entity={entity} />
+						<CardText cardUtils={cardUtils} entity={entity} replay={replay} />
 						{legendaryFrame}
 						{tranformedEffect}
 						<CardRace cardUtils={cardUtils} entity={entity} />
@@ -77,7 +80,7 @@ class RenderedCard extends React.Component
 						<CardCost cardUtils={cardUtils} entity={entity} />
 					</div>
 					<ReactTooltip id={@entityRefId} >
-					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

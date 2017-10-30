@@ -9,12 +9,11 @@ class Mulligan extends React.Component
 		# console.log 'rendering mulligan?', @props.entity, @props.entity.getHand(), @props.mulligan
 		return null unless @props.inMulligan
 
-
 		# console.log '\tyes'
 		hidden = @props.isHidden
 		cards = @props.entity.getHand().slice(0, 4).map (entity) =>
 			# console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
-			<RenderedCard entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan?.indexOf(entity.id) != -1} cost={true} cardUtils={@props.replay.cardUtils} conf={@props.conf}/>
+			<RenderedCard entity={entity} key={entity.id} isHidden={hidden} isDiscarded={@props.mulligan?.indexOf(entity.id) != -1} cost={true} replay={@props.replay} cardUtils={@props.replay.cardUtils} conf={@props.conf}/>
 
 
 		return <div className="mulligan">

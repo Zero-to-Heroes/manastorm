@@ -12,14 +12,16 @@ Hero = React.createClass
 		@heroPower = @props.entity.getHeroPower()
 		@weapon = @props.entity.getWeapon()
 		@secrets = @props.entity.getSecrets()
-		# console.log 'rendering hero', @props.entity.cardId, @props.entity.tags
+		
 		cardUtils = @props.replay.cardUtils
 		conf = @props.conf
+		
+		console.log 'rendering hero', @props.entity.cardId, @props.entity.tags, @props.entity
 
 		return 	<div className="hero">
 					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} cardUtils={cardUtils} replay={@props.replay} conf={conf}/>
 					<HeroCard entity={@hero} weapon={@weapon} key={@hero.id} secrets={@secrets} ref={@hero.id} showSecrets={@props.showConcealedInformation} className="avatar" cardUtils={cardUtils} conf={conf} />
-					<HeroPower entity={@heroPower} controller={@props.entity} key={@heroPower?.id} ref={@heroPower?.id} cardUtils={cardUtils} conf={conf}/>
+					<HeroPower entity={@heroPower} controller={@props.entity} key={@heroPower?.id} ref={@heroPower?.id} cardUtils={cardUtils} replay={@props.replay} conf={conf}/>
 				</div>
 
 	getCardsMap: ->

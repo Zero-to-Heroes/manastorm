@@ -44,7 +44,7 @@ class HeroPower extends React.Component
 						{cost}
 					</div>
 					<ReactTooltip id={"" + entity.id} >
-					    <HeroPowerTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <HeroPowerTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={@props.replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

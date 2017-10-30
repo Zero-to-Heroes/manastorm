@@ -20,6 +20,7 @@ class CardTooltip extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		conf = @props.conf
+		replay = @props.replay
 
 		if !entity.cardID or @props.isHidden
 			return <div key={'card' + entity.id} className="game-card rendered-card" style={@props.style}>
@@ -55,7 +56,7 @@ class CardTooltip extends React.Component
 						<CardRarity cardUtils={cardUtils} entity={entity} />
 						<CardNameBanner cardUtils={cardUtils} entity={entity} />
 						<CardName cardUtils={cardUtils} entity={entity} />
-						<CardText cardUtils={cardUtils} entity={entity} />
+						<CardText cardUtils={cardUtils} entity={entity} replay={replay} />
 						{legendaryFrame}
 						{tranformedEffect}
 						<CardRace cardUtils={cardUtils} entity={entity} />

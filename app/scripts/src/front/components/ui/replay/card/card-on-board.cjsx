@@ -19,6 +19,7 @@ class CardOnBoard extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		conf = @props.conf
+		replay = @props.replay
 
 		@entityRefId = "" + entity.id
 		@tooltipRefId = 'tooltip' + @entityRefId
@@ -65,7 +66,7 @@ class CardOnBoard extends React.Component
 						<CardHealingReceived cardUtils={cardUtils} entity={entity} />
 					</div>
 					<ReactTooltip id={@entityRefId} >
-					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={@props.entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

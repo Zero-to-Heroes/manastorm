@@ -20,7 +20,7 @@ class Card extends React.Component
 
 		imageCls = "art "
 		baseFolder = 'fullcards/en/256'
-		# console.log 'rendering card', entity.cardID, originalCard, entity, @props.conf
+		
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage and !@props.conf?.noGolden
 			# console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'

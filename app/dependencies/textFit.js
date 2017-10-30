@@ -47,6 +47,8 @@
 
   return function textFit(els, options) {
 
+    if (!els) return;
+
     if (!options) options = {};
 
     // Extend options.
@@ -58,7 +60,7 @@
         settings[key] = defaultSettings[key];
       }
     }
-    console.log('setting textFit options', options, settings)
+    // console.log('setting textFit options', options, settings)
 
     // Convert jQuery objects into arrays
     if (typeof els.toArray === "function") {
@@ -88,7 +90,7 @@
       return false;
     }
 
-    console.log('processing element', el)
+    // console.log('processing element', el)
     // Set textFitted attribute so we know this was processed.
     if(!settings.reProcess){
       el.setAttribute('textFitted', 1);
@@ -158,17 +160,17 @@
     // Binary search for best fit
     while (low <= high) {
       mid = parseInt((low + high) / 2, 10);
-      console.log('trying font size', low, high, mid)
+      // console.log('trying font size', low, high, mid)
       innerSpan.style.fontSize = mid + 'px';
       if(innerSpan.scrollWidth <= originalWidth + 1 && (settings.widthOnly || innerSpan.scrollHeight <= originalHeight + 1)){
         low = mid + 1;
       } else {
         high = mid - 1;
       }
-      console.log('updated', low, high)
-      console.log('params', innerSpan.scrollWidth, originalWidth, settings.widthOnly, innerSpan.scrollHeight, originalHeight)
+      // console.log('updated', low, high)
+      // console.log('params', innerSpan.scrollWidth, originalWidth, settings.widthOnly, innerSpan.scrollHeight, originalHeight)
     }
-    console.log('found it!', mid)
+    // console.log('found it!', mid)
     // Sub 1 at the very end, this is closer to what we wanted.
     innerSpan.style.fontSize = (mid - 1) + 'px';
 

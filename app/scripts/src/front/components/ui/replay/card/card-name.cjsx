@@ -40,6 +40,9 @@ class CardName extends React.Component
 
 	updateText: ->
 		setTimeout () =>
+			if !@svgRef
+				return
+				
 			bb = @svgRef.getBBox()
 
 			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]

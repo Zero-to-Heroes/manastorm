@@ -10,7 +10,7 @@ ActiveSpell = React.createClass
 		return null unless @spell
 
 		# console.log 'rendering activeSpell', @spell
-		return 	<RenderedCard entity={@spell} key={@spell.id} ref={@spell.id} cardUtils={@props.replay.cardUtils} conf={@props.conf} className="active-spell"/>
+		return 	<RenderedCard entity={@spell} key={@spell.id} ref={@spell.id} cardUtils={@props.replay.cardUtils} replay={@props.replay} conf={@props.conf} className="active-spell"/>
 
 	getCardsMap: ->
 		result = {}

@@ -13,7 +13,7 @@ class Discover extends React.Component
 			#console.log 'is card discarded', @props.mulligan.indexOf(entity.id) != -1, entity, @props.mulligan
 			#console.log 'discover card', entity
 			discovered = if @props.discoverAction.discovered is entity.id then 'picked' else ''
-			<RenderedCard className={discovered} entity={entity} key={entity.id} isHidden={hidden} static={true} cardUtils={replay.cardUtils} conf={@props.conf} />
+			<RenderedCard className={discovered} entity={entity} replay={replay} key={entity.id} isHidden={hidden} static={true} cardUtils={replay.cardUtils} conf={@props.conf} />
 
 		return  <div className="discover-container">
 					<div className="discover">
