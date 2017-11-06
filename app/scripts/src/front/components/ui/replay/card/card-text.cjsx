@@ -19,6 +19,8 @@ class CardText extends React.Component
 			damageBonus = controller.tags.CURRENT_SPELLPOWER || 0
 			if entity.tags.RECEIVES_DOUBLE_SPELLDAMAGE_BONUS > 0
 				damageBonus *= 2
+			doubleDamage = controller.tags.SPELLPOWER_DOUBLE
+			# TODO: hero power
 
 		#console.log 'damageBonus', damageBonus
 		description = originalCard.text?.replace('\n', '<br/>')
@@ -43,7 +45,10 @@ class CardText extends React.Component
 				@updateText()
 			else
 				#maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
-				textBoxWidth = ReactDOM.findDOMNode(@cardText).offsetWidth
+				domNode = ReactDOM.findDOMNode(@cardText)
+				if !domNode
+					return
+				textBoxWidth = domNode.offsetWidth
 				maxFontSize = Math.round(textBoxWidth / 10.0)
 				#console.log 'max font sizes', textBoxWidth, maxFontSize
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
@@ -56,12 +61,12 @@ class CardText extends React.Component
 
 	modifier: (bonus, double) => 
 		return (match, part1) =>
-			#console.log 'applying modifier for', bonus, double, match, part1
+			console.log 'applying modifier for', bonus, double, match, part1
 			value = +part1
 			if +bonus != 0 or +double != 0
 				value += bonus
 				value *= Math.pow(2, double)
-				#console.log 'updated value', value
+				console.log 'updated value', value
 				return "*" + value + "*"
 			return "" + value
 
