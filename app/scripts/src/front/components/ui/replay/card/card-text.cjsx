@@ -11,7 +11,7 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity
+		#console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity
 
 		damageBonus = 0
 		doubleDamage = 0
@@ -24,7 +24,7 @@ class CardText extends React.Component
 		description = originalCard.text?.replace('\n', '<br/>')
 		description = description?.replace(/^\[x\]/, "");
 		description = description?.replace(/\$(\d+)/g, @modifier(damageBonus, doubleDamage));
-		console.log 'setting description', description
+		#console.log 'setting description', description
 
 		@description = description
 
@@ -45,7 +45,7 @@ class CardText extends React.Component
 				#maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
 				textBoxWidth = ReactDOM.findDOMNode(@cardText).offsetWidth
 				maxFontSize = Math.round(textBoxWidth / 10.0)
-				console.log 'max font sizes', textBoxWidth, maxFontSize
+				#console.log 'max font sizes', textBoxWidth, maxFontSize
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
 				#console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
 		, 0
