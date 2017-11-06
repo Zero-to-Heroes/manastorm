@@ -7,6 +7,7 @@ class CardName extends React.Component
 		entity = @props.entity
 
 		originalCard = cardUtils?.getCard(entity.cardID)
+		@name = originalCard.name
 
 		if originalCard.type is 'Minion'
 			pathId = 'minionPath'
@@ -31,7 +32,7 @@ class CardName extends React.Component
 							{path}
 						</defs>
 						<text textAnchor="middle" ref={ (text) => @text = text; } >
-							<textPath startOffset="50%" xlinkHref={'#' + pathId}>{originalCard.name}</textPath>
+							<textPath startOffset="50%" xlinkHref={'#' + pathId}>{@name}</textPath>
 						</text>
 					</svg>
 					{svgDebug}
@@ -49,7 +50,12 @@ class CardName extends React.Component
 			if rootFontSize <= 0
 				@updateText()
 			else
-				@text.setAttribute("font-size", rootFontSize * 7)
+				fontSize = rootFontSize * 7
+				# Fumbling around a bit to make big names fit in the text box
+				if @name.length > 18
+					fontSize = rootFontSize * 6
+					
+				@text.setAttribute("font-size", fontSize)
 		, 50
 
 	updatePath: (initialValue, previousMin, previousLength, newMin, newLength) => 
