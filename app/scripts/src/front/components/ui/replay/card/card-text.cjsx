@@ -1,4 +1,5 @@
 React = require 'react'
+ReactDOM = require 'react-dom'
 
 class CardText extends React.Component
 
@@ -6,7 +7,7 @@ class CardText extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		controller = @props.replay.getController(entity.tags.CONTROLLER)
-		@inTooltip = @props.inTooltip
+		#@inTooltip = @props.inTooltip
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
@@ -41,8 +42,10 @@ class CardText extends React.Component
 			if rootFontSize <= 0
 				@updateText()
 			else
-				maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
-				console.log 'max font sizes', @cardText?.toString(), maxFontSize
+				#maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
+				textBoxWidth = ReactDOM.findDOMNode(@cardText).offsetWidth
+				maxFontSize = Math.round(textBoxWidth / 10.0)
+				console.log 'max font sizes', textBoxWidth, maxFontSize
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
 				#console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
 		, 0

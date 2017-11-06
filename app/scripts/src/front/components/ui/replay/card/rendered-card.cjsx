@@ -72,7 +72,7 @@ class RenderedCard extends React.Component
 						<CardRarity cardUtils={cardUtils} entity={entity} />
 						<CardNameBanner cardUtils={cardUtils} entity={entity} />
 						<CardName cardUtils={cardUtils} entity={entity} />
-						<CardText cardUtils={cardUtils} entity={entity} replay={replay} inTooltip={@props.useBigFont} />
+						<CardText cardUtils={cardUtils} entity={entity} replay={replay} />
 						{legendaryFrame}
 						{tranformedEffect}
 						<CardRace cardUtils={cardUtils} entity={entity} />
