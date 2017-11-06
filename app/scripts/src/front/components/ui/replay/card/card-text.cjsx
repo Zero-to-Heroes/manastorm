@@ -6,7 +6,7 @@ class CardText extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 		controller = @props.replay.getController(entity.tags.CONTROLLER)
-		@
+		@inTooltip = @props.inTooltip
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
@@ -27,6 +27,7 @@ class CardText extends React.Component
 
 		@description = description
 
+		# We need to keep the structure textFit will use so that changes to the description are properly propagated
 		return <div className="card-text textFitAlignVertFlex" ref={ (div) => @cardText = div; } >
 					<span className="textFitted textFitAlignVert">
 						<p dangerouslySetInnerHTML={{ __html: description }}></p>
@@ -40,7 +41,7 @@ class CardText extends React.Component
 			if rootFontSize <= 0
 				@updateText()
 			else
-				maxFontSize = rootFontSize * 0.55
+				maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
 				console.log 'max font sizes', @cardText?.toString(), maxFontSize
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
 				#console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style

@@ -65,7 +65,7 @@ class HeroPowerTooltip extends React.Component
 						<CardRarity cardUtils={cardUtils} entity={entity} />
 						<CardNameBanner cardUtils={cardUtils} entity={entity} />
 						<CardName cardUtils={cardUtils} entity={entity} />
-						<CardText cardUtils={cardUtils} entity={entity} replay={@props.replay} />
+						<CardText cardUtils={cardUtils} entity={entity} replay={@props.replay} inTooltip={true} />
 						{legendaryFrame}
 						{highlight}
 						{tranformedEffect}
