@@ -12,6 +12,8 @@ class CardOverlay extends React.Component
 
 		if entity.tags.DIVINE_SHIELD
 			divineShield = <div className="overlay divine-shield"></div>
+		if entity.tags.CANT_BE_DAMAGED
+			immune = <div className="overlay immune"></div>
 		if entity.tags.SILENCED
 			silenced = <div className="overlay silenced"></div>
 		if entity.tags.FROZEN
@@ -24,8 +26,9 @@ class CardOverlay extends React.Component
 			windfury = <div className="overlay windfury"></div>
 
 		return <div>
-				{divineShield}
 				{silenced}
+				{divineShield}
+				{immune}
 				{frozen}
 				{stealth}
 				{elusive}
