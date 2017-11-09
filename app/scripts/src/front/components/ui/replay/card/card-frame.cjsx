@@ -11,6 +11,8 @@ class CardFrame extends React.Component
 
 		cls = 'game-card rendered-card visible'
 
+		console.log 'building tooltip for', entity.cardID, originalCard.name, originalCard, entity
+
 		if originalCard.type is 'Minion'
 			cls += ' minion'
 			if entity.tags.PREMIUM is 1 and !conf?.noGolden
@@ -29,6 +31,9 @@ class CardFrame extends React.Component
 				frame = 'inhand_weapon_premium.png'
 			else
 				frame = 'frame-weapon-' + originalCard.playerClass?.toLowerCase() + '.png'
+		else if originalCard.type is 'Hero_power'
+			cls += ' hero-power'
+			frame = 'frame-hero-power.png'
 
 		frame = 'scripts/static/images/card/' + frame
 

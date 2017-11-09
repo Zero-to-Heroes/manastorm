@@ -9,7 +9,7 @@ Armor = require './armor'
 Card = require './card'
 CardArt = require './card/card-art'
 CardCost = require './card/card-cost'
-HeroPowerTooltip = require './card/hero-power-tooltip'
+CardTooltip = require './card-tooltip'
 
 class HeroPower extends React.Component
 
@@ -44,7 +44,7 @@ class HeroPower extends React.Component
 						{cost}
 					</div>
 					<ReactTooltip id={"" + entity.id} >
-					    <HeroPowerTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={@props.replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
+					    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={entity.id} isHidden={@props.hidden} cost={true} cardUtils={cardUtils} replay={@props.replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
 					</ReactTooltip>
 				</div>
 

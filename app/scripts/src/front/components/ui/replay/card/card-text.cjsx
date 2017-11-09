@@ -16,16 +16,23 @@ class CardText extends React.Component
 		damageBonus = 0
 		doubleDamage = 0
 		if controller
-			damageBonus = controller.tags.CURRENT_SPELLPOWER || 0
-			if entity.tags.RECEIVES_DOUBLE_SPELLDAMAGE_BONUS > 0
-				damageBonus *= 2
-			doubleDamage = controller.tags.SPELLPOWER_DOUBLE
+			if originalCard.type is 'Spell'
+				damageBonus = controller.tags.CURRENT_SPELLPOWER || 0
+				if entity.tags.RECEIVES_DOUBLE_SPELLDAMAGE_BONUS > 0
+					damageBonus *= 2
+				doubleDamage = controller.tags.SPELLPOWER_DOUBLE || 0
+			else if originalCard.type is 'Hero_power'
+				damageBonus = controller.tags.CURRENT_HEROPOWER_DAMAGE_BONUS || 0
+				doubleDamage = controller.tags.HERO_POWER_DOUBLE || 0
+
+
 			# TODO: hero power
 
 		#console.log 'damageBonus', damageBonus
 		description = originalCard.text?.replace('\n', '<br/>')
 		description = description?.replace(/^\[x\]/, "");
 		description = description?.replace(/\$(\d+)/g, @modifier(damageBonus, doubleDamage));
+		description = description?.replace(/\#(\d+)/g, @modifier(damageBonus, doubleDamage));
 		#console.log 'setting description', description
 
 		@description = description
