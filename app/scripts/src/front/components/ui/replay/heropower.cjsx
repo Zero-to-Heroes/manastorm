@@ -24,7 +24,7 @@ class HeroPower extends React.Component
 		heroPowerVisual = <img src="scripts/static/images/hero_power.png" className="visual" />
 		cost = <CardCost cardUtils={cardUtils} entity={entity} />
 
-		if @props.entity.tags.EXHAUSTED
+		if @props.entity.tags.EXHAUSTED or @props.controller.tags.HERO_POWER_DISABLED
 			art = <img src="scripts/static/images/hero_power_exhausted.png" className="exhausted" />
 			heroPowerVisual = null
 			cost = null
