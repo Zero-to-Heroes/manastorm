@@ -184,35 +184,21 @@
         .info-container {
             display: flex;
             align-items: center;
+            position: relative;
         }
 
         .icon {
             margin-right: 5%;
-            // flex-basis: 30%;
-            -webkit-clip-path: circle(50% at center);
-            position: relative;
-            // background-size: 250%;
-            // background-position: 50% 30%;
+            clip-path: circle(50% at center);
             align-self: flex-start;
             width: 23%;
+        }
 
-            &:before {
-                content: "";
-                padding-top: 100%;
-                position: relative;
-                display: block;
-            }
-
-            &:after {
-                content: "";
-                background-image: url('images/enchantment-ring.png');
-                background-size: cover;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                right: 0;
-            }
+        .ring {
+            position: absolute;
+            top: 1%;
+            left: 0%;
+            width: 23%;
         }
 
         .text {
