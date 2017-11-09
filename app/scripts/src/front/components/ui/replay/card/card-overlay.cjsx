@@ -24,6 +24,8 @@ class CardOverlay extends React.Component
 			elusive = <div className="overlay elusive"></div>
 		if entity.tags.WINDFURY
 			windfury = <div className="overlay windfury"></div>
+		if entity.tags._333
+			temporary = <div className="overlay temporary"></div>
 
 		return <div>
 				{silenced}
@@ -33,6 +35,7 @@ class CardOverlay extends React.Component
 				{stealth}
 				{elusive}
 				{windfury}
+				{temporary}
 			</div>
 
 module.exports = CardOverlay
