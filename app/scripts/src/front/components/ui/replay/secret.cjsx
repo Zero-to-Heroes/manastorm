@@ -1,10 +1,10 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 ReactTooltip = require 'react-tooltip'
-Card = require './card'
+RenderedCard = require './card/rendered-card'
 Secret = require './Secret'
 
-class Secret extends Card
+class Secret extends React.Component
 
 	render: ->
 		entity = @props.entity
@@ -28,18 +28,23 @@ class Secret extends Card
 		if entity.tags.QUEST is 1
 			cardRewardId = @getRewardId entity.cardID
 
-			questArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
-			rewardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{cardRewardId}.png"
+			#questArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
+			#rewardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{cardRewardId}.png"
+			reward = {
+				cardID: cardRewardId,
+				id: cardRewardId,
+				tags: {}
+			}
 
 			questProgress =
-				<div className="quest-progress">
-					<img src={questArt} />
+				<div className="quest-progress rendered-card-tooltip">
+					<RenderedCard entity={entity} key={'quest' + entity.id} cost={true} cardUtils={replay.cardUtils} replay={@props.replay} conf={@props.conf}/>
 					<div className="progress-indicator">
 						<div className="status current">{entity.tags.QUEST_PROGRESS or 0}</div>
 						<div className="separator">/</div>
 						<div className="status total">{entity.tags.QUEST_PROGRESS_TOTAL}</div>
 					</div>
-					<img src={rewardArt} />
+					<RenderedCard entity={reward} key={'reward' + reward.id} cost={true} cardUtils={replay.cardUtils} replay={@props.replay} conf={@props.conf}/>
 				</div>
 
 			return <div className={cls} key={'secret' + entity.id} data-tip data-for={entity.id} data-place="top" data-effect="solid" data-delay-show="50" data-class="card-tooltip quest-tooltip">

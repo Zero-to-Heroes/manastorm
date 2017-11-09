@@ -16,6 +16,7 @@ class HeroCard extends Card
 
 		entity = @props.entity
 		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/cardart/256x/#{entity.cardID}.jpg"
+		replay = @props.replay
 
 		weapon = @props.weapon
 
@@ -46,8 +47,8 @@ class HeroCard extends Card
 
 		if @props.secrets
 			show = @props.showSecrets
-			secrets = @props.secrets.map (secret) ->
-				<Secret entity={secret} key={secret.id} showSecret={show}/>
+			secrets = @props.secrets.map (secret) =>
+				<Secret entity={secret} key={secret.id} showSecret={show} replay={replay} conf={@props.conf}/>
 
 		entity.damageTaken = entity.damageTaken or 0
 		if entity.tags.DAMAGE - entity.damageTaken > 0

@@ -86,6 +86,9 @@ class ActionParser extends EventEmitter
 			if item.command == 'receiveShowEntity'
 				if item.node.tags.SECRET == 1
 					@entities[item.node.id].tags.SECRET = 1
+				@entities[item.node.id].tags.CREATOR = item.node.tags.CREATOR
+				@entities[item.node.id].tags.TAG_SCRIPT_DATA_NUM_1 = item.node.tags.TAG_SCRIPT_DATA_NUM_1
+				@entities[item.node.id].tags.TAG_SCRIPT_DATA_NUM_2 = item.node.tags.TAG_SCRIPT_DATA_NUM_2
 			if item.command == 'receiveChoices'
 				@usesChoices = true
 				console.log 'using choices'

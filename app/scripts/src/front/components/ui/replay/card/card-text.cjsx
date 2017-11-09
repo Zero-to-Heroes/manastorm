@@ -1,12 +1,13 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
+_ = require 'lodash'
 
 class CardText extends React.Component
 
 	render: ->
 		cardUtils = @props.cardUtils
 		entity = @props.entity
-		controller = @props.replay.getController(entity.tags.CONTROLLER)
+		controller = @props.replay.getController(entity.tags?.CONTROLLER)
 		#@inTooltip = @props.inTooltip
 
 		originalCard = cardUtils?.getCard(entity.cardID)
@@ -25,11 +26,26 @@ class CardText extends React.Component
 				damageBonus = controller.tags.CURRENT_HEROPOWER_DAMAGE_BONUS || 0
 				doubleDamage = controller.tags.HERO_POWER_DOUBLE || 0
 
+		description = originalCard.text?.replace('\n', '<br/>')
 
-			# TODO: hero power
+		# Kazakus
+		if entity.tags.MODULAR_ENTITY_PART_1
+			data1 = entity.tags.TAG_SCRIPT_DATA_NUM_1
+			data2 = entity.tags.TAG_SCRIPT_DATA_NUM_2
+			arg1 = ''
+			arg2 = ''
+			# Get the ones created by the entity
+			effects = _.filter @props.replay.entities, (e) =>
+				e.tags.CREATOR is entity.id and e.tags.ZONE is 6
+			effects.forEach (effect) => 
+				if effect.tags.TAG_SCRIPT_DATA_NUM_1 is data1
+					arg1 = cardUtils.getCard(effect.cardID).text
+				if effect.tags.TAG_SCRIPT_DATA_NUM_1 is data2
+					arg2 = cardUtils.getCard(effect.cardID).text
+			description = description.replace('{0}', arg1).replace('{1}', arg2)
+
 
 		#console.log 'damageBonus', damageBonus
-		description = originalCard.text?.replace('\n', '<br/>')
 		description = description?.replace(/^\[x\]/, "");
 		description = description?.replace(/\$(\d+)/g, @modifier(damageBonus, doubleDamage));
 		description = description?.replace(/\#(\d+)/g, @modifier(damageBonus, doubleDamage));

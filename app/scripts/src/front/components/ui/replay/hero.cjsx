@@ -20,7 +20,7 @@ Hero = React.createClass
 
 		return 	<div className="hero">
 					<Weapon entity={@weapon} key={@weapon?.id} ref={@weapon?.id} cardUtils={cardUtils} replay={@props.replay} conf={conf}/>
-					<HeroCard entity={@hero} weapon={@weapon} key={@hero.id} secrets={@secrets} ref={@hero.id} showSecrets={@props.showConcealedInformation} className="avatar" cardUtils={cardUtils} conf={conf} />
+					<HeroCard entity={@hero} weapon={@weapon} key={@hero.id} secrets={@secrets} ref={@hero.id} showSecrets={@props.showConcealedInformation} className="avatar" cardUtils={cardUtils} replay={@props.replay} conf={conf} />
 					<HeroPower entity={@heroPower} controller={@props.entity} key={@heroPower?.id} ref={@heroPower?.id} cardUtils={cardUtils} replay={@props.replay} conf={conf}/>
 				</div>
 

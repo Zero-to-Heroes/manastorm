@@ -21,7 +21,7 @@ class RenderedCard extends React.Component
 		entity = @props.entity
 		conf = @props.conf
 		replay = @props.replay
-		controller = replay.getController(entity.tags.CONTROLLER)
+		controller = replay.getController(entity.tags?.CONTROLLER)
 
 		@entityRefId = "" + entity.id
 		@tooltipRefId = 'tooltip' + @entityRefId
@@ -62,7 +62,7 @@ class RenderedCard extends React.Component
 			if entity.tags.POWERED_UP == 1
 				highlightCls += " combo"
 
-		if entity.tags.TRANSFORMED_FROM_CARD
+		if entity.tags?.TRANSFORMED_FROM_CARD
 			tranformedEffect = <div className="transformed-from-card"></div>
 
 		@updateDimensions()
