@@ -45,6 +45,8 @@ class RenderedCard extends React.Component
 				legendaryFrame = <img src={'scripts/static/images/card/legendary-spell.png'} className="legendary-frame"/>
 		else if originalCard.type is 'Weapon'
 			cls += ' weapon'
+		else if originalCard.type is 'Hero'
+			cls += ' hero-card'
 
 		if @props.className
 			cls += " " + @props.className

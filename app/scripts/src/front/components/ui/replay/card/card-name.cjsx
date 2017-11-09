@@ -19,8 +19,11 @@ class CardName extends React.Component
 			pathId = 'weaponPath'
 			path = <path id={pathId} d="M 0,50 H 1000" />
 		else if originalCard.type is 'Hero_power'
-			pathId = 'weaponPath'
+			pathId = 'heroPowerPath'
 			path = <path id={pathId} d="M 0,50 H 1000" />
+		else if originalCard.type is 'Hero'
+			pathId = 'heroPath'
+			path = <path id={pathId} d="M 0,180 Q 500,-63 1000,180" />
 
 		# @updateText()
 

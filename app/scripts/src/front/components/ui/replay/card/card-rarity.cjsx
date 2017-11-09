@@ -12,14 +12,12 @@ class CardRarity extends React.Component
 
 		if originalCard.type is 'Minion'
 			rarity = 'rarity-minion-' + originalCard.rarity.toLowerCase() + '.png'
-			if originalCard.rarity.toLowerCase() is 'legendary'
-				legendaryFrame = <img src={'scripts/static/images/card/legendary-minion.png'} className="legendary-frame"/>
 		else if originalCard.type is 'Spell'
 			rarity = 'rarity-spell-' + originalCard.rarity.toLowerCase() + '.png'
-			if originalCard.rarity.toLowerCase() is 'legendary'
-				legendaryFrame = <img src={'scripts/static/images/card/legendary-spell.png'} className="legendary-frame"/>
 		else if originalCard.type is 'Weapon'
 			rarity = 'rarity-weapon-' + originalCard.rarity.toLowerCase() + '.png'
+		else if originalCard.type is 'Hero'
+			rarity = 'rarity-' + originalCard.rarity.toLowerCase() + '.png'
 
 		return <img src={'scripts/static/images/card/' + rarity} className="rarity"/>
 

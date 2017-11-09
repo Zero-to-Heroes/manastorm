@@ -45,6 +45,10 @@
     	clip-path: ellipse(45% 45% at 50% 50%);
 	}
 
+	&.hero-card .art {
+		clip-path: polygon(0% 100%, 0% 56%, 15% 19%, 50% 0%, 85% 19%, 100% 56%, 100% 100%);
+	}
+
 	.frame {
 	    width: 100%;
 	    position: absolute;
@@ -138,6 +142,12 @@
 	    left: 41%;
 	}
 
+	&.hero-card .rarity {
+		width: 9%;
+		left: 45%;
+		top: 54%;
+	}
+
 	.card-text {
 	    position: absolute;
 	    color: black;
@@ -160,6 +170,12 @@
 	    p {
 	    	margin: auto;
 	    }
+	}
+
+	&.hero-card .card-text {
+		top: 69%;
+		height: 18%;
+		left: 19%;
 	}
 
 	&.weapon .card-text {
@@ -213,6 +229,18 @@
 			bottom: 1%;
 			background: url(images/attack.png) center center no-repeat;
 			background-size: contain;
+			position: absolute;
+		    color: white;
+		    text-align: center;
+		    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+		    font-weight: bold;
+		     
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block;
+		    }
 
 			span {
 				position: absolute;
@@ -233,6 +261,18 @@
 			left: 68%;
 			background: url(images/health_new.png) center center no-repeat;
 			background-size: contain;
+			position: absolute;
+		    color: white;
+		    text-align: center;
+		    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+		    font-weight: bold;
+		     
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block;
+		    }
 
 			span {
 				position: absolute;
@@ -245,6 +285,40 @@
 				line-height: 2.4em;
 				font-size: 1.1em;
 			}
+		}
+
+		.card__stats__armor {
+		    width: 22%;
+		    bottom: 12%;
+		    left: 78%;
+		    background: url(images/armor.png) center center no-repeat;
+			background-size: contain;
+			position: absolute;
+		    color: white;
+		    text-align: center;
+		    text-shadow: -1px -1px 0 #000, 0px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0px 1px 0 #000, 1px 1px 0 #000;
+		    font-weight: bold;
+		     
+		    &::before {
+			    content: "";
+			    padding-top: 100%;
+			    position: relative;
+			    display: block;
+		    }
+
+			span {
+				position: absolute;
+				display: inline-block;
+				text-align: center;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				line-height: 1.2em;
+				font-size: 1.1em;
+			}
+
+			display: none;
 		}
 	}
 
@@ -260,5 +334,13 @@
         width: 24%;
 		right: 0%;
 		left: auto;
+    }
+
+    &.hero-card .card__stats__attack, &.hero-card .card__stats__health {
+        display: none;
+    }
+
+    &.hero-card .card__stats__armor {
+        display: inherit;
     }
 }

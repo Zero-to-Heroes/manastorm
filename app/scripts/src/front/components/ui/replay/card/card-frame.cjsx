@@ -34,6 +34,12 @@ class CardFrame extends React.Component
 		else if originalCard.type is 'Hero_power'
 			cls += ' hero-power'
 			frame = 'frame-hero-power.png'
+		else if originalCard.type is 'Hero'
+			cls += ' hero'
+			if entity.tags.PREMIUM is 1 and !conf?.noGolden
+				frame = 'frame-hero-premium.png'
+			else
+				frame = 'frame-hero-' + originalCard.playerClass?.toLowerCase() + '.png'
 
 		frame = 'scripts/static/images/card/' + frame
 
