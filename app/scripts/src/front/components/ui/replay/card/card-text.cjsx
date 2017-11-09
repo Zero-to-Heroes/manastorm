@@ -29,14 +29,16 @@ class CardText extends React.Component
 		description = originalCard.text?.replace('\n', '<br/>')
 
 		# Kazakus
-		if entity.tags.MODULAR_ENTITY_PART_1
+		if entity.tags.TAG_SCRIPT_DATA_NUM_1 and entity.tags.TAG_SCRIPT_DATA_NUM_2
 			data1 = entity.tags.TAG_SCRIPT_DATA_NUM_1
 			data2 = entity.tags.TAG_SCRIPT_DATA_NUM_2
 			arg1 = ''
 			arg2 = ''
 			# Get the ones created by the entity
+			console.log 'trying to get Kazakus text', entity
 			effects = _.filter @props.replay.entities, (e) =>
 				e.tags.CREATOR is entity.id and e.tags.ZONE is 6
+			console.log 'efffects', effects
 			effects.forEach (effect) => 
 				if effect.tags.TAG_SCRIPT_DATA_NUM_1 is data1
 					arg1 = cardUtils.getCard(effect.cardID).text
