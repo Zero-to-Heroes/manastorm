@@ -8,7 +8,7 @@ _ = require 'lodash'
 Hand = React.createClass
 
 	render: ->
-		return <div className="hand"></div> unless @props.entity.tags.MULLIGAN_STATE is 4
+		return <div className="hand"></div> unless !@props.entity.tags.MULLIGAN_STATE or @props.entity.tags.MULLIGAN_STATE is 4
 
 		active = _.filter @props.entity.getHand(), (entity) -> entity.tags.ZONE_POSITION > 0
 
