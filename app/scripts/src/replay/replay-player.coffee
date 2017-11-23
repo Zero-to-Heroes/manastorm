@@ -100,6 +100,7 @@ class ReplayPlayer extends EventEmitter
 
 		# Trigger the population of all the main game entities
 		@initializeGameState()
+		@fixFirstPlayer()
 		# console.log 'initializeGameState done', @players
 
 		# Parse the data to build the game structure
@@ -128,6 +129,8 @@ class ReplayPlayer extends EventEmitter
 
 		# @finalizeInit()
 		# And go to the fisrt action
+		# @currentActionInTurn = 0
+		# @historyPosition = 0
 		@goNextAction()
 		# console.log 'notifying changed turn', @players
 		@notifyChangedTurn @turns[@currentTurn].turn
@@ -187,7 +190,7 @@ class ReplayPlayer extends EventEmitter
 	# ========================
 	goNextAction: ->
 		actionIndex = @currentActionInTurn
-		# console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
+		console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
@@ -526,7 +529,7 @@ class ReplayPlayer extends EventEmitter
 		@pause()
 
 		timestamp += @startTimestamp
-		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
+		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
 		# currentTimestamp = @getCurrentTimestamp()
 		# @newStep()
 
@@ -771,7 +774,7 @@ class ReplayPlayer extends EventEmitter
 				lastAction = @history[index]
 			# In case we spectate a game, we don't always have the mulligan
 			if @history[index].command is 'receiveAction' and @history[index].node.attributes.type == '7'
-				console.log 'stopping gs init because we found a play action'
+				# console.log 'stopping gs init because we found a play action', lastAction
 				break
 			else if @history[index].command is 'receiveTagChange' and @history[index].node.tag is 'MULLIGAN_STATE' and lastAction
 				break
@@ -792,15 +795,17 @@ class ReplayPlayer extends EventEmitter
 
 	receivePlayer: (definition) ->
 		entity = new Player(this)
-		console.log 'receiving player', entity, this
+		# console.log 'receiving player', entity, entity.tags.CURRENT_PLAYER, this
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
 
 		if entity.tags.CURRENT_PLAYER
 			@player = entity
+			# console.log 'setting player', entity, @player
 		else
 			@opponent = entity
+			# console.log 'setting opponent', entity, @opponent
 
 	receiveEntity: (definition, action) ->
 		# console.log 'receiving entity', definition.id, definition, @entities[definition.id]
@@ -815,8 +820,6 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log 'receving entity', definition, entity
 
 	receiveTagChange: (change, action) ->
-		# if change.tag is 'RESOURCES_USED'
-		# 	console.log '\t\treceiving tag change', change, @entities[change.entity], change.value
 
 		tags = {}
 		tags[change.tag] = change.value
@@ -834,26 +837,37 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		# console.log '\t\treceiving show entity', definition.id, definition
+		console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
 			@entities[definition.id] = new Entity(definition, this)
 
-		# Since patch 5.2.0.13619, the first showEntity with a cardID (and that is not an enchantment, cf tavern
-		# brawl conditions) always comes from the current player
-		# Case of newer replay
-		if (@player is null or @opponent is null) and definition.cardID and definition.tags?.CARDTYPE != 6
-			entity = @entities[definition.id]
-			# console.log 'setting player', entity
-			for player in @players
-				if player.tags.CONTROLLER is entity.tags.CONTROLLER
-					@player = player
-					# console.log '\tsetting player', @player
-				else
-					@opponent = player
-					# console.log '\tsetting opponent', @opponent
-			# console.log 'set player and opponent', @player, @opponent
+
+	fixFirstPlayer: () =>
+		# This happened in TB of 23/11/2017 where the player wasn't guessable at the start of the game
+		if (@player is null or @opponent is null or @player is @opponent)
+			console.log 'fixing first player'
+			for item in @history
+				if item.command is 'receiveShowEntity'
+					definition = item.node
+					if definition.cardID and definition.tags?.CARDTYPE != 6
+						# entity = @entities[definition.id]
+						# if !entity
+						# 	continue
+
+						console.log 'setting player from', definition, item, @entities
+						for entityId, candidate of @entities
+							if candidate.tags?.CARDTYPE is 2
+								player = candidate
+								if player.tags.CONTROLLER is definition.tags.CONTROLLER
+									@player = player
+									# console.log '\tsetting player', @player
+								else
+									@opponent = player
+									# console.log '\tsetting opponent', @opponent
+						console.log 'set player and opponent', @player, @opponent
+						return
 
 	receiveChangeEntity: (definition, action) ->
 		# console.log '\t\treceiving change entity', definition.id, definition
@@ -1057,9 +1071,9 @@ class ReplayPlayer extends EventEmitter
 		return images
 
 	preloadPictures: (arrayOfImages) ->
-		console.log 'preloading', arrayOfImages
+		# console.log 'preloading', arrayOfImages
 		arrayOfImages.forEach (img) ->
-			console.log '\tpreloading', img
+			# console.log '\tpreloading', img
 			(new Image()).src = img
 
 

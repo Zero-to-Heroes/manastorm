@@ -15,7 +15,7 @@ class HeroPower extends Card
 
 		cls = "power"
 
-		console.log 'rendering HeroPower', @props.entity, @props.controller
+		# console.log 'rendering HeroPower', @props.entity, @props.controller
 
 		if @props.entity.tags.EXHAUSTED or @props.controller.tags.HERO_POWER_DISABLED
 			cls += " exhausted"
@@ -29,7 +29,7 @@ class HeroPower extends Card
 
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 		costCls = "mana-cost"
-		console.log 'getting cost from', originalCard, @props.entity
+		# console.log 'getting cost from', originalCard, @props.entity
 		originalCost = originalCard?.cost
 		if @props.entity.tags.COST is 0
 			tagCost = 0

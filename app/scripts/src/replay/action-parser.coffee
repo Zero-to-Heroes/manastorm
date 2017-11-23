@@ -21,10 +21,12 @@ class ActionParser extends EventEmitter
 		@cardUtils = @replay.cardUtils
 
 		@turnNumber = 1
+		@mulligan = false
 
 
 	populateEntities: ->
 		players = [@player, @opponent]
+		console.log 'populating entities', players, @replay
 		@player.tags.RESOURCES_USED = 0
 		@opponent.tags.RESOURCES_USED = 0
 
@@ -88,7 +90,7 @@ class ActionParser extends EventEmitter
 					@entities[item.node.id].tags.SECRET = 1
 			if item.command == 'receiveChoices'
 				@usesChoices = true
-				console.log 'using choices'
+				# console.log 'using choices'
 
 		# Sometimes card type isn't precised
 		for k,v of @entities
@@ -116,6 +118,7 @@ class ActionParser extends EventEmitter
 			# console.log 'parsing history item', item
 
 			@parseMulliganTurn item
+			@parseEndOfMulligan item
 			@parseChangeActivePlayer item
 			@parseStartOfTurn item
 
@@ -186,7 +189,7 @@ class ActionParser extends EventEmitter
 			# console.log 'final actions', finalActions
 
 			@turns[tempTurnNumber].actions = finalActions
-			# console.log '\tsorted', @turns[tempTurnNumber].actions
+			# console.log '\tsorted', @turns[tempTurnNumber], @turns[tempTurnNumber].actions
 			tempTurnNumber++
 
 	filterAction: (action) ->
@@ -236,6 +239,7 @@ class ActionParser extends EventEmitter
 		# Mulligan
 		# Add only one command for mulligan start, no need for both
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 1
+			@mulligan = true
 			# console.log 'parsing mulligan', item
 			if @turns[1]
 				@turns[1].index = Math.max @turns[1].index, item.index
@@ -251,8 +255,13 @@ class ActionParser extends EventEmitter
 				@turns.length++
 				@turnNumber++
 
+	parseEndOfMulligan: (item) =>
+		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 4
+			@mulligan = false
+
 	parseChangeActivePlayer: (item) ->
-		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and @currentTurnNumber >= 2
+		#and @currentTurnNumber >= 2
+		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'CURRENT_PLAYER' and item.node.value == 1 and !@mulligan
 				previousPlayer = @currentPlayer
 				@currentPlayer = _.find @players, (o) ->
 					return o.id == item.node.entity
@@ -268,12 +277,12 @@ class ActionParser extends EventEmitter
 
 					# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
 
-				# console.log 'switching active player', item, @currentPlayer, @players
+				console.log 'switching active player', item, @currentPlayer, @players
 
 	parseStartOfTurn: (item) ->
 		# Start of turn
 		if item.command is 'receiveTagChange' and item.node.entity == 1 and item.node.tag == 'STEP' and item.node.value == 6
-			# console.log 'parsing start of turn', item, @currentPlayer
+			console.log 'parsing start of turn', item, @currentPlayer
 			@turns[@turnNumber] = {
 				# historyPosition: i
 				turn: @turnNumber - 1
@@ -289,7 +298,7 @@ class ActionParser extends EventEmitter
 
 
 	createFirstTurnForSpectate: (item) ->
-		console.log 'creating fake turn', @turnNumber, @turns
+		# console.log 'creating fake turn', @turnNumber, @turns
 		@turns[@turnNumber] = {
 			turn: @turnNumber - 1
 			timestamp: item.timestamp
@@ -307,7 +316,7 @@ class ActionParser extends EventEmitter
 		# But don't log cards that come back in hand from play
 		if item.command is 'receiveTagChange' and currentCommand.tag == 'ZONE' and currentCommand.value == 3
 			# Don't add card draws that are at the beginning of the game or during Mulligan
-			if @currentTurnNumber >= 2
+			if !@mulligan # @currentTurnNumber >= 2
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
@@ -353,7 +362,7 @@ class ActionParser extends EventEmitter
 		# Draw cards - 2 - The player draws a card, thus revealing a full entity
 		if item.command is 'receiveAction'
 			# Don't add card draws that are at the beginning of the game or during Mulligan
-			if @currentTurnNumber >= 2
+			if !@mulligan # @currentTurnNumber >= 2
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
@@ -397,7 +406,7 @@ class ActionParser extends EventEmitter
 		# But don't log cards that come back in hand from play
 		if item.command is 'receiveTagChange' and currentCommand.tag == 'ZONE' and currentCommand.value == 4
 			# Don't add card discards that are at the beginning of the game or during Mulligan
-			if @currentTurnNumber >= 2
+			if !@mulligan # @currentTurnNumber >= 2
 				while currentCommand.parent and currentCommand.entity not in ['2', '3']
 					currentCommand = currentCommand.parent
 
@@ -485,6 +494,8 @@ class ActionParser extends EventEmitter
 
 	parseMulliganCards: (item) ->
 		command = item.node
+		if !@mulligan
+			return
 		# Mulligan
 		# Prince Malchezaar has the same signature, but with a different entity ID
 		if command.attributes.type == '5' and @currentTurnNumber == 1 and command.hideEntities and command.attributes.entity in ['2', '3']
@@ -642,7 +653,7 @@ class ActionParser extends EventEmitter
 					owner: owner
 					initialCommand: command
 				}
-				console.log 'secret played from hand', action
+				# console.log 'secret played from hand', action
 				@addAction @currentTurnNumber, action
 
 
@@ -994,7 +1005,7 @@ class ActionParser extends EventEmitter
 						owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
 						initialCommand: command
 					}
-					console.log 'secret put in play', action
+					# console.log 'secret put in play', action
 					@addAction @currentTurnNumber, action
 
 	# The other effects, like battlecry, echoing ooze duplication, etc.
@@ -1069,11 +1080,11 @@ class ActionParser extends EventEmitter
 		command = item.node
 
 		if command.type is '2'
-			console.log 'possible choices', command
+			# console.log 'possible choices', command
 
 			choices = []
 			for entity in command.cards
-				console.log '\tdiscovering?', entity, @entities[entity]
+				# console.log '\tdiscovering?', entity, @entities[entity]
 				choices.push @entities[entity]
 
 			action = {
@@ -1087,18 +1098,18 @@ class ActionParser extends EventEmitter
 			}
 			command.isDiscover = true
 			@addAction @currentTurnNumber, action
-			console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+			# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
 			# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
 
 
 	parseDiscoverPick: (item) ->
 		command = item.node
-		console.log 'considering last pick', item, @turns[@currentTurnNumber].actions, @currentTurnNumber, @turns
+		# console.log 'considering last pick', item, @turns[@currentTurnNumber].actions, @currentTurnNumber, @turns
 
 		lastAction = @turns[@currentTurnNumber].actions?[@turns[@currentTurnNumber].actions.length - 1];
 		if lastAction?.actionType is 'discover'
 			lastAction.discovered = @entities[command.cards[0]]?.id
-			console.log 'highlighting pick', lastAction, item
+			# console.log 'highlighting pick', lastAction, item
 
 
 	parseDiscoversOld: (item) ->
@@ -1247,7 +1258,7 @@ class ActionParser extends EventEmitter
 		if command.attributes.type == '5'
 			entity = @entities[command.attributes.entity]
 			if entity?.tags?.QUEST == 1
-				console.log 'possible quest', command, entity
+				# console.log 'possible quest', command, entity
 				if command.fullEntities?.length is 1
 					action = {
 						turn: @currentTurnNumber - 1
@@ -1282,10 +1293,10 @@ class ActionParser extends EventEmitter
 		if command.tag == 'CAST_RANDOM_SPELLS'
 			if command.value is 1
 				@minionCasting = parseInt(command.entity)
-				console.log 'in minion casting mode'
+				# console.log 'in minion casting mode'
 			else
 				@minionCasting = undefined
-				console.log 'ending minion casting mode'
+				# console.log 'ending minion casting mode'
 
 
 
