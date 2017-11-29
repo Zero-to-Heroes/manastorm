@@ -21,19 +21,24 @@ var manastorm = {
 	},
 
 	loadReplay: function(replayXml, callback, configurationOptions) {
-		// console.log('serializing to string', replayXml)
+		if (!window.replay) {
+			console.log('external player not loaded yet, pausing before loadReplay');
+			setTimeout(function() {
+				manastorm.loadReplay(replayXml, callback, configurationOptions);
+			}, 100)
+			return;
+		}
+
 		if (replayXml) {
 			try {
 				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
 			}
 			catch(e) {
-				// console.log('couldnt parse as XML', JSON.stringify(e))
 				var strReplayXml = replayXml
 			}
 		}
-		//console.log('string xml', strReplayXml);
 
-		//require('coffee-react/register');
+		// console.log('loading replay', window.replay, window)
 		var bundle = require('./js/src/front/bundle.js');
 		bundle.init(strReplayXml, configurationOptions, callback);
 
@@ -41,6 +46,14 @@ var manastorm = {
 	},
 
 	reload: function(replayXml, callback) {
+		if (!window.replay) {
+			console.log('external player not loaded yet, pausing before reload');
+			setTimeout(function() {
+				manastorm.reload(replayXml, callback);
+			}, 100)
+			return;
+		}
+
 		if (replayXml) {
 			try {
 				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
@@ -51,7 +64,8 @@ var manastorm = {
 			}
 		}
 
-		window.replay.reload(strReplayXml, callback)
+		// console.log('reloading replay', window.replay, window);
+		window.replay.reload(strReplayXml, callback);
 	},
 
 	goToTimestamp: function(turnNumber) {
@@ -83,7 +97,7 @@ var manastorm = {
 	getTurnNumber: function(label) {
 		return window.replay.getTurnNumberFromLabel(label)
 	},
-	
+
 	getPlayerInfo: function() {
 		return window.replay.getPlayerInfo()
 	},
