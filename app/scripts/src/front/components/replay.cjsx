@@ -31,18 +31,18 @@ ActiveSpell = require './ui/replay/activeSpell'
 ReactTooltip = require("react-tooltip")
 {subscribe} = require '../../subscription'
 
-Raven = require('raven-js')
+# Raven = require('raven-js')
 _ = require 'lodash'
 
 class Replay extends React.Component
 	constructor: (props) ->
 		super(props)
 
-		Raven
-			.config('https://45915013fcc448aaa8008b76732bc230@sentry.io/207914')
-			.install();
+		# Raven
+		# 	.config('https://45915013fcc448aaa8008b76732bc230@sentry.io/207914')
+		# 	.install();
 
-		console.log 'raven-js installed'
+		# console.log 'raven-js installed'
 
 		# @reloadGame props.route.replay
 		@configurationOptions = props.route.configurationOptions
