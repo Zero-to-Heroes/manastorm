@@ -166,10 +166,10 @@ class ReplayPlayer extends EventEmitter
 			return 'Mulligan'
 		else if @isEndGame
 			return 'End game'
-		else if @getActivePlayer() == @player
-			return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2)
+		# else if @getActivePlayer() == @player
+		# 	return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2)
 		else
-			return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2) + 'o'
+			return 'Turn ' + Math.ceil((@turns[@currentTurn].turn + @turnOffset) / 2)
 
 	getCurrentTurn: ->
 		# console.log 'getting current turn', @turns[@currentTurn]
