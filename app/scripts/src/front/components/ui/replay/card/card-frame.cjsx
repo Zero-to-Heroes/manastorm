@@ -12,7 +12,7 @@ class CardFrame extends React.Component
 
 		cls = 'game-card rendered-card visible'
 
-		console.log 'building tooltip for', entity.cardID, originalCard.name, originalCard, entity
+		# console.log 'building tooltip for', entity.cardID, originalCard.name, originalCard, entity
 
 		if originalCard.type is 'Minion'
 			cls += ' minion'

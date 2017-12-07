@@ -12,7 +12,7 @@ class CardKeywords extends React.Component
 
 		for k,v of entity.tags
 			key = 'GLOBAL_KEYWORD_' + k
-			console.log '\t' + key, v
+			# console.log '\t' + key, v
 			if v and v isnt 0 and cardUtils.keywords[key]
 				# console.log '\t\texists'
 				name = cardUtils.localizeKeyword(key)

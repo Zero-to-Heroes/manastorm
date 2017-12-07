@@ -26,7 +26,7 @@ class ActionParser extends EventEmitter
 
 	populateEntities: ->
 		players = [@player, @opponent]
-		console.log 'populating entities', players, @replay
+		# console.log 'populating entities', players, @replay
 		@player.tags.RESOURCES_USED = 0
 		@opponent.tags.RESOURCES_USED = 0
 
@@ -280,12 +280,12 @@ class ActionParser extends EventEmitter
 
 					# console.log 'setting back active player', item, @turns[@turnNumber - 1].activePlayer
 
-				console.log 'switching active player', item, @currentPlayer, @players
+				# console.log 'switching active player', item, @currentPlayer, @players
 
 	parseStartOfTurn: (item) ->
 		# Start of turn
 		if item.command is 'receiveTagChange' and item.node.entity == 1 and item.node.tag == 'STEP' and item.node.value == 6
-			console.log 'parsing start of turn', item, @currentPlayer
+			# console.log 'parsing start of turn', item, @currentPlayer
 			@turns[@turnNumber] = {
 				# historyPosition: i
 				turn: @turnNumber - 1

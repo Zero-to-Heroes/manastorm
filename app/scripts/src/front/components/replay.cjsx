@@ -56,7 +56,7 @@ class Replay extends React.Component
 		@dirty = false
 
 		subscribe @state.replay, 'players-ready', =>
-			console.log 'in players-ready'
+			# console.log 'in players-ready'
 			@callProtectedCallback()
 
 		# subscribe @state.replay, 'reset', =>
@@ -96,11 +96,11 @@ class Replay extends React.Component
 		}
 
 		if props.route.callback
-			console.log 'init, calling callback', this.refs['root']
+			# console.log 'init, calling callback', this.refs['root']
 			props.route.callback()
 			# setTimeout @updateDimensions 200
 
-		console.log 'loaded', @props
+		# console.log 'loaded', @props
 
 
 	bindKeypressHandlers: =>
@@ -426,13 +426,13 @@ class Replay extends React.Component
 		@callProtectedCallback()
 
 	onClickPlay: (e) =>
-		console.log 'clicked on Play'
+		# console.log 'clicked on Play'
 		e.preventDefault()
 		@state.replay.autoPlay()
 		@callProtectedCallback()
 
 	onClickPause: (e) =>
-		console.log 'clicked on Pause'
+		# console.log 'clicked on Pause'
 		e.preventDefault()
 		@state.replay.pause()
 		@callProtectedCallback()
@@ -448,7 +448,7 @@ class Replay extends React.Component
 
 	onMainPlayerSwitchedChange: =>
 		@mainPlayerSwitched = !@mainPlayerSwitched
-		console.log 'switching main player', @state.replay
+		# console.log 'switching main player', @state.replay
 		@state.replay.switchMainPlayer()
 		@callProtectedCallback()
 

@@ -23,7 +23,7 @@ class ReplayPlayer extends EventEmitter
 
 
 	reload: (xmlReplay, callback) ->
-		console.log 'reloading'
+		# console.log 'reloading'
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -36,19 +36,19 @@ class ReplayPlayer extends EventEmitter
 		@init()
 
 		if callback
-			console.log 'calling reload callback'
+			# console.log 'calling reload callback'
 			callback()
 
 
 	init: ->
-		console.log 'trying to init'
+		# console.log 'trying to init'
 		if @initializing
 			setTimeout () =>
 				@init()
 			, 50
 			return
 
-		console.log 'init starting'
+		# console.log 'init starting'
 
 		@initializing = true
 
@@ -62,7 +62,7 @@ class ReplayPlayer extends EventEmitter
 		@players = []
 		@emit 'reset'
 
-		console.log 'starting init in manastorm', @players
+		# console.log 'starting init in manastorm', @players
 
 		@game = null
 		@mainPlayerId = null
@@ -190,7 +190,7 @@ class ReplayPlayer extends EventEmitter
 	# ========================
 	goNextAction: ->
 		actionIndex = @currentActionInTurn
-		console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
+		# console.log 'goNextAction', @currentTurn, actionIndex, @historyPosition, @history[@historyPosition].index, @turns, @turns.length, @turns[@currentTurn]
 
 		## last acation in the game
 		if @currentTurn == @turns.length and @currentActionInTurn >= @turns[@currentTurn].actions.length - 1
@@ -276,7 +276,7 @@ class ReplayPlayer extends EventEmitter
 			@moveToStart()
 			@currentTurn = 0
 			@currentActionInTurn = 0
-			console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
+			# console.log 'init because of going to previous action', @currentActionInTurn, @currentTurn
 			@init()
 			return
 
@@ -500,7 +500,7 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'going to index', index, @history[@historyPosition].index, @historyPosition, @history[@historyPosition]
 		# The -1 is an ugly hack, no idea why sometimes the index is not properly positioned
 		if index < @history[@historyPosition].index - 1 and !skipping
-			console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
+			# console.log 'init because going to index', index, @historyPosition, @history[@historyPosition]
 			@historyPosition = 0
 			@init()
 
@@ -837,7 +837,7 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		console.log '\t\treceiving show entity', definition.id, definition
+		# console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
@@ -847,7 +847,7 @@ class ReplayPlayer extends EventEmitter
 	fixFirstPlayer: () =>
 		# This happened in TB of 23/11/2017 where the player wasn't guessable at the start of the game
 		if (@player is null or @opponent is null or @player is @opponent)
-			console.log 'fixing first player'
+			# console.log 'fixing first player'
 			for item in @history
 				if item.command is 'receiveShowEntity'
 					definition = item.node
@@ -856,7 +856,7 @@ class ReplayPlayer extends EventEmitter
 						# if !entity
 						# 	continue
 
-						console.log 'setting player from', definition, item, @entities
+						# console.log 'setting player from', definition, item, @entities
 						for entityId, candidate of @entities
 							if candidate.tags?.CARDTYPE is 2
 								player = candidate
@@ -866,7 +866,7 @@ class ReplayPlayer extends EventEmitter
 								else
 									@opponent = player
 									# console.log '\tsetting opponent', @opponent
-						console.log 'set player and opponent', @player, @opponent
+						# console.log 'set player and opponent', @player, @opponent
 						return
 
 	receiveChangeEntity: (definition, action) ->

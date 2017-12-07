@@ -18,7 +18,7 @@ Hand = React.createClass
 		isInfoConcealed = @props.isInfoConcealed
 		conf = @props.conf
 
-		console.log 'rendering hand for', @props.entity, controller
+		# console.log 'rendering hand for', @props.entity, controller
 		cards = active.map (entity) ->
 			margin = -6
 			if active.length == 7

@@ -35,11 +35,11 @@ class CardText extends React.Component
 			arg1 = ''
 			arg2 = ''
 			# Get the ones created by the entity
-			console.log 'trying to get Kazakus text', entity
+			# console.log 'trying to get Kazakus text', entity
 			effects = _.filter @props.replay.entities, (e) =>
 				e.tags.CREATOR is entity.id and e.tags.ZONE is 6
-			console.log 'efffects', effects
-			effects.forEach (effect) => 
+			# console.log 'efffects', effects
+			effects.forEach (effect) =>
 				if effect.tags.TAG_SCRIPT_DATA_NUM_1 is data1
 					arg1 = cardUtils.getCard(effect.cardID).text
 				if effect.tags.TAG_SCRIPT_DATA_NUM_1 is data2
@@ -84,14 +84,14 @@ class CardText extends React.Component
 		window.addEventListener 'resize', @updateText
 		@updateText()
 
-	modifier: (bonus, double) => 
+	modifier: (bonus, double) =>
 		return (match, part1) =>
-			console.log 'applying modifier for', bonus, double, match, part1
+			# console.log 'applying modifier for', bonus, double, match, part1
 			value = +part1
 			if +bonus != 0 or +double != 0
 				value += bonus
 				value *= Math.pow(2, double)
-				console.log 'updated value', value
+				# console.log 'updated value', value
 				return "*" + value + "*"
 			return "" + value
 

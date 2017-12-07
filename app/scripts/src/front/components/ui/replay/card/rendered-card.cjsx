@@ -32,7 +32,7 @@ class RenderedCard extends React.Component
 			</div>
 
 		originalCard = cardUtils?.getCard(entity.cardID)
-		console.log 'rendering card', originalCard.name, entity.cardID, entity, originalCard, controller
+		# console.log 'rendering card', originalCard.name, entity.cardID, entity, originalCard, controller
 
 		cls = 'game-card rendered-card visible'
 		if originalCard.type is 'Minion'
