@@ -64,8 +64,10 @@ class CardTooltip extends React.Component
 						<CardRace cardUtils={cardUtils} entity={entity} />
 						<CardStats cardUtils={cardUtils} entity={entity} />
 						<CardCost cardUtils={cardUtils} entity={entity} />
-						<CardEnchantments cardUtils={cardUtils} entity={entity} />
-						<CardCreator cardUtils={cardUtils} entity={entity} />
+						<div className="supplementary-info">
+							<CardEnchantments cardUtils={cardUtils} entity={entity} />
+							<CardCreator cardUtils={cardUtils} entity={entity} />
+						</div>
 					</div>
 					<CardKeywords cardUtils={cardUtils} entity={entity} />
 				</div>
