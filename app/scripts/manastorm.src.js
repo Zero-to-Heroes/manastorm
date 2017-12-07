@@ -21,14 +21,6 @@ var manastorm = {
 	},
 
 	loadReplay: function(replayXml, callback, configurationOptions) {
-		if (!window.replay) {
-			console.log('external player not loaded yet, pausing before loadReplay');
-			setTimeout(function() {
-				manastorm.loadReplay(replayXml, callback, configurationOptions);
-			}, 100)
-			return;
-		}
-
 		if (replayXml) {
 			try {
 				var strReplayXml = (new XMLSerializer()).serializeToString(replayXml);
@@ -42,7 +34,17 @@ var manastorm = {
 		var bundle = require('./js/src/front/bundle.js');
 		bundle.init(strReplayXml, configurationOptions, callback);
 
-		window.replay.cardUtils = window['parseCardsText']
+		manastorm.setCardUtils();
+	},
+
+	setCardUtils: function() {
+		if (!window.replay) {
+			console.log('external player not loaded yet, pausing before loadReplay');
+			setTimeout(function() {
+				manastorm.setCardUtils();
+			}, 100)
+			return;
+		}
 	},
 
 	reload: function(replayXml, callback) {
