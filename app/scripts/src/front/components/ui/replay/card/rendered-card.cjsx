@@ -24,7 +24,6 @@ class RenderedCard extends React.Component
 		controller = replay.getController(entity.tags?.CONTROLLER)
 
 		@entityRefId = "" + entity.id
-		@tooltipRefId = 'tooltip' + @entityRefId
 
 		if !entity.cardID or @props.isHidden
 			return <div key={'card' + entity.id} className="game-card rendered-card" style={@props.style}>

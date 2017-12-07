@@ -1,8 +1,7 @@
 React = require 'react'
-Card = require './card'
-ReactCSSTransitionGroup = require 'react-addons-css-transition-group'
+RenderedCard = require './card/rendered-card'
+
 _ = require 'lodash'
-{subscribe} = require '../../../../subscription'
 
 class SecretRevealed extends React.Component
 
@@ -11,7 +10,7 @@ class SecretRevealed extends React.Component
 		return null unless entity
 
 		cardUtils = @props.replay.cardUtils
-		
+
 		secretClass = "secret-splash-container "
 		switch entity.tags.CLASS
 			when 3
@@ -24,7 +23,7 @@ class SecretRevealed extends React.Component
 		# console.log 'rendering secret', @props.entity
 
 		return 	<div className={secretClass}>
-					<Card entity={entity} key={'secret' + entity.id} ref={'secret' + entity.id} cardUtils={cardUtils}/>
+					<RenderedCard entity={entity} key={'secret' + entity.id} cost={true} ref={'secret' + entity.id} replay={@props.replay} cardUtils={cardUtils} />
 					<div className="secret-splash">
 						<div className="splash" />
 						<div className="banner" />
