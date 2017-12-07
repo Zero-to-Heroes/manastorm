@@ -2,12 +2,18 @@ React = require 'react'
 ReactDOM = require 'react-dom'
 ReactTooltip = require 'react-tooltip'
 RenderedCard = require './card/rendered-card'
+CardTooltip = require './card-tooltip'
 Secret = require './Secret'
 
 class Secret extends React.Component
 
 	render: ->
 		entity = @props.entity
+		cardUtils = @props.cardUtils
+		replay = @props.replay
+
+		@entityRefId = "" + entity.id
+		@tooltipRefId = 'tooltip' + @entityRefId
 
 		style = {}
 		cls = "secret "
@@ -38,13 +44,13 @@ class Secret extends React.Component
 
 			questProgress =
 				<div className="quest-progress rendered-card-tooltip">
-					<RenderedCard entity={entity} key={'quest' + entity.id} cost={true} cardUtils={replay.cardUtils} replay={@props.replay} conf={@props.conf}/>
+					<RenderedCard entity={entity} key={'quest' + entity.id} cost={true} cardUtils={replay.cardUtils} replay={replay} conf={@props.conf}/>
 					<div className="progress-indicator">
 						<div className="status current">{entity.tags.QUEST_PROGRESS or 0}</div>
 						<div className="separator">/</div>
 						<div className="status total">{entity.tags.QUEST_PROGRESS_TOTAL}</div>
 					</div>
-					<RenderedCard entity={reward} key={'reward' + reward.id} cost={true} cardUtils={replay.cardUtils} replay={@props.replay} conf={@props.conf}/>
+					<RenderedCard entity={reward} key={'reward' + reward.id} cost={true} cardUtils={replay.cardUtils} replay={replay} conf={@props.conf}/>
 				</div>
 
 			return <div className={cls} key={'secret' + entity.id} data-tip data-for={entity.id} data-place="top" data-effect="solid" data-delay-show="50" data-class="card-tooltip quest-tooltip">
@@ -54,10 +60,13 @@ class Secret extends React.Component
 				</div>
 
 		else if @props.showSecret
-			locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 			cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
 			link = '<img src="' + cardArt + '">'
-			return <div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip"></div>
+			return 	<div key={'card' + entity.id} className={cls} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="10" data-class="card-tooltip rendered-card-tooltip">
+						<ReactTooltip id={@entityRefId} >
+						    <CardTooltip isInfoConcealed={@props.isInfoConcealed} entity={entity} key={entity.id} cost={true} cardUtils={replay.cardUtils} replay={replay} controller={@props.controller} style={@props.style} conf={@props.conf} />
+						</ReactTooltip>
+					</div>
 		else
 			return <div className={cls} ></div>
 
