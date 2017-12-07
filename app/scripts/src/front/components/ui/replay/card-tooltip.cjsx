@@ -67,9 +67,7 @@ class CardTooltip extends React.Component
 						<CardEnchantments cardUtils={cardUtils} entity={entity} />
 						<CardCreator cardUtils={cardUtils} entity={entity} />
 					</div>
-					<div className="keywords">
-						<CardKeywords cardUtils={cardUtils} entity={entity} />
-					</div>
+					<CardKeywords cardUtils={cardUtils} entity={entity} />
 				</div>
 
 
