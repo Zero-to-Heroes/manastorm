@@ -25,7 +25,7 @@ class CardEnchantments extends React.Component
 				<h3 className="name">{cardUtils.localizeName(enchantCard)}</h3>
 				<div className="info-container">
 					<img className="icon" src={enchantImageUrl} />
-					<img className="ring" src="scripts/static/images/enchantment-ring.png" />
+					<img className="ring" src="https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/enchantment-ring.png" />
 					<span className="text" dangerouslySetInnerHTML={{__html: cardUtils.localizeText(enchantCard)}}></span>
 				</div>
 			</div>

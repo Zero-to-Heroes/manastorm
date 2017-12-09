@@ -42,7 +42,7 @@ class CardFrame extends React.Component
 			else
 				frame = 'frame-hero-' + originalCard.playerClass?.toLowerCase() + '.png'
 
-		frame = 'scripts/static/images/card/' + frame
+		frame = 'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/' + frame
 
 		return <img src={frame} className="frame"/>
 

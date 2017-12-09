@@ -36,7 +36,7 @@ class CardOnBoard extends React.Component
 
 		cls = 'game-card rendered-card minion'
 		if originalCard.rarity?.toLowerCase() is 'legendary'
-			legendaryFrame = <img src={'scripts/static/images/card/legendary-minion.png'} className="legendary-frame"/>
+			legendaryFrame = <img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/legendary-minion.png'} className="legendary-frame"/>
 
 		if @props.className
 			cls += " " + @props.className
@@ -49,7 +49,7 @@ class CardOnBoard extends React.Component
 			imageCls += " img-option-on"
 
 		entity.damageTaken = entity.damageTaken or 0
-		
+
 		@updateDimensions()
 
 		return  <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="10" data-class="card-tooltip rendered-card-tooltip">

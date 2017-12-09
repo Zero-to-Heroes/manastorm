@@ -11,7 +11,7 @@ class CardRace extends React.Component
 		return null unless originalCard.race
 
 		return <div className="race">
-					<img src={'scripts/static/images/card/race-banner.png'} className="race-banner" />
+					<img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/race-banner.png'} className="race-banner" />
 					<p>{originalCard.race.toLowerCase()}</p>
 				</div>
 

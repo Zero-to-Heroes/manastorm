@@ -14,13 +14,13 @@ class CardFrameOnBoard extends React.Component
 		if entity.tags.TAUNT
 			frame = 'onboard_minion_taunt.png'
 			frameCls += ' taunt'
-		else 
+		else
 			frame = 'onboard_minion_frame.png'
 
 		if entity.tags.PREMIUM is 1 and !conf?.noGolden
 			frame = 'golden/' + frame
 
-		frame = 'scripts/static/images/' + frame
+		frame = 'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/' + frame
 
 		return <img src={frame} className={frameCls}/>
 
