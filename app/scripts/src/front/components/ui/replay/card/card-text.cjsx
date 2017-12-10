@@ -1,6 +1,7 @@
 React = require 'react'
 ReactDOM = require 'react-dom'
 _ = require 'lodash'
+textFit = require 'textFit-z2h'
 
 class CardText extends React.Component
 
@@ -63,24 +64,28 @@ class CardText extends React.Component
 				</div>
 
 	updateText: ->
-		#console.log 'updating text'
 		setTimeout () =>
 			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]
 			if rootFontSize <= 0
-				@updateText()
+				# console.log '\t[card-text] rootFontSize not defined yet', document.getElementById('replayMainArea')
+				setTimeout () =>
+					@updateText()
+				, 250
 			else
-				#maxFontSize = if @inTooltip then rootFontSize * 0.85 else rootFontSize * 0.5
+				console.log '[card-text] updating text for', @props.entity.cardID
 				domNode = ReactDOM.findDOMNode(@cardText)
 				if !domNode
+					console.log '\t[card-text] domNode doesnt exist'
 					return
 				textBoxWidth = domNode.offsetWidth
 				maxFontSize = Math.round(textBoxWidth / 10.0)
-				#console.log 'max font sizes', textBoxWidth, maxFontSize
+				console.log '\t[card-text] max font sizes', textBoxWidth, maxFontSize, domNode.offsetWidth, domNode
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
-				#console.log 'set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
+				console.log '\t[card-text] set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
 		, 0
 
 	componentDidMount: ->
+		console.log '[card-text] component mounted'
 		window.addEventListener 'resize', @updateText
 		@updateText()
 
