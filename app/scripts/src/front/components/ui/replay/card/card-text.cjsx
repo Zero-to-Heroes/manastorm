@@ -72,20 +72,20 @@ class CardText extends React.Component
 					@updateText()
 				, 250
 			else
-				console.log '[card-text] updating text for', @props.entity.cardID
+				# console.log '[card-text] updating text for', @props.entity.cardID
 				domNode = ReactDOM.findDOMNode(@cardText)
 				if !domNode
-					console.log '\t[card-text] domNode doesnt exist'
+					# console.log '\t[card-text] domNode doesnt exist'
 					return
 				textBoxWidth = domNode.offsetWidth
 				maxFontSize = Math.round(textBoxWidth / 10.0)
-				console.log '\t[card-text] max font sizes', textBoxWidth, maxFontSize, domNode.offsetWidth, domNode
+				# console.log '\t[card-text] max font sizes', textBoxWidth, maxFontSize, domNode.offsetWidth, domNode
 				textFit @cardText, {alignHoriz: true, alignVert: true, alignVertWithFlexbox: true, multiLine: true, minFontSize: 1, maxFontSize: maxFontSize}
-				console.log '\t[card-text] set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
+				# console.log '\t[card-text] set font size', @cardText.offsetWidth, @cardText.offsetHeight, @cardText.style
 		, 0
 
 	componentDidMount: ->
-		console.log '[card-text] component mounted'
+		# console.log '[card-text] component mounted'
 		window.addEventListener 'resize', @updateText
 		@updateText()
 
