@@ -19,6 +19,7 @@ class ActionParser extends EventEmitter
 		@turns = @replay.turns
 		@getController = @replay.getController
 		@cardUtils = @replay.cardUtils
+		@mulliganOver = [false, false]
 
 		@turnNumber = 1
 		@mulligan = false
@@ -260,7 +261,9 @@ class ActionParser extends EventEmitter
 
 	parseEndOfMulligan: (item) =>
 		if item.command is 'receiveTagChange' and item.node.entity in [2, 3] and item.node.tag == 'MULLIGAN_STATE' and item.node.value == 4
-			@mulligan = false
+			@mulliganOver[item.node.entity - 2] = true
+			if @mulliganOver[0] and @mulliganOver[1]
+				@mulligan = false
 
 	parseChangeActivePlayer: (item) ->
 		#and @currentTurnNumber >= 2
