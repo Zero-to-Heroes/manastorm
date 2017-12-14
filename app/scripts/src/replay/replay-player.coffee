@@ -666,9 +666,12 @@ class ReplayPlayer extends EventEmitter
 		@updateOptions()
 		@updateCurrentReplayTime()
 
+	inMulligan: ->
+		return @opponent.tags?.MULLIGAN_STATE < 4 or @player.tags?.MULLIGAN_STATE < 4
+
 	choosing: ->
 		# Blur during mulligan
-		if @turns[@currentTurn].turn is 'Mulligan'
+		if @inMulligan()
 			return true
 
 		# Same for discover
@@ -711,13 +714,13 @@ class ReplayPlayer extends EventEmitter
 
 		realAction = action.mainAction?.associatedAction || action
 		mainEntity = action.mainAction?.associatedAction?.data || action.data
-		# console.log 'updating active spell', action, realAction, mainEntity
-		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType in ['played-card-from-hand', 'played-card-with-target', 'played-card-by-minion']
-			# console.log '\tupdating active spell', mainEntity
+		console.log 'updating active spell', action, realAction, mainEntity
+		if mainEntity?.tags?.CARDTYPE is 5 and realAction.actionType in ['played-card-from-hand', 'played-card-with-target', 'played-card-by-minion', 'power-target']
+			console.log '\tupdating active spell', mainEntity
 			@activeSpell = mainEntity
 
 		else if realAction.actionType in ['minion-death', 'secret-revealed', 'quest-completed', 'card-draw']
-			# console.log '\tstill showing previous spell', @activeSpell, @previousActiveSpell
+			console.log '\tstill showing previous spell', @activeSpell, @previousActiveSpell
 			@activeSpell = @previousActiveSpell
 			@previousActiveSpell = undefined
 
