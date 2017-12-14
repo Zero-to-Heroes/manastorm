@@ -156,7 +156,7 @@ class Replay extends React.Component
 		# console.log 'rerendering replay'
 
 		if replay.players.length == 2
-			inMulligan = replay.opponent.tags?.MULLIGAN_STATE < 4 or replay.player.tags?.MULLIGAN_STATE < 4
+			inMulligan = replay.inMulligan()
 			# console.log 'All players are here', replay
 
 			topArea = <div className="top" >
