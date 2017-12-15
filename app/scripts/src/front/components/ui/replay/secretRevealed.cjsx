@@ -19,6 +19,8 @@ class SecretRevealed extends React.Component
 				secretClass += "mage"
 			when 5
 				secretClass += "paladin"
+			when 7
+				secretClass += "rogue"
 
 		# console.log 'rendering secret', @props.entity
 
