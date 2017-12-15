@@ -13,7 +13,7 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		#console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity
+		console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity, originalCard, originalCard.referencedTags
 
 		damageBonus = 0
 		doubleDamage = 0
@@ -47,6 +47,14 @@ class CardText extends React.Component
 					arg2 = cardUtils.getCard(effect.cardID).text
 			description = description.replace('{0}', arg1).replace('{1}', arg2)
 
+		# We can't rely on the "Mechanics" tag, as Jade Chieftain doesn't have it. Aya BLackpaw doesn't have the JADE8GOLEM referencedTag, and Jade Golems have it but have no description
+		# So we add extra checks and run this last to be sure it doesn't interfere wiht anything else
+		if entity.tags.JADE_GOLEM or (originalCard.referencedTags and 'JADE_GOLEM' in originalCard.referencedTags) and description and description.indexOf('{0}') != -1 and description.indexOf('{1}') != -1
+
+			console.log 'setting JADE_GOLEM'
+			value = controller.tags.JADE_GOLEM + 1
+			arg1 = if value in [8, 11, 18] then 'n' else ''
+			description = description.replace('{0}', value + '/' + value).replace('{1}', arg1)
 
 		# Replace &nbsp;
 		description = description?.replace(/\u00a0/g, " ");
