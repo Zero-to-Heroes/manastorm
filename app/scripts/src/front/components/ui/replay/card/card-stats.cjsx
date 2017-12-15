@@ -24,7 +24,10 @@ class CardStats extends React.Component
 			atkCls += " debuff"
 
 		originalHealth = originalCard.health
-		tagHealth = entity.tags?.HEALTH || originalHealth
+		if entity.tags?.HEALTH is 0
+			tagHealth = 0
+		else
+			tagHealth = entity.tags?.HEALTH || originalHealth
 		if tagHealth > originalHealth
 			healthClass += " buff"
 		if entity.tags?.DAMAGE > 0
@@ -33,7 +36,7 @@ class CardStats extends React.Component
 		tagDurability = entity.tags?.DURABILITY || originalCard.durability
 		return <div className="card__stats">
 				<div className={atkCls}><span>{tagAtk or 0}</span></div>
-				<div className={healthClass}><span>{(tagHealth or tagDurability) - (entity.tags?.DAMAGE or 0)}</span></div>
+				<div className={healthClass}><span>{(tagDurability or tagHealth) - (entity.tags?.DAMAGE or 0)}</span></div>
 				<div className="card__stats__armor"><span>{(entity.tags?.ARMOR)}</span></div>
 			</div>
 
