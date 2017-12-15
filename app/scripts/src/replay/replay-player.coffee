@@ -526,7 +526,7 @@ class ReplayPlayer extends EventEmitter
 
 	# Interface with the external world
 	moveToTimestamp: (timestamp) ->
-		@pause()
+		# @pause()
 
 		timestamp += @startTimestamp
 		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
