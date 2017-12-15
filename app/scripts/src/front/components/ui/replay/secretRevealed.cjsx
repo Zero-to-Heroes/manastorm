@@ -11,7 +11,7 @@ class SecretRevealed extends React.Component
 		return null unless entity
 
 		cardUtils = @props.replay.cardUtils
-		
+
 		secretClass = "secret-splash-container "
 		switch entity.tags.CLASS
 			when 3
@@ -20,6 +20,8 @@ class SecretRevealed extends React.Component
 				secretClass += "mage"
 			when 5
 				secretClass += "paladin"
+			when 7
+				secretClass += "rogue"
 
 		# console.log 'rendering secret', @props.entity
 

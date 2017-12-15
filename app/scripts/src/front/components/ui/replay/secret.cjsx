@@ -21,6 +21,8 @@ class Secret extends Card
 					cls += "mage"
 				when 5
 					cls += "paladin"
+				when 7
+					cls += "rogue"
 
 		if @props.className
 			cls += " " + @props.className
