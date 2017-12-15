@@ -48,7 +48,8 @@ class CardText extends React.Component
 			description = description.replace('{0}', arg1).replace('{1}', arg2)
 
 
-		#console.log 'damageBonus', damageBonus
+		# Replace &nbsp;
+		description = description?.replace(/\u00a0/g, " ");
 		description = description?.replace(/^\[x\]/, "");
 		description = description?.replace(/\$(\d+)/g, @modifier(damageBonus, doubleDamage));
 		description = description?.replace(/\#(\d+)/g, @modifier(damageBonus, doubleDamage));
