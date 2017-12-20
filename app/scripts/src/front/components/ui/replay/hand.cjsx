@@ -7,7 +7,7 @@ _ = require 'lodash'
 Hand = React.createClass
 
 	render: ->
-		return <div className="hand"></div> unless !@props.entity.tags.MULLIGAN_STATE or @props.entity.tags.MULLIGAN_STATE is 4
+		return <div className="hand"></div> unless !@props.replay.inMulligan()
 
 		active = _.filter @props.entity.getHand(), (entity) -> entity.tags.ZONE_POSITION > 0
 
@@ -34,7 +34,7 @@ Hand = React.createClass
 			}
 
 			console.log 'rendering card in hand', entity.cardID, entity
-			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf}/>
+			<Card isInfoConcealed={isInfoConcealed} entity={entity} key={entity.id} isHidden={hidden} cost={true} cardUtils={replay.cardUtils} controller={controller} style={style} conf={conf} origin="hand"/>
 
 		return <div className="hand">
 				<div>{cards}</div>

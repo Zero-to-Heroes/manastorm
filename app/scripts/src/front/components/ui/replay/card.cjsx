@@ -208,7 +208,7 @@ class Card extends React.Component
 		# Don't use tooltips if we don't know what card it is - or shouldn't know
 		if entity.cardID && !@props.isHidden
 			# link = '<img src="' + art + '">';
-			return <div key={'card' + entity.id} className={cls} style={@props.style} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
+			return <div key={'card' + @props.origin + entity.id} className={cls} style={@props.style} data-tip data-for={'' + @props.origin + entity.id} data-place="right" data-effect="solid" data-delay-show="50" data-class="card-tooltip">
 				<div className={highlightCls}>
 					{taunt}
 					<div className={imageCls} style={style}></div>
@@ -227,7 +227,7 @@ class Card extends React.Component
 					{divineShield}
 					{cost}
 				</div>
-				<ReactTooltip id={"" + entity.id} >
+				<ReactTooltip id={"" + @props.origin + entity.id} >
 				    {cardTooltip}
 				</ReactTooltip>
 			</div>
