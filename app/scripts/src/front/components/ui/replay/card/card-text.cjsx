@@ -52,7 +52,7 @@ class CardText extends React.Component
 		if entity.tags.JADE_GOLEM or (originalCard.referencedTags and 'JADE_GOLEM' in originalCard.referencedTags) and description and description.indexOf('{0}') != -1 and description.indexOf('{1}') != -1
 
 			console.log 'setting JADE_GOLEM'
-			value = controller.tags.JADE_GOLEM + 1
+			value = (controller.tags.JADE_GOLEM or 0) + 1
 			arg1 = if value in [8, 11, 18] then 'n' else ''
 			description = description.replace('{0}', value + '/' + value).replace('{1}', arg1)
 
