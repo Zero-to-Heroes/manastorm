@@ -13,7 +13,7 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity, originalCard, originalCard.referencedTags
+		# console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity, originalCard, originalCard.referencedTags
 
 		damageBonus = 0
 		doubleDamage = 0
@@ -65,8 +65,12 @@ class CardText extends React.Component
 
 		@description = description
 
+		cls = "card-text textFitAlignVertFlex"
+		if entity.tags?.PREMIUM is 1
+			cls += " premium"
+
 		# We need to keep the structure textFit will use so that changes to the description are properly propagated
-		return <div className="card-text textFitAlignVertFlex" ref={ (div) => @cardText = div; } >
+		return <div className={cls} ref={ (div) => @cardText = div; } >
 					<span className="textFitted textFitAlignVert">
 						<p dangerouslySetInnerHTML={{ __html: description }}></p>
 					</span>
