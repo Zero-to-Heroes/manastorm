@@ -1,0 +1,3 @@
+Resize to 1100 height + keep aspect ratio
+Expand canvas to 764 large
+overlay with Druid until exact match
