@@ -50,6 +50,9 @@ class RenderedCard extends React.Component
 		if @props.className
 			cls += " " + @props.className
 
+		if @props.isDiscarded
+			cls += " discarded"
+
 		imageCls = "art "
 		highlightCls = ''
 		if entity.highlighted
