@@ -65,7 +65,8 @@ class RenderedCard extends React.Component
 				highlightCls += " combo"
 
 		if entity.tags?.TRANSFORMED_FROM_CARD
-			tranformedEffect = <div className="transformed-from-card"></div>
+			transformCls = "transformed-from-card " + originalCard.type.toLowerCase()
+			tranformedEffect = <div className={transformCls}></div>
 
 		@updateDimensions()
 

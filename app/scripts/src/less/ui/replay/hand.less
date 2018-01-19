@@ -51,16 +51,6 @@
 			margin-right: 0;
 		}
 
-		.transformed-from-card {
-			background-image: url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/trigger_visual.png);
-			background-size: cover;
-		    position: absolute;
-		    top: 6%;
-		    width: 100%;
-		    height: 100%;
-		    opacity: 0.8;
-		}
-
 	}
 
 	.rendered-card {
@@ -73,6 +63,25 @@
 
 		&.minion .art {
     		clip-path: ellipse(39% 48% at 52% 51%);
+		}
+
+
+		.transformed-from-card {
+			background-size: cover;
+		    position: absolute;
+		    top: 6%;
+		    width: 100%;
+		    height: 100%;
+		    opacity: 0.6;
+		}
+
+		.transformed-from-card.minion {
+			background-image: url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/shifting_minion.png);
+		}
+
+		.transformed-from-card.spell {
+			background-image: url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/shifting_spell.png);
+			top: 0;
 		}
 
 		.option-on {
