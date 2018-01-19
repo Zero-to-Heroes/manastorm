@@ -49,7 +49,7 @@ class CardName extends React.Component
 		setTimeout () =>
 			if !@svgRef
 				return
-				
+
 			bb = @svgRef.getBBox()
 
 			rootFontSize = document.getElementById('replayMainArea').style.fontSize.split('px')[0]
@@ -58,13 +58,13 @@ class CardName extends React.Component
 			else
 				fontSize = rootFontSize * 7
 				# Fumbling around a bit to make big names fit in the text box
-				if @name.length > 18
+				if @name.length > 16
 					fontSize = rootFontSize * 6
-					
+
 				@text.setAttribute("font-size", fontSize)
 		, 50
 
-	updatePath: (initialValue, previousMin, previousLength, newMin, newLength) => 
+	updatePath: (initialValue, previousMin, previousLength, newMin, newLength) =>
 		return newMin + (initialValue - previousMin) * (newLength / previousLength)
 
 	componentDidMount: ->
