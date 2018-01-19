@@ -798,17 +798,17 @@ class ReplayPlayer extends EventEmitter
 
 	receivePlayer: (definition) ->
 		entity = new Player(this)
-		# console.log 'receiving player', entity, entity.tags.CURRENT_PLAYER, this
+		console.log 'receiving player', entity, entity.tags.CURRENT_PLAYER, this
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
 
 		if entity.tags.CURRENT_PLAYER
 			@player = entity
-			# console.log 'setting player', entity, @player
+			console.log 'setting player', entity, @player
 		else
 			@opponent = entity
-			# console.log 'setting opponent', entity, @opponent
+			console.log 'setting opponent', entity, @opponent
 
 	receiveEntity: (definition, action) ->
 		# console.log 'receiving entity', definition.id, definition, @entities[definition.id]
@@ -854,7 +854,7 @@ class ReplayPlayer extends EventEmitter
 			for item in @history
 				if item.command is 'receiveShowEntity'
 					definition = item.node
-					if definition.cardID and definition.tags?.CARDTYPE != 6
+					if definition.cardID and definition.tags?.CARDTYPE != 6 and definition.tags.CONTROLLER
 						# entity = @entities[definition.id]
 						# if !entity
 						# 	continue
@@ -865,10 +865,34 @@ class ReplayPlayer extends EventEmitter
 								player = candidate
 								if player.tags.CONTROLLER is definition.tags.CONTROLLER
 									@player = player
-									# console.log '\tsetting player', @player
+									console.log '\tsetting player', @player
 								else
 									@opponent = player
 									# console.log '\tsetting opponent', @opponent
+						console.log 'set player and opponent', @player, @opponent
+
+		# Couldn't fix it because we haven't receive any meaningful ShowEntity.
+		# This happened here for instance: http://www.zerotoheroes.com/r/hearthstone/57dc4980ac2a3935c6aa6e1b/tacticts-trainer
+		if (@player is null or @opponent is null or @player is @opponent)
+			console.log 're-fixing first player'
+			for item in @history
+				if item.command is 'receiveEntity'
+					definition = item.node
+					if definition.cardID and definition.tags?.CARDTYPE != 6 and definition.tags.CONTROLLER
+						# entity = @entities[definition.id]
+						# if !entity
+						# 	continue
+
+						console.log 'setting player from', definition, item, @entities
+						for entityId, candidate of @entities
+							if candidate.tags?.CARDTYPE is 2
+								player = candidate
+								if player.tags.CONTROLLER is definition.tags.CONTROLLER
+									@player = player
+									console.log '\tsetting player', @player
+								else
+									@opponent = player
+									console.log '\tsetting opponent', @opponent
 						console.log 'set player and opponent', @player, @opponent
 						return
 
