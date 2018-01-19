@@ -1,32 +1,29 @@
 .splash-reveal-container {
+    width: 70%;
+    margin: auto;
+    margin-top: 23%;
+    display: flex;
     position: relative;
     margin: auto;
-    margin-top: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%;
-    flex-basis: 100%;
+    left: 10%;
+    pointer-events: auto;
 
-    .game-card {
-	    width: 35%;
-	    top: -20%;
+    .rendered-card {
+    	width: 60%;
+    	left: -14%;
+    	pointer-events: none;
+    	font-size: 2em;
+
+	    .card__stats.card__stats.card__stats {
+	        span {
+    			line-height: 3.4em;
+	        }
+	    }
 	}
 
-	.art {
-	    width: 100%;
-	    position: absolute;
-	    left: 0;
-	    top: 0;
-	    background-size: contain;
-
-		&::before {
-		    content: "";
-		    padding-top: 128%;
-		    position: relative;
-		    display: block; 	
-	    }	
-	}
 }
 
 
