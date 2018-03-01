@@ -23,7 +23,8 @@ class ReplayPlayer extends EventEmitter
 
 
 	reload: (xmlReplay, callback) ->
-		# console.log 'reloading'
+		console.log 'reloading'
+		clearInterval @interval if @interval
 		@parser.xmlReplay = xmlReplay
 		# EventEmitter.call(this)
 		# console.log 'init parser', @parser, xmlReplay
@@ -80,7 +81,7 @@ class ReplayPlayer extends EventEmitter
 		@started = false
 		@speed = 0
 		@previousSpeed = 0
-		clearInterval @interval
+		clearInterval @interval if @interval
 
 		@turns = {
 			length: 0
@@ -143,6 +144,7 @@ class ReplayPlayer extends EventEmitter
 		@speed = @previousSpeed || 1
 		# console.log 'in autoPlay', @previousSpeed, @speed
 		if @speed > 0
+			clearInterval @interval if @interval
 			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 			# console.log 'speed > 0', @interval
 
@@ -152,13 +154,13 @@ class ReplayPlayer extends EventEmitter
 			# console.log 'speed was > 0, storing previous speed', @previousSpeed
 		@speed = 0
 		# console.log 'pausing', @previousSpeed, @speed, @interval
-		clearInterval(@interval)
+		clearInterval @interval if @interval
 		# console.log 'cleared interval', @interval
 
 	changeSpeed: (speed) ->
 		# console.log 'changing speed'
 		@speed = speed
-		clearInterval(@interval)
+		clearInterval @interval if @interval
 		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	getCurrentTurnString: ->
