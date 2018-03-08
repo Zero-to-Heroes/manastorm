@@ -6,6 +6,8 @@ class CardEffect extends React.Component
 		cardUtils = @props.cardUtils
 		entity = @props.entity
 
+		console.log 'rendering', entity.cardID, entity
+
 		return null unless entity.tags
 
 		originalCard = cardUtils?.getCard(entity.cardID)
@@ -14,13 +16,13 @@ class CardEffect extends React.Component
 			return <div className="effect poisonous"></div>
 		if entity.tags.LIFESTEAL
 			return <div className="effect lifesteal"></div>
-		if entity.tags.DEATHRATTLE
+		if entity.tags.DEATH_RATTLE
 			return <div className="effect deathrattle"></div>
 		if entity.tags.INSPIRE
 			return <div className="effect inspire"></div>
 		if entity.tags.TRIGGER
 			return <div className="effect trigger"></div>
-		else 
+		else
 			return null
 
 module.exports = CardEffect
