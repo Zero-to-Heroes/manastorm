@@ -6,8 +6,11 @@ class PlayerName extends React.Component
 		cls = "player-name"
 		if @props.isActive
 			cls += " active"
+		name = @props.entity.name
+		if name.indexOf('#') != -1
+			name = @props.entity.name.substring(0, name.lastIndexOf('#'))
 		return <div className={cls}>
-			{@props.entity.name}
+			{name}
 		</div>
 
 module.exports = PlayerName
