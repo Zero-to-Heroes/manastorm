@@ -645,7 +645,7 @@ TurnLog = React.createClass
 	# Turn specific log
 	# ===================
 	buildTurnLog: (turn) ->
-		console.log 'building turn log', turn
+		# console.log 'building turn log', turn
 		if turn
 			if turn.turn is 'Mulligan'
 				log = @buildMulliganLog turn

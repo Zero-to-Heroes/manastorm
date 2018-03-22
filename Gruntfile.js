@@ -172,10 +172,7 @@ module.exports = function (grunt) {
 		'removelogging',
 		'browserify',
 		'uglify',
-		'cssmin',
-		'copy:static',
-		'copy:staticRelease',
-		'copy:mainRelease'
+		'cssmin'
 	]);
 
 
