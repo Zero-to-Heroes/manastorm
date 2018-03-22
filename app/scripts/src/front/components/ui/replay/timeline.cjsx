@@ -48,15 +48,13 @@ class Timeline extends React.Component
 		</div>
 
 	handleClick: (e) =>
+		# console.log 'handling timeline click', e
 		left = 0
-		element = @refs['scrub-bar']
-		target = element
-		while (element != null)
-			left += (element.offsetLeft || 0)
-			element = element.offsetParent
+		target = @refs['scrub-bar']
+		left = target.getBoundingClientRect().x
 
 		progression = (e.clientX - left) / target.offsetWidth
-		# console.log 'moving to progression', progression, element, left, e.clientX, target, target.offsetWidth
+		# console.log 'moving to progression', progression, left, e.clientX, lastElement, target, target.offsetWidth
 		# This avoids small deviations and keeps the impression that we can click on the same point and not move the timeline
 		progression = progression.toFixed(2)
 		# console.log 'rounded', progression
