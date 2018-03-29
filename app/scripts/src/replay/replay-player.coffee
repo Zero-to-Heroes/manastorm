@@ -42,14 +42,14 @@ class ReplayPlayer extends EventEmitter
 
 
 	init: ->
-		console.log 'trying to init'
+		# console.log 'trying to init'
 		if @initializing
 			setTimeout () =>
 				@init()
 			, 50
 			return
 
-		console.log 'init starting'
+		# console.log 'init starting'
 
 		@initializing = true
 
@@ -63,7 +63,7 @@ class ReplayPlayer extends EventEmitter
 		@players = []
 		@emit 'reset'
 
-		console.log 'starting init in manastorm', @players
+		# console.log 'starting init in manastorm', @players
 
 		@game = null
 		@mainPlayerId = null
@@ -531,7 +531,7 @@ class ReplayPlayer extends EventEmitter
 		# @pause()
 
 		timestamp += @startTimestamp
-		# console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
+		console.log 'moving to timestamp', timestamp, @getCurrentTimestamp(), @turns[@currentTurn]
 		# currentTimestamp = @getCurrentTimestamp()
 		# @newStep()
 
@@ -539,11 +539,11 @@ class ReplayPlayer extends EventEmitter
 		# console.log 'moving on the timeline', timestamp, @getCurrentTimestamp()
 		# Going forward
 		if !@getCurrentTimestamp() or timestamp > @getCurrentTimestamp()
-			# console.log '\tforward'
+			console.log '\tforward', @getCurrentTimestamp(), timestamp
 			hasMoved = true
 			while hasMoved and (!@getCurrentTimestamp() or timestamp > @getCurrentTimestamp())
 				hasMoved = @goNextAction()
-				# console.log 'going to next action', hasMoved, @getCurrentTimestamp(), timestamp, @turns[@currentTurn], @currentActionInTurn, @turns
+				console.log 'timestamp going to next action', hasMoved, timestamp - @getCurrentTimestamp(), @turns[@currentTurn], @currentActionInTurn, @turns
 		else if timestamp < @getCurrentTimestamp()
 			console.log '\tbackward'
 			# Stop at mulligan
@@ -800,7 +800,7 @@ class ReplayPlayer extends EventEmitter
 
 	receivePlayer: (definition) ->
 		entity = new Player(this)
-		console.log 'receiving player', entity, entity.tags.CURRENT_PLAYER, this
+		# console.log 'receiving player', entity, entity.tags.CURRENT_PLAYER, this
 		@entities[definition.id] = entity
 		@players.push(entity)
 		entity.update(definition)
@@ -842,7 +842,7 @@ class ReplayPlayer extends EventEmitter
 		# 	console.log '\tprocessed tag change', change, @entities[change.entity]
 
 	receiveShowEntity: (definition, action) ->
-		console.log '\t\treceiving show entity', definition.id, definition
+		# console.log '\t\treceiving show entity', definition.id, definition
 		if @entities[definition.id]
 			@entities[definition.id].update(definition, action)
 		else
@@ -852,7 +852,7 @@ class ReplayPlayer extends EventEmitter
 	fixFirstPlayer: () =>
 		# This happened in TB of 23/11/2017 where the player wasn't guessable at the start of the game
 		if (@player is null or @opponent is null or @player is @opponent)
-			console.log 'fixing first player'
+			# console.log 'fixing first player'
 			for item in @history
 				if item.command is 'receiveShowEntity'
 					definition = item.node
