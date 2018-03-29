@@ -1092,7 +1092,7 @@ class ActionParser extends EventEmitter
 
 			action = {
 				turn: @currentTurnNumber - 1
-				timestamp: tsToSeconds(command.ts) || item.timestamp
+				timestamp: command.ts || item.timestamp
 				actionType: 'discover'
 				data: @entities[command.source]
 				owner: @entities[command.entity]
@@ -1102,7 +1102,7 @@ class ActionParser extends EventEmitter
 			command.isDiscover = true
 			@addAction @currentTurnNumber, action
 			# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
-			# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
+			console.log 'parsing discover action', action, command, item
 
 
 	parseDiscoverPick: (item) ->
@@ -1178,10 +1178,9 @@ class ActionParser extends EventEmitter
 				}
 				command.isDiscover = true
 				@addAction @currentTurnNumber, action
-				# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
+				# console.log 'added old discover action', action, @turns[@currentTurnNumber], @turns
 				currentIndex += numberOfChoices
-				# console.log 'parsing discover action', action, command, choices, actionChoices, @entities[command.attributes.entity], numberOfChoices
-
+				# console.log 'parsing old discover action', action, command, item
 
 
 	parseSummons: (item) ->
