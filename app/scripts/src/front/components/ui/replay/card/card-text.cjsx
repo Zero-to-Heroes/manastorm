@@ -13,7 +13,12 @@ class CardText extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
+		description = originalCard.text?.replace('\n', '<br/>')
 		# console.log 'Trying to render text for', originalCard.name, entity.cardID, controller, entity, originalCard, originalCard.referencedTags
+		# HIDDEN_CHOICE, for now only on Fatespinner
+
+		if entity.tags.HIDDEN_CHOICE and description.indexOf('@') > -1
+			description = description.split('@')[entity.tags.HIDDEN_CHOICE]
 
 		damageBonus = 0
 		doubleDamage = 0
@@ -26,8 +31,6 @@ class CardText extends React.Component
 			else if originalCard.type is 'Hero_power'
 				damageBonus = controller.tags.CURRENT_HEROPOWER_DAMAGE_BONUS || 0
 				doubleDamage = controller.tags.HERO_POWER_DOUBLE || 0
-
-		description = originalCard.text?.replace('\n', '<br/>')
 
 		# Kazakus
 		if entity.tags.TAG_SCRIPT_DATA_NUM_1 and entity.tags.TAG_SCRIPT_DATA_NUM_2
