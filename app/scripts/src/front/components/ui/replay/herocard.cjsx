@@ -15,7 +15,7 @@ class HeroCard extends Card
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
 
 		entity = @props.entity
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/cardart/256x/#{entity.cardID}.jpg"
+		art = "http://static.zerotoheroes.com/hearthstone/cardart/256x/#{entity.cardID}.jpg"
 
 		weapon = @props.weapon
 

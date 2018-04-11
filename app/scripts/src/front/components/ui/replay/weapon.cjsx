@@ -15,7 +15,7 @@ class Weapon extends Card
 		# console.log '\trendering weapon', @props.entity.cardID, @props.entity.tags
 		entity = @props.entity
 
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{@props.entity.cardID}.png"
+		art = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{@props.entity.cardID}.png"
 		originalCard = @props.cardUtils?.getCard(@props.entity.cardID)
 
 		# console.log 'rendering weapon', @props.entity

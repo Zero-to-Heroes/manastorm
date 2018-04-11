@@ -30,8 +30,8 @@ class Secret extends Card
 		if entity.tags.QUEST is 1
 			cardRewardId = @getRewardId entity.cardID
 
-			questArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
-			rewardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{cardRewardId}.png"
+			questArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{entity.cardID}.png"
+			rewardArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{cardRewardId}.png"
 
 			questProgress =
 				<div className="quest-progress">
@@ -52,7 +52,7 @@ class Secret extends Card
 
 		else if @props.showSecret
 			locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
-			cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
+			cardArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{entity.cardID}.png"
 			link = '<img src="' + cardArt + '">'
 			return <div className={cls} data-tip={link} data-html={true} data-place="right" data-effect="solid" data-delay-show="100" data-class="card-tooltip"></div>
 		else

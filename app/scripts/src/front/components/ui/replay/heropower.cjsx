@@ -11,7 +11,7 @@ class HeroPower extends Card
 	render: ->
 		return null unless @props.entity
 		locale = if window.localStorage.language and window.localStorage.language != 'en' then '/' + window.localStorage.language else ''
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{@props.entity.cardID}.png"
+		art = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{@props.entity.cardID}.png"
 
 		cls = "power"
 
