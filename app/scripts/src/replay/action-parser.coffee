@@ -143,6 +143,7 @@ class ActionParser extends EventEmitter
 					@parseSummons item
 					@parseEquipEffect item
 					@parseTriggerFullEntityCreation item
+					@parseTriggerPutEntityInPlay item
 					@parseTriggerPutSecretInPlay item
 					@parseNewHeroPower item
 				else
@@ -1039,6 +1040,36 @@ class ActionParser extends EventEmitter
 						}
 						@addAction @currentTurnNumber, action
 
+	# Like Skull of the Man'ari
+	parseTriggerPutEntityInPlay: (item) ->
+		command = item.node
+		if command.attributes.type in ['5'] and command.attributes.triggerKeyword > 0
+			entitiesPutInPlay = []
+
+			if command.tags
+				for tag in command.tags
+					if tag.tag == 'ZONE' and tag.value == 1
+						entity = @entities[tag.entity]
+						entitiesPutInPlay.push entity
+						index = tag.index
+
+			# Trigger that creates an entity
+			if entitiesPutInPlay.length > 0
+					action = {
+						turn: @currentTurnNumber - 1
+						timestamp: tsToSeconds(command.attributes.ts) || item.timestamp
+						index: index
+						entities: entitiesPutInPlay
+						mainAction: command.parent
+						actionType: 'trigger-entity-put-in-play'
+						data: @entities[command.attributes.entity]
+						owner: @getController(@entities[command.attributes.entity].tags.CONTROLLER)
+						initialCommand: command
+					}
+					# console.log 'secret put in play', action
+					@addAction @currentTurnNumber, action
+					console.log 'adding parseTriggerPutEntityInPlay', action
+
 
 	parseAttacks: (item) ->
 		command = item.node
@@ -1102,7 +1133,7 @@ class ActionParser extends EventEmitter
 			command.isDiscover = true
 			@addAction @currentTurnNumber, action
 			# console.log 'added discover action', action, @turns[@currentTurnNumber], @turns
-			console.log 'parsing discover action', action, command, item
+			# console.log 'parsing discover action', action, command, item
 
 
 	parseDiscoverPick: (item) ->

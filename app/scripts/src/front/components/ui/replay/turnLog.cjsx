@@ -121,6 +121,9 @@ TurnLog = React.createClass
 		else if action.actionType == 'trigger-secret-play'
 			log = @buildTriggerSecretPlayLog action
 
+		else if action.actionType == 'trigger-entity-put-in-play'
+			log = @buildTriggerEntityPutInPlayLog action
+
 		else if action.actionType == 'new-hero-power'
 			log = @buildNewHeroPowerLog action
 
@@ -352,6 +355,23 @@ TurnLog = React.createClass
 
 		log = <p key={'log' + ++@logIndex}>
 				{secrets}
+			</p>
+
+		return log
+
+	buildTriggerEntityPutInPlayLog: (action) ->
+		creator = @buildCardLink action.data
+
+		entities = []
+		for entity in action.entities
+			cardLink = @buildCardLink entity
+			entities.push <SpanDisplayLog newLog={cardLink} />
+
+
+		log = <p key={'log' + ++@logIndex}>
+				<SpanDisplayLog newLog={creator} />
+				<span> summons </span>
+				{entities}
 			</p>
 
 		return log

@@ -175,6 +175,7 @@ class HSReplayParser
 
 				@entityDefinition.attributes = @entityDefinition.attributes or {}
 				@entityDefinition.attributes.ts = node.attributes.ts
+				@entityDefinition.attributes.triggerKeyword = parseInt(node.attributes.triggerKeyword or 0)
 				@entityDefinition.index = @index++
 
 				if node.attributes.cardID
@@ -280,7 +281,7 @@ class HSReplayParser
 					index: @index++
 					cards: []
 				@state.push('choices')
-				
+
 
 			when 'ChosenEntities'.toLowerCase()
 				@chosen =

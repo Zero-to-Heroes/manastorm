@@ -872,6 +872,7 @@ class ReplayPlayer extends EventEmitter
 									@opponent = player
 									# console.log '\tsetting opponent', @opponent
 						# console.log 'set player and opponent', @player, @opponent
+						return
 
 		# Couldn't fix it because we haven't receive any meaningful ShowEntity.
 		# This happened here for instance: http://www.zerotoheroes.com/r/hearthstone/57dc4980ac2a3935c6aa6e1b/tacticts-trainer
