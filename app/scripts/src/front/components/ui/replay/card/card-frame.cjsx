@@ -13,7 +13,7 @@ class CardFrame extends React.Component
 		cls = 'game-card rendered-card visible'
 
 		playerClass = originalCard.playerClass?.toLowerCase()
-		console.log 'building frame for', entity.cardID, originalCard.name, originalCard, entity, playerClass
+		# console.log 'building frame for', entity.cardID, originalCard.name, originalCard, entity, playerClass
 
 		#Ysera
 		if playerClass is 'dream'
