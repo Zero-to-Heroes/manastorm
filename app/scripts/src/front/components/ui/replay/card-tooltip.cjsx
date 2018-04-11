@@ -33,11 +33,11 @@ class CardTooltip extends React.Component
 		if originalCard.type is 'Minion'
 			cls += ' minion'
 			if originalCard.rarity?.toLowerCase() is 'legendary'
-				legendaryFrame = <img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/legendary-minion.png'} className="legendary-frame"/>
+				legendaryFrame = <img src={'http://static.zerotoheroes.com/hearthstone/asset/manastorm/card/legendary-minion.png'} className="legendary-frame"/>
 		else if originalCard.type is 'Spell'
 			cls += ' spell'
 			if originalCard.rarity?.toLowerCase() is 'legendary'
-				legendaryFrame = <img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/legendary-spell.png'} className="legendary-frame"/>
+				legendaryFrame = <img src={'http://static.zerotoheroes.com/hearthstone/asset/manastorm/card/legendary-spell.png'} className="legendary-frame"/>
 		else if originalCard.type is 'Weapon'
 			cls += ' weapon'
 		else if originalCard.type is 'Hero_power'

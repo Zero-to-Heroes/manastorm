@@ -19,15 +19,14 @@ class Card extends React.Component
 		suffix = '.png'
 
 		imageCls = "art "
-		baseFolder = 'fullcards/en/256'
-		
+
 		if entity.tags.PREMIUM is 1 and originalCard?.goldenImage and !@props.conf?.noGolden
 			# console.log 'showing golden card', entity, originalCard
 			premiumClass = 'golden'
 			premiumDir = 'golden/'
 			suffix = '.png'
 
-		art = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/#{baseFolder}/#{premiumDir}#{entity.cardID}" + suffix
+		art = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{premiumDir}#{entity.cardID}" + suffix
 
 
 		# imageCls = "art "
@@ -281,8 +280,8 @@ class Card extends React.Component
 
 				if enchantor
 					enchantImage =
-						backgroundImage: "url(https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{enchantor.cardID}.png)"
-					enchantImageUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{enchantor.cardID}.png"
+						backgroundImage: "url(http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{enchantor.cardID}.png)"
+					enchantImageUrl = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{enchantor.cardID}.png"
 
 				<div className="enchantment" key={'enchantment' + entity.id + enchant.cardID + seqNumber++}>
 					<h3 className="name">{cardUtils?.localizeName(enchantCard)}</h3>

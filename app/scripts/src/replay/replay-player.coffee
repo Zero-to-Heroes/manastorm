@@ -1082,7 +1082,7 @@ class ReplayPlayer extends EventEmitter
 				card = @cardUtils.getCard(entity.cardID)
 
 				if card and card.type != 'Enchantment'
-					imgUrl = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/cardart/256x/#{entity.cardID}.jpg"
+					imgUrl = "http://static.zerotoheroes.com/hearthstone/cardart/256x/#{entity.cardID}.jpg"
 					images.push imgUrl
 
 		# console.log 'image array', images

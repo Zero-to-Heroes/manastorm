@@ -8,7 +8,7 @@ class CardArt extends React.Component
 
 		originalCard = cardUtils?.getCard(entity.cardID)
 
-		cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/cardart/256x/#{entity.cardID}.jpg"
+		cardArt = "http://static.zerotoheroes.com/hearthstone/cardart/256x/#{entity.cardID}.jpg"
 		imageCls = "art "
 
 		return <img src={cardArt} className={imageCls} />

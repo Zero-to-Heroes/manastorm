@@ -36,7 +36,7 @@ class CardOnBoard extends React.Component
 
 		cls = 'game-card rendered-card minion'
 		if originalCard.rarity?.toLowerCase() is 'legendary'
-			legendaryFrame = <img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/legendary-minion.png'} className="legendary-frame"/>
+			legendaryFrame = <img src={'http://static.zerotoheroes.com/hearthstone/asset/manastorm/card/legendary-minion.png'} className="legendary-frame"/>
 
 		if @props.className
 			cls += " " + @props.className

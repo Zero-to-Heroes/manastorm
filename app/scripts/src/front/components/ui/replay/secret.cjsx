@@ -36,8 +36,8 @@ class Secret extends React.Component
 		if entity.tags.QUEST is 1
 			cardRewardId = @getRewardId entity.cardID
 
-			#questArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
-			#rewardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{cardRewardId}.png"
+			#questArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{entity.cardID}.png"
+			#rewardArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{cardRewardId}.png"
 			reward = {
 				cardID: cardRewardId,
 				id: cardRewardId,
@@ -62,7 +62,7 @@ class Secret extends React.Component
 				</div>
 
 		else if @props.showSecret
-			cardArt = "https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/fullcards/en/256/#{entity.cardID}.png"
+			cardArt = "http://static.zerotoheroes.com/hearthstone/fullcard/en/256/#{entity.cardID}.png"
 			link = '<img src="' + cardArt + '">'
 			return 	<div key={'card' + entity.id} className={cls} data-tip data-for={entity.id} data-place="right" data-effect="solid" data-delay-show="10" data-class="card-tooltip rendered-card-tooltip">
 						<ReactTooltip id={@entityRefId} >

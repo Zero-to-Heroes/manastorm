@@ -20,7 +20,7 @@ class CardFrameOnBoard extends React.Component
 		if entity.tags.PREMIUM is 1 and !conf?.noGolden
 			frame = 'golden/' + frame
 
-		frame = 'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/' + frame
+		frame = 'http://static.zerotoheroes.com/hearthstone/asset/manastorm/' + frame
 
 		return <img src={frame} className={frameCls}/>
 

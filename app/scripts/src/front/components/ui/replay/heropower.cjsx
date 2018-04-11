@@ -21,11 +21,11 @@ class HeroPower extends React.Component
 		originalCard = cardUtils.getCard(@props.entity.cardID)
 
 		art = <CardArt cardUtils={cardUtils} entity={entity} />
-		heroPowerVisual = <img src="https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/hero_power.png" className="visual" />
+		heroPowerVisual = <img src="http://static.zerotoheroes.com/hearthstone/asset/manastorm/hero_power.png" className="visual" />
 		cost = <CardCost cardUtils={cardUtils} entity={entity} />
 
 		if @props.entity.tags.EXHAUSTED or @props.controller.tags.HERO_POWER_DISABLED
-			art = <img src="https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/hero_power_exhausted.png" className="exhausted" />
+			art = <img src="http://static.zerotoheroes.com/hearthstone/asset/manastorm/hero_power_exhausted.png" className="exhausted" />
 			heroPowerVisual = null
 			cost = null
 

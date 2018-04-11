@@ -19,6 +19,6 @@ class CardRarity extends React.Component
 		else if originalCard.type is 'Hero'
 			rarity = 'rarity-' + originalCard.rarity.toLowerCase() + '.png'
 
-		return <img src={'https://s3.amazonaws.com/com.zerotoheroes/plugins/hearthstone/manastorm/images/card/' + rarity} className="rarity"/>
+		return <img src={'http://static.zerotoheroes.com/hearthstone/asset/manastorm/card/' + rarity} className="rarity"/>
 
 module.exports = CardRarity
