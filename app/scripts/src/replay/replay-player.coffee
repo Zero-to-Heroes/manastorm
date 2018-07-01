@@ -155,13 +155,16 @@ class ReplayPlayer extends EventEmitter
 		@speed = 0
 		# console.log 'pausing', @previousSpeed, @speed, @interval
 		clearInterval @interval if @interval
+		@interval = null
 		# console.log 'cleared interval', @interval
 
 	changeSpeed: (speed) ->
 		# console.log 'changing speed'
 		@speed = speed
-		clearInterval @interval if @interval
-		@interval = setInterval((=> @goNextAction()), @frequency / @speed)
+		@previousSpeed = speed
+		if @interval
+			clearInterval @interval
+			@interval = setInterval((=> @goNextAction()), @frequency / @speed)
 
 	getCurrentTurnString: ->
 		if @turns[@currentTurn].turn is 'Mulligan'
