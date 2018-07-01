@@ -227,7 +227,7 @@ class Replay extends React.Component
 				</div>
 			</button>
 
-		if @state.replay.speed > 0
+		if @state.replay.interval
 			playButton = <button className="btn btn-default glyphicon glyphicon-pause" onClick={@onClickPause}/>
 
 		if @configurationOptions?.showGameBorder
