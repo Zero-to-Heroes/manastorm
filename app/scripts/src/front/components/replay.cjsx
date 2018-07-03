@@ -15,6 +15,7 @@ SecretRevealed = require './ui/replay/secretRevealed'
 QuestCompleted = require './ui/replay/questCompleted'
 SplashReveal = require './ui/replay/splashReveal'
 Fatigue = require './ui/replay/fatigue'
+Overdraw = require './ui/replay/overdraw'
 Board = require './ui/replay/board'
 Mana = require './ui/replay/mana'
 Health = require './ui/replay/health'
@@ -191,6 +192,7 @@ class Replay extends React.Component
 
 			commonOverlay = <div className="common">
 				<Fatigue entity={replay.getActivePlayer()} isFatigue={replay.isFatigue()} action={replay.getCurrentAction()} />
+				<Overdraw isOverdraw={replay.isOverdraw()} action={replay.getCurrentAction()} replay={replay} />
 				<SecretRevealed entity={replay.revealedSecret} replay={replay} />
 				<QuestCompleted entity={replay.questCompleted} replay={replay} />
 				<SplashReveal entity={replay.splashEntity} replay={replay} />
@@ -236,7 +238,7 @@ class Replay extends React.Component
 
 		blur = ""
 		overlayCls = "overlay"
-		if replay.choosing() or replay.isFatigue()
+		if replay.choosing() or replay.isFatigue() or replay.isOverdraw()
 			blur = "blur"
 			overlayCls += " silent"
 

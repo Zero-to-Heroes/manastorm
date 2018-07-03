@@ -32,4 +32,47 @@
 		    padding-right: 25%;
 		}
 	}
+
+	.overdraw {
+		width: 100%;
+		margin: auto;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+
+		.burnt-cards {
+			display: flex;
+			justify-content: center;
+		}
+
+		.rendered-card {
+			width: 25%;
+		}
+
+		.burnt:after {
+			content: "";
+			position: absolute;
+		    top: 8%;
+		    bottom: 6%;
+		    left: 6%;
+		    right: 10%;
+			background: url(http://static.zerotoheroes.com/hearthstone/asset/manastorm/mulligan_discard.png) top left no-repeat;
+			background-size: contain;
+			// content: "X";
+			// font-size: 15em;
+			// color: red;
+			// line-height: 1.1em;
+			// text-align: center;
+			// opacity: 0.5;
+		}
+
+		.text {
+		    color: black;
+		    text-align: center;
+		    display: block;
+		    font-weight: bold;
+     		font-size: 1.2em;
+		}
+	}
 }

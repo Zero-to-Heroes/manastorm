@@ -694,6 +694,9 @@ class ReplayPlayer extends EventEmitter
 	isFatigue: ->
 		return @turns[@currentTurn].actions[@currentActionInTurn]?.actionType is 'fatigue-damage'
 
+	isOverdraw: ->
+		return @turns[@currentTurn].actions[@currentActionInTurn]?.actionType is 'overdraw'
+
 
 	updateOptions: (action) ->
 		# console.log 'updating options', @historyPosition
