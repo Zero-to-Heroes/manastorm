@@ -85,6 +85,11 @@
 		}
 
 		.option-on {
+			// Needed for FF
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			top: 0;
 			-webkit-filter: drop-shadow(-@glowSize -@glowSize 1px @innerGlow)
 							drop-shadow(@glowSize @glowSize 1px @innerGlow)
 							drop-shadow(-@glowSize @glowSize 1px @innerGlow)
